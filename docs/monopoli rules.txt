@@ -1,0 +1,18 @@
+rules:
+ - pilih bentuk papan:			 - password:
+	> normal				> max 8 karakter
+	> segitiga
+	> tidak normal			 - pilih karakter?:
+ - pilih dadu:					> kotak
+	> 1 dadu				> lingkaran
+	> 2 dadu				> segitiga
+ - uang mulai:					> diamond
+	> 50_000				> tabung
+	> 75_000
+	> 100_000
+ - uang kalah:
+	> -25_000
+	> -50_000
+	> -75_000
+ - max player:
+	> 2 ~ 5 player
