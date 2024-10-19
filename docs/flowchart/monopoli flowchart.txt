@@ -1,0 +1,99 @@
+flow untuk game:
+
+- player buat room
+- masuk game room
+- cek jumlah player
+- apakah jumlah player cukup?
+	> yes
+	 - semua player klik ready
+	 - tombol berubah roll dice & roll turn
+	 - semua player klik roll turn
+	 - giliran player ditentukan angka tertinggi
+	 - game dimulai
+	 - player klik roll dice
+	 - dapet angka dan bergerak 
+	 - berenti, apakah lap > 1?
+		> yes
+		 - petak kota?
+			> yes
+			 - beli kota?
+				> yes
+				 - punya kartu diskon?
+					> yes
+					 - diskon harga kota
+					 - kurangi uang
+					 - tambah icon rumah & label pemilik
+					 - simpan kota ke db (games table)
+					 - giliran selesai
+					> no
+					 - kurangi uang
+					 - tambah icon rumah & label pemilik
+					 - simpan kota ke db (games table)
+					 - giliran selesai
+				> no
+				 - simpan data ke db (games table)
+				 - giliran selesai
+			> no, break
+		 - petak kartu?
+			> yes
+			 - ambil kartu
+			 - apakah dapat kartu spesial?
+				> yes
+				 - simpan kartu ke db (games table)
+				 - giliran selesai
+				> no
+				 - jalankan efek kartu
+				 - simpan data ke db (games table)
+				 - giliran selesai
+			> no, break
+		 - petak penjara?
+			> yes
+			 - apakah punya kartu anti penjara?
+				> yes
+				 - pakai kartu?
+					> yes
+					 - bebas penjara
+					 - simpan data ke db (games table)
+					 - giliran selesai
+					> no
+					 - masuk penjara
+					 - simpan data ke db (games table)
+					 - giliran selesai
+					 - dapat angka 1 / > 6 = bebas
+				> no
+				 - masuk penjara
+				 - simpan data ke db (games table)
+				 - giliran selesai
+				 - dapat angka 1 / > 6 = bebas
+			> no, break
+		 - petak parkir?
+			> yes
+			 - apakah punya kartu nerf parkir?
+				> yes
+				 - kurangi pilihan 50%
+				 - pilih petak & bergerak
+				 - simpan data ke db (games table)
+				 - giliran selesai
+				> no
+				 - pilih petak & bergerak
+				 - simpan data ke db (games table)
+				 - giliran selesai
+			> no, break
+		 - petak terkutuk?
+			> yes
+			 - kurangi uang
+			 - simpan data ke db (games table)
+			 - giliran selesai
+			> no, break
+		 - petak buff/debuff?
+			> yes
+			 - dapat random buff/debuff
+			   (+uang, -uang, kartu debuff, maju 1 langkah)
+			 - simpan data ke db (games table)
+			 - giliran selesai
+		> no
+		 - ambil data posisi, uang, kartu
+		 - simpan data ke db (games table)
+		 - giliran selesai
+	> no
+	 - tunggu player

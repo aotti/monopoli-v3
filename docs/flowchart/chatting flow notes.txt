@@ -1,0 +1,21 @@
+chat property:
+- display_name
+- text
+- time
+- isSent
+
+
+message payload:
+- target (channel)
+- display_name
+- text
+- time
+- isSent (default FALSE)
+  > user akan dapat chat dari diri sendiri
+  > saat chat masuk ke client-side
+  > cocokkan display_name & time 
+  > lalu set isSent menjadi TRUE agar icon (✔)
+
+subscribe based on page:
+- room list page = room_list_channel
+- game room page = game_room_channel

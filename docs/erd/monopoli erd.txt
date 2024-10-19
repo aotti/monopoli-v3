@@ -1,0 +1,18 @@
+ERD untuk monopoli lemao
+
+table:
+- player
+- profile
+- room
+- game
+
+erd:
+- player
+  > setiap player memiliki satu profile
+- room
+  > 1 room berisi banyak player (count)
+  > setiap player hanya boleh membuat 1 room
+- game
+  > 1 game berisi banyak player (player id)
+  > setiap room hanya menjalankan satu game
+  > 1 player hanya bisa main 1 game (sampai game over)
