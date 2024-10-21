@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-darkblue-1 { background-color: #363062 }
+.bg-darkblue-2 { background-color: #435585 }
+.bg-darkblue-3 { background-color: #818FB4 }
+.bg-darkblue-4 { background-color: #F5E8C7 }
+
+.border-8bit-modal {
+    box-shadow:
+        4px 0 #818FB4,
+        -4px 0 #818FB4,
+        0 -4px #818FB4,
+        0 4px #818FB4,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    margin: 8px auto;
+}
+.border-8bit-success {
+    box-shadow:
+        4px 0 #22c55e,
+        -4px 0 #22c55e,
+        0 -4px #22c55e,
+        0 4px #22c55e,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    margin: 8px auto;
+}
+.border-8bit-primary {
+    box-shadow:
+        4px 0 #3b82f6,
+        -4px 0 #3b82f6,
+        0 -4px #3b82f6,
+        0 4px #3b82f6,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    margin: 8px auto;
+}

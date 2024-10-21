@@ -1,0 +1,7 @@
+window bisa di zoom-in/out dgn scale:
+- scale-100, scale-90, scale-80, scale-70
+- window harus fit, tidak boleh ada scroll
+- scroll atas = zoom-in, scroll bawah = zoom-out
+
+design papan:
+- gambar kota pixel
