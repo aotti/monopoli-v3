@@ -1,4 +1,9 @@
+import { useContext } from "react"
+import { translateUI } from "../../helper/helper"
+import { MiscContext } from "../../context/MiscContext"
+
 export default function Login({ showModalState }) {
+    const { language } = useContext(MiscContext)
     const { showModal, setShowModal } = showModalState
 
     return (
@@ -28,7 +33,7 @@ export default function Login({ showModalState }) {
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1" onClick={() => setShowModal(null)}> Close </button>
+                        <button type="button" className="text-red-300 p-1" onClick={() => setShowModal(null)}> {translateUI({lang: language, text: 'Close'})} </button>
                         <button type="submit" className="text-green-300 p-1"> Login </button>
                     </div>
                 </form>

@@ -1,5 +1,12 @@
+"use client"
+
 import { Press_Start_2P } from "next/font/google"
 import MainContent from "./main/MainContent"
+import { useState } from "react"
+import { IMiscContext, ITranslate } from "../helper/types"
+import HeaderContent from "./header/HeaderContent"
+import ScreenPortraitWarning from "./ScreenPortraitWarning"
+import { MiscContext } from "../context/MiscContext"
 
 const retroFont = Press_Start_2P({
     subsets: ['latin'],
@@ -7,21 +14,29 @@ const retroFont = Press_Start_2P({
 })
 
 export default function Home() {
+    const [language, setLanguage] = useState<ITranslate['lang']>('english')
+    // misc context state
+    const miscContextState: IMiscContext = {
+        language: language,
+        setLanguage: setLanguage
+    }
+
     return (
-        <div className={`${retroFont.className}`}>
-            {/* padding .5rem */}
-            <div className="p-2 bg-darkblue-2 text-white text-xs lg:text-sm h-screen w-screen">
-                <header>
-                    {/* height 3rem, padding .25rem */}
-                    <nav className="flex justify-center h-12 p-1 border-b-2">
-                        <span className="font-semibold text-xl"> Monopoli Lemao </span>
-                    </nav>
-                </header>
-    
-                <main>
-                    <MainContent />
-                </main>
+        <MiscContext.Provider value={miscContextState}>
+            <div className={`${retroFont.className} text-white text-xs lg:text-sm`}>
+                {/* padding .5rem */}
+                <div className="p-2 bg-darkblue-2 h-screen w-screen">
+                    <header>
+                        <HeaderContent />
+                    </header>
+        
+                    <main>
+                        <MainContent />
+                    </main>
+                </div>
+                {/* orientation portrait warning */}
+                <ScreenPortraitWarning />
             </div>
-        </div>
+        </MiscContext.Provider>
     )
 }

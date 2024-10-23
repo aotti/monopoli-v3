@@ -7,6 +7,19 @@
 .bg-darkblue-3 { background-color: #818FB4 }
 .bg-darkblue-4 { background-color: #F5E8C7 }
 
+.border-8bit-normal {
+    box-shadow:
+        4px 0 #363062,
+        -4px 0 #363062,
+        0 -4px #363062,
+        0 4px #363062,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    margin: 8px auto;
+}
 .border-8bit-modal {
     box-shadow:
         4px 0 #818FB4,

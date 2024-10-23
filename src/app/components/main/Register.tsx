@@ -1,4 +1,9 @@
+import { useContext } from "react"
+import { translateUI } from "../../helper/helper"
+import { MiscContext } from "../../context/MiscContext"
+
 export default function Register({ showModalState }) {
+    const { language } = useContext(MiscContext)
     const { showModal, setShowModal } = showModalState
 
     return ( 
@@ -6,7 +11,7 @@ export default function Register({ showModalState }) {
             w-[calc(100vw-50%)] lg:w-[calc(100vw-65%)]`}>
             {/* modal head */}
             <div className="border-b-2 mb-4">
-                <span> Create Account </span>
+                <span> {translateUI({lang: language, text: 'Create Account'})} </span>
             </div>
             {/* modal body */}
             <div>
@@ -23,12 +28,12 @@ export default function Register({ showModalState }) {
                     </div>
                     {/* confirm password */}
                     <div className="flex justify-between">
-                        <label htmlFor="confirm_password" className="w-min"> Confirm Password </label>
+                        <label htmlFor="confirm_password" className="w-min"> {translateUI({lang: language, text: 'Confirm Password'})} </label>
                         <input type="password" className="w-2/3 px-1 text-black !text-2xs" id="confirm_password" maxLength={16} required />
                     </div>
                     {/* name */}
                     <div className="flex justify-between">
-                        <label htmlFor="display_name" className="w-min"> Name </label>
+                        <label htmlFor="display_name" className="w-min"> {translateUI({lang: language, text: 'Name'})} </label>
                         <input type="text" className="w-2/3 px-1 text-black" id="display_name" maxLength={16} required />
                     </div>
                     {/* message */}
@@ -38,8 +43,8 @@ export default function Register({ showModalState }) {
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1" onClick={() => setShowModal(null)}> Close </button>
-                        <button type="submit" className="text-green-300 p-1"> Create </button>
+                        <button type="button" className="text-red-300 p-1" onClick={() => setShowModal(null)}> {translateUI({lang: language, text: 'Close'})} </button>
+                        <button type="submit" className="text-green-300 p-1"> {translateUI({lang: language, text: 'Create'})} </button>
                     </div>
                 </form>
             </div>

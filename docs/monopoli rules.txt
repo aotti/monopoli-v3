@@ -10,8 +10,8 @@ rules:
 	> 50_000			 - game mode:
 	> 75_000				> last man standing
 	> 100_000				> round limit
- - uang kalah:
-	> -25_000
+ - uang kalah:				 - rand % kota terkutuk
+	> -25_000				> 5 ~ 10%
 	> -50_000
 	> -75_000
  - max player:
