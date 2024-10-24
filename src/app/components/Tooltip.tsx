@@ -10,6 +10,8 @@ export default function Tooltip({ options }: {options: ITooltip}) {
     // window size
     const [winWidth, winHeight] = [window.innerWidth, window.innerHeight]
     // element pos
+    // winWidth/winHeight are used to check if element close to the wall
+    // right + bottom values would be > 1000 if element is on far right/bottom
     const elementPos = {
         top: +top.toFixed(),
         left: +left.toFixed(),
@@ -21,8 +23,10 @@ export default function Tooltip({ options }: {options: ITooltip}) {
         // return [x, y]
         if(pos == 'top') {
             let minusRem = null
-            // count the text character
+            // count the text character to determine -top size
+            // max length in tooltip is 126 characters
             switch(true) {
+                // 126 length = 160 px = -top-[10rem]
                 case text.length > (14*9): minusRem = 16*10; break
                 case text.length > (14*8): minusRem = 16*9; break
                 case text.length > (14*7): minusRem = 16*8; break
@@ -31,20 +35,27 @@ export default function Tooltip({ options }: {options: ITooltip}) {
                 case text.length > (14*4): minusRem = 16*5; break
                 case text.length > (14*3): minusRem = 16*4; break
                 case text.length > (14*2): minusRem = 16*3; break
+                // 14 length = 32 px = -top-[2rem]
                 default: minusRem = 16*2; break
             }
+            // [0 width, N height]
+            // text length + element height + 32 (addition for arrow)
             return [0, minusRem + elHeight + 32]
         }
+        // tooltip below element only need top-[1rem]
         else if(pos == 'bottom') return [0, 16] 
+        // tooltip on left
+        // w-[160px] + 48 (for arrow) = 208 (this number will be the base for LEFT/RIGHT position)
+        // 40 height only to make the tooltip pos equal to involved element 
         else if(pos == 'left') return [208, 40]
+        // tooltip on right
         else if(pos == 'right') return [elWidth + (208/8), 40]
     }
     const elemSize = elementSize()
-    console.log({elemSize});
-    
-    // set X position
+    // var to store the TOP/BOTTOM or LEFT/RIGHT classes
     let xPosClass = null
     let yPosClass = null
+    // set X position
     switch(true) {
         // left is free space
         case elementPos.left > 100 && pos == 'left': xPosClass = setTooltipPos('left', elemSize[0]); break
@@ -58,7 +69,6 @@ export default function Tooltip({ options }: {options: ITooltip}) {
         // top is free space
         case elementPos.top > 100 && (pos == 'left' || pos == 'right'): yPosClass = setTooltipPos('top', elemSize[1]); break
     }
-    console.log(elementPos, xPosClass, yPosClass);
     
     return (
         <div className={`relative ${yPosClass} ${xPosClass} w-40 max-h-40 bg-darkblue-1 border-8bit-normal ${arrowDirection(arrow)}`}>
@@ -68,38 +78,43 @@ export default function Tooltip({ options }: {options: ITooltip}) {
 }
 
 function setTooltipPos(pos: ITooltip['pos'], size: number) {
+    // element size 
+    // top + bottom = height size + addition for arrow size
+    // left + right = height size + addition for arrow size
     const pixelToRem = +(size / 16).toFixed(1)
     
     switch(true) {
-        // size > 7rem
+        // size > 13rem
         case pixelToRem > 13: 
             console.log(size, pixelToRem, 13);
+            // top + bottom size +2 (addition for arrow)
+            // left + right size +1 (addition for arrow)
             if(pos == 'top') return `-bottom-[15rem]`
             else if(pos == 'bottom') return `-top-[15rem]`
             else if(pos == 'left') return `right-[14rem]`
             else if(pos == 'right') return `left-[14rem]`
-        // size > 6rem
+        // size > 11rem
         case pixelToRem > 11: 
             console.log(size, pixelToRem, 11);
             if(pos == 'top') return `-bottom-[13rem]`
             else if(pos == 'bottom') return `-top-[13rem]`
             else if(pos == 'left') return `right-[12rem]`
             else if(pos == 'right') return `left-[12rem]`
-        // size > 5rem
+        // size > 9rem
         case pixelToRem > 9: 
             console.log(size, pixelToRem, 9);
             if(pos == 'top') return `-bottom-[11rem]`
             else if(pos == 'bottom') return `-top-[11rem]`
             else if(pos == 'left') return `right-[10rem]`
             else if(pos == 'right') return `left-[10rem]`
-        // size > 4rem
+        // size > 7rem
         case pixelToRem > 7: 
             console.log(size, pixelToRem, 8);
             if(pos == 'top') return `-bottom-[9rem]`
             else if(pos == 'bottom') return `-top-[9rem]`
             else if(pos == 'left') return `right-[8rem]`
             else if(pos == 'right') return `left-[8rem]`
-        // size > 3rem
+        // size > 5rem
         case pixelToRem > 5: 
             console.log(size, pixelToRem, 6);
             if(pos == 'top') return `-bottom-[7rem]`
@@ -113,14 +128,14 @@ function setTooltipPos(pos: ITooltip['pos'], size: number) {
             else if(pos == 'bottom') return `-top-[5rem]`
             else if(pos == 'left') return `right-[4rem]`
             else if(pos == 'right') return `left-[4rem]`
-        // size > 3rem
+        // size > 1rem
         case pixelToRem > 1: 
             console.log(size, pixelToRem, 2);
             if(pos == 'top') return `-bottom-[3rem]`
             else if(pos == 'bottom') return `-top-[3rem]`
             else if(pos == 'left') return `right-[2rem]`
             else if(pos == 'right') return `left-[2rem]`
-        // size == 3rem
+        // size == 0rem
         default: 
             console.log(size, pixelToRem, 0);
             if(pos == 'top') return `-bottom-[1rem]`
@@ -140,10 +155,10 @@ function arrowDirection(arrow: string[]) {
     const rightArrow = `before:absolute before:-right-5 before:border-y-8 before:border-y-transparent before:border-l-[.9rem] before:border-l-[#F5E8C7]`
     // border bottom = top arrow
     const bottomArrow = `after:absolute after:-bottom-5 after:border-x-8 after:border-x-transparent after:border-t-[.9rem] after:border-t-[#F5E8C7]`
-    // direction
+    // check direction
     switch(arrow[0]) {
         case 'top': 
-            // position
+            // set position
             if(arrow[1] == 'start') return topArrow + ' before:left-0'
             else if(arrow[1] == 'middle') return topArrow + ' before:left-1/2'
             else if(arrow[1] == 'end') return topArrow + ' before:right-0'
