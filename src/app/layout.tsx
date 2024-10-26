@@ -1,3 +1,4 @@
+import { MiscProvider } from '../context/MiscContext'
 import './globals.css'
 import { Metadata, Viewport } from 'next'
 
@@ -20,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <MiscProvider>
+        <body>{children}</body>
+      </MiscProvider>
     </html>
   )
 }

@@ -1,47 +1,44 @@
-import { useContext, useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
+import { useState } from "react";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import { translateUI } from "../../helper/helper";
-import { MiscContext } from "../../context/MiscContext";
-import { ITooltip } from "../../helper/types";
-import Tooltip from "../Tooltip";
+import { useMisc } from "../../context/MiscContext";
 
-export default function MainContent() {
-    const { language } = useContext(MiscContext)
+export default function HomeContent() {
+    const miscState = useMisc()
     const [showModal, setShowModal] = useState<'register'|'login'>(null)
-    const [onHover, setOnHover] = useState(false)
-    // tooltip pos
-    const tooltipOptions: ITooltip = {
-        key: '#registerButton',
-        text: 'klik untuk daftar dan mulai bermain!',
-        pos: 'bottom',
-        arrow: ['top', 'middle']
-    }
 
     return (
         // h-[calc()] used to fill the empty (height) space 
         // 100vh = landscape using h-screen
         // must count all pixel that affected by margin, padding, height
+        // 100vh - 3.75rem (header height)
         <div className="flex items-center justify-center h-[calc(100vh-3.75rem)]">
             <div className="text-center">
-                <p className="text-xl"> {translateUI({lang: language, text: 'Do you already have an account?'})} </p>
+                <p className="text-xl"> 
+                    {translateUI({lang: miscState.language, text: 'Do you already have an account?'})} 
+                </p>
                 {/* register and login buttons */}
                 <div className="flex justify-center gap-14 mt-2">
                     {/* login button */}
                     <div className="h-12 w-[calc(9rem+2rem)]">
                         <button className="bg-green-500 border-8bit-success px-2 py-1 w-36 active:opacity-75" 
-                        onClick={() => setShowModal('login')}> Login </button>
+                        onClick={() => {
+                            // to give zoom-in animate class
+                            miscState.setAnimation(true); 
+                            // show the modal
+                            setShowModal('login') 
+                        }}> Login </button>
                     </div>
                     {/* register button */}
                     <div id="registerButton" className="h-12 w-[calc(9rem+2rem)]">
                         <button className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75" 
-                        onMouseOver={() => setOnHover(true)} onMouseOut={() => setOnHover(false)}
-                        onClick={() => setShowModal('register')}> Register </button>
-                        {
-                            onHover
-                                ? <Tooltip options={tooltipOptions} />
-                                : null
-                        }
+                        onClick={() => { 
+                            // to give zoom-in animate class
+                            miscState.setAnimation(true); 
+                            // show the modal
+                            setShowModal('register') 
+                        }}> Register </button>
                     </div>
                 </div>
             </div> 

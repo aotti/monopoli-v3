@@ -1,9 +1,9 @@
 "use client"
 
+import HeaderContent from "../../components/HeaderContent";
+import ScreenPortraitWarning from "../../components/ScreenPortraitWarning";
 import { Press_Start_2P } from "next/font/google"
-import HeaderContent from "../components/HeaderContent"
-import HomeContent from "./home/HomeContent"
-import ScreenPortraitWarning from "../components/ScreenPortraitWarning"
+import RoomContent from "./RoomContent";
 
 const retroFont = Press_Start_2P({
     subsets: ['latin'],
@@ -21,7 +21,7 @@ export default function Page() {
                 </header>
     
                 <main>
-                    <HomeContent />
+                    <RoomContent />
                 </main>
             </div>
             {/* orientation portrait warning */}

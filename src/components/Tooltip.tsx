@@ -2,7 +2,7 @@ import { qS } from "../helper/helper"
 import { ITooltip } from "../helper/types"
 
 export default function Tooltip({ options }: {options: ITooltip}) {
-    const { key, text, pos, arrow } = options
+    const { text, key, pos, arrow } = options
     // get element position
     const elementRects = qS(key).getBoundingClientRect()
     const [elWidth, elHeight] = [elementRects.width, elementRects.height]
@@ -71,8 +71,10 @@ export default function Tooltip({ options }: {options: ITooltip}) {
     }
     
     return (
-        <div className={`relative ${yPosClass} ${xPosClass} w-40 max-h-40 bg-darkblue-1 border-8bit-normal ${arrowDirection(arrow)}`}>
-            <p className="text-center text-xs"> {text} </p>
+        <div className={`relative ${yPosClass} ${xPosClass} w-40 max-h-40`}>
+            <div className={`absolute z-20 w-40 max-h-40 bg-darkblue-1 border-8bit-text ${arrowDirection(arrow)}`}>
+                <p className="text-center text-2xs lg:text-xs whitespace-pre-line"> {text} </p>
+            </div>
         </div>
     )
 }
@@ -86,58 +88,50 @@ function setTooltipPos(pos: ITooltip['pos'], size: number) {
     switch(true) {
         // size > 13rem
         case pixelToRem > 13: 
-            console.log(size, pixelToRem, 13);
-            // top + bottom size +2 (addition for arrow)
+            // top + bottom size +1.5 (addition for arrow)
             // left + right size +1 (addition for arrow)
-            if(pos == 'top') return `-bottom-[15rem]`
-            else if(pos == 'bottom') return `-top-[15rem]`
+            if(pos == 'top') return `-bottom-[14.5rem]`
+            else if(pos == 'bottom') return `-top-[14.5rem]`
             else if(pos == 'left') return `right-[14rem]`
             else if(pos == 'right') return `left-[14rem]`
         // size > 11rem
         case pixelToRem > 11: 
-            console.log(size, pixelToRem, 11);
-            if(pos == 'top') return `-bottom-[13rem]`
-            else if(pos == 'bottom') return `-top-[13rem]`
+            if(pos == 'top') return `-bottom-[12.5rem]`
+            else if(pos == 'bottom') return `-top-[12.5rem]`
             else if(pos == 'left') return `right-[12rem]`
             else if(pos == 'right') return `left-[12rem]`
         // size > 9rem
         case pixelToRem > 9: 
-            console.log(size, pixelToRem, 9);
-            if(pos == 'top') return `-bottom-[11rem]`
-            else if(pos == 'bottom') return `-top-[11rem]`
+            if(pos == 'top') return `-bottom-[10.5rem]`
+            else if(pos == 'bottom') return `-top-[10.5rem]`
             else if(pos == 'left') return `right-[10rem]`
             else if(pos == 'right') return `left-[10rem]`
         // size > 7rem
         case pixelToRem > 7: 
-            console.log(size, pixelToRem, 8);
-            if(pos == 'top') return `-bottom-[9rem]`
-            else if(pos == 'bottom') return `-top-[9rem]`
+            if(pos == 'top') return `-bottom-[8.5rem]`
+            else if(pos == 'bottom') return `-top-[8.5rem]`
             else if(pos == 'left') return `right-[8rem]`
             else if(pos == 'right') return `left-[8rem]`
         // size > 5rem
         case pixelToRem > 5: 
-            console.log(size, pixelToRem, 6);
-            if(pos == 'top') return `-bottom-[7rem]`
-            else if(pos == 'bottom') return `-top-[7rem]`
+            if(pos == 'top') return `-bottom-[6.5rem]`
+            else if(pos == 'bottom') return `-top-[6.5rem]`
             else if(pos == 'left') return `right-[6rem]`
             else if(pos == 'right') return `left-[6rem]`
         // size > 3rem
         case pixelToRem > 3: 
-            console.log(size, pixelToRem, 4);
-            if(pos == 'top') return `-bottom-[5rem]`
-            else if(pos == 'bottom') return `-top-[5rem]`
+            if(pos == 'top') return `-bottom-[4.5rem]`
+            else if(pos == 'bottom') return `-top-[4.5rem]`
             else if(pos == 'left') return `right-[4rem]`
             else if(pos == 'right') return `left-[4rem]`
         // size > 1rem
         case pixelToRem > 1: 
-            console.log(size, pixelToRem, 2);
-            if(pos == 'top') return `-bottom-[3rem]`
-            else if(pos == 'bottom') return `-top-[3rem]`
+            if(pos == 'top') return `-bottom-[2.5rem]`
+            else if(pos == 'bottom') return `-top-[2.5rem]`
             else if(pos == 'left') return `right-[2rem]`
             else if(pos == 'right') return `left-[2rem]`
         // size == 0rem
         default: 
-            console.log(size, pixelToRem, 0);
             if(pos == 'top') return `-bottom-[1rem]`
             else if(pos == 'bottom') return `top-[1rem]`
             else if(pos == 'left') return `right-[0rem]`

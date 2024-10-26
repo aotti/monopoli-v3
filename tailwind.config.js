@@ -7,17 +7,39 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
-    extend: {},
-    fontSize: {
-      '2xs': '0.5rem',
-      xs: '0.75rem',
-      sm: '0.875rem',
-      base: '1rem',
-      lg: '1.125rem',
-      xl: '1.25rem',
-      '2xl': '1.5rem',
-      '3xl': '1.875rem',
-    }
+    extend: {
+      fontSize: {
+        '2xs': '0.5rem',
+      },
+      animation: {
+        'zoom-in': 'zoom-in .3s linear 1',
+        'zoom-out': 'zoom-out .3s linear 1',
+      },
+      keyframes: {
+        'zoom-in': {
+          '0%': { opacity: '0', transform: 'scale(.8)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'zoom-out': {
+          '0%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { opacity: '0', transform: 'scale(.8)' },
+        },
+      },
+      backgroundColor: {
+        'darkblue-1': '#363062',
+        'darkblue-2': '#435585',
+        'darkblue-3': '#818FB4',
+        'darkblue-4': '#F5E8C7',
+        'primary': '#3b82f6',
+        'success': '#22c55e',
+      },
+      borderWidth: {
+        '8bit-text': {},
+        '8bit-modal': {},
+        '8bit-success': {},
+        '8bit-primary': {}
+      }
+    },
   },
   plugins: [],
 }

@@ -2,12 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-.bg-darkblue-1 { background-color: #363062 }
-.bg-darkblue-2 { background-color: #435585 }
-.bg-darkblue-3 { background-color: #818FB4 }
-.bg-darkblue-4 { background-color: #F5E8C7 }
+input {
+    @apply text-black
+}
 
-.border-8bit-normal {
+.border-8bit-text {
     box-shadow:
         4px 0 #363062,
         -4px 0 #363062,
