@@ -1,12 +1,11 @@
 import { translateUI } from "../../../helper/helper"
 import { useMisc } from "../../../context/MiscContext"
 
-export default function Register({ showModalState }) {
+export default function Register() {
     const miscState = useMisc()
-    const { showModal, setShowModal } = showModalState
 
     return ( 
-        <div id="register_modal" className={`${showModal == 'register' ? 'block' : 'hidden'} bg-darkblue-3 border-8bit-modal p-2
+        <div id="register_modal" className={`${miscState.showModal == 'register' ? 'block' : 'hidden'} bg-darkblue-3 border-8bit-modal p-2
             ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-[calc(100vw-50%)] lg:w-[calc(100vw-65%)]`}>
             {/* modal head */}
             <div className="border-b-2 mb-4">
@@ -33,7 +32,7 @@ export default function Register({ showModalState }) {
                     {/* name */}
                     <div className="flex justify-between">
                         <label htmlFor="display_name" className="w-min"> {translateUI({lang: miscState.language, text: 'Name'})} </label>
-                        <input type="text" className="w-2/3 px-1" id="display_name" maxLength={16} required />
+                        <input type="text" className="w-2/3 px-1" id="display_name" maxLength={12} required />
                     </div>
                     {/* message */}
                     <div className="flex justify-between">
@@ -46,7 +45,7 @@ export default function Register({ showModalState }) {
                             // set false to give zoom-out animate class
                             miscState.setAnimation(false); 
                             // timeout to wait the animation zoom-out
-                            setTimeout(() => setShowModal(null), 200) 
+                            setTimeout(() => miscState.setShowModal(null), 200) 
                         }}> 
                             {translateUI({lang: miscState.language, text: 'Close'})} 
                         </button>

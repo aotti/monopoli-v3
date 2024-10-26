@@ -7,8 +7,10 @@ const MiscContext = createContext<IMiscContext>(null)
 
 export const MiscProvider = ({ children }: {children: React.ReactNode}) => {
     const [language, setLanguage] = useState<ITranslate['lang']>('english')
+    const [showModal, setShowModal] = useState<string>(null)
     const [hoverTooltip, setHoverTooltip] = useState<string>(null)
     const [animation, setAnimation] = useState<boolean>(true)
+    const [isChatFocus, setIsChatFocus] = useState<boolean>(false)
 
     useEffect(() => {
         // get language setting
@@ -19,10 +21,14 @@ export const MiscProvider = ({ children }: {children: React.ReactNode}) => {
     const states: IMiscContext = {
         language: language,
         setLanguage: setLanguage,
+        showModal: showModal,
+        setShowModal: setShowModal,
         hoverTooltip: hoverTooltip,
         setHoverTooltip: setHoverTooltip,
         animation: animation,
         setAnimation: setAnimation,
+        isChatFocus: isChatFocus,
+        setIsChatFocus: setIsChatFocus,
     }
 
     return (

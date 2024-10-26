@@ -14,7 +14,7 @@ export default function RoomCard({ roomRules }: {roomRules: ITooltip}) {
                         <span> Name </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="room_name" className="bg-transparent invert w-3/5 border-b border-b-black" value={'lele'} readOnly />
+                    <input type="text" id="room_name" className="bg-transparent invert w-3/5 border-b border-b-black" value={'lele gaming'} readOnly />
                 </div>
                 {/* player count */}
                 <div className="flex justify-between p-2">
@@ -39,9 +39,12 @@ export default function RoomCard({ roomRules }: {roomRules: ITooltip}) {
                         <span> : </span>
                     </label>
                     <div className="w-3/5 border-b">
-                        <input type="text" id={roomRules.key.substring(1)} value={'dialog popup'} readOnly 
-                        className="bg-transparent invert" 
-                        onMouseOver={() => miscState.setHoverTooltip(`${roomRules.key.substring(1)}`)} onMouseOut={() => miscState.setHoverTooltip(null)} />
+                        {/* hover rules */}
+                        <p id={roomRules.key.substring(1)} className="w-full text-center bg-transparent" 
+                        onMouseOver={() => miscState.setHoverTooltip(`${roomRules.key.substring(1)}`)} 
+                        onMouseOut={() => miscState.setHoverTooltip(null)} > ??? </p>
+                        {/* input */}
+                        <input type="hidden" value={roomRules.text} readOnly />
                         {
                             miscState.hoverTooltip == roomRules.key.substring(1)
                                 ? <Tooltip options={roomRules}/>

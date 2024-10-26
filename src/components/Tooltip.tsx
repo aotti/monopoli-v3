@@ -73,7 +73,7 @@ export default function Tooltip({ options }: {options: ITooltip}) {
     return (
         <div className={`relative ${yPosClass} ${xPosClass} w-40 max-h-40`}>
             <div className={`absolute z-20 w-40 max-h-40 bg-darkblue-1 border-8bit-text ${arrowDirection(arrow)}`}>
-                <p className="text-center text-2xs lg:text-xs whitespace-pre-line"> {text} </p>
+                <p className="text-center text-2xs lg:text-xs whitespace-pre-line"> {text.replaceAll(';', '\n')} </p>
             </div>
         </div>
     )

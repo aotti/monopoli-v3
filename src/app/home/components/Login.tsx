@@ -2,12 +2,11 @@ import Link from "next/link"
 import { useMisc } from "../../../context/MiscContext"
 import { qS, translateUI } from "../../../helper/helper"
 
-export default function Login({ showModalState }) {
+export default function Login() {
     const miscState = useMisc()
-    const { showModal, setShowModal } = showModalState
 
     return (
-        <div id="login_modal" className={`${showModal == 'login' ? 'block' : 'hidden'} bg-darkblue-3 border-8bit-modal p-2 
+        <div id="login_modal" className={`${miscState.showModal == 'login' ? 'block' : 'hidden'} bg-darkblue-3 border-8bit-modal p-2 
             ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-[calc(100vw-50%)] lg:w-[calc(100vw-65%)]`}>
             {/* modal head */}
             <div className="border-b-2 mb-4">
@@ -23,12 +22,12 @@ export default function Login({ showModalState }) {
                     {/* username */}
                     <div className="flex justify-between">
                         <label htmlFor="username" className="w-min"> Username </label>
-                        <input type="text" className="w-2/3 px-1 text-black" id="username" maxLength={10} required />
+                        <input type="text" className="w-2/3 px-1" id="username" maxLength={10} required />
                     </div>
                     {/* password */}
                     <div className="flex justify-between">
                         <label htmlFor="password" className="w-min"> Password </label>
-                        <input type="password" className="w-2/3 px-1 text-black !text-2xs" id="password" maxLength={16} required />
+                        <input type="password" className="w-2/3 px-1 !text-2xs" id="password" maxLength={16} required />
                     </div>
                     {/* message */}
                     <div className="flex justify-between">
@@ -41,7 +40,7 @@ export default function Login({ showModalState }) {
                             // set false to give zoom-out animate class
                             miscState.setAnimation(false); 
                             // timeout to wait the animation zoom-out
-                            setTimeout(() => setShowModal(null), 200) 
+                            setTimeout(() => miscState.setShowModal(null), 200) 
                         }}> 
                             {translateUI({lang: miscState.language, text: 'Close'})} 
                         </button>

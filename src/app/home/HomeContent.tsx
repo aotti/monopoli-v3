@@ -6,7 +6,6 @@ import { useMisc } from "../../context/MiscContext";
 
 export default function HomeContent() {
     const miscState = useMisc()
-    const [showModal, setShowModal] = useState<'register'|'login'>(null)
 
     return (
         // h-[calc()] used to fill the empty (height) space 
@@ -22,34 +21,34 @@ export default function HomeContent() {
                 <div className="flex justify-center gap-14 mt-2">
                     {/* login button */}
                     <div className="h-12 w-[calc(9rem+2rem)]">
-                        <button className="bg-green-500 border-8bit-success px-2 py-1 w-36 active:opacity-75" 
+                        <button type="button" className="bg-green-500 border-8bit-success px-2 py-1 w-36 active:opacity-75" 
                         onClick={() => {
                             // to give zoom-in animate class
                             miscState.setAnimation(true); 
                             // show the modal
-                            setShowModal('login') 
+                            miscState.setShowModal('login') 
                         }}> Login </button>
                     </div>
                     {/* register button */}
-                    <div id="registerButton" className="h-12 w-[calc(9rem+2rem)]">
-                        <button className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75" 
+                    <div className="h-12 w-[calc(9rem+2rem)]">
+                        <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75" 
                         onClick={() => { 
                             // to give zoom-in animate class
                             miscState.setAnimation(true); 
                             // show the modal
-                            setShowModal('register') 
+                            miscState.setShowModal('register') 
                         }}> Register </button>
                     </div>
                 </div>
             </div> 
             {/* register and login modal */}
             <div className={`absolute bg-black/30
-                ${showModal === null ? 'hidden' : 'flex'} items-center justify-center
+                ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center
                 h-[calc(100vh-4.5rem)] w-[calc(100vw-2rem)]`}>
                 {/* register modal */}
-                <Register showModalState={{showModal: showModal, setShowModal: setShowModal}} />
+                <Register />
                 {/* login modal */}
-                <Login showModalState={{showModal: showModal, setShowModal: setShowModal}} />
+                <Login />
             </div>
         </div>
     )

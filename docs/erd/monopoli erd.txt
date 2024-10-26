@@ -16,3 +16,11 @@ erd:
   > 1 game berisi banyak player (player id)
   > setiap room hanya menjalankan satu game
   > 1 player hanya bisa main 1 game (sampai game over)
+
+length
+- user
+  > username = max 10
+- player
+  > display_name = max 12
+- room
+  > name = max 12

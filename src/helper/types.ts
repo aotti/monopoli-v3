@@ -21,8 +21,12 @@ export interface ITooltip {
 export interface IMiscContext {
     language: ITranslate['lang'];
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>;
+    showModal: string;
+    setShowModal: Dispatch<SetStateAction<string>>;
     hoverTooltip: string;
     setHoverTooltip: Dispatch<SetStateAction<string>>;
     animation: boolean;
     setAnimation: Dispatch<SetStateAction<boolean>>;
+    isChatFocus: boolean;
+    setIsChatFocus: Dispatch<SetStateAction<boolean>>;
 }
