@@ -75,7 +75,7 @@ export default function CreateRoom() {
                     {/* set password */}
                     <div className="flex justify-between">
                         <label htmlFor="password" className=""> Password </label>
-                        <input type="text" className="w-32 lg:w-44 px-1" id="password" maxLength={8} placeholder="optional" required />
+                        <input type="text" className="w-32 lg:w-44 px-1" id="password" maxLength={8} placeholder="optional" />
                     </div>
                     {/* message */}
                     <div className="flex justify-between">
