@@ -16,6 +16,8 @@ export default function Login() {
             <div>
                 <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => {
                     ev.preventDefault()
+                    // hide the modal
+                    miscState.setShowModal(null)
                     const link = qS('#goToRoom') as HTMLAnchorElement
                     link.click()
                 }}>

@@ -1,4 +1,9 @@
+import { useMisc } from "../../../context/MiscContext";
+import { translateUI } from "../../../helper/helper";
+
 export default function PlayerStats() {
+    const miscState = useMisc()
+
     return (
         <>
             <span> {`${'dengkul'}'s stats`} </span>
@@ -10,11 +15,11 @@ export default function PlayerStats() {
                 {/* stats */}
                 <div className="lg:flex lg:flex-col lg:gap-4">
                     <div>
-                        <p> game played: </p>
+                        <p> {translateUI({lang: miscState.language, text: 'game played'})}: </p>
                         <p className="text-green-400"> {5} games </p>
                     </div>
                     <div>
-                        <p> worst lost: </p>
+                        <p> {translateUI({lang: miscState.language, text: 'worst lost'})}: </p>
                         <p className="text-red-400"> {`Rp -985.000`} </p>
                     </div>
                     <div>

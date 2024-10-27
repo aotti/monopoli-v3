@@ -11,32 +11,32 @@ export default function CreateRoom() {
             ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-[calc(100vw-60vw)]`}>
             {/* modal head */}
             <div className="border-b-2 mb-4">
-                <span> Create Room </span>
+                <span> {translateUI({lang: miscState.language, text: 'Create Room'})} </span>
             </div>
             {/* modal body */}
             <div>
                 <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => ev.preventDefault()}>
                     {/* select board */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_board" className=""> Board </label>
+                        <label htmlFor="select_board" className=""> {translateUI({lang: miscState.language, text: 'Board'})} </label>
                         <select id="select_board" className="w-32 lg:w-44">
                             <option value="normal"> Normal </option>
-                            <option value="2_way"> 2 Way </option>
+                            <option value="2_way"> {translateUI({lang: miscState.language, text: '2 Way'})} </option>
                             <option value="delta"> Delta </option>
                         </select>
                     </div>
                     {/* dice */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_dice" className=""> Dice </label>
+                        <label htmlFor="select_dice" className=""> {translateUI({lang: miscState.language, text: 'Dice'})} </label>
                         <select id="select_dice" className="w-32 lg:w-44">
-                            <option value="1"> 1 dice </option>
-                            <option value="2"> 2 dice </option>
+                            <option value="1"> 1 </option>
+                            <option value="2"> 2 </option>
                         </select>
                     </div>
                     {/* money start */}
                     <div className="flex justify-between">
                         <label htmlFor="select_money_start" className="text-left">
-                            <span> Money Start </span>
+                            <span> {translateUI({lang: miscState.language, text: 'Money Start'})} </span>
                             <span id="selected_money_start"></span>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_start" 
@@ -46,7 +46,7 @@ export default function CreateRoom() {
                     {/* money lose */}
                     <div className="flex justify-between">
                         <label htmlFor="select_money_lose" className="text-left">
-                            <span> Money Lose </span>
+                            <span> {translateUI({lang: miscState.language, text: 'Money Lose'})} </span>
                             <span id="selected_money_lose"></span>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_lose" 
@@ -55,7 +55,7 @@ export default function CreateRoom() {
                     </div>
                     {/* max player */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_max_player" className=""> Max Player </label>
+                        <label htmlFor="select_max_player" className=""> {translateUI({lang: miscState.language, text: 'Max Player'})} </label>
                         <select id="select_max_player" className="w-32 lg:w-44">
                             <option value="1"> 1 </option>
                             <option value="2"> 2 </option>

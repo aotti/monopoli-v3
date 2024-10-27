@@ -1,4 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
+import { translateUI } from "../../helper/helper";
 import { ITooltip } from "../../helper/types";
 import ChatBox from "./components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
@@ -35,7 +36,9 @@ export default function RoomContent() {
             <div className="flex flex-col w-[calc(100vw-75vw)]">
                 <div className="h-[calc(100vh-52vh)] lg:h-[calc(100vh-50vh)] p-1 border-b-2">
                     <span className="border-b-2">
-                        { miscState.isChatFocus ? 'chat box' : 'player list' }
+                        { miscState.isChatFocus 
+                            ? translateUI({lang: miscState.language, text: 'chat box'}) 
+                            : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
                     <div className="w-full h-[calc(100%-1rem)]">
                         {
@@ -48,7 +51,8 @@ export default function RoomContent() {
                         {/* chat input */}
                         <form className="mt-2" onSubmit={ev => ev.preventDefault()}>
                             <div className="flex items-center gap-2">
-                                <input type="text" className="w-4/5 lg:h-10 lg:p-1" placeholder="chat here" required 
+                                <input type="text" className="w-4/5 lg:h-10 lg:p-1" 
+                                placeholder={translateUI({lang: miscState.language, text: 'chat here'})} required 
                                 onFocus={() => miscState.setIsChatFocus(true)} onBlur={() => miscState.setIsChatFocus(false)} />
                                 <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                                     <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
@@ -67,7 +71,7 @@ export default function RoomContent() {
                 <div className="flex gap-4 w-full h-fit text-center p-2">
                     {/* title */}
                     <div className="flex items-center justify-end mr-10 w-3/5">
-                        <p> Room List </p>
+                        <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
                     </div>
                     {/* create room button */}
                     <div className="text-right w-2/5">
@@ -78,7 +82,7 @@ export default function RoomContent() {
                             // show the modal
                             miscState.setShowModal('create room') 
                         }}> 
-                            Create Room 
+                            {translateUI({lang: miscState.language, text: 'Create Room'})}
                         </button>
                     </div>
                     {/* create room modal */}
