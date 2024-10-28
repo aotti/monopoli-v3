@@ -1,8 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import translateUI_data from '../config/translate-ui.json'
 
-const tui = Object.keys(translateUI_data['indonesia'])
-
 // translate language
 export interface ITranslate {
     lang: 'english' | 'indonesia';

@@ -1,4 +1,4 @@
 26 oktober 2024
-- value useState tidak reset jika berpindah halaman dgn <Link>
+- (fix) value useState tidak reset jika berpindah halaman dgn <Link>
   value showModal setelah login tersimpan, lalu saat masuk /room 
   background hitam tetap ada

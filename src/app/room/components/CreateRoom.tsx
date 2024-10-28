@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import { useMisc } from "../../../context/MiscContext";
 import { qS, translateUI } from "../../../helper/helper";
+import Link from "next/link";
 
 export default function CreateRoom() {
     const miscState = useMisc()
@@ -15,7 +16,13 @@ export default function CreateRoom() {
             </div>
             {/* modal body */}
             <div>
-                <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => ev.preventDefault()}>
+                <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => {
+                    ev.preventDefault()
+                    // hide the modal
+                    miscState.setShowModal(null)
+                    const link = qS('#gotoGame') as HTMLAnchorElement
+                    link.click()
+                }}>
                     {/* select board */}
                     <div className="flex justify-between">
                         <label htmlFor="select_board" className=""> {translateUI({lang: miscState.language, text: 'Board'})} </label>
@@ -95,6 +102,7 @@ export default function CreateRoom() {
                         <button type="submit" className="text-green-300 p-1"> 
                             {translateUI({lang: miscState.language, text: 'Create'})} 
                         </button>
+                        <Link id="gotoGame" href={'/game'} hidden={true}></Link>
                     </div>
                 </form>
             </div>

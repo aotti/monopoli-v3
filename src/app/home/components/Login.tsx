@@ -18,7 +18,7 @@ export default function Login() {
                     ev.preventDefault()
                     // hide the modal
                     miscState.setShowModal(null)
-                    const link = qS('#goToRoom') as HTMLAnchorElement
+                    const link = qS('#gotRoom') as HTMLAnchorElement
                     link.click()
                 }}>
                     {/* username */}
@@ -49,7 +49,7 @@ export default function Login() {
                         <button type="submit" className="text-green-300 p-1"> 
                             Login 
                         </button>
-                        <Link id="goToRoom" href={'/room'} hidden={true}></Link>
+                        <Link id="gotRoom" href={'/room'} hidden={true}></Link>
                     </div>
                 </form>
             </div>
