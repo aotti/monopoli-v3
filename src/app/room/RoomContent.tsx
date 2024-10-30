@@ -33,7 +33,7 @@ export default function RoomContent() {
     return (
         <div className="flex gap-2">
             {/* player list && stats */}
-            <div className="flex flex-col w-[calc(100vw-75vw)]">
+            <div className="flex flex-col w-[calc(100vw-70vw)]">
                 <div className="h-[calc(100vh-52vh)] lg:h-[calc(100vh-50vh)] p-1 border-b-2">
                     <span className="border-b-2">
                         { miscState.isChatFocus 
@@ -61,12 +61,13 @@ export default function RoomContent() {
                         </form>
                     </div>
                 </div>
+                {/* player stats */}
                 <div className="h-[calc(100vh-65vh)] lg:h-[calc(100vh-60vh)] p-1">
                     <PlayerStats />
                 </div>
             </div>
             {/* room list */}
-            <div className="flex flex-col w-[calc(100vw-25vw)]">
+            <div className="flex flex-col w-[calc(100vw-30vw)]">
                 {/* 1rem gap, 3.5rem title, 0.5rem margin bot */}
                 <div className="flex gap-4 w-full h-fit text-center p-2">
                     {/* title */}

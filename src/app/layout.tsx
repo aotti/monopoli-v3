@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  initialScale: 1.0,
+  initialScale: 1,
   width: 'device-width'
 }
 

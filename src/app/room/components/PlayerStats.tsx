@@ -9,13 +9,13 @@ export default function PlayerStats() {
             <span> {`${'dengkul'}'s stats`} </span>
             <div className="flex gap-2 text-2xs lg:text-xs mt-1">
                 {/* profile picture */}
-                <div className="border-2 w-[4.5rem] h-[4.5rem] lg:w-32 lg:h-32">
+                <div className="border-2 w-[4rem] h-[4rem] lg:w-32 lg:h-32">
                     <img src="" alt="pfp" />
                 </div>
                 {/* stats */}
                 <div className="lg:flex lg:flex-col lg:gap-4">
                     <div>
-                        <p> {translateUI({lang: miscState.language, text: 'game played'})}: </p>
+                        <p> {translateUI({lang: miscState.language, text: 'game count'})}: </p>
                         <p className="text-green-400"> {5} games </p>
                     </div>
                     <div>
