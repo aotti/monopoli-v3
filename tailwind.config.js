@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       fontSize: {
-        '2xs': '0.5rem',
+        '2xs': ['0.5rem', '.75rem'],
       },
       animation: {
         'zoom-in': 'zoom-in .3s linear 1',

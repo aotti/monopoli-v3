@@ -42,8 +42,10 @@ export default function RoomCard({ roomRules }: {roomRules: ITooltip}) {
                     <div className="w-3/5 border-b">
                         {/* hover rules */}
                         <p id={roomRules.key.substring(1)} className="w-full text-center bg-transparent" 
+                        onTouchStart={() => miscState.setHoverTooltip(`${roomRules.key.substring(1)}`)}
+                        onTouchEnd={() => miscState.setHoverTooltip(null)}
                         onMouseOver={() => miscState.setHoverTooltip(`${roomRules.key.substring(1)}`)} 
-                        onMouseOut={() => miscState.setHoverTooltip(null)} > ??? </p>
+                        onMouseOut={() => miscState.setHoverTooltip(null)}> ??? </p>
                         {/* input */}
                         <input type="hidden" value={roomRules.text} readOnly />
                         {

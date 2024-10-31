@@ -1,161 +1,50 @@
+import Tooltip from "../../components/Tooltip"
+import { useMisc } from "../../context/MiscContext"
+import { ITooltip } from "../../helper/types"
+import BoardDelta from "./components/BoardDelta"
+import BoardNormal from "./components/BoardNormal"
+import BoardTwoWay from "./components/BoardTwoWay"
+import GameInfo from "./components/GameInfo"
+
 export default function GameContent() {
-    const xsWidthHeight = `w-[55px] h-[55px]`
-    const smWidthHeight = `sm:w-[60px] sm:h-[60px] `
-    const lgWidthHeight = `lg:w-[100px] lg:h-[100px]`
+    const miscState = useMisc()
+    const backTooltip: ITooltip = {
+        text: 'back to room list (not leaving)',
+        key: '#backTooltip',
+        pos: 'right',
+        arrow: ['left', 'start']
+    }
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
-            <div className="flex self-start mt-6 mx-2 border-2">
-                <button type="button" className="w-10 h-6 lg:w-14 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs">
-                    Back 
+            <div id="backTooltip" className="flex flex-col gap-10 self-start mt-6 mx-2 w-20 lg:w-24">
+                <button type="button" className="w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs"
+                onTouchStart={() => miscState.setHoverTooltip(`${backTooltip.key.substring(1)}`)}
+                onTouchEnd={() => miscState.setHoverTooltip(null)}
+                onMouseOver={() => miscState.setHoverTooltip(`${backTooltip.key.substring(1)}`)} 
+                onMouseOut={() => miscState.setHoverTooltip(null)}>
+                    <span> Back to room </span>
+                    {
+                        miscState.hoverTooltip == backTooltip.key.substring(1)
+                            ? <Tooltip options={backTooltip}/>
+                            : null
+                    }
                 </button>
+                {/* game info */}
+                <GameInfo />
             </div>
             {/* normal board | 28 square */}
-            <section className="col-span-10 grid grid-rows-6 gap-8 justify-center 
-                h-[calc(100vh-3.75rem)] scale-90 -mt-2 border-2 border-red-300">
-                {/* row 1 */}
-                <div className="flex row-span-1">
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                </div>
-                {/* row 2 */}
-                <div className="flex">
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                </div>
-                {/* row 3 */}
-                <div className="flex">
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                </div>
-                {/* row 4 */}
-                <div className="flex">
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                </div>
-                {/* row 5 */}
-                <div className="flex">
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]"></div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                </div>
-                {/* row 6 */}
-                <div className="flex row-span-1">
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                    <div className="border w-[7.5vw] h-[15.5vh]">
-                        <img src="" alt="" className="bg-success w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    </div>
-                </div>
-            </section>
+            {/* <BoardNormal /> */}
+            <BoardDelta />
+            {/* <BoardTwoWay /> */}
             {/* 
                 utilities
                 writing-mode: vertical-lr (vertical text) 
             */}
-            <div className="absolute right-[calc(0rem+1rem)]
+            <div className="absolute top-[20vh] right-[calc(0rem+1rem)]
             flex items-center [writing-mode:vertical-lr] 
             text-center text-2xs lg:text-sm 
-            h-60 lg:h-96 w-7 lg:w-8
+            h-60 lg:h-96 w-6 lg:w-8
             bg-darkblue-1 border-8bit-text">
                 {/* help */}
                 <div className="h-20 lg:h-32 p-1">

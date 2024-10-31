@@ -5,7 +5,7 @@ import { useMisc } from "../context/MiscContext"
 export default function HeaderContent() {
     const miscState = useMisc()
     // tooltip pos
-    const tooltipOptions: ITooltip = {
+    const translateTooltip: ITooltip = {
         key: '#translate',
         text: miscState.language == 'english' ? '🇮🇩 indonesia' : '🇬🇧  inggris',
         pos: 'left',
@@ -20,18 +20,21 @@ export default function HeaderContent() {
             {/* translate button */}
             <div className="absolute top-2 w-8 lg:w-10 right-4">
                 <button type="button" id="translate" 
-                    onMouseOver={() => miscState.setHoverTooltip('translate')} onMouseOut={() => miscState.setHoverTooltip(null)}
-                    onClick={() => miscState.setLanguage(lang => {
-                        const chosenLang = lang == 'english' ? 'indonesia' : 'english'
-                        // save the language in localstorage
-                        localStorage.setItem('language', chosenLang)
-                        return chosenLang
-                    }) }>
+                onTouchStart={() => miscState.setHoverTooltip(`${translateTooltip.key.substring(1)}`)}
+                onTouchEnd={() => miscState.setHoverTooltip(null)}
+                onMouseOver={() => miscState.setHoverTooltip(`${translateTooltip.key.substring(1)}`)} 
+                onMouseOut={() => miscState.setHoverTooltip(null)}
+                onClick={() => miscState.setLanguage(lang => {
+                    const chosenLang = lang == 'english' ? 'indonesia' : 'english'
+                    // save the language in localstorage
+                    localStorage.setItem('language', chosenLang)
+                    return chosenLang
+                })}>
                     <img src="https://img.icons8.com/?id=12455&format=png&color=FFFFFF" alt="lang" />
                 </button>
                 {
                     miscState.hoverTooltip == 'translate'
-                        ? <Tooltip options={tooltipOptions} />
+                        ? <Tooltip options={translateTooltip} />
                         : null
                 }
             </div>
