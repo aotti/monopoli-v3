@@ -31,3 +31,8 @@ export interface IMiscContext {
     isChatFocus: boolean;
     setIsChatFocus: Dispatch<SetStateAction<boolean>>;
 }
+
+export interface IGameContext {
+    gameSideButton: 'help' | 'players' | 'chat';
+    setGameSideButton: Dispatch<SetStateAction<IGameContext['gameSideButton']>>;
+}

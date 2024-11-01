@@ -6,6 +6,37 @@ input, select {
     @apply text-black
 }
 
+@media screen and (min-width: 1024px) {
+    ol > details > li {
+        @apply pl-10 py-1 ml-4
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    ol > details > li {
+        @apply pl-10 py-1 ml-1
+    }
+}
+
+body {
+    counter-reset: li-counter;
+}
+
+ol > details > li::before {
+    counter-increment: li-counter;
+    content: counter(li-counter) '.';
+    position: absolute;
+    margin-left: -2rem;
+}
+
+ol > details > li:hover {
+    @apply bg-darkblue-2
+}
+
+ul > li {
+    @apply py-1
+}
+
 .border-8bit-text {
     box-shadow:
         4px 0 #363062,

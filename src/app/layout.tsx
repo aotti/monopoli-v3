@@ -1,3 +1,4 @@
+import { GameProvider } from '../context/GameContext'
 import { MiscProvider } from '../context/MiscContext'
 import './globals.css'
 import { Metadata, Viewport } from 'next'
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <MiscProvider>
-        <body>{children}</body>
+        <GameProvider>
+          <body>{children}</body>
+        </GameProvider>
       </MiscProvider>
     </html>
   )
