@@ -33,6 +33,14 @@ export interface IMiscContext {
 }
 
 export interface IGameContext {
+    // board
+    showTileImage: 'city'|'other';
+    setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>;
+    // side buttons
     gameSideButton: 'help' | 'players' | 'chat';
     setGameSideButton: Dispatch<SetStateAction<IGameContext['gameSideButton']>>;
+    openPlayerSetting: boolean;
+    setOpenPlayerSetting: Dispatch<SetStateAction<boolean>>;
+    displaySettingItem: 'sell_city'|'game_history'|'attack_city';
+    setDisplaySettingItem: Dispatch<SetStateAction<IGameContext['displaySettingItem']>>;
 }

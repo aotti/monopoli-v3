@@ -88,8 +88,8 @@ export default function RoomContent() {
                     </div>
                     {/* create room modal */}
                     <div className={`absolute z-20 bg-black/50
-                    ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center
-                    h-[calc(100vh-4.25rem)] w-[calc(100vw-30vw+1rem)] lg:w-[calc(100vw-30vw+2.5rem)]`}>
+                    ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
+                    h-[calc(100vh-4.25rem)] w-[calc(65vw+1rem)] lg:w-[calc(65vw+2.5rem)]`}>
                         <CreateRoom />
                     </div>
                 </div>

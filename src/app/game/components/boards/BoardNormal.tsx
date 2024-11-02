@@ -1,3 +1,5 @@
+import { useGame } from "../../../../context/GameContext"
+
 export default function BoardDelta() {
     const squareNumberStyle = 'before:absolute before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
 
@@ -20,7 +22,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 4 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="18">
-                    <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
+                    <TileCity cityname={'Jakarta'} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
                 </div>
                 {/* 5 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="19">
@@ -28,7 +30,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 6 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="20">
-                    <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
+                    <TileCity cityname={'Jakarta'} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="21">
@@ -40,7 +42,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="23">
-                    <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
+                    <TileCity cityname={'Jakarta'} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="24">
@@ -171,7 +173,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 4 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="7">
-                    <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
+                    <TileCity cityname={'Jakarta'} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
                 </div>
                 {/* 5 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="6">
@@ -179,7 +181,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 6 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="5">
-                    <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
+                    <TileCity cityname={'Jakarta'} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="4">
@@ -191,7 +193,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="2">
-                    <img src="/img/city/jakarta_100.png" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
+                    <TileCity cityname={'Jakarta'} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="1">
@@ -199,5 +201,29 @@ export default function BoardDelta() {
                 </div>
             </div>
         </section>
+    )
+}
+
+function TileCity({ cityname, imgsrc }) {
+    const gameState = useGame()
+
+    return (
+        <>
+            <button type="button" className="absolute mt-0.5 lg:mt-1 ml-[5.8vw] 
+            w-3 lg:w-4 bg-darkblue-4 rounded-bl-md"
+            onClick={() => {
+                gameState.setShowTileImage('city');
+                setTimeout(() => gameState.setShowTileImage(null), 3000);
+            }}>
+                <img src="https://img.icons8.com/?id=83218&format=png&color=000000" alt="" />
+            </button>
+            <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
+            bg-darkblue-4/90 text-black text-center">
+                <p className={`leading-3 lg:leading-relaxed text-[2vh] after:block after:content-['Rp_70.000']`}> 
+                    {cityname} 
+                </p>
+            </div>
+            <img src={imgsrc} alt={cityname} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
+        </>
     )
 }
