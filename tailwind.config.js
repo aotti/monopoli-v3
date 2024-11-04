@@ -14,6 +14,8 @@ module.exports = {
       animation: {
         'zoom-in': 'zoom-in .3s linear 1',
         'zoom-out': 'zoom-out .3s linear 1',
+        'slide-down': 'slide-down .5s linear 1',
+        'slide-up': 'slide-up .5s linear 1',
       },
       keyframes: {
         'zoom-in': {
@@ -24,6 +26,14 @@ module.exports = {
           '0%': { opacity: '1', transform: 'scale(1)' },
           '100%': { opacity: '0', transform: 'scale(.8)' },
         },
+        'slide-down': {
+          '0%': { opacity: '0', top: '20%' },
+          '100%': { opacity: '1', top: '33.3%' },
+        },
+        'slide-up': {
+          '0%': { opacity: '1', top: '33.33%' },
+          '100%': { opacity: '0', top: '20%' },
+        }
       },
       backgroundColor: {
         'darkblue-1': '#363062',

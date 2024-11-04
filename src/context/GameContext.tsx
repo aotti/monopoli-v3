@@ -12,6 +12,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gameSideButton, setGameSideButton] = useState<IGameContext['gameSideButton']>(null)
     const [openPlayerSetting, setOpenPlayerSetting] = useState(false)
     const [displaySettingItem, setDisplaySettingItem] = useState<IGameContext['displaySettingItem']>(null)
+    const [showGameHistory, setShowGameHistory] = useState(false)
 
     const states: IGameContext = {
         // board
@@ -24,6 +25,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setOpenPlayerSetting: setOpenPlayerSetting,
         displaySettingItem: displaySettingItem,
         setDisplaySettingItem: setDisplaySettingItem,
+        showGameHistory: showGameHistory,
+        setShowGameHistory: setShowGameHistory,
     }
 
     return (

@@ -22,8 +22,8 @@ export interface ITooltip {
 export interface IMiscContext {
     language: ITranslate['lang'];
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>;
-    showModal: string;
-    setShowModal: Dispatch<SetStateAction<string>>;
+    showModal: 'login'|'register'|'create room'|'notif';
+    setShowModal: Dispatch<SetStateAction<IMiscContext['showModal']>>;
     hoverTooltip: string;
     setHoverTooltip: Dispatch<SetStateAction<string>>;
     animation: boolean;
@@ -43,4 +43,6 @@ export interface IGameContext {
     setOpenPlayerSetting: Dispatch<SetStateAction<boolean>>;
     displaySettingItem: 'sell_city'|'game_history'|'attack_city';
     setDisplaySettingItem: Dispatch<SetStateAction<IGameContext['displaySettingItem']>>;
+    showGameHistory: boolean;
+    setShowGameHistory: Dispatch<SetStateAction<boolean>>;
 }

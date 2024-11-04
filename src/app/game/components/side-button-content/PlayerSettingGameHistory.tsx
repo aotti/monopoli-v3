@@ -1,32 +1,44 @@
+import { useRef } from "react"
+import { clickOutsideElement } from "../../../../helper/helper"
 import { useGame } from "../../../../context/GameContext"
 
 export default function PlayerSettingGameHistory() {
     const gameState = useGame()
+    const gameHistoryRef = useRef()
+    clickOutsideElement(gameHistoryRef, () => gameState.setShowGameHistory(false))
 
     return (
-        <div className={`${gameState.displaySettingItem == 'game_history' ? 'block' : 'hidden'}
-        absolute top-9 bg-darkblue-2 
-        w-[calc(100%-.5rem)] h-[calc(100%-2.5rem)]`}>
-            <div className="flex flex-col p-1">
-                {/* title */}
-                <div className="mb-1">
-                    <span className="border-b-2 pb-1"> game history </span>
-                </div>
-                {/* history list */}
-                <div className="flex flex-col gap-2 h-36 lg:h-[17rem] overflow-y-scroll">
-                    <div className="flex justify-between">
-                        <span> dengkul </span>
-                        <span> roll dice 6 </span>
+        <div ref={gameHistoryRef} className={`${gameState.displaySettingItem == 'game_history' ? 'visible' : 'invisible'} text-2xs lg:text-xs`}>
+            {/* history container */}
+            <div className={`absolute left-2 bottom-8 flex flex-col items-center transition-all ease-in-out duration-500
+            w-[14vw] ${gameState.showGameHistory ? 'h-[55vh]' : 'h-[5vh]'} bg-darkblue-1 border-2`}>
+                {/* history content */}
+                <div className="h-[45vh] overflow-y-scroll p-1">
+                    <div className="border-b-2 border-dashed">
+                        <p className="text-green-400"> dengkul </p>
+                        <p> roll dice 6 </p>
                     </div>
-                    <div className="flex justify-between">
-                        <span> dengkul </span>
-                        <span> buy jakarta city </span>
+                    <div className="border-b-2 border-dashed">
+                        <p className="text-green-400"> dengkul </p>
+                        <p> buy jakarta city </p>
+                    </div>
+                    <div className="border-b-2 border-dashed">
+                        <p className="text-green-400"> lele </p>
+                        <p> roll dice 3 </p>
+                    </div>
+                    <div className="border-b-2 border-dashed">
+                        <p className="text-green-400"> lele </p>
+                        <p> go to jail </p>
+                    </div>
+                    <div className="border-b-2 border-dashed">
+                        <p className="text-green-400"> dengkul </p>
+                        <p> roll dice 6 </p>
                     </div>
                 </div>
-                {/* close button */}
-                <div className="w-[calc(100%-.5rem)] p-1 border-t-2">
-                    <button type="button" onClick={() => gameState.setDisplaySettingItem(null)}> Close </button>
-                </div>
+                <p className="absolute bottom-0 z-20 w-full text-[1vw] text-center py-1 lg:py-2 cursor-pointer bg-darkblue-1 border-t-2"
+                onClick={() => gameState.setShowGameHistory(b => !b)} > 
+                    game history 
+                </p>
             </div>
         </div>
     )

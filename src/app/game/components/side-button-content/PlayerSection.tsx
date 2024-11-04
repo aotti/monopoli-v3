@@ -2,7 +2,6 @@ import { useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { clickOutsideElement } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
-import PlayerSettingGameHistory from "./PlayerSettingGameHistory"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 
 export default function PlayerSection() {
@@ -43,12 +42,13 @@ export default function PlayerSection() {
                             <label htmlFor="sell_city" className="w-full"> Sell City </label>
                         </div>
                         {/* history */}
-                        <div className="flex items-center p-1 hover:bg-darkblue-2">
-                            <input type="button" id="game_history" onClick={() => {
-                                gameState.setDisplaySettingItem('game_history')
-                                gameState.setOpenPlayerSetting(false)
-                            }} />
+                        <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
                             <label htmlFor="game_history" className="w-full"> Game History </label>
+                            <input type="checkbox" id="game_history" onChange={ev => {
+                                ev.currentTarget.checked
+                                    ? gameState.setDisplaySettingItem('game_history')
+                                    : gameState.setDisplaySettingItem(null)
+                            }} />
                         </div>
                         {/* attack */}
                         <div className="flex items-center p-1 hover:bg-darkblue-2">
@@ -89,8 +89,6 @@ export default function PlayerSection() {
             </div>
             {/* sell city box */}
             <PlayerSettingSellCity />
-            {/* game history box */}
-            <PlayerSettingGameHistory />
             {/* attack city box */}
             <PlayerSettingAttackCity />
         </div>

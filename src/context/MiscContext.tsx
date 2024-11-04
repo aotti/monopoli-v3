@@ -7,7 +7,7 @@ const MiscContext = createContext<IMiscContext>(null)
 
 export const MiscProvider = ({ children }: {children: React.ReactNode}) => {
     const [language, setLanguage] = useState<ITranslate['lang']>('english')
-    const [showModal, setShowModal] = useState<string>(null)
+    const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
     const [hoverTooltip, setHoverTooltip] = useState<string>(null)
     const [animation, setAnimation] = useState<boolean>(true)
     const [isChatFocus, setIsChatFocus] = useState<boolean>(false)
