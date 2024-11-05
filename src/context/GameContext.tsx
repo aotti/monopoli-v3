@@ -8,6 +8,7 @@ const GameContext = createContext<IGameContext>(null)
 export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // board
     const [showTileImage, setShowTileImage] = useState<IGameContext['showTileImage']>(null)
+    const [showNotif, setShowNotif] = useState<IGameContext['showNotif']>(null)
     // side buttons
     const [gameSideButton, setGameSideButton] = useState<IGameContext['gameSideButton']>(null)
     const [openPlayerSetting, setOpenPlayerSetting] = useState(false)
@@ -18,6 +19,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         // board
         showTileImage: showTileImage,
         setShowTileImage: setShowTileImage,
+        showNotif: showNotif,
+        setShowNotif: setShowNotif,
         // side buttons
         gameSideButton: gameSideButton,
         setGameSideButton: setGameSideButton,
