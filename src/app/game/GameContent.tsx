@@ -54,9 +54,13 @@ export default function GameContent() {
                     <GameButtons />
                 </div>
                 {/* game notif + roll number */}
-                <div className={`absolute h-full w-full text-center text-2xs lg:text-xs`}>
+                <div className={`${gameState.showNotif || gameState.rollNumber ? 'block' : 'hidden'} absolute h-full w-full text-center text-2xs lg:text-xs`}>
                     <GameNotif />
-                    <RollNumber />
+                    {
+                        gameState.rollNumber !== null
+                            ? <RollNumber />
+                            : null
+                    }
                 </div>
             </section>
 

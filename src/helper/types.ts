@@ -38,6 +38,8 @@ export interface IGameContext {
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
     showNotif: 'normal'|'with_button',
     setShowNotif: Dispatch<SetStateAction<IGameContext['showNotif']>>,
+    rollNumber: 'dice'|'turn',
+    setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
     // side buttons
     gameSideButton: 'help' | 'players' | 'chat',
     setGameSideButton: Dispatch<SetStateAction<IGameContext['gameSideButton']>>,

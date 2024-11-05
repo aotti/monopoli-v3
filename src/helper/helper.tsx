@@ -14,6 +14,13 @@ export function translateUI(params: ITranslate) {
 export function qS(el: string) {
     return document.querySelector(el)
 }
+/**
+ * @param el element id/class/attribute 
+ * @returns all selected HTML element
+ */
+export function qSA(el: string) {
+    return document.querySelectorAll(el)
+}
 
 export function clickOutsideElement(ref: MutableRefObject<any>, handler: () => void) {
     useEffect(() => {
