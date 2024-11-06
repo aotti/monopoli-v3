@@ -158,7 +158,7 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
             // display
             setTimeout(() => {
                 resultDice.textContent = `your dice is ${diceNumber.reduce((accumulator, currentVal) => accumulator + currentVal)}`
-            }, 3500);
+            }, 3000);
         }
         else if(type == 'turn') {
             const resultTurn = qS('#turn_result')

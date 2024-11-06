@@ -22,6 +22,16 @@ export function qSA(el: string) {
     return document.querySelectorAll(el)
 }
 
+export function moneyFormat(number: number) {
+    const formatter = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        trailingZeroDisplay: 'stripIfInteger'
+    })
+    // format number to currency
+    return formatter.format(number).replace(/\s/, '_')
+}
+
 export function clickOutsideElement(ref: MutableRefObject<any>, handler: () => void) {
     useEffect(() => {
         const listener = (ev: Event) => {
