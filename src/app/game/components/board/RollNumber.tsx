@@ -7,13 +7,10 @@ export default function RollNumber() {
     const gameState = useGame()
 
     useEffect(() => {
-        // ### KALAU SUDAH ADA SETTING JUMLAH dice 
-        // ### ARRAY UNTUK dice HARUS DISESUAIKAN
-        // ### 1 dice = [1,2,3,4,5,6] | 2 dice = [0,1,2,3,4,5,6]
-        const number = gameState.rollNumber == 'dice' ? [0,1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
+        const number = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
         startAnimation(number, gameState.rollNumber)
         // hidden the roll after end
-        setTimeout(() => gameState.setRollNumber(null), 6000);
+        setTimeout(() => gameState.setRollNumber(null), 3500);
     }, [])
 
     return (
@@ -91,7 +88,7 @@ function removeAllChildNodes(parent: HTMLElement) {
 const totalDuplicates = 4
 
 // Clear slots and recreate random list of images
-const buildItemLists = (number: number[], resultItem: number) => {  
+const buildItemLists = (number: number[]) => {  
     const slots = document.getElementsByClassName('slot');
     // Iterate through the slot html elements
     Array.prototype.forEach.call(slots, (slot, s) => {
@@ -106,11 +103,12 @@ const buildItemLists = (number: number[], resultItem: number) => {
             prizeBlocks.appendChild(prizeElement);
         })
     
+        // Get a random item from the prizes array
+        const resultItem = getRandomInt(0, number.length - 1);
         // Adds the result to the last row
-    	const position = s < slots.length-1 ? 0 : s;
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')
-        resultElement.textContent = number[position + resultItem].toString()
+        resultElement.textContent = number[resultItem].toString()
         prizeBlocks.appendChild(resultElement);
     
         // Clear the slots and add the new ones
@@ -124,11 +122,9 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
     // less than 1024 for mobile, more than 1024 for desktop
     const windowWidth = window.innerWidth
     const defaultSize = windowWidth < 1024 ? 24 : 32
-    // Get a random item from the prizes array
-    const resultItem = getRandomInt(0, number.length - 3);
     
     // Rebuild the items list with the result
-    buildItemLists(number, resultItem);
+    buildItemLists(number);
     
     // Determine the total height to be animated  
     const totalHeight = number.length * totalDuplicates * defaultSize;
@@ -144,7 +140,7 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
             transform: `translateY(-${totalHeight}px)`
             }
         ], {
-            duration: 2000 + (s * 500),
+            duration: 1000 + (s * 500),
             fill: "forwards",
             easing: 'ease-in-out'
         });
@@ -158,7 +154,7 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
             // display
             setTimeout(() => {
                 resultDice.textContent = `your dice is ${diceNumber.reduce((accumulator, currentVal) => accumulator + currentVal)}`
-            }, 3000);
+            }, 2000);
         }
         else if(type == 'turn') {
             const resultTurn = qS('#turn_result')
@@ -169,7 +165,7 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
             // display
             setTimeout(() => {
                 resultTurn.textContent = `your number is ${+(turnNumber[0] + turnNumber[1] + turnNumber[2])}`
-            }, 3500);
+            }, 2500);
         }
     });
 }

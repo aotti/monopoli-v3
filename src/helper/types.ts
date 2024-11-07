@@ -5,6 +5,7 @@ import translateUI_data from '../config/translate-ui.json'
 export interface ITranslate {
     lang: 'english' | 'indonesia',
     text: keyof typeof translateUI_data['indonesia'],
+    lowercase?: boolean,
 }
 
 // tooltip

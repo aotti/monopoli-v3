@@ -3,8 +3,9 @@ import { ITranslate } from "./types";
 import translateUI_data from '../config/translate-ui.json'
 
 export function translateUI(params: ITranslate) {
-    const { lang, text } = params
-    return lang == 'indonesia' ? translateUI_data[lang][text] : text
+    const { lang, text, lowercase } = params
+    const translated = lang == 'indonesia' ? translateUI_data[lang][text] : text
+    return lowercase ? translated.toLowerCase() : translated
 }
 
 /**
@@ -26,10 +27,10 @@ export function moneyFormat(number: number) {
     const formatter = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
-        trailingZeroDisplay: 'stripIfInteger'
+        trailingZeroDisplay: 'stripIfInteger',
     })
     // format number to currency
-    return formatter.format(number).replace(/\s/, '_')
+    return formatter.format(number)
 }
 
 export function clickOutsideElement(ref: MutableRefObject<any>, handler: () => void) {

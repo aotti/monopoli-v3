@@ -1,14 +1,15 @@
 {
     "test": ["Create Account"],
     "indonesia": {
-        "__TRANSLATE BAGIAN HOME__": "",
+        "__TRANSLATE BAGIAN HOME__": "__TRANSLATE BAGIAN HOME__",
         "Do you already have an account?": "Apakah anda sudah punya akun?",
         "Create Account": "Buat Akun",
         "Confirm Password": "Konfirmasi Password",
         "Name": "Nama",
         "Close": "Tutup",
         "Create": "Buat",
-        "__TRANSLATE BAGIAN ROOM LIST__": "",
+
+        "__TRANSLATE BAGIAN ROOM LIST__": "__TRANSLATE BAGIAN ROOM LIST__",
         "chat box": "kotak obrolan",
         "player list": "daftar player",
         "view": "lihat",
@@ -16,7 +17,7 @@
         "game count": "total main",
         "worst lost": "terburuk",
         "Room List": "Daftar Ruang",
-        "Create Room": "Buat Room",
+        "Create Room": "Buat Ruang",
         "Board": "Papan",
         "2 Way": "2 Jalur",
         "Dice": "Dadu",
@@ -29,6 +30,25 @@
         "Creator": "Pembuat",
         "Join": "Gabung",
         "Spectate": "Nonton",
-        "Delete": "Hapus"
+        "Delete": "Hapus",
+
+        "__TRANSLATE BAGIAN GAME ROOM__": "__TRANSLATE BAGIAN GAME ROOM__",
+        "Back to room": "Kembali",
+        "help": "bantuan",
+        "players": "pemain",
+        "chat": "ngobrol",
+        "__BOARD__": "__BOARD__",
+        "Start line": "Imagine lewat start..",
+        "Community Card": "Kartu Dana Umum",
+        "Chance Card": "Kartu Kesempatan",
+        "Special": "Khusus",
+        "Cursed": "Terkutuk",
+        "Get Arrested": "Masuk Penjara",
+        "Free Parking": "Parkir Bebas",
+        "ready": "siap",
+        "leave": "kabur",
+        "roll dice": "lempar dadu",
+        "roll turn": "putar angka",
+        "surrender": "menyerah"
     }
 }

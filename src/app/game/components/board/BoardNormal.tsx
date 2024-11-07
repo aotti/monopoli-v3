@@ -1,7 +1,9 @@
 import { useGame } from "../../../../context/GameContext"
-import { moneyFormat } from "../../../../helper/helper"
+import { useMisc } from "../../../../context/MiscContext"
+import { moneyFormat, translateUI } from "../../../../helper/helper"
 
 export default function BoardDelta() {
+    const miscState = useMisc()
     const squareNumberStyle = 'before:absolute before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
 
     return (
@@ -10,15 +12,15 @@ export default function BoardDelta() {
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="15">
-                    <TileCity cityname={'Khusus-3'} cityprice={70000} imgsrc={''} />
+                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-3`} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 2 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="16">
-                    <TileOther tilename={`Kartu Dana Umum`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc="" />
                 </div>
                 {/* 3 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="17">
-                    <TileOther tilename={`Kartu Kesempatan`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc="" />
                 </div>
                 {/* 4 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="18">
@@ -30,7 +32,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 6 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="20">
-                    <TileCity cityname={'Khusus-4'} cityprice={70000} imgsrc={''} />
+                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-4`} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="21">
@@ -38,7 +40,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 8 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="22">
-                    <TileOther tilename={`Kartu Dana Umum`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc="" />
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="23">
@@ -46,7 +48,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="24">
-                    <TileOther tilename={`Parkir Bebas 😎 `} imgsrc="" />
+                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Free Parking'})} 😎 `} imgsrc="" />
                 </div>
             </div>
             {/* row 2 */}
@@ -127,14 +129,14 @@ export default function BoardDelta() {
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="27">
-                    <TileCity cityname={'Terkutuk-2'} cityprice={70000} imgsrc={''} />
+                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Cursed'})}-2`} cityprice={70000} imgsrc={''} />
                 </div>
             </div>
             {/* row 5 */}
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="11">
-                    <TileCity cityname={'Khusus-2'} cityprice={70000} imgsrc={''} />
+                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-2`} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 2 */}
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
@@ -154,26 +156,26 @@ export default function BoardDelta() {
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="28">
-                    <TileOther tilename={`Kartu Kesempatan`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc="" />
                 </div>
             </div>
             {/* row 6 */}
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="10">
-                    <TileOther tilename={`Masuk Penjara 👮 `} imgsrc="" />
+                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Get Arrested'})} 👮 `} imgsrc="" />
                 </div>
                 {/* 2 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="9">
-                    <TileOther tilename={`Kartu Kesempatan`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc="" />
                 </div>
                 {/* 3 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="8">
-                    <TileCity cityname={'Terkutuk-1'} cityprice={70000} imgsrc={''} />
+                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Cursed'})}-1`} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 4 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="7">
-                    <TileCity cityname={'Khusus-1'} cityprice={70000} imgsrc={''} />
+                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-1`} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 5 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="6">
@@ -185,7 +187,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="4">
-                    <TileOther tilename={`Kartu Dana Umum`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc="" />
                 </div>
                 {/* 8 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="3">
@@ -197,7 +199,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="1">
-                    <TileOther tilename={`Imagine lewat start..`} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Start line'})} imgsrc="" />
                 </div>
             </div>
         </>
@@ -206,7 +208,7 @@ export default function BoardDelta() {
 
 function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: string, cityprice: number, cityhouse?: string}) {
     const gameState = useGame()
-    const priceText = `after:block after:content-['${moneyFormat(cityprice)}']`
+    const priceText = `after:block after:content-[attr(data-price)]`
 
     return (
         <>
@@ -220,7 +222,7 @@ function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: st
             </button>
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
-                <p className={`leading-3 lg:leading-relaxed text-[2vh] ${priceText}`}> 
+                <p className={`leading-3 lg:leading-relaxed text-[2vh] ${priceText}`} data-price={moneyFormat(cityprice)}> 
                     {cityname} 
                 </p>
             </div>

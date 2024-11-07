@@ -1,6 +1,9 @@
 import { useGame } from "../../../../context/GameContext"
+import { useMisc } from "../../../../context/MiscContext"
+import { translateUI } from "../../../../helper/helper"
 
 export default function GameButtons() {
+    const miscState = useMisc()
     const gameState = useGame()
 
     return (
@@ -11,21 +14,21 @@ export default function GameButtons() {
                 <p> lap: 1 </p>
             </div>
             {/* ready + leave */}
-            {/* <div className="flex mx-auto w-52 lg:w-72">
-                <button type="button" className="bg-primary border-8bit-primary"> ready </button>
-                <button type="button" className="bg-primary border-8bit-primary"> leave </button>
+            {/* <div className="flex gap-6 mx-auto w-52 lg:w-72">
+                <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'ready'})} </button>
+                <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'leave'})} </button>
             </div> */}
             {/* roll dice + roll turn */}
-            <div className="flex mx-auto w-52 lg:w-72">
+            <div className="flex gap-6 mx-auto w-52 lg:w-72">
                 <button type="button" className="bg-primary border-8bit-primary active:opacity-50"
-                onClick={() => gameState.setRollNumber('dice')}> roll dice </button>
+                onClick={() => gameState.setRollNumber('dice')}> {translateUI({lang: miscState.language, text: 'roll dice'})} </button>
                 <button type="button" className="bg-primary border-8bit-primary active:opacity-50"
-                onClick={() => gameState.setRollNumber('turn')}> roll turn </button>
+                onClick={() => gameState.setRollNumber('turn')}> {translateUI({lang: miscState.language, text: 'roll turn'})} </button>
             </div>
             {/* roll dice + leave */}
-            {/* <div className="flex mx-auto w-52 lg:w-72">
-                <button type="button" className="bg-primary border-8bit-primary"> roll dice </button>
-                <button type="button" className="bg-primary border-8bit-primary"> leave </button>
+            {/* <div className="flex gap-6 mx-auto w-52 lg:w-72">
+                <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'roll dice'})} </button>
+                <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'surrender'})} </button>
             </div> */}
         </>
     )

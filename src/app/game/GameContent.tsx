@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import Tooltip from "../../components/Tooltip"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { clickOutsideElement, qS } from "../../helper/helper"
+import { clickOutsideElement, qS, translateUI } from "../../helper/helper"
 import { ITooltip } from "../../helper/types"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
@@ -33,7 +33,7 @@ export default function GameContent() {
                     const link = qS('#back_to_room') as HTMLAnchorElement
                     link.click()
                 }}>
-                    <span> Back to room </span>
+                    <span> {translateUI({lang: miscState.language, text: 'Back to room'})} </span>
                     <Link id="back_to_room" href={'/room'} hidden={true}></Link>
                 </button>
                 {/* game info */}
@@ -91,8 +91,10 @@ export default function GameContent() {
 }
 
 function SideButtons({ text, setGameSideButton }) {
+    const miscState = useMisc()
+
     return (
         <button type="button" className="h-full p-2 hover:bg-darkblue-4 hover:text-black"
-        onClick={() => setGameSideButton(text)}> {text} </button>
+        onClick={() => setGameSideButton(text)}> {translateUI({lang: miscState.language, text: text})} </button>
     )
 }

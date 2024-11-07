@@ -1,4 +1,9 @@
+import { useMisc } from "../../../context/MiscContext";
+import { translateUI } from "../../../helper/helper";
+
 export default function GameInfo() {
+    const miscState = useMisc()
+
     return (
         <div className="flex flex-col gap-4 text-2xs lg:text-xs">
             {/* name */}
@@ -7,7 +12,7 @@ export default function GameInfo() {
             </div>
             {/* player */}
             <div>
-                <span> player: </span>
+                <span> {translateUI({lang: miscState.language, text: 'players'})}: </span>
                 <span className="text-green-400"> 1/4 </span>
             </div>
             {/* mode */}
@@ -17,7 +22,7 @@ export default function GameInfo() {
             </div>
             {/* creator */}
             <div>
-                <span> creator: </span>
+                <span> {translateUI({lang: miscState.language, text: 'Creator', lowercase: true})}: </span>
                 <span className="text-green-400"> dengkul </span>
             </div>
         </div>
