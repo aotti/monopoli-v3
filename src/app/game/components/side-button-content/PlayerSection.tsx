@@ -1,10 +1,12 @@
 import { useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { clickOutsideElement } from "../../../../helper/helper"
+import { clickOutsideElement, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
+import { useMisc } from "../../../../context/MiscContext"
 
 export default function PlayerSection() {
+    const miscState = useMisc()
     const gameState = useGame()
     // click outside element
     const playerSettingRef = useRef()
@@ -15,8 +17,10 @@ export default function PlayerSection() {
         absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
         [writing-mode:horizontal-tb] p-1 overflow-y-scroll
         bg-darkblue-1 border-8bit-text w-[35vw] h-[calc(100%-1rem)]`}>
+            {/* header */}
             <div className="flex items-center justify-center text-xs lg:text-sm border-b-2 pb-2 mb-1">
-                <span> players </span>
+                {/* title */}
+                <span> {translateUI({lang: miscState.language, text: 'players'})} </span>
                 {/* setting */}
                 <div className="absolute top-0 right-0 w-6 lg:w-8">
                     {/* setting button */}
@@ -30,7 +34,9 @@ export default function PlayerSection() {
                     bg-darkblue-3 border-8bit-modal w-max p-1`}>
                         {/* auto roll dice */}
                         <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
-                            <label htmlFor="auto_roll_dice" className="w-full"> Auto roll dice </label>
+                            <label htmlFor="auto_roll_dice" className="w-full"> 
+                                {translateUI({lang: miscState.language, text: 'Auto roll dice'})} 
+                            </label>
                             <input type="checkbox" id="auto_roll_dice" onClick={() => console.log('auto_roll')} />
                         </div>
                         {/* sell city */}
@@ -39,11 +45,15 @@ export default function PlayerSection() {
                                 gameState.setDisplaySettingItem('sell_city')
                                 gameState.setOpenPlayerSetting(false)
                             }} />
-                            <label htmlFor="sell_city" className="w-full"> Sell City </label>
+                            <label htmlFor="sell_city" className="w-full"> 
+                                {translateUI({lang: miscState.language, text: 'Sell City'})} 
+                            </label>
                         </div>
                         {/* history */}
                         <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
-                            <label htmlFor="game_history" className="w-full"> Game History </label>
+                            <label htmlFor="game_history" className="w-full">
+                                {translateUI({lang: miscState.language, text: 'Game History'})}
+                            </label>
                             <input type="checkbox" id="game_history" onChange={ev => {
                                 ev.currentTarget.checked
                                     ? gameState.setDisplaySettingItem('game_history')
@@ -56,11 +66,14 @@ export default function PlayerSection() {
                                 gameState.setDisplaySettingItem('attack_city')
                                 gameState.setOpenPlayerSetting(false)
                             }} />
-                            <label htmlFor="attack_city" className="w-full"> Attack City </label>
+                            <label htmlFor="attack_city" className="w-full">
+                                {translateUI({lang: miscState.language, text: 'Attack City'})}
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
+            {/* player list */}
             <div className="flex flex-col gap-1">
                 {/* player 1 */}
                 <div className="flex items-stretch text-center gap-1">

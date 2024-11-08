@@ -16,7 +16,7 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
             : <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
             absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
             text-left [writing-mode:horizontal-tb] p-1 
-            overflow-y-scroll overflow-x-hidden
+            flex flex-col gap-2 overflow-y-scroll overflow-x-hidden
             bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
                 <ChatMessages />
                 {/* chat input */}
@@ -33,11 +33,13 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
 }
 
 function ChatMessages() {
+    const miscState = useMisc()
+
     return (
         <>
             <div className="hover:bg-darkblue-3/30 text-2xs lg:text-xs text-green-400">
                 <span className="text-orange-200"> system: </span>
-                <span> only player in this room can see the chat </span>
+                <span> {translateUI({lang: miscState.language, text: 'only player in this room can see the chat'})} </span>
             </div>
             <div className="hover:bg-darkblue-3/30 text-2xs lg:text-xs">
                 <span className="text-orange-200"> lemao: </span>

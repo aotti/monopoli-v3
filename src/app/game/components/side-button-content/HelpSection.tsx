@@ -1,6 +1,9 @@
 import { useGame } from "../../../../context/GameContext"
+import { useMisc } from "../../../../context/MiscContext"
+import { translateUI } from "../../../../helper/helper"
 
 export default function HelpSection() {
+    const miscState = useMisc()
     const gameState = useGame()
 
     return (
@@ -8,28 +11,33 @@ export default function HelpSection() {
         absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
         [writing-mode:horizontal-tb] p-1 overflow-y-scroll
         bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
-            <p className="text-xs lg:text-sm border-b-2 pb-1 mb-1"> help </p>
+            <p className="text-xs lg:text-sm border-b-2 pb-1 mb-1">
+                {translateUI({lang: miscState.language, text: 'help'})}
+            </p>
             <ol className="text-left text-2xs lg:text-[10px]">
                 {/* kartu dana umum */}
                 <details className="my-2 cursor-pointer">
-                    <summary className="text-[10px] lg:text-xs text-green-400"> Kartu Dana Umum </summary>
-                        <li> [^25%] Hadiah dari bank, anda mendapatkan 40.000 </li>
-                        <li> [^25%] Hari ulang tahun anda, dapat 15.000 dari tiap player </li>
-                        <li> [^25%] Anda mendapat warisan 65.000 </li>
-                        <li> [25%] Gilang sang hecker meretas akun bank anda dan kehilangan uang 20.000 </li>
-                        <li> [25%] Kartu penghambat rezeki, saat lewat start hanya mendapat 5.000 </li>
-                        <li> [25%] Mobil anda rusak, bayar biaya perbaikan 35.000 </li>
-                        <li> [25%] Kartu nerf pajak 35% </li>
-                        <li> [25%] Anda mendapat uang 20.000 dikali jumlah angka pada koin yang dipilih </li>
-                        <li> [15%] Debt collector datang ke rumah, anda membayar hutang 60.000 </li>
-                        <li> [15%] Bayar rumah sakit 50.000 </li>
-                        <li> [15%] Gilang si baik hati memberi anda uang 5.000 </li>
-                        <li> [15%] Pilih kota anda yang ingin dituju </li>
-                        <li> [15%] Kartu anti pajak </li>
-                        <li> [8%] Gaji bulanan sudah cair, anda mendapat 160.000 </li>
-                        <li> [8%] Bayar tagihan listrik & air 100.000 </li>
-                        <li> [8%] Menjual 1 kota yang dimiliki (acak) </li>
-                        <li> [5%] Kartu upgrade kota </li>
+                    <summary className="text-[10px] lg:text-xs text-green-400"> {translateUI({lang: miscState.language, text: 'Community Card'})} </summary>
+                        <li> [^25%] {translateUI({lang: miscState.language, text: 'Gift from the bank, you get 40.000'})} </li>
+                        <li> [^25%] {translateUI({lang: miscState.language, text: 'Your birthday, get 15.000 from each player'})} </li>
+                        <li> [^25%] {translateUI({lang: miscState.language, text: 'You get an inheritance of 65.000'})} </li>
+
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Gilang the hacker hacks your bank account and loses 20.000'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Fortune-blocking card, when you pass the start, you only get 5.000'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Your car is broken, pay 35.000 repair costs'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Tax nerf card 35%'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'You get 20.000 times the number on the selected coin'})} </li>
+
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Debt collectors come to your house, you pay 60.000 debt'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Pay the hospital 50.000'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'The kind Gilang gives you 5.000'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Select the city you want to go to'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Anti-tax card'})} </li>
+
+                        <li> [8%] {translateUI({lang: miscState.language, text: 'Monthly salary has been paid, you get 160.000'})} </li>
+                        <li> [8%] {translateUI({lang: miscState.language, text: 'Pay electricity & water bills 100.000'})} </li>
+                        <li> [8%] {translateUI({lang: miscState.language, text: 'Sell 1 owned city (random)'})} </li>
+                        <li> [5%] {translateUI({lang: miscState.language, text: 'City upgrade card'})} </li>
                 </details>
                 {/* kartu kesempatan */}
                 <details className="my-2 cursor-pointer">
