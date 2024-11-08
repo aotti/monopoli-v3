@@ -23,7 +23,7 @@ export default function HelpSection() {
                         <li> [^25%] {translateUI({lang: miscState.language, text: 'You get an inheritance of 65.000'})} </li>
 
                         <li> [25%] {translateUI({lang: miscState.language, text: 'Gilang the hacker hacks your bank account and loses 20.000'})} </li>
-                        <li> [25%] {translateUI({lang: miscState.language, text: 'Fortune-blocking card, when you pass the start, you only get 5.000'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Fortune blocking card, when you pass the start, you only get 5.000'})} </li>
                         <li> [25%] {translateUI({lang: miscState.language, text: 'Your car is broken, pay 35.000 repair costs'})} </li>
                         <li> [25%] {translateUI({lang: miscState.language, text: 'Tax nerf card 35%'})} </li>
                         <li> [25%] {translateUI({lang: miscState.language, text: 'You get 20.000 times the number on the selected coin'})} </li>
@@ -32,7 +32,7 @@ export default function HelpSection() {
                         <li> [15%] {translateUI({lang: miscState.language, text: 'Pay the hospital 50.000'})} </li>
                         <li> [15%] {translateUI({lang: miscState.language, text: 'The kind Gilang gives you 5.000'})} </li>
                         <li> [15%] {translateUI({lang: miscState.language, text: 'Select the city you want to go to'})} </li>
-                        <li> [15%] {translateUI({lang: miscState.language, text: 'Anti-tax card'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Anti tax card'})} </li>
 
                         <li> [8%] {translateUI({lang: miscState.language, text: 'Monthly salary has been paid, you get 160.000'})} </li>
                         <li> [8%] {translateUI({lang: miscState.language, text: 'Pay electricity & water bills 100.000'})} </li>
@@ -41,59 +41,63 @@ export default function HelpSection() {
                 </details>
                 {/* kartu kesempatan */}
                 <details className="my-2 cursor-pointer">
-                    <summary className="text-[10px] lg:text-xs text-green-400"> Kartu Kesempatan </summary>
-                        <li> [^25%] Kaki anda tersandung, maju 1 langkah </li>
-                        <li> [^25%] Anda menemukan uang 50.000 di jalan, ambil uang atau maju 2 langkah </li>
-                        <li> [^25%] Anda menemukan uang 30.000 di kantong celana </li>
-                        <li> [25%] Renovasi rumah, bayar 30% dari total uang </li>
-                        <li> [25%] Anda lari dikejar biawak, mundur 2 langkah </li>
-                        <li> [25%] Pilih maju sampai start atau ambil kartu dana umum </li>
-                        <li> [25%] Kartu dadu gaming, mendapat uang Rp 10.000 dikali angka kocok dadu </li>
-                        <li> [25%] Upgrade 1 kota yang anda miliki (acak) </li>
-                        <li> [15%] Menuju kota punya orang lain </li>
-                        <li> [15%] Gilang menjatuhkan ichi ochanya, anda harus mundur 3 langkah untuk mengembalikannya </li>
-                        <li> [15%] Adu nasib, masuk parkir bebas atau masuk penjara </li>
-                        <li> [15%] Kartu nerf parkir sabeb </li>
-                        <li> [15%] Gempa bumi, 1 bangunan roboh #menangid </li>
-                        <li> [8%] Anda tertangkap basah korupsi, masuk penjara & denda 90% dari total uang </li>
-                        <li> [8%] Kartu bebas penjara </li>
-                        <li> [8%] Anda mendapatkan uang kaget sebanyak 200.000 </li>
-                        <li> [5%] Kartu upgrade kota </li>
+                    <summary className="text-[10px] lg:text-xs text-green-400"> {translateUI({lang: miscState.language, text: 'Chance Card'})} </summary>
+                        <li> [^25%] {translateUI({lang: miscState.language, text: 'You stumbled, take 1 step forward'})} </li>
+                        <li> [^25%] {translateUI({lang: miscState.language, text: 'You find 50.000 on the road, take the money or take 2 steps forward'})} </li>
+                        <li> [^25%] {translateUI({lang: miscState.language, text: 'You find 30.000 in your pocket'})} </li>
+
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Home renovation, pay 30% of the total money'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'You chased by a monitor lizard, take 2 steps back'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Go forward to the start or take a general fund card'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Gaming dice card, get 10.000 multiplied by the rolled dice number'})} </li>
+                        <li> [25%] {translateUI({lang: miscState.language, text: 'Upgrade 1 owned city (random)'})} </li>
+
+                        <li> [15%] {translateUI({lang: miscState.language, text: "Head to someone else's city"})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Gilang drops his ichi ocha, you have to take 3 steps back to return it'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Try your luck, go to free parking or go to jail'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Free parking nerf card'})} </li>
+                        <li> [15%] {translateUI({lang: miscState.language, text: 'Earthquake, 1 building collapses #sadge'})} </li>
+
+                        <li> [8%] {translateUI({lang: miscState.language, text: 'You are caught red-handed in corruption, go to jail & fined 90% of the total money'})} </li>
+                        <li> [8%] {translateUI({lang: miscState.language, text: 'Anti jail card'})} </li>
+                        <li> [8%] {translateUI({lang: miscState.language, text: 'You get a surprise money of 200.000'})} </li>
+                        <li> [5%] {translateUI({lang: miscState.language, text: 'City upgrade card'})} </li>
                 </details>
                 {/* efek kartu */}
                 <details className="my-2 cursor-pointer">
-                    <summary className="text-[10px] lg:text-xs text-green-400"> Efek Kartu </summary>
-                        <li className="text-red-400"> Semua kartu hanya 1x pakai lalu hangus </li>
-                        <li className="text-red-400"> Tidak bisa punya 2 kartu yg sama, kalo kau punya kartu anti pajak lalu dapat lagi, tetap dihitung 1 </li>
-                        <li> Bebas Penjara = ya sesuai namanya lah ya... #h3h3 </li>
-                        <li> Anti Pajak = kalo kaw menginjak kota orang lain, maka tak bayar pajak </li>
-                        <li> Nerf Pajak = pajak saat injak kota orang lain dikurangi 35% :sunglasses: </li>
-                        <li> Dadu Gaming = mendapat uang 10k dikali jumlah kocok dadu </li>
-                        <li> Nerf Dadu Gaming = mendapat uang 5k dikali jumlah kocok dadu </li>
-                        <li> Sad Dadu Gaming = uang berkurang 5k dikali jumlah kocok dadu </li>
-                        <li> Nerf Parkir = daftar petak yg bisa dipilih saat masuk parkir bebas berkurang 40% </li>
-                        <li> Penghambat Rezeki = saat lewat start hanya mendapat uang 5k </li>
-                        <li> Upgrade Kota = bisa beli rumah tanpa harus mampir ke kotanya (tapi random h3h3) </li>
+                    <summary className="text-[10px] lg:text-xs text-green-400"> {translateUI({lang: miscState.language, text: 'Card Effect'})} </summary>
+                        <li className="text-red-400"> {translateUI({lang: miscState.language, text: 'Each card can only be used once'})} </li>
+                        <li className="text-red-400"> {translateUI({lang: miscState.language, text: "Cannot have 2 same card, if you get 2x anti tax card it'll only count as 1"})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Anti Jail = when you step on jail tile, you can avoid imprisoned effect'})} </li>
+                        <li> {translateUI({lang: miscState.language, text: "Anti Tax = avoid paying tax on stepping someone's city"})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Nerf Tax = pay tax 35% less'})} 😎 </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Gaming Dice = get money 10k * dice number'})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Nerf Gaming Dice = get money 5k * dice number'})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Sad Gaming Dice = loss money 5k * dice number'})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Nerf Parking = your tile selection on stepping free parking is 40% less'})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'Fortune Blocking = when passing start line, only get 5k'})} </li>
+                        <li> {translateUI({lang: miscState.language, text: 'City Upgrade = can upgrade your city without getting there, but random'})} </li>
                 </details>
                 {/* buff debuff */}
                 <details className="my-2 cursor-pointer">
-                    <summary className="text-[10px] lg:text-xs text-green-400"> Area Buff/Debuff </summary>
-                        <li> Area Normal (65% dapat bonus)
-                        <ul className="list-disc">
-                            <li> [25%] Maju 1 langkah </li>
-                            <li> [15%] Maju 2 langkah </li>
-                            <li> [10%] Kartu nerf dadu gaming </li>
-                            <li> [8%] Kartu nerf parkir </li>
-                            <li> [7%] Maju ke petak normal selanjutnya </li>
-                        </ul>
+                    <summary className="text-[10px] lg:text-xs text-green-400"> {translateUI({lang: miscState.language, text: 'Buff/Debuff Area'})} </summary>
+                        <li> {translateUI({lang: miscState.language, text: 'Normal Area (65% chance)'})}
+                            <ul className="list-disc">
+                                <li> [25%] {translateUI({lang: miscState.language, text: 'Take 1 step forward'})} </li>
+                                <li> [15%] {translateUI({lang: miscState.language, text: 'Take 2 step forward'})} </li>
+                                <li> [10%] {translateUI({lang: miscState.language, text: 'Get nerf gaming dice card'})} </li>
+                                <li> [8%] {translateUI({lang: miscState.language, text: 'Get nerf parking card'})} </li>
+                                <li> [7%] {translateUI({lang: miscState.language, text: 'Go to next Normal Area'})} </li>
+                            </ul>
                         </li>
-                        <li> Area Buff (100% dapat bonus)
-                        <ul className="list-disc">
-                            <li> [35%] Dapat uang 5k x jml putaran </li>
-                            <li> [10%] Kartu upgrade kota </li>
-                            <li> [35%] Kartu nerf dadu gaming / pajak </li>
-                            <li> [20%] Kartu bebas penjara </li>
-                        </ul>
+                        <li> {translateUI({lang: miscState.language, text: 'Buff Area (100% chance)'})}
+                            <ul className="list-disc">
+                                <li> [40%] {translateUI({lang: miscState.language, text: 'Get money 5k x laps'})} </li>
+                                <li> [20%] {translateUI({lang: miscState.language, text: 'Get anti jail card'})} </li>
+                                <li> [15%] {translateUI({lang: miscState.language, text: 'Get nerf gaming dice card'})} </li>
+                                <li> [15%] {translateUI({lang: miscState.language, text: 'Get nerf tax card'})} </li>
+                                <li> [10%] {translateUI({lang: miscState.language, text: 'Get city upgrade card'})} </li>
+                            </ul>
                         </li>
                 </details>
             </ol>
