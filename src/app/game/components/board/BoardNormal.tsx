@@ -16,11 +16,11 @@ export default function BoardDelta() {
                 </div>
                 {/* 2 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="16">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc={``} />
                 </div>
                 {/* 3 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="17">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc={``} />
                 </div>
                 {/* 4 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="18">
@@ -40,22 +40,22 @@ export default function BoardDelta() {
                 </div>
                 {/* 8 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="22">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc={``} />
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="23">
-                    <TileOther tilename={`Buff or Debuff`} imgsrc="" />
+                    <TileOther tilename={`Buff or Debuff`} imgsrc={``} />
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="24">
-                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Free Parking'})} 😎 `} imgsrc="" />
+                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Free Parking'})} 😎 `} imgsrc={``} />
                 </div>
             </div>
             {/* row 2 */}
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="14">
-                    <TileOther tilename={`Buff or Debuff`} imgsrc="" />
+                    <TileOther tilename={`Buff or Debuff`} imgsrc={``} />
                 </div>
                 {/* 2 */}
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
@@ -156,18 +156,18 @@ export default function BoardDelta() {
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="28">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc={``} />
                 </div>
             </div>
             {/* row 6 */}
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="10">
-                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Get Arrested'})} 👮 `} imgsrc="" />
+                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Get Arrested'})} 👮 `} imgsrc={``} />
                 </div>
                 {/* 2 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="9">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc={``} />
                 </div>
                 {/* 3 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="8">
@@ -187,11 +187,11 @@ export default function BoardDelta() {
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="4">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc={``} />
                 </div>
                 {/* 8 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="3">
-                    <TileOther tilename={`Buff or Debuff`} imgsrc="" />
+                    <TileOther tilename={`Buff or Debuff`} imgsrc={``} />
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="2">
@@ -199,7 +199,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="1">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Start line'})} imgsrc="" />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Start line'})} imgsrc={``} />
                 </div>
             </div>
         </>
@@ -250,7 +250,7 @@ function TileOther({ tilename, imgsrc }: {tilename: string, imgsrc: string}) {
                     {tilename} 
                 </p>
             </div>
-            <img src={imgsrc} alt={tilename} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
+            <img src={imgsrc} alt={tilename} className={`${gameState.showTileImage == 'other' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
         </>
     )
 }

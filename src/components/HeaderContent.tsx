@@ -30,7 +30,7 @@ export default function HeaderContent() {
                     localStorage.setItem('language', chosenLang)
                     return chosenLang
                 })}>
-                    <img src="https://img.icons8.com/?id=12455&format=png&color=FFFFFF" alt="lang" />
+                    <img src="https://img.icons8.com/?id=12455&format=png&color=FFFFFF" alt="lang" draggable={false} />
                 </button>
                 {
                     miscState.hoverTooltip == 'translate'

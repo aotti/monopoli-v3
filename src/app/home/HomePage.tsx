@@ -1,16 +1,16 @@
 "use client"
 
-import HeaderContent from "../../components/HeaderContent";
-import ScreenPortraitWarning from "../../components/ScreenPortraitWarning";
 import { Press_Start_2P } from "next/font/google"
-import TestingTooltip from "./TestingTooltip";
+import HeaderContent from "../../components/HeaderContent"
+import HomeContent from "../home/HomeContent"
+import ScreenPortraitWarning from "../../components/ScreenPortraitWarning"
 
 const retroFont = Press_Start_2P({
     subsets: ['latin'],
     weight: ['400']
 })
 
-export default function Page() {
+export default function HomePage() {
 
     return (
         <div className={`${retroFont.className} text-white text-xs lg:text-sm`}>
@@ -21,7 +21,7 @@ export default function Page() {
                 </header>
     
                 <main>
-                    <TestingTooltip />
+                    <HomeContent />
                 </main>
             </div>
             {/* orientation portrait warning */}

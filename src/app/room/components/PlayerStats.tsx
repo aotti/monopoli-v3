@@ -10,7 +10,7 @@ export default function PlayerStats() {
             <div className="flex gap-2 text-2xs lg:text-xs mt-1">
                 {/* profile picture */}
                 <div className="border-2 w-[4rem] h-[4rem] lg:w-32 lg:h-32">
-                    <img src="" alt="pfp" />
+                    <img src="" alt="upload your avatar" />
                 </div>
                 {/* stats */}
                 <div className="lg:flex lg:flex-col lg:gap-4">

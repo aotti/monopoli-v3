@@ -2,20 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --box-shadow-text: 
+        4px 0 #363062,
+        -4px 0 #363062,
+        0 -4px #363062,
+        0 4px #363062,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    --box-shadow-modal: 
+        4px 0 #818FB4,
+        -4px 0 #818FB4,
+        0 -4px #818FB4,
+        0 4px #818FB4,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    --box-shadow-success: 
+        4px 0 #22c55e,
+        -4px 0 #22c55e,
+        0 -4px #22c55e,
+        0 4px #22c55e,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+    --box-shadow-primary: 
+        4px 0 #3b82f6,
+        -4px 0 #3b82f6,
+        0 -4px #3b82f6,
+        0 4px #3b82f6,
+        8px 0 #F5E8C7,
+        -8px 0 #F5E8C7,
+        0 -8px #F5E8C7,
+        0 8px #F5E8C7, 
+        0 0 0 4px #F5E8C7;
+}
+
 input, select {
     @apply text-black
 }
 
-@media screen and (min-width: 1024px) {
-    ol > details > li {
-        @apply pl-10 py-1 ml-4
-    }
-}
-
-@media screen and (max-width: 1024px) {
-    ol > details > li {
-        @apply pl-10 py-1 ml-1
-    }
+img[alt] {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    height: 100%;
 }
 
 body {
@@ -38,54 +76,148 @@ ul > li {
 }
 
 .border-8bit-text {
-    box-shadow:
-        4px 0 #363062,
-        -4px 0 #363062,
-        0 -4px #363062,
-        0 4px #363062,
-        8px 0 #F5E8C7,
-        -8px 0 #F5E8C7,
-        0 -8px #F5E8C7,
-        0 8px #F5E8C7, 
-        0 0 0 4px #F5E8C7;
+    box-shadow: var(--box-shadow-text);
     margin: 8px auto;
 }
 .border-8bit-modal {
-    box-shadow:
-        4px 0 #818FB4,
-        -4px 0 #818FB4,
-        0 -4px #818FB4,
-        0 4px #818FB4,
-        8px 0 #F5E8C7,
-        -8px 0 #F5E8C7,
-        0 -8px #F5E8C7,
-        0 8px #F5E8C7, 
-        0 0 0 4px #F5E8C7;
+    box-shadow: var(--box-shadow-modal);
     margin: 8px auto;
 }
 .border-8bit-success {
-    box-shadow:
-        4px 0 #22c55e,
-        -4px 0 #22c55e,
-        0 -4px #22c55e,
-        0 4px #22c55e,
-        8px 0 #F5E8C7,
-        -8px 0 #F5E8C7,
-        0 -8px #F5E8C7,
-        0 8px #F5E8C7, 
-        0 0 0 4px #F5E8C7;
+    box-shadow: var(--box-shadow-success);
     margin: 8px auto;
 }
 .border-8bit-primary {
-    box-shadow:
-        4px 0 #3b82f6,
-        -4px 0 #3b82f6,
-        0 -4px #3b82f6,
-        0 4px #3b82f6,
-        8px 0 #F5E8C7,
-        -8px 0 #F5E8C7,
-        0 -8px #F5E8C7,
-        0 8px #F5E8C7, 
-        0 0 0 4px #F5E8C7;
+    box-shadow: var(--box-shadow-primary);
     margin: 8px auto;
+}
+
+/* desktop ver */
+@media screen and (min-width: 1024px) {
+    ol > details > li {
+        @apply pl-10 py-1 ml-4
+    }
+    
+    /* tooltip */
+    .tooltip-bottom-lg[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        max-height: 10rem;
+        background-color: #363062;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: 3rem;
+        margin-left: -5rem;
+        width: 10rem;
+        font-size: smaller;
+    }
+    .tooltip-top-lg[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        max-height: 10rem;
+        background-color: #363062;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: -9rem;
+        margin-left: -5rem;
+        width: 10rem;
+        font-size: smaller;
+    }
+    .tooltip-right-lg[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        max-height: 10rem;
+        background-color: #363062;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: -3rem;
+        margin-left: 3rem;
+        width: 10rem;
+        font-size: smaller;
+    }
+    .tooltip-left-lg[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        max-height: 10rem;
+        background-color: #363062;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: -3rem;
+        margin-left: -17rem;
+        width: 10rem;
+        font-size: smaller;
+    }
+}
+
+/* mobile ver */
+@media screen and (max-width: 1024px) {
+    ol > details > li {
+        @apply pl-10 py-1 ml-1
+    }
+    
+    /* tooltip */
+    .tooltip-bottom[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        background-color: #363062;
+        max-height: 10rem;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: 2rem;
+        margin-left: -5rem;
+        font-size: xx-small;
+        width: 8.5rem;
+    }
+    .tooltip-top[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        background-color: #363062;
+        max-height: 10rem;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: -7rem;
+        margin-left: -5rem;
+        font-size: xx-small;
+        width: 8.5rem;
+    }
+    .tooltip-right[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        background-color: #363062;
+        max-height: 10rem;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: -2rem;
+        margin-left: 2rem;
+        font-size: xx-small;
+        width: 8.5rem;
+    }
+    .tooltip-left[data-tooltip]:hover::after {
+        /* static */
+        content: attr(data-tooltip);
+        position: absolute;
+        background-color: #363062;
+        max-height: 10rem;
+        white-space: pre-line;
+        box-shadow: var(--box-shadow-text);
+        /* need modify */
+        margin-top: -2rem;
+        margin-left: -14rem;
+        font-size: xx-small;
+        width: 8.5rem;
+    }
 }

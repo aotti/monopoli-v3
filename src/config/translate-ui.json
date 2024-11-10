@@ -37,8 +37,9 @@
         "help": "bantuan",
         "players": "pemain",
         "chat": "ngobrol",
+
         "__BOARD__": "__BOARD__",
-        "Start line": "Imagine lewat start..",
+        "Start line": "Garis start",
         "Community Card": "Kartu Dana Umum",
         "Chance Card": "Kartu Kesempatan",
         "Special": "Khusus",
@@ -51,6 +52,7 @@
         "roll dice": "lempar dadu",
         "roll turn": "putar angka",
         "surrender": "menyerah",
+
         "__SIDE BUTTONS & CONTENT__": "__SIDE BUTTONS & CONTENT__",
         "Auto roll dice": "Dadu otomatis",
         "Sell City": "Jual Kota",
@@ -60,6 +62,7 @@
         "only player in this room can see the chat": "obrolan ini hanya bisa dilihat pemain yang ada disini",
 
         "__HELP CONTENT__": "__HELP CONTENT__",
+
         "__KARTU DANA UMUM__": "__KARTU DANA UMUM__",
         "Gift from the bank, you get 40.000": "Hadiah dari bank, anda mendapatkan 40.000",
         "Your birthday, get 15.000 from each player": "Hari ulang tahun anda, dapat 15.000 dari tiap player",
