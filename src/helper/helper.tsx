@@ -79,28 +79,30 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
     }
 
     function applyTooltipStyle(rows: number) {
-        // check XY axis first
+        // check Y axis first
+        // ### LALU CEK X AXIS, LALU CEK JUMLAH ROWS
+        // ### JIKA ROWS <= 2, MAKA PILIH KANAN/KIRI, SELAIN ITU ATAS/BAWAH 
         switch(true) {
-            // bottom | bottom-lg
-            case elementPos.bottom >= 200:
-                ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                return
-            // top-25 | top-50 | top-75 | top-100
             case elementPos.top >= 200:
+                // top-25 | top-50 | top-75 | top-100
                 if(rows === 2) ['tooltip-top-25', 'tooltip-top-25-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 if(rows === 4) ['tooltip-top-50', 'tooltip-top-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 if(rows === 6) ['tooltip-top-75', 'tooltip-top-75-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 if(rows === 8) ['tooltip-top-100', 'tooltip-top-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 return
-            // right-50 | right-100
             case elementPos.right >= 200:
+                // right-50 | right-100
                 if(rows <= 4) ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 else ['tooltip-right-100', 'tooltip-right-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 return
-            // left-50 | left-100
             case elementPos.left >= 200:
+                // left-50 | left-100
                 if(rows <= 4) ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 else ['tooltip-left-100', 'tooltip-left-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                return
+            case elementPos.bottom >= 200:
+                // bottom | bottom-lg
+                ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 return
         }
     }

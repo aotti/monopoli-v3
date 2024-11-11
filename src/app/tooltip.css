@@ -6,11 +6,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: 3rem;
             margin-left: -7rem;
@@ -22,11 +23,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -3.5rem;
             margin-left: -7rem;
@@ -38,11 +40,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -6rem;
             margin-left: -7rem;
@@ -54,11 +57,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -8.5rem;
             margin-left: -7rem;
@@ -70,11 +74,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -11rem;
             margin-left: -7rem;
@@ -86,14 +91,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
-            margin-top: -1rem;
-            margin-left: 3rem;
+            margin-top: 0;
+            margin-left: 2rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -102,14 +108,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -3rem;
-            margin-left: 3rem;
+            margin-left: 2rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -118,14 +125,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
-            margin-top: -1rem;
-            margin-left: -17rem;
+            margin-top: 0;
+            margin-left: -15rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -134,14 +142,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -3rem;
-            margin-left: -17rem;
+            margin-left: -15rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -154,11 +163,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: 2rem;
             margin-left: -6rem;
@@ -170,11 +180,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -3rem;
             margin-left: -6rem;
@@ -186,11 +197,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -5rem;
             margin-left: -6rem;
@@ -202,11 +214,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -7rem;
             margin-left: -6rem;
@@ -218,11 +231,12 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -9rem;
             margin-left: -6rem;
@@ -234,14 +248,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
-            margin-top: -1rem;
-            margin-left: 2rem;
+            margin-top: 0;
+            margin-left: 1rem;
             font-size: xx-small;
             width: 8.5rem;
         }
@@ -250,14 +265,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -2rem;
-            margin-left: 2rem;
+            margin-left: 1rem;
             font-size: xx-small;
             width: 8.5rem;
         }
@@ -266,14 +282,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
-            margin-top: -1rem;
-            margin-left: -14rem;
+            margin-top: 0;
+            margin-left: -13rem;
             font-size: xx-small;
             width: 8.5rem;
         }
@@ -282,14 +299,15 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
             box-shadow: var(--box-shadow-text);
+            text-align: center;
             /* need modify */
             margin-top: -2rem;
-            margin-left: -14rem;
+            margin-left: -13rem;
             font-size: xx-small;
             width: 8.5rem;
         }

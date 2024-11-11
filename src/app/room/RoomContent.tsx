@@ -9,26 +9,11 @@ import RoomCard from "./components/RoomCard";
 
 export default function RoomContent() {
     const miscState = useMisc()
-    const roomRules: {[key: number]: ITooltip} = {
-        '1': {
-            text: `board: normal;dice: 2;start: 75k;lose: -25k;mode: 5 laps;curse: 5%`,
-            key: `#rules_${1}`,
-            pos: 'top',
-            arrow: ['bottom', 'middle']
-        },
-        '2': {
-            text: `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5%`,
-            key: `#rules_${2}`,
-            pos: 'top',
-            arrow: ['bottom', 'middle']
-        },
-        '3': {
-            text: `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`,
-            key: `#rules_${3}`,
-            pos: 'top',
-            arrow: ['bottom', 'middle']
-        },
-    }
+    const roomRules = [
+        `board: normal;dice: 2;start: 75k;lose: -25k;mode: 5 laps;curse: 5%`,
+        `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5%`,
+        `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`
+    ]
 
     return (
         <div className="flex gap-2">
@@ -101,11 +86,11 @@ export default function RoomContent() {
                     text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
                     overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
                     {/* card */}
+                    <RoomCard roomRules={roomRules[0]} />
+                    {/* card */}
                     <RoomCard roomRules={roomRules[1]} />
                     {/* card */}
                     <RoomCard roomRules={roomRules[2]} />
-                    {/* card */}
-                    <RoomCard roomRules={roomRules[3]} />
                 </div>
             </div>
         </div>

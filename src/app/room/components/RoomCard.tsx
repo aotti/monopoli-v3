@@ -1,10 +1,20 @@
-import Tooltip from "../../../components/Tooltip"
+import { useEffect } from "react"
 import { useMisc } from "../../../context/MiscContext"
-import { translateUI } from "../../../helper/helper"
-import { ITooltip } from "../../../helper/types"
+import { applyTooltip, qSA, translateUI } from "../../../helper/helper"
 
-export default function RoomCard({ roomRules }: {roomRules: ITooltip}) {
+export default function RoomCard({ roomRules }: {roomRules: string}) {
     const miscState = useMisc()
+    // tooltip (the element must have position: relative)
+    useEffect(() => {
+        qSA('[data-tooltip]').forEach((el: HTMLElement) => {
+            // mouse event
+            el.onpointerover = ev => applyTooltip(ev as any)
+            el.onpointerout = ev => applyTooltip(ev as any)
+            // touch event
+            el.ontouchstart = ev => applyTooltip(ev as any)
+            el.ontouchend = ev => applyTooltip(ev as any)
+        })
+    }, [])
 
     return (
         <div className="w-[calc(100%-52.5%)] h-56 lg:h-60 border-2">
@@ -41,18 +51,9 @@ export default function RoomCard({ roomRules }: {roomRules: ITooltip}) {
                     </label>
                     <div className="w-3/5 border-b">
                         {/* hover rules */}
-                        <p id={roomRules.key.substring(1)} className="w-full text-center bg-transparent" 
-                        onTouchStart={() => miscState.setHoverTooltip(`${roomRules.key.substring(1)}`)}
-                        onTouchEnd={() => miscState.setHoverTooltip(null)}
-                        onMouseOver={() => miscState.setHoverTooltip(`${roomRules.key.substring(1)}`)} 
-                        onMouseOut={() => miscState.setHoverTooltip(null)}> ??? </p>
+                        <p data-tooltip={roomRules.replaceAll(';', '\n')} className="relative w-full text-center bg-transparent" > ??? </p>
                         {/* input */}
-                        <input type="hidden" value={roomRules.text} readOnly />
-                        {
-                            miscState.hoverTooltip == roomRules.key.substring(1)
-                                ? <Tooltip options={roomRules}/>
-                                : null
-                        }
+                        <input type="hidden" value={roomRules} readOnly />
                     </div>
                 </div>
                 {/* creator */}

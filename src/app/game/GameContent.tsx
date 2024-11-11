@@ -1,9 +1,7 @@
 import { useEffect, useRef } from "react"
-import Tooltip from "../../components/Tooltip"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { clickOutsideElement, qS, translateUI } from "../../helper/helper"
-import { ITooltip } from "../../helper/types"
+import { applyTooltip, clickOutsideElement, qS, qSA, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -23,14 +21,27 @@ export default function GameContent() {
     // click outside element
     const gameSideButtonRef = useRef()
     clickOutsideElement(gameSideButtonRef, () => gameState.setGameSideButton(null))
+    // tooltip (the element must have position: relative)
+    useEffect(() => {
+        qSA('[data-tooltip]').forEach((el: HTMLElement) => {
+            // mouse event
+            el.onpointerover = ev => applyTooltip(ev as any)
+            el.onpointerout = ev => applyTooltip(ev as any)
+            // touch event
+            el.ontouchstart = ev => applyTooltip(ev as any)
+            el.ontouchend = ev => applyTooltip(ev as any)
+        })
+    }, [])
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
             {/* left side | back button, game info, game history */}
             <div className="flex flex-col justify-between gap-6 self-start mt-6 mx-2 w-20 lg:w-24 h-[calc(100%-5rem)]">
-                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs">
-                    {translateUI({lang: miscState.language, text: 'Back to room'})}
-                </Link>
+                <div data-tooltip={'back to room, not leave game'} className="relative">
+                    <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs">
+                        {translateUI({lang: miscState.language, text: 'Back to room'})}
+                    </Link>
+                </div>
                 {/* game info */}
                 <GameInfo />
                 {/* game history */}
