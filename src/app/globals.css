@@ -1,4 +1,5 @@
-@tailwind base;
+@import "tailwindcss/base";
+@import "./tooltip.css";
 @tailwind components;
 @tailwind utilities;
 
@@ -92,132 +93,13 @@ ul > li {
     margin: 8px auto;
 }
 
-/* desktop ver */
 @media screen and (min-width: 1024px) {
     ol > details > li {
         @apply pl-10 py-1 ml-4
     }
-    
-    /* tooltip */
-    .tooltip-bottom-lg[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        max-height: 10rem;
-        background-color: #363062;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: 3rem;
-        margin-left: -5rem;
-        width: 10rem;
-        font-size: smaller;
-    }
-    .tooltip-top-lg[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        max-height: 10rem;
-        background-color: #363062;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: -9rem;
-        margin-left: -5rem;
-        width: 10rem;
-        font-size: smaller;
-    }
-    .tooltip-right-lg[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        max-height: 10rem;
-        background-color: #363062;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: -3rem;
-        margin-left: 3rem;
-        width: 10rem;
-        font-size: smaller;
-    }
-    .tooltip-left-lg[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        max-height: 10rem;
-        background-color: #363062;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: -3rem;
-        margin-left: -17rem;
-        width: 10rem;
-        font-size: smaller;
-    }
 }
-
-/* mobile ver */
 @media screen and (max-width: 1024px) {
     ol > details > li {
         @apply pl-10 py-1 ml-1
-    }
-    
-    /* tooltip */
-    .tooltip-bottom[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        background-color: #363062;
-        max-height: 10rem;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: 2rem;
-        margin-left: -5rem;
-        font-size: xx-small;
-        width: 8.5rem;
-    }
-    .tooltip-top[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        background-color: #363062;
-        max-height: 10rem;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: -7rem;
-        margin-left: -5rem;
-        font-size: xx-small;
-        width: 8.5rem;
-    }
-    .tooltip-right[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        background-color: #363062;
-        max-height: 10rem;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: -2rem;
-        margin-left: 2rem;
-        font-size: xx-small;
-        width: 8.5rem;
-    }
-    .tooltip-left[data-tooltip]:hover::after {
-        /* static */
-        content: attr(data-tooltip);
-        position: absolute;
-        background-color: #363062;
-        max-height: 10rem;
-        white-space: pre-line;
-        box-shadow: var(--box-shadow-text);
-        /* need modify */
-        margin-top: -2rem;
-        margin-left: -14rem;
-        font-size: xx-small;
-        width: 8.5rem;
     }
 }

@@ -1,0 +1,297 @@
+@layer base {
+    /* desktop ver */
+    @media screen and (min-width: 1024px) {
+        /* tooltip */
+        .tooltip-bottom-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: 3rem;
+            margin-left: -7rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    
+        .tooltip-top-25-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -3.5rem;
+            margin-left: -7rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    
+        .tooltip-top-50-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -6rem;
+            margin-left: -7rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    
+        .tooltip-top-75-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -8.5rem;
+            margin-left: -7rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    
+        .tooltip-top-100-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -11rem;
+            margin-left: -7rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    
+        .tooltip-right-50-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -1rem;
+            margin-left: 3rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    
+        .tooltip-right-100-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -3rem;
+            margin-left: 3rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+        
+        .tooltip-left-50-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -1rem;
+            margin-left: -17rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+        
+        .tooltip-left-100-lg[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            max-height: 10rem;
+            background-color: #363062;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -3rem;
+            margin-left: -17rem;
+            width: 10rem;
+            font-size: smaller;
+        }
+    }
+    
+    /* mobile ver */
+    @media screen and (max-width: 1024px) {
+        /* tooltip */
+        .tooltip-bottom[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: 2rem;
+            margin-left: -6rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-top-25[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -3rem;
+            margin-left: -6rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-top-50[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -5rem;
+            margin-left: -6rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-top-75[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -7rem;
+            margin-left: -6rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-top-100[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -9rem;
+            margin-left: -6rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-right-50[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -1rem;
+            margin-left: 2rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-right-100[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -2rem;
+            margin-left: 2rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-left-50[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -1rem;
+            margin-left: -14rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+
+        .tooltip-left-100[data-tooltip]::after {
+            /* static */
+            content: attr(data-tooltip);
+            position: absolute;
+            z-index: 10;
+            background-color: #363062;
+            max-height: 10rem;
+            white-space: pre-line;
+            box-shadow: var(--box-shadow-text);
+            /* need modify */
+            margin-top: -2rem;
+            margin-left: -14rem;
+            font-size: xx-small;
+            width: 8.5rem;
+        }
+    }
+}

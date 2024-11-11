@@ -1,0 +1,76 @@
+{
+    "city": {
+        "aceh": {
+            "name": "Aceh",
+            "img": "",
+            "price": 70000
+        },
+        "padang": {
+            "name": "Padang",
+            "img": "",
+            "price": 70000
+        },
+        "palembang": {
+            "name": "Palembang",
+            "img": "",
+            "price": 70000
+        },
+        "jakarta": {
+            "name": "Jakarta",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png",
+            "price": 70000
+        },
+        "yogyakarta": {
+            "name": "Yogyakarta",
+            "img": "",
+            "price": 70000
+        },
+        "magelang": {
+            "name": "Magelang",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png",
+            "price": 70000
+        },
+        "surabaya": {
+            "name": "Surabaya",
+            "img": "",
+            "price": 70000
+        },
+        "denpasar": {
+            "name": "Denpasar",
+            "img": "",
+            "price": 70000
+        },
+        "mataram": {
+            "name": "Mataram",
+            "img": "",
+            "price": 70000
+        },
+        "merauke": {
+            "name": "Merauke",
+            "img": "",
+            "price": 70000
+        }
+    },
+    "other": {
+        "start": {
+            "name": "Start line",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Start_100-wIOOcS7Dm9xTo36ZgtEHTNabPzjoz1.gif"
+        },
+        "community": {
+            "name": "Community Card",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
+        },
+        "chance": {
+            "name": "Chance Card",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png"
+        },
+        "buff": {
+            "name": "Buff Area",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png"
+        },
+        "debuff": {
+            "name": "Debuff Area",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png"
+        }
+    }
+}

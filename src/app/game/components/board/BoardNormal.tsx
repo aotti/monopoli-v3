@@ -1,10 +1,15 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { moneyFormat, translateUI } from "../../../../helper/helper"
+import board_tiles from '../../../../config/board-tiles.json'
 
 export default function BoardDelta() {
     const miscState = useMisc()
     const squareNumberStyle = 'before:absolute before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
+    // city tiles
+    const cityTiles = board_tiles.city
+    // other tiles
+    const otherTiles = board_tiles.other
 
     return (
         <>
@@ -16,19 +21,19 @@ export default function BoardDelta() {
                 </div>
                 {/* 2 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="16">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.community.name})} imgsrc={otherTiles.community.img} />
                 </div>
                 {/* 3 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="17">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.chance.name})} imgsrc={otherTiles.chance.img} />
                 </div>
                 {/* 4 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="18">
-                    <TileCity cityname={'Magelang'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={cityTiles.magelang.name} cityprice={cityTiles.magelang.price} imgsrc={cityTiles.magelang.img} />
                 </div>
                 {/* 5 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="19">
-                    <TileCity cityname={'Surabaya'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Surabaya'} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 6 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="20">
@@ -36,15 +41,15 @@ export default function BoardDelta() {
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="21">
-                    <TileCity cityname={'Denpasar'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Denpasar'} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 8 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="22">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.community.name})} imgsrc={otherTiles.community.img} />
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="23">
-                    <TileOther tilename={`Buff or Debuff`} imgsrc={``} />
+                    <TileOther tilename={otherTiles.debuff.name} imgsrc={otherTiles.debuff.img} />
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="24">
@@ -55,7 +60,7 @@ export default function BoardDelta() {
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="14">
-                    <TileOther tilename={`Buff or Debuff`} imgsrc={``} />
+                    <TileOther tilename={otherTiles.buff.name} imgsrc={otherTiles.buff.img} />
                 </div>
                 {/* 2 */}
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
@@ -75,14 +80,14 @@ export default function BoardDelta() {
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="25">
-                    <TileCity cityname={'Mataram'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Mataram'} cityprice={70000} imgsrc={''} />
                 </div>
             </div>
             {/* row 3 */}
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="13">
-                    <TileCity cityname={'Yogyakarta'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Yogyakarta'} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 2 */}
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
@@ -102,14 +107,14 @@ export default function BoardDelta() {
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="26">
-                    <TileCity cityname={'Merauke'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Merauke'} cityprice={70000} imgsrc={''} />
                 </div>
             </div>
             {/* row 4 */}
             <div className="flex">
                 {/* 1 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="12">
-                    <TileCity cityname={'Jakarta'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={cityTiles.jakarta.name} cityprice={cityTiles.jakarta.price} imgsrc={cityTiles.jakarta.img} />
                 </div>
                 {/* 2 */}
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
@@ -156,7 +161,7 @@ export default function BoardDelta() {
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="28">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.chance.name})} imgsrc={otherTiles.chance.img} />
                 </div>
             </div>
             {/* row 6 */}
@@ -167,7 +172,7 @@ export default function BoardDelta() {
                 </div>
                 {/* 2 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="9">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Chance Card'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.chance.name})} imgsrc={otherTiles.chance.img} />
                 </div>
                 {/* 3 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="8">
@@ -179,27 +184,27 @@ export default function BoardDelta() {
                 </div>
                 {/* 5 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="6">
-                    <TileCity cityname={'Palembang'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Palembang'} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 6 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="5">
-                    <TileCity cityname={'Padang'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Padang'} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 7 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="4">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Community Card'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.community.name})} imgsrc={otherTiles.community.img} />
                 </div>
                 {/* 8 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="3">
-                    <TileOther tilename={`Buff or Debuff`} imgsrc={``} />
+                    <TileOther tilename={otherTiles.debuff.name} imgsrc={otherTiles.debuff.img} />
                 </div>
                 {/* 9 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="2">
-                    <TileCity cityname={'Aceh'} cityprice={70000} imgsrc={'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM'} />
+                    <TileCity cityname={'Aceh'} cityprice={70000} imgsrc={''} />
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="1">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: 'Start line'})} imgsrc={``} />
+                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.start.name})} imgsrc={otherTiles.start.img} />
                 </div>
             </div>
         </>
