@@ -1,6 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
 import { translateUI } from "../../helper/helper";
-import { ITooltip } from "../../helper/types";
 import ChatBox from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";

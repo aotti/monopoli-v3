@@ -4,7 +4,7 @@ import translateUI_data from '../config/translate-ui.json'
 // translate language
 export interface ITranslate {
     lang: 'english' | 'indonesia',
-    text: keyof typeof translateUI_data['indonesia'] | string,
+    text: keyof typeof translateUI_data['indonesia'],
     lowercase?: boolean,
 }
 

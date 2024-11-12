@@ -1,24 +1,9 @@
-import Tooltip from "../../../../components/Tooltip"
 import { useMisc } from "../../../../context/MiscContext"
-import { ITooltip } from "../../../../helper/types"
 
 export default function BoardDelta() {
     const miscState = useMisc()
     // square number
     const squareNumberStyle = 'before:absolute before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
-    // tooltip options
-    const cityOneTooltip: ITooltip = {
-        text: 'kota jakarta\nowner:\ndengkul\nprice:\nRp 70.000',
-        key: '#jakarta',
-        pos: 'right',
-        arrow: ['left', 'start']
-    }
-    const cityTwoTooltip: ITooltip = {
-        text: 'kota bandung\nowner:\nlele\nprice:\nRp 50.000',
-        key: '#bandung',
-        pos: 'top',
-        arrow: ['bottom', 'middle']
-    }
 
     return (
         <>
@@ -37,17 +22,8 @@ export default function BoardDelta() {
                     <img src="" alt="" className="bg-darkblue-1 w-[7.5vw] h-[15.5vh]" draggable={false} />
                 </div>
                 {/* 6 */}
-                <div id="jakarta" className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="20"
-                onTouchStart={() => miscState.setHoverTooltip(`${cityOneTooltip.key.substring(1)}`)}
-                onTouchEnd={() => miscState.setHoverTooltip(null)}
-                onMouseOver={() => miscState.setHoverTooltip(`${cityOneTooltip.key.substring(1)}`)} 
-                onMouseOut={() => miscState.setHoverTooltip(null)}>
+                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="5">
                     <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    {
-                        miscState.hoverTooltip == 'jakarta'
-                            ? <Tooltip options={cityOneTooltip} />
-                            : null
-                    }
                 </div>
                 {/* 7 */}
                 <div className="w-[7.5vw] h-[15.5vh]"></div>
@@ -217,17 +193,8 @@ export default function BoardDelta() {
                     <img src="" alt="" className="bg-darkblue-1 w-[7.5vw] h-[15.5vh]" draggable={false} />
                 </div>
                 {/* 9 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="2"
-                onTouchStart={() => miscState.setHoverTooltip(`${cityTwoTooltip.key.substring(1)}`)}
-                onTouchEnd={() => miscState.setHoverTooltip(null)}
-                onMouseOver={() => miscState.setHoverTooltip(`${cityTwoTooltip.key.substring(1)}`)} 
-                onMouseOut={() => miscState.setHoverTooltip(null)}>
-                    <img id="bandung" src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
-                    {
-                        miscState.hoverTooltip == 'bandung'
-                            ? <Tooltip options={cityTwoTooltip} />
-                            : null
-                    }
+                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="5">
+                    <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/jakarta-mWTBxZTjqPhyEVaMF0HSkitkyVxjKM" alt="jakarta" className="w-[7.5vw] h-[15.5vh]" draggable={false} />
                 </div>
                 {/* 10 */}
                 <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="1">

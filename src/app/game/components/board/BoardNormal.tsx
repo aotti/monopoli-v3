@@ -1,217 +1,117 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { moneyFormat, translateUI } from "../../../../helper/helper"
-import board_tiles from '../../../../config/board-tiles.json'
+import board_normal from '../../config/board-normal.json'
 
 export default function BoardDelta() {
-    const miscState = useMisc()
     const squareNumberStyle = 'before:absolute before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
-    // city tiles
-    const cityTiles = board_tiles.city
-    // other tiles
-    const otherTiles = board_tiles.other
+    // board tiles
+    const boardNormal = board_normal
 
     return (
         <>
             {/* row 1 */}
             <div className="flex">
-                {/* 1 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="15">
-                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-3`} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 2 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="16">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.community.name})} imgsrc={otherTiles.community.img} />
-                </div>
-                {/* 3 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="17">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.chance.name})} imgsrc={otherTiles.chance.img} />
-                </div>
-                {/* 4 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="18">
-                    <TileCity cityname={cityTiles.magelang.name} cityprice={cityTiles.magelang.price} imgsrc={cityTiles.magelang.img} />
-                </div>
-                {/* 5 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="19">
-                    <TileCity cityname={'Surabaya'} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 6 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="20">
-                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-4`} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 7 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="21">
-                    <TileCity cityname={'Denpasar'} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 8 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="22">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.community.name})} imgsrc={otherTiles.community.img} />
-                </div>
-                {/* 9 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="23">
-                    <TileOther tilename={otherTiles.debuff.name} imgsrc={otherTiles.debuff.img} />
-                </div>
-                {/* 10 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="24">
-                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Free Parking'})} 😎 `} imgsrc={``} />
-                </div>
+                {boardNormal.row_1.map(tile => {
+                    return (
+                        tile.type === null
+                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            : tile.type == 'city'
+                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                </div>
+                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                </div>
+                    )
+                })}
             </div>
             {/* row 2 */}
             <div className="flex">
-                {/* 1 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="14">
-                    <TileOther tilename={otherTiles.buff.name} imgsrc={otherTiles.buff.img} />
-                </div>
-                {/* 2 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 3 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 4 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 5 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 6 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 7 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 8 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 9 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 10 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="25">
-                    <TileCity cityname={'Mataram'} cityprice={70000} imgsrc={''} />
-                </div>
+                {boardNormal.row_2.map(tile => {
+                    return (
+                        tile.type === null
+                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            : tile.type == 'city'
+                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                </div>
+                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                </div>
+                    )
+                })}
             </div>
             {/* row 3 */}
             <div className="flex">
-                {/* 1 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="13">
-                    <TileCity cityname={'Yogyakarta'} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 2 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 3 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 4 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 5 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 6 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 7 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 8 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 9 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 10 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="26">
-                    <TileCity cityname={'Merauke'} cityprice={70000} imgsrc={''} />
-                </div>
+                {boardNormal.row_3.map(tile => {
+                    return (
+                        tile.type === null
+                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            : tile.type == 'city'
+                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                </div>
+                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                </div>
+                    )
+                })}
             </div>
             {/* row 4 */}
             <div className="flex">
-                {/* 1 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="12">
-                    <TileCity cityname={cityTiles.jakarta.name} cityprice={cityTiles.jakarta.price} imgsrc={cityTiles.jakarta.img} />
-                </div>
-                {/* 2 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 3 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 4 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 5 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 6 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 7 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 8 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 9 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 10 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="27">
-                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Cursed'})}-2`} cityprice={70000} imgsrc={''} />
-                </div>
+                {boardNormal.row_4.map(tile => {
+                    return (
+                        tile.type === null
+                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            : tile.type == 'city'
+                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                </div>
+                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                </div>
+                    )
+                })}
             </div>
             {/* row 5 */}
             <div className="flex">
-                {/* 1 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="11">
-                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-2`} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 2 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 3 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 4 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 5 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 6 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 7 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 8 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 9 */}
-                <div className="w-[7.5vw] h-[15.5vh]"></div>
-                {/* 10 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="28">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.chance.name})} imgsrc={otherTiles.chance.img} />
-                </div>
+                {boardNormal.row_5.map(tile => {
+                    return (
+                        tile.type === null
+                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            : tile.type == 'city'
+                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                </div>
+                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                </div>
+                    )
+                })}
             </div>
             {/* row 6 */}
             <div className="flex">
-                {/* 1 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="10">
-                    <TileOther tilename={`${translateUI({lang: miscState.language, text: 'Get Arrested'})} 👮 `} imgsrc={``} />
-                </div>
-                {/* 2 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="9">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.chance.name})} imgsrc={otherTiles.chance.img} />
-                </div>
-                {/* 3 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="8">
-                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Cursed'})}-1`} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 4 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="7">
-                    <TileCity cityname={`${translateUI({lang: miscState.language, text: 'Special'})}-1`} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 5 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="6">
-                    <TileCity cityname={'Palembang'} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 6 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="5">
-                    <TileCity cityname={'Padang'} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 7 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="4">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.community.name})} imgsrc={otherTiles.community.img} />
-                </div>
-                {/* 8 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="3">
-                    <TileOther tilename={otherTiles.debuff.name} imgsrc={otherTiles.debuff.img} />
-                </div>
-                {/* 9 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="2">
-                    <TileCity cityname={'Aceh'} cityprice={70000} imgsrc={''} />
-                </div>
-                {/* 10 */}
-                <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square="1">
-                    <TileOther tilename={translateUI({lang: miscState.language, text: otherTiles.start.name})} imgsrc={otherTiles.start.img} />
-                </div>
+                {boardNormal.row_6.map(tile => {
+                    return (
+                        tile.type === null
+                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            : tile.type == 'city'
+                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                </div>
+                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                </div>
+                    )
+                })}
             </div>
         </>
     )
 }
 
 function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: string, cityprice: number, cityhouse?: string}) {
+    const miscState = useMisc()
     const gameState = useGame()
     const priceText = `after:block after:content-[attr(data-price)]`
 
@@ -228,7 +128,11 @@ function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: st
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
                 <p className={`leading-3 lg:leading-relaxed text-[2vh] ${priceText}`} data-price={moneyFormat(cityprice)}> 
-                    {cityname} 
+                    {
+                        cityname.match(/\d/)
+                            ? translateUI({lang: miscState.language, text: cityname as any})
+                            : cityname
+                    } 
                 </p>
             </div>
             <img src={imgsrc} alt={cityname} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
@@ -237,6 +141,7 @@ function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: st
 }
 
 function TileOther({ tilename, imgsrc }: {tilename: string, imgsrc: string}) {
+    const miscState = useMisc()
     const gameState = useGame()
 
     return (
@@ -252,7 +157,7 @@ function TileOther({ tilename, imgsrc }: {tilename: string, imgsrc: string}) {
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
                 <p className={`leading-3 lg:leading-relaxed text-[2vh]`}> 
-                    {tilename} 
+                    {translateUI({lang: miscState.language, text: tilename as any})} 
                 </p>
             </div>
             <img src={imgsrc} alt={tilename} className={`${gameState.showTileImage == 'other' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />

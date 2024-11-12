@@ -1,0 +1,229 @@
+{
+    "row_1": [
+        { 
+            "square": 15, 
+            "type": "city",
+            "name": "Special-3", 
+            "img": "" 
+        },
+        { 
+            "square": 16, 
+            "type": "other",
+            "name": "Community Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png" 
+        },
+        { 
+            "square": 17, 
+            "type": "other",
+            "name": "Chance Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+        },
+        { 
+            "square": 18, 
+            "type": "city",
+            "name": "Magelang", 
+            "price": 70000,
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png" 
+        },
+        { 
+            "square": 19, 
+            "type": "city",
+            "name": "Surabaya", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 20, 
+            "type": "city",
+            "name": "Special-4", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 21, 
+            "type": "city",
+            "name": "Denpasar", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 22, 
+            "type": "other",
+            "name": "Community Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png" 
+        },
+        { 
+            "square": 23, 
+            "type": "other",
+            "name": "Debuff Area", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png" 
+        },
+        { 
+            "square": 24, 
+            "type": "other",
+            "name": "Free Parking 😎", 
+            "img": "" 
+        }
+    ],
+    "row_2": [
+        { 
+            "square": 14, 
+            "type": "other",
+            "name": "Buff Area", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png" 
+        },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { 
+            "square": 25, 
+            "type": "city",
+            "name": "Mataram", 
+            "price": 70000,
+            "img": "" 
+        }
+    ],
+    "row_3": [
+        { 
+            "square": 13, 
+            "type": "city",
+            "name": "Yogyakarta", 
+            "price": 70000,
+            "img": "" 
+        },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { 
+            "square": 26, 
+            "type": "city",
+            "name": "Merauke", 
+            "price": 70000,
+            "img": "" 
+        }
+    ],
+    "row_4": [
+        { 
+            "square": 12, 
+            "type": "city",
+            "name": "Jakarta", 
+            "price": 70000,
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png" 
+        },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { 
+            "square": 27, 
+            "type": "city",
+            "name": "Cursed-2", 
+            "price": 70000,
+            "img": "" 
+        }
+    ],
+    "row_5": [
+        { 
+            "square": 11, 
+            "type": "city",
+            "name": "Special-2", 
+            "price": 70000,
+            "img": "" 
+        },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { "type": null },
+        { 
+            "square": 28, 
+            "type": "other",
+            "name": "Chance Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+        }
+    ],
+    "row_6": [
+        { 
+            "square": 10, 
+            "type": "other",
+            "name": "Get Arrested 👮", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Jail_100l-ICZXioK3ZAtyBzFw1EDulpESLGnpYt.png" 
+        },
+        { 
+            "square": 9, 
+            "type": "other",
+            "name": "Chance Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+        },
+        { 
+            "square": 8, 
+            "type": "city",
+            "name": "Cursed-1", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 7, 
+            "type": "city",
+            "name": "Special-1", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 6, 
+            "type": "city",
+            "name": "Palembang", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 5, 
+            "type": "city",
+            "name": "Padang", 
+            "price": 70000,
+            "img": "" 
+        },
+        { 
+            "square": 4, 
+            "type": "other",
+            "name": "Community Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png" 
+        },
+        { 
+            "square": 3, 
+            "type": "other",
+            "name": "Debuff Area", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png" 
+        },
+        { 
+            "square": 2, 
+            "type": "city",
+            "name": "Aceh", 
+            "price": 70000,
+            "img": ""
+        },
+        { 
+            "square": 1, 
+            "type": "other",
+            "name": "Start line", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Start_100-wIOOcS7Dm9xTo36ZgtEHTNabPzjoz1.gif" 
+        }
+    ]
+}

@@ -1,4 +1,4 @@
-import { MouseEvent, MutableRefObject, PointerEvent, useEffect } from "react";
+import { MutableRefObject, PointerEvent, useEffect } from "react";
 import { ITranslate } from "./types";
 import translateUI_data from '../config/translate-ui.json'
 
