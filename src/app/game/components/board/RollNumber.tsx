@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 import { useGame } from "../../../../context/GameContext";
-import { IGameContext } from "../../../../helper/types";
-import { qS, qSA } from "../../../../helper/helper";
+import { IGameContext, ITranslate } from "../../../../helper/types";
+import { qS, qSA, translateUI } from "../../../../helper/helper";
+import { useMisc } from "../../../../context/MiscContext";
 
 export default function RollNumber() {
+    const miscState = useMisc()
     const gameState = useGame()
 
     useEffect(() => {
         const number = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-        startAnimation(number, gameState.rollNumber)
+        startAnimation(number, gameState.rollNumber, miscState.language)
         // hidden the roll after end
         setTimeout(() => gameState.setRollNumber(null), 3500);
     }, [])
@@ -23,9 +25,11 @@ export default function RollNumber() {
 }
 
 function RollDice() {
+    const miscState = useMisc()
+
     return (
         <div className="relative top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
-            <p> roll dice </p>
+            <p> {translateUI({lang: miscState.language, text: 'roll dice'})} </p>
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">
                 {/* 1st number */}
@@ -40,9 +44,11 @@ function RollDice() {
 }
 
 function RollTurn() {
+    const miscState = useMisc()
+
     return (
         <div className="relative top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
-            <p> roll turn </p>
+            <p> {translateUI({lang: miscState.language, text: 'roll turn'})} </p>
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">
                 {/* 1st number */}
@@ -118,7 +124,7 @@ const buildItemLists = (number: number[]) => {
 }
 
 // Determine whether the player won and start the spinning animation
-const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
+const startAnimation = (number: number[], type: IGameContext['rollNumber'], language: ITranslate['lang']) => {
     // less than 1024 for mobile, more than 1024 for desktop
     const windowWidth = window.innerWidth
     const defaultSize = windowWidth < 1024 ? 24 : 32
@@ -153,7 +159,7 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
             dices.forEach(dice => diceNumber.push(+dice.textContent))
             // display
             setTimeout(() => {
-                resultDice.textContent = `your dice is ${diceNumber.reduce((accumulator, currentVal) => accumulator + currentVal)}`
+                resultDice.textContent = `${translateUI({lang: language, text: 'your dice is'})} ${diceNumber.reduce((accumulator, currentVal) => accumulator + currentVal)}`
             }, 2000);
         }
         else if(type == 'turn') {
@@ -164,7 +170,7 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber']) => {
             turns.forEach(turn => turnNumber.push(turn.textContent))
             // display
             setTimeout(() => {
-                resultTurn.textContent = `your number is ${+(turnNumber[0] + turnNumber[1] + turnNumber[2])}`
+                resultTurn.textContent = `${translateUI({lang: language, text: 'your number is'})} ${+(turnNumber[0] + turnNumber[1] + turnNumber[2])}`
             }, 2500);
         }
     });

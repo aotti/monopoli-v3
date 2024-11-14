@@ -1,0 +1,91 @@
+{
+    "community_card": {
+        ">25%": [
+            "Gift from the bank, you get 40.000",
+            "Your birthday, get 15.000 from each player",
+            "You get an inheritance of 65.000"
+        ],
+        "25%": [
+            "Gilang the hacker hacks your bank account and loses 20.000",
+            "Fortune block card, when you pass the start, you only get 5.000",
+            "Your car is broken, pay 35.000 repair costs",
+            "Tax nerf card 35%",
+            "You get 20.000 times the number on the selected coin"
+        ],
+        "15%": [
+            "Debt collectors come to your house, you pay 60.000 debt",
+            "Pay the hospital 50.000",
+            "The kind Gilang gives you 5.000",
+            "Select the city you want to go to",
+            "Anti tax card"
+        ],
+        "8%": [
+            "Monthly salary has been paid, you get 160.000",
+            "Pay electricity & water bills 100.000",
+            "Sell 1 owned city (random)"
+        ],
+        "5%": ["City upgrade card"]
+    },
+    "chance_card": {
+        ">25%": [
+            "You stumbled, take 1 step forward",
+            "You find 50.000 on the road, take the money or take 2 steps forward",
+            "You find 30.000 in your pocket"
+        ],
+        "25%": [
+            "Home renovation, pay 30% of the total money",
+            "You chased by a monitor lizard, take 2 steps back",
+            "Go forward to the start or take a general fund card",
+            "Gaming dice card, get 10.000 multiplied by the rolled dice number",
+            "Upgrade 1 owned city (random)"
+        ],
+        "15%": [
+            "Head to someone else's city",
+            "Gilang drops his ichi ocha, you have to take 3 steps back to return it",
+            "Try your luck, go to free parking or go to jail",
+            "Free parking nerf card",
+            "Earthquake, 1 building collapses #sadge"
+        ],
+        "8%": [
+            "You are caught red-handed in corruption, go to jail & fined 90% of the total money",
+            "Anti jail card",
+            "You get a surprise money of 200.000"
+        ],
+        "5%": ["City upgrade card"]
+    },
+    "card_effect": {
+        "reminder": [
+            "Each card can only be used once",
+            "Cannot have 2 same card, if you get 2x anti tax card it'll only count as 1"
+        ],
+        "page 1": [
+            "Anti Jail = when you step on jail tile, you can avoid imprisoned effect",
+            "Anti Tax = avoid paying tax on stepping someone's city",
+            "Nerf Tax = pay tax 35% less",
+            "Gaming Dice = get money 10k * dice number",
+            "Nerf Gaming Dice = get money 5k * dice number"
+        ],
+        "page 2": [
+            "Sad Gaming Dice = loss money 5k * dice number",
+            "Nerf Parking = your tile selection on stepping free parking is 40% less",
+            "Fortune Block = when passing start line, only get 5k",
+            "City Upgrade = can upgrade your city without getting there, but random"
+        ]
+    },
+    "area_items": {
+        "buff 100%": [
+            "[40%] Get money 5k x laps",
+            "[20%] Get anti jail card",
+            "[15%] Get nerf gaming dice card",
+            "[15%] Get nerf tax card",
+            "[10%] Get city upgrade card"
+        ],
+        "debuff 65%": [
+            "[25%] Take 1 step backward",
+            "[15%] Take 2 step forward",
+            "[10%] Get sad gaming dice card",
+            "[8%] Get nerf parking card",
+            "[7%] Go to next Debuff Area"
+        ]
+    }
+}

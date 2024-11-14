@@ -52,6 +52,17 @@ export function clickOutsideElement(ref: MutableRefObject<any>, handler: () => v
     }, [ref, handler])
 }
 
+export function applyTooltipEvent() {
+    qSA('[data-tooltip]').forEach((el: HTMLElement) => {
+        // mouse event
+        el.onpointerover = ev => applyTooltip(ev as any)
+        el.onpointerout = ev => applyTooltip(ev as any)
+        // touch event
+        el.ontouchstart = ev => applyTooltip(ev as any)
+        el.ontouchend = ev => applyTooltip(ev as any)
+    })
+}
+
 export function applyTooltip(ev: PointerEvent<HTMLElement>) {
     // get element position
     const elementRects = ev.currentTarget.getBoundingClientRect()

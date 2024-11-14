@@ -37,11 +37,11 @@ export default function GameContent() {
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
             {/* left side | back button, game info, game history */}
             <div className="flex flex-col justify-between gap-6 self-start mt-6 mx-2 w-20 lg:w-24 h-[calc(100%-5rem)]">
-                <div data-tooltip={'back to room, not leave game'} className="relative">
-                    <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs">
-                        {translateUI({lang: miscState.language, text: 'Back to room'})}
-                    </Link>
-                </div>
+                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs">
+                    <span data-tooltip={'back to room, not leave game'} className="relative"> 
+                        {translateUI({lang: miscState.language, text: 'Back to room'})} 
+                    </span>
+                </Link>
                 {/* game info */}
                 <GameInfo />
                 {/* game history */}

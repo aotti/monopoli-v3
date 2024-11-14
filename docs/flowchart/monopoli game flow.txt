@@ -1,0 +1,11 @@
+flow game monopoli
+
+# harga kota
+  > saat awal game
+	- buat variable untuk simpan data semua player (usestate + context)
+	- saat player membeli kota, input kota ke dalam object player tsb
+	- lalu simpan ke table games (kolom city)
+	- perbarui label kota yang terbeli (nama/icon rumah)
+	- cocokkan "lokasi kota" dgn "kota terbeli"
+	- naikkan harga 10% kota tsb
+	- ulangi setiap kali kota diupgrade

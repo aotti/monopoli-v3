@@ -8,10 +8,10 @@ export default function CreateRoom() {
 
     return (
         <div id="create_room_modal" className={`${miscState.showModal == 'create room' ? 'block' : 'hidden'} 
-            relative z-20 bg-darkblue-3 border-8bit-modal p-2 
+            relative z-20 bg-darkblue-3 border-8bit-modal px-2
             ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-[calc(100vw-60vw)]`}>
             {/* modal head */}
-            <div className="border-b-2 mb-4">
+            <div className="border-b-2 mb-2">
                 <span> {translateUI({lang: miscState.language, text: 'Create Room'})} </span>
             </div>
             {/* modal body */}
@@ -44,21 +44,31 @@ export default function CreateRoom() {
                     <div className="flex justify-between">
                         <label htmlFor="select_money_start" className="text-left">
                             <span> {translateUI({lang: miscState.language, text: 'Money Start'})} </span>
-                            <span id="selected_money_start"></span>
+                            <p id="selected_money_start"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_start" 
                         step={25000} min={50000} max={100000} defaultValue={75000} required 
-                        onChange={ev => displaySelectedMoney(ev)} />
+                        onChange={ev => displaySelectedRange(ev)} />
                     </div>
                     {/* money lose */}
                     <div className="flex justify-between">
                         <label htmlFor="select_money_lose" className="text-left">
                             <span> {translateUI({lang: miscState.language, text: 'Money Lose'})} </span>
-                            <span id="selected_money_lose"></span>
+                            <p id="selected_money_lose"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_lose" 
                         step={25000} min={25000} max={75000} defaultValue={75000} required 
-                        onChange={ev => displaySelectedMoney(ev)} />
+                        onChange={ev => displaySelectedRange(ev)} />
+                    </div>
+                    {/* curse random */}
+                    <div className="flex justify-between">
+                        <label htmlFor="select_curse" className="text-left">
+                            <span> {translateUI({lang: miscState.language, text: 'Curse'})} </span>
+                            <p id="selected_curse"></p>
+                        </label>
+                        <input type="range" className="w-32 lg:w-44 px-1" id="select_curse" 
+                        step={5} min={5} max={15} defaultValue={5} required 
+                        onChange={ev => displaySelectedRange(ev)} />
                     </div>
                     {/* max player */}
                     <div className="flex justify-between">
@@ -110,7 +120,7 @@ export default function CreateRoom() {
     )
 }
 
-function displaySelectedMoney(ev: ChangeEvent<HTMLInputElement>) {
+function displaySelectedRange(ev: ChangeEvent<HTMLInputElement>) {
     const element = ev.currentTarget
     const elementId = element.id
     // check id
@@ -119,5 +129,8 @@ function displaySelectedMoney(ev: ChangeEvent<HTMLInputElement>) {
     }
     else if(elementId == 'select_money_lose') {
         qS('#selected_money_lose').textContent = `(-${element.value})`
+    }
+    else if(elementId == 'select_curse') {
+        qS('#selected_curse').textContent = +element.value > 5 ? `(5~${element.value}%)` : `(${element.value}%)`
     }
 }

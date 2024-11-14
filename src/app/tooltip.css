@@ -19,6 +19,7 @@
             font-size: smaller;
         }
     
+        /* top 25/50/75/100 = adjust margin top */
         .tooltip-top-25-lg[data-tooltip]::after {
             /* static */
             content: attr(data-tooltip);
@@ -87,6 +88,7 @@
             font-size: smaller;
         }
     
+        /* right 50 / 100 = adjust margin top */
         .tooltip-right-50-lg[data-tooltip]::after {
             /* static */
             content: attr(data-tooltip);
@@ -99,7 +101,7 @@
             text-align: center;
             /* need modify */
             margin-top: 0;
-            margin-left: 2rem;
+            margin-left: 1rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -116,11 +118,12 @@
             text-align: center;
             /* need modify */
             margin-top: -3rem;
-            margin-left: 2rem;
+            margin-left: 1rem;
             width: 10rem;
             font-size: smaller;
         }
         
+        /* left 50 / 100 = adjust margin top */
         .tooltip-left-50-lg[data-tooltip]::after {
             /* static */
             content: attr(data-tooltip);
@@ -133,7 +136,7 @@
             text-align: center;
             /* need modify */
             margin-top: 0;
-            margin-left: -15rem;
+            margin-left: -14rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -150,7 +153,7 @@
             text-align: center;
             /* need modify */
             margin-top: -3rem;
-            margin-left: -15rem;
+            margin-left: -14rem;
             width: 10rem;
             font-size: smaller;
         }
@@ -176,6 +179,7 @@
             width: 8.5rem;
         }
 
+        /* top 25/50/75/100 = adjust margin top */
         .tooltip-top-25[data-tooltip]::after {
             /* static */
             content: attr(data-tooltip);
@@ -244,6 +248,7 @@
             width: 8.5rem;
         }
 
+        /* right 50 / 100 = adjust margin top */
         .tooltip-right-50[data-tooltip]::after {
             /* static */
             content: attr(data-tooltip);
@@ -278,6 +283,7 @@
             width: 8.5rem;
         }
 
+        /* left 50 / 100 = adjust margin top */
         .tooltip-left-50[data-tooltip]::after {
             /* static */
             content: attr(data-tooltip);
@@ -290,7 +296,7 @@
             text-align: center;
             /* need modify */
             margin-top: 0;
-            margin-left: -13rem;
+            margin-left: -12rem;
             font-size: xx-small;
             width: 8.5rem;
         }
@@ -307,7 +313,7 @@
             text-align: center;
             /* need modify */
             margin-top: -2rem;
-            margin-left: -13rem;
+            margin-left: -12rem;
             font-size: xx-small;
             width: 8.5rem;
         }
