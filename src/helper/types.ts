@@ -20,6 +20,7 @@ export interface ITooltip {
 }
 
 // context
+type TutorialRoomlist = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
 export interface IMiscContext {
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
@@ -31,6 +32,8 @@ export interface IMiscContext {
     setAnimation: Dispatch<SetStateAction<boolean>>,
     isChatFocus: boolean,
     setIsChatFocus: Dispatch<SetStateAction<boolean>>,
+    showTutorial: TutorialRoomlist,
+    setShowTutorial: Dispatch<SetStateAction<IMiscContext['showTutorial']>>,
 }
 
 export interface IGameContext {

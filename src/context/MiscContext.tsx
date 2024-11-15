@@ -11,6 +11,7 @@ export const MiscProvider = ({ children }: {children: React.ReactNode}) => {
     const [hoverTooltip, setHoverTooltip] = useState<string>(null)
     const [animation, setAnimation] = useState<boolean>(true)
     const [isChatFocus, setIsChatFocus] = useState<boolean>(false)
+    const [showTutorial, setShowTutorial] = useState<IMiscContext['showTutorial']>(null)
 
     useEffect(() => {
         // get language setting
@@ -29,6 +30,8 @@ export const MiscProvider = ({ children }: {children: React.ReactNode}) => {
         setAnimation: setAnimation,
         isChatFocus: isChatFocus,
         setIsChatFocus: setIsChatFocus,
+        showTutorial: showTutorial,
+        setShowTutorial: setShowTutorial,
     }
 
     return (

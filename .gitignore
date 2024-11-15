@@ -131,3 +131,4 @@ dist
 
 # other
 src/app/testing
+*.mp4

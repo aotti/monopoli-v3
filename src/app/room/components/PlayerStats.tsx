@@ -11,6 +11,10 @@ export default function PlayerStats() {
                 {/* profile picture */}
                 <div className="border-2 w-[4rem] h-[4rem] lg:w-32 lg:h-32">
                     <img src="" alt={translateUI({lang: miscState.language, text: 'upload your avatar'})} />
+                    {/* logout */}
+                    <form className="text-center mt-2" onSubmit={ev => ev.preventDefault()}>
+                        <button type="submit" className="bg-darkblue-1 border-8bit-text"> logout </button>
+                    </form>
                 </div>
                 {/* stats */}
                 <div className="lg:flex lg:flex-col lg:gap-4">

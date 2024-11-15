@@ -52,6 +52,9 @@ export function clickOutsideElement(ref: MutableRefObject<any>, handler: () => v
     }, [ref, handler])
 }
 
+/**
+ * @description hover event for desktop & mobile
+ */
 export function applyTooltipEvent() {
     qSA('[data-tooltip]').forEach((el: HTMLElement) => {
         // mouse event

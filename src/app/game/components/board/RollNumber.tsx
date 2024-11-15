@@ -28,7 +28,7 @@ function RollDice() {
     const miscState = useMisc()
 
     return (
-        <div className="relative top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
+        <div className="relative z-10 top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
             <p> {translateUI({lang: miscState.language, text: 'roll dice'})} </p>
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">
@@ -47,7 +47,7 @@ function RollTurn() {
     const miscState = useMisc()
 
     return (
-        <div className="relative top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
+        <div className="relative z-10 top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
             <p> {translateUI({lang: miscState.language, text: 'roll turn'})} </p>
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">

@@ -49,7 +49,7 @@ export default function GameContent() {
                 {/* <BoardDelta /> */}
                 {/* <BoardTwoWay /> */}
                 {/* game buttons */}
-                <div className="absolute top-1/2 w-full flex flex-col gap-3 text-2xs lg:text-xs">
+                <div className="absolute top-[45%] w-full flex flex-col gap-3 text-2xs lg:text-xs">
                     <GameButtons />
                 </div>
                 {/* game notif + roll number */}
