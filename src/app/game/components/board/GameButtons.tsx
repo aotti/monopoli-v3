@@ -19,7 +19,7 @@ export default function GameButtons() {
                 <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'leave'})} </button>
             </div> */}
             {/* roll dice + roll turn */}
-            <div className="flex gap-6 mx-auto w-52 lg:w-72">
+            <div className="relative z-10 flex gap-6 mx-auto w-52 lg:w-72">
                 <button type="button" className="bg-primary border-8bit-primary active:opacity-50"
                 onClick={() => gameState.setRollNumber('dice')}> 
                     {translateUI({lang: miscState.language, text: 'roll dice'})} 
@@ -34,6 +34,10 @@ export default function GameButtons() {
                 <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'roll dice'})} </button>
                 <button type="button" className="bg-primary border-8bit-primary"> {translateUI({lang: miscState.language, text: 'surrender'})} </button>
             </div> */}
+            {/* player turn notif */}
+            <div className="mx-auto">
+                <span> {miscState.language == 'english' ? `dengkul turn` : `giliran dengkul`} </span>
+            </div>
         </>
     )
 }

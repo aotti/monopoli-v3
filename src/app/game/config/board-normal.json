@@ -4,7 +4,9 @@
             "square": 15, 
             "type": "city",
             "name": "Special-3", 
-            "img": "" 
+            "price": 70000,
+            "img": "",
+            "info": "after purchasing, get money every visit"
         },
         { 
             "square": 16, 
@@ -23,28 +25,32 @@
             "type": "city",
             "name": "Magelang", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 19, 
             "type": "city",
             "name": "Surabaya", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 20, 
             "type": "city",
             "name": "Special-4", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "after purchasing, get money every visit"
         },
         { 
             "square": 21, 
             "type": "city",
             "name": "Denpasar", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 22, 
@@ -85,7 +91,8 @@
             "type": "city",
             "name": "Mataram", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         }
     ],
     "row_3": [
@@ -94,7 +101,8 @@
             "type": "city",
             "name": "Yogyakarta", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { "type": null },
         { "type": null },
@@ -109,7 +117,8 @@
             "type": "city",
             "name": "Merauke", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         }
     ],
     "row_4": [
@@ -118,7 +127,8 @@
             "type": "city",
             "name": "Jakarta", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png",
+            "info": "price +10% for each upgrade"
         },
         { "type": null },
         { "type": null },
@@ -133,7 +143,8 @@
             "type": "city",
             "name": "Cursed-2", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "lose money every visit"
         }
     ],
     "row_5": [
@@ -142,7 +153,8 @@
             "type": "city",
             "name": "Special-2", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "after purchasing, get money every visit"
         },
         { "type": null },
         { "type": null },
@@ -177,28 +189,32 @@
             "type": "city",
             "name": "Cursed-1", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "lose money every visit"
         },
         { 
             "square": 7, 
             "type": "city",
             "name": "Special-1", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "after purchasing, get money every visit"
         },
         { 
             "square": 6, 
             "type": "city",
             "name": "Palembang", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 5, 
             "type": "city",
             "name": "Padang", 
             "price": 70000,
-            "img": "" 
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 4, 
@@ -217,7 +233,8 @@
             "type": "city",
             "name": "Aceh", 
             "price": 70000,
-            "img": ""
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 1, 

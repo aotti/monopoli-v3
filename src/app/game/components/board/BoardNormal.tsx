@@ -1,122 +1,133 @@
+import { useEffect } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { moneyFormat, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import board_normal from '../../config/board-normal.json'
 
-export default function BoardDelta() {
-    const squareNumberStyle = 'before:absolute before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
+export default function BoardNormal() {
+    const squareNumberStyle = 'before:absolute before:z-10 before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
     // board tiles
     const boardNormal = board_normal
+    // tooltip (the element must have position: relative)
+    useEffect(() => {
+        applyTooltipEvent()
+    }, [])
 
     return (
-        <>
+        <div className="relative z-10">
             {/* row 1 */}
             <div className="flex">
-                {boardNormal.row_1.map(tile => {
+                {boardNormal.row_1.map((tile, i) => {
                     return (
                         tile.type === null
-                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            ? <div key={i} className="w-[7.5vw] h-[15.5vh]"></div>
                             : tile.type == 'city'
-                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                ? <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
                                 </div>
-                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                : <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
                                 </div>
                     )
                 })}
             </div>
             {/* row 2 */}
             <div className="flex">
-                {boardNormal.row_2.map(tile => {
+                {boardNormal.row_2.map((tile, i) => {
                     return (
                         tile.type === null
-                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            ? <div key={i} className="w-[7.5vw] h-[15.5vh]"></div>
                             : tile.type == 'city'
-                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                ? <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
                                 </div>
-                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                : <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
                                 </div>
                     )
                 })}
             </div>
             {/* row 3 */}
             <div className="flex">
-                {boardNormal.row_3.map(tile => {
+                {boardNormal.row_3.map((tile, i) => {
                     return (
                         tile.type === null
-                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            ? <div key={i} className="w-[7.5vw] h-[15.5vh]"></div>
                             : tile.type == 'city'
-                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                ? <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
                                 </div>
-                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                : <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
                                 </div>
                     )
                 })}
             </div>
             {/* row 4 */}
             <div className="flex">
-                {boardNormal.row_4.map(tile => {
+                {boardNormal.row_4.map((tile, i) => {
                     return (
                         tile.type === null
-                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            ? <div key={i} className="w-[7.5vw] h-[15.5vh]"></div>
                             : tile.type == 'city'
-                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                ? <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
                                 </div>
-                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                : <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
                                 </div>
                     )
                 })}
             </div>
             {/* row 5 */}
             <div className="flex">
-                {boardNormal.row_5.map(tile => {
+                {boardNormal.row_5.map((tile, i) => {
                     return (
                         tile.type === null
-                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            ? <div key={i} className="w-[7.5vw] h-[15.5vh]"></div>
                             : tile.type == 'city'
-                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                ? <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
                                 </div>
-                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                : <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
                                 </div>
                     )
                 })}
             </div>
             {/* row 6 */}
             <div className="flex">
-                {boardNormal.row_6.map(tile => {
+                {boardNormal.row_6.map((tile, i) => {
                     return (
                         tile.type === null
-                            ? <div className="w-[7.5vw] h-[15.5vh]"></div>
+                            ? <div key={i} className="w-[7.5vw] h-[15.5vh]"></div>
                             : tile.type == 'city'
-                                ? <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileCity cityname={tile.name} cityprice={tile.price} imgsrc={tile.img} />
+                                ? <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
                                 </div>
-                                : <div className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                    <TileOther tilename={tile.name} imgsrc={tile.img} />
+                                : <div key={i} className={`border w-[7.5vw] h-[15.5vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
                                 </div>
                     )
                 })}
             </div>
-        </>
+        </div>
     )
 }
 
-function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: string, cityprice: number, cityhouse?: string}) {
+function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const miscState = useMisc()
     const gameState = useGame()
+    // tile data
+    type TileCityType = {name: string, price: number, img: string, info: string}
+    const { name, price, img, info } = data as TileCityType 
+    // price label
     const priceText = `after:block after:content-[attr(data-price)]`
+    // modify info
+    const newInfo = `${name};${info}`
 
     return (
-        <>
+        <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative">
             <button type="button" className="absolute mt-0.5 lg:mt-1 ml-[5.8vw] 
             w-3 lg:w-4 bg-darkblue-4 rounded-bl-md"
             onClick={() => {
@@ -127,25 +138,28 @@ function TileCity({ cityname, cityprice, imgsrc }: {imgsrc: string, cityname: st
             </button>
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
-                <p className={`leading-3 lg:leading-relaxed text-[2vh] ${priceText}`} data-price={moneyFormat(cityprice)}> 
+                <p className={`leading-3 lg:leading-relaxed text-[2vh] ${priceText}`} data-price={moneyFormat(price)}> 
                     {
-                        cityname.match(/\d/)
-                            ? translateUI({lang: miscState.language, text: cityname as any})
-                            : cityname
+                        name.match(/\d/)
+                            ? translateUI({lang: miscState.language, text: name as any})
+                            : name
                     } 
                 </p>
             </div>
-            <img src={imgsrc} alt={cityname} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
-        </>
+            <img src={img} alt={name} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
+        </div>
     )
 }
 
-function TileOther({ tilename, imgsrc }: {tilename: string, imgsrc: string}) {
+function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const miscState = useMisc()
     const gameState = useGame()
+    // tile data
+    type TileOtherType = {name: string, img: string}
+    const { name, img } = data as TileOtherType 
 
     return (
-        <>
+        <div>
             <button type="button" className="absolute mt-0.5 lg:mt-1 ml-[5.8vw] 
             w-3 lg:w-4 bg-darkblue-4 rounded-bl-md"
             onClick={() => {
@@ -157,10 +171,10 @@ function TileOther({ tilename, imgsrc }: {tilename: string, imgsrc: string}) {
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
                 <p className={`leading-3 lg:leading-relaxed text-[2vh]`}> 
-                    {translateUI({lang: miscState.language, text: tilename as any})} 
+                    {translateUI({lang: miscState.language, text: name as any})} 
                 </p>
             </div>
-            <img src={imgsrc} alt={tilename} className={`${gameState.showTileImage == 'other' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
-        </>
+            <img src={img} alt={name} className={`${gameState.showTileImage == 'other' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
+        </div>
     )
 }

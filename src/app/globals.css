@@ -79,7 +79,7 @@ ol > details > li::before, ol > li::before {
     margin-left: -1.5rem;
 }
 
-ol > details > li:hover, ol > li:hover {
+ol > details > li:hover {
     @apply bg-darkblue-2
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { applyTooltip, clickOutsideElement, qSA, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, clickOutsideElement, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
@@ -14,18 +14,12 @@ export default function PlayerSection() {
     // ### TEMP PLAYER CARDS
     const tempCards = [
         '>anti tax;>anti jail',
-        '>nerf gaming dice;>nerf parking;>nerf tax'
+        '>nerf gaming dice;>nerf parking;>nerf tax',
+        '>anti tax;>anti jail;>nerf gaming dice;>nerf parking;>nerf tax;>terlele awiwi'
     ]
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        qSA('[data-tooltip]').forEach((el: HTMLElement) => {
-            // mouse event
-            el.onpointerover = ev => applyTooltip(ev as any)
-            el.onpointerout = ev => applyTooltip(ev as any)
-            // touch event
-            el.ontouchstart = ev => applyTooltip(ev as any)
-            el.ontouchend = ev => applyTooltip(ev as any)
-        })
+        applyTooltipEvent()
     }, [])
 
     return (
@@ -38,7 +32,7 @@ export default function PlayerSection() {
                 {/* title */}
                 <span> {translateUI({lang: miscState.language, text: 'players'})} </span>
                 {/* setting */}
-                <div className="absolute top-0 right-0 w-6 lg:w-8">
+                <div className="absolute z-10 top-0 right-0 w-6 lg:w-8">
                     {/* setting button */}
                     <button type="button" onClick={() => gameState.setOpenPlayerSetting(b => !b)}>
                         <img src="https://img.icons8.com/?size=50&id=4511GGVppfIx&format=png&color=FFFFFF" alt="setting" />
@@ -123,7 +117,7 @@ export default function PlayerSection() {
                     <div className="flex items-center w-[15vw] bg-darkblue-2">
                         <span className="w-full"> Rp 20.000 </span>
                     </div>
-                    <div className="relative flex items-center bg-darkblue-2" data-tooltip={tempCards[1].replaceAll(';', '\n')}>
+                    <div className="relative flex items-center bg-darkblue-2" data-tooltip={tempCards[2].replaceAll(';', '\n')}>
                         <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
                     </div>
                 </div>

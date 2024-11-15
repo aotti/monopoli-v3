@@ -46,20 +46,24 @@ function ListWithTabs({ title, data }: {title: string, data: {[key:string]: stri
             <div className="relative border">
                 {/* pages */}
                 <div className="flex justify-around">
-                    {Object.keys(data).map(key => {
+                    {Object.keys(data).map((key, i) => {
+                        // rarity bg color
+                        const rarityBgColor = getRarityBgColor(key)
                         return (
-                            <p className={`${tab == key ? 'bg-emerald-600' : 'bg-slate-600'} w-full text-center py-1`} 
+                            <p key={i} className={`${tab == key ? rarityBgColor : 'bg-slate-600'} w-full text-center py-1`} 
                             onClick={() => setTab(key as any)}> {key} </p>
                         )
                     })}
                 </div>
                 {/* list */}
-                {Object.entries(data).map(([key,value]) => {
+                {Object.entries(data).map(([key,value], i) => {
+                    // rarity bg color
+                    const rarityBgColor = getRarityBgColor(key)
                     return (
-                        <div className={`${tab == key ? 'block bg-emerald-600' : 'hidden'} w-full border`}>
+                        <div key={i} className={`${tab == key ? `block ${rarityBgColor}` : 'hidden'} w-full border`}>
                             <ol>
-                                {value.map(v => {
-                                    return <li> {translateUI({lang: miscState.language, text: v as any})} </li>
+                                {value.map((v, j) => {
+                                    return <li key={j}> {translateUI({lang: miscState.language, text: v as any})} </li>
                                 })}
                             </ol>
                         </div>
@@ -68,4 +72,13 @@ function ListWithTabs({ title, data }: {title: string, data: {[key:string]: stri
             </div>
         </details>
     )
+}
+
+function getRarityBgColor(key: string) {
+    return key == '>25%' ? 'bg-red-600'
+        : key == '25%' ? 'bg-orange-600'
+        : key == '15%' ? 'bg-yellow-600'
+        : key == '8%' ? 'bg-emerald-600' 
+        : key == '5%' ? 'bg-stone-600'
+        : 'bg-emerald-600'
 }

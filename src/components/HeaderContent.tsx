@@ -1,20 +1,13 @@
 import { useMisc } from "../context/MiscContext"
-import { useEffect, useState } from "react"
-import { applyTooltip, qSA } from "../helper/helper"
+import { useEffect } from "react"
+import { applyTooltipEvent } from "../helper/helper"
 import Credit from "./Credit"
 
 export default function HeaderContent() {
     const miscState = useMisc()
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        qSA('[data-tooltip]').forEach((el: HTMLElement) => {
-            // mouse event
-            el.onpointerover = ev => applyTooltip(ev as any)
-            el.onpointerout = ev => applyTooltip(ev as any)
-            // touch event
-            el.ontouchstart = ev => applyTooltip(ev as any)
-            el.ontouchend = ev => applyTooltip(ev as any)
-        })
+        applyTooltipEvent()
     }, [])
 
     return (

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { applyTooltip, clickOutsideElement, qS, qSA, translateUI } from "../../helper/helper"
+import { applyTooltipEvent, clickOutsideElement, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -23,14 +23,7 @@ export default function GameContent() {
     clickOutsideElement(gameSideButtonRef, () => gameState.setGameSideButton(null))
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        qSA('[data-tooltip]').forEach((el: HTMLElement) => {
-            // mouse event
-            el.onpointerover = ev => applyTooltip(ev as any)
-            el.onpointerout = ev => applyTooltip(ev as any)
-            // touch event
-            el.ontouchstart = ev => applyTooltip(ev as any)
-            el.ontouchend = ev => applyTooltip(ev as any)
-        })
+        applyTooltipEvent()
     }, [])
 
     return (
@@ -56,7 +49,7 @@ export default function GameContent() {
                 {/* <BoardDelta /> */}
                 {/* <BoardTwoWay /> */}
                 {/* game buttons */}
-                <div className="absolute top-1/2 w-full flex flex-col gap-4 text-2xs lg:text-xs">
+                <div className="absolute top-1/2 w-full flex flex-col gap-3 text-2xs lg:text-xs">
                     <GameButtons />
                 </div>
                 {/* game notif + roll number */}
