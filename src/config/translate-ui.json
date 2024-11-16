@@ -25,9 +25,12 @@
         "2 Way": "2 Jalur",
         "Dice": "Dadu",
         "Money Start": "Uang Mulai",
+        "money that player have on start": "uang yang pemain dapat diawal main",
         "Money Lose": "Uang Kalah",
-        "Max Player": "Pemain Maks",
+        "player lose if the money less than this limit": "pemain kalah jika uangnya lewati batas ini",
         "Curse": "Kutukan",
+        "cursed tile price will go up/down around this %": "harga petak terkutuk akan naik/turun diantara % ini",
+        "Max Player": "Pemain Maks",
         "Count": "Jumlah",
         "Max": "Maks",
         "Rules": "Aturan",
@@ -35,6 +38,24 @@
         "Join": "Gabung",
         "Spectate": "Nonton",
         "Delete": "Hapus",
+
+        "__ROOM LIST TUTORIAL__": "__ROOM LIST TUTORIAL__",
+        "click here to continue": "klik ini untuk lanjut",
+        "tutorial complete": "tutorial selesai",
+
+        "__PART 1__":"__PART 1__",
+        "display list of online player, if there's no one online, it will be empty 😭. the \"view\" button used to check other player stats": "menampilkan daftar online player, kalo gk ada yang online, maka kosong 😭. tombol \"view\" untuk cek stats player lain",
+        "for chat, just type in the \"chat here\" box and chat box will appear, or you can type \"/on\" to keep chat box open and \"/off\" to revert it": "untuk ngobrol, ketik di kotak \"ngobrol disini\" maka kotak ngobrol akan muncul, atau ketik \"/on\" biar kotaknya tetap muncul dan \"/off\" buat tutup",
+
+        "__PART 2__":"__PART 2__",
+        "display you/other player game stats. to upload avatar, click the \"upload your avatar\".": "menampilkan stats main kau/orang lain. buat unggah avatar, klik \"unggah avatar kau\".",
+        "\"worst lost\" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
+        
+        "__PART 3__":"__PART 3__",
+        "icon on the right is tutorial button":"ikon di kanan itu tombol tutorial",
+        "to play the game, click on \"create room\", fill the form and it'll show in the room list.":"untuk main, klik \"buat ruang\", isi form dan ruang game akan muncul di daftar ruang.",
+        "the rules: ??? text is a tooltip. on phone, just swipe + hold on the text as in this .gif:":"aturan: ??? isinya keterangan. di hp, tinggal swipe + tahan teksnya seperti di gambar:",
+        "delete button only show if the creator is you":"tombol hapus cuma muncul kalo kau pembuatnya",
 
         "__TRANSLATE BAGIAN GAME ROOM__": "__TRANSLATE BAGIAN GAME ROOM__",
         "Back to room": "Kembali",

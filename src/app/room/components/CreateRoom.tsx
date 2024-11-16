@@ -1,15 +1,25 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { useMisc } from "../../../context/MiscContext";
-import { qS, translateUI } from "../../../helper/helper";
+import { applyTooltipEvent, qS, questionMark, translateUI } from "../../../helper/helper";
 import Link from "next/link";
 
 export default function CreateRoom() {
     const miscState = useMisc()
+    // tooltip
+    const tooltip = {
+        moneyStart: translateUI({lang: miscState.language, text: 'money that player have on start'}),
+        moneyLose: translateUI({lang: miscState.language, text: 'player lose if the money less than this limit'}),
+        curse: translateUI({lang: miscState.language, text: 'cursed tile price will go up/down around this %'}),
+    }
+    // tooltip (the element must have position: relative)
+    useEffect(() => {
+        applyTooltipEvent()
+    }, [])
 
     return (
         <div id="create_room_modal" className={`${miscState.showModal == 'create room' ? 'block' : 'hidden'} 
             relative z-20 bg-darkblue-3 border-8bit-modal px-2
-            ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-[calc(100vw-60vw)]`}>
+            ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-80 lg:w-1/2`}>
             {/* modal head */}
             <div className="border-b-2 mb-2">
                 <span> {translateUI({lang: miscState.language, text: 'Create Room'})} </span>
@@ -42,8 +52,10 @@ export default function CreateRoom() {
                     </div>
                     {/* money start */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_money_start" className="text-left">
-                            <span> {translateUI({lang: miscState.language, text: 'Money Start'})} </span>
+                        <label htmlFor="select_money_start" data-tooltip={tooltip.moneyStart} className="relative text-left">
+                            <span className={`${questionMark()}`}> 
+                                {translateUI({lang: miscState.language, text: 'Money Start'})} 
+                            </span>
                             <p id="selected_money_start"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_start" 
@@ -52,8 +64,10 @@ export default function CreateRoom() {
                     </div>
                     {/* money lose */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_money_lose" className="text-left">
-                            <span> {translateUI({lang: miscState.language, text: 'Money Lose'})} </span>
+                        <label htmlFor="select_money_lose" data-tooltip={tooltip.moneyLose} className="relative text-left">
+                            <span className={`${questionMark()}`}> 
+                                {translateUI({lang: miscState.language, text: 'Money Lose'})} 
+                            </span>
                             <p id="selected_money_lose"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_lose" 
@@ -62,8 +76,10 @@ export default function CreateRoom() {
                     </div>
                     {/* curse random */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_curse" className="text-left">
-                            <span> {translateUI({lang: miscState.language, text: 'Curse'})} </span>
+                        <label htmlFor="select_curse" data-tooltip={tooltip.curse} className="relative text-left">
+                            <span className={`${questionMark()}`}> 
+                                {translateUI({lang: miscState.language, text: 'Curse'})} 
+                            </span>
                             <p id="selected_curse"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_curse" 

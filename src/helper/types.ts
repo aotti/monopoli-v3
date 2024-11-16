@@ -20,7 +20,8 @@ export interface ITooltip {
 }
 
 // context
-type TutorialRoomlist = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
+type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
+type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
@@ -32,7 +33,7 @@ export interface IMiscContext {
     setAnimation: Dispatch<SetStateAction<boolean>>,
     isChatFocus: boolean,
     setIsChatFocus: Dispatch<SetStateAction<boolean>>,
-    showTutorial: TutorialRoomlist,
+    showTutorial: TutorialRoomList | TutorialGameRoom,
     setShowTutorial: Dispatch<SetStateAction<IMiscContext['showTutorial']>>,
 }
 

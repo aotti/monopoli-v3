@@ -8,6 +8,10 @@ export function translateUI(params: ITranslate) {
     return lowercase ? translated.toLowerCase() : translated
 }
 
+export function questionMark() {
+    return `after:font-mono after:content-['?'] after:px-1 after:border after:rounded-full`
+}
+
 /**
  * @param el element id/class/attribute 
  * @returns selected HTML element

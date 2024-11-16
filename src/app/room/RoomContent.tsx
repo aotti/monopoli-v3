@@ -1,5 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, translateUI } from "../../helper/helper";
+import { applyTooltipEvent, qSA, translateUI } from "../../helper/helper";
 import ChatBox from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
@@ -18,6 +18,23 @@ export default function RoomContent() {
     useEffect(() => {
         applyTooltipEvent()
     }, [])
+    // tutorial text
+    const tutorialText = {
+        part_1: [
+            `display list of online player, if there's no one online, it will be empty 😭. the "view" button used to check other player stats`,
+            `for chat, just type in the "chat here" box and chat box will appear, or you can type "/on" to keep chat box open and "/off" to revert it`
+        ],
+        part_2: [
+            `display you/other player game stats. to upload avatar, click the "upload your avatar".`,
+            `"worst lost" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.`
+        ],
+        part_3: [
+            `icon on the right is tutorial button`,
+            `to play the game, click on "create room", fill the form and it'll show in the room list.`,
+            `the rules: ??? text is a tooltip. on phone, just swipe + hold on the text as in this .gif:`,
+            `delete button only show if the creator is you`,
+        ]
+    }
 
     return (
         <div className="flex gap-2">
@@ -108,74 +125,66 @@ export default function RoomContent() {
                     <RoomCard roomRules={roomRules[2]} />
                 </div>
             </div>
+            
             {/* tutorial */}
             <div className={`${miscState.showTutorial ? 'block' : 'hidden'} 
-            absolute mt-1 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
+            absolute mt-1.5 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
                 {/* player list + chat */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_1' ? 'block' : 'hidden'} 
                 absolute mt-2 pr-1 right-0 w-2/3 lg:right-[calc(20%-1rem)] lg:w-1/2`}>
                     <p className="text-green-400"> beningging of tutorial </p>
                     <hr />
-                    <p className="tutorial_roomlist_1">
-                        display list of online player, 
-                        if there's no one online, it will be empty 😭. 
-                        the "view" button used to check other player 
-                        stats
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_1[0] as any})}
                     </p>
                     <hr className="my-1" />
-                    <p className="tutorial_roomlist_1">
-                        for the chat, just try type something in the 
-                        "chat here" box and the chat box will appear 
-                        or you can type "/on" to make the chat box 
-                        keep open and "/off" to revert it
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_1[1] as any})}
                     </p>
                     <hr className="my-1" />
                     <button type="button" className="text-green-400 p-1"
-                    onClick={() => miscState.setShowTutorial('tutorial_roomlist_2')}> click here to continue </button>
+                    onClick={() => miscState.setShowTutorial('tutorial_roomlist_2')}>
+                        {translateUI({lang: miscState.language, text: 'click here to continue'})}
+                    </button>
                 </div>
                 {/* player stats */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_2' ? 'block' : 'hidden'} 
                 absolute mt-2 pr-1 right-0 bottom-0 lg:bottom-10 w-2/3 lg:right-[calc(20%-1rem)] lg:w-1/2`}>
-                    <p className="tutorial_roomlist_2">
-                        display you or other player game stats. 
-                        to upload avatar, click the "upload your avatar".
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_2[0] as any})}
                     </p>
                     <hr className="my-1" />
-                    <p className="tutorial_roomlist_2">
-                        "worst lost" mean the worst money you have when losing 
-                        a game since you <i>breathed in this world</i>, um..i mean created ur account.
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_2[1] as any})}
                     </p>
                     <hr className="my-1" />
                     <button type="button" className="text-green-400 p-1" 
                     onClick={() => miscState.setShowTutorial('tutorial_roomlist_3')}> 
-                        click here to continue 
+                        {translateUI({lang: miscState.language, text: 'click here to continue'})}
                     </button>
                 </div>
                 {/* room list */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'block' : 'hidden'}
                 absolute mt-2 w-[30%] text-right text-2xs lg:text-sm lg:!leading-6`}>
-                    <p className="tutorial_roomlist_3">
-                        icon on the right is tutorial button
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_3[0] as any})}
                     </p>
                     <hr className="my-1" />
-                    <p className="tutorial_roomlist_3">
-                        to play the game, just click on "create room" 
-                        fill the form and it'll show in the room list
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_3[1] as any})}
                     </p>
                     <hr className="my-1" />
-                    <p className="tutorial_roomlist_3">
-                        the rules ??? text is a tooltip.
-                        on phone, just swipe + hold on the 
-                        text as in this .gif: 
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_3[2] as any})}
                         <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/tooltip-jMhpG5ZcuTWhHKb4VxPirbhBl2YZ9Y.gif" alt="tap + swipe.gif" className="mx-auto w-[95%] !h-20 lg:!h-44" />
                     </p>
                     <hr className="my-1" />
-                    <p className="tutorial_roomlist_3">
-                        delete button only show if the creator is you
+                    <p className="tutorial_roomlist text-balance">
+                        {translateUI({lang: miscState.language, text: tutorialText.part_3[3] as any})}
                     </p>
                     <hr className="my-1" />
                     <button type="button" className="text-green-400 p-1" onClick={() => miscState.setShowTutorial(null)}> 
-                        tutorial complete 
+                        {translateUI({lang: miscState.language, text: 'tutorial complete'})}
                     </button>
                 </div>
             </div>
