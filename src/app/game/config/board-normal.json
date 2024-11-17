@@ -12,7 +12,7 @@
             "name": "Special-3",
             "price": 70000, 
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Yogyakarta_100-qOFnzEC7fYHBId2aKIC3fWOIWGdU5a.png",
-            "info": "Yogyakarta\nafter purchasing, get money every visit" 
+            "info": "Yogyakarta\nafter purchase, get money every visit" 
         },
         { 
             "square": 17, 
@@ -48,14 +48,14 @@
             "name": "Special-4",
             "price": 70000, 
             "img": "",
-            "info": "Merauke\nafter purchasing, get money every visit"
+            "info": "Merauke\nafter purchase, get money every visit"
         },
         { 
             "square": 22, 
             "type": "city",
             "name": "Makassar",
             "price": 70000, 
-            "img": "",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Makassar_100-KQI2wyZj34yZf1GIZGfx3yUuP5OcNC.png",
             "info": "price +10% for each upgrade" 
         },
         { 
@@ -154,7 +154,7 @@
             "name": "Special-2", 
             "price": 70000,
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png",
-            "info": "Jakarta\nafter purchasing, get money every visit"
+            "info": "Jakarta\nafter purchase, get money every visit"
         },
         { "type": null },
         { "type": null },
@@ -205,7 +205,7 @@
             "type": "city",
             "name": "Palembang", 
             "price": 70000,
-            "img": "",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Palembang_100-QNw03JGc5PepXjqNvBoynheDKVulxS.png",
             "info": "price +10% for each upgrade"
         },
         { 
@@ -213,8 +213,8 @@
             "type": "city",
             "name": "Special-1", 
             "price": 70000,
-            "img": "",
-            "info": "Aceh\nafter purchasing, get money every visit"
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Aceh_100-KDP7nZIFp80TCSaaSA2HAioxfwY6hb.png",
+            "info": "Aceh\nafter purchase, get money every visit"
         },
         { 
             "square": 4, 

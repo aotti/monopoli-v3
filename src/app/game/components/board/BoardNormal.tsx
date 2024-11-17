@@ -124,10 +124,12 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // price label
     const priceText = `after:block after:content-[attr(data-price)]`
     // modify info
-    const newInfo = `${name};${info}`
+    const newInfo = name.match('Cursed')
+                    ? `${name};5~10%;${info}`
+                    : `${name};${info}`
 
     return (
-        <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative">
+        <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex">
             <button type="button" className="absolute mt-0.5 lg:mt-1 ml-[5.8vw] 
             w-3 lg:w-4 bg-darkblue-4 rounded-bl-md"
             onClick={() => {

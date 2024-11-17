@@ -22,8 +22,7 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
                 {/* chat input */}
                 <div className="absolute bottom-0 flex items-center justify-center gap-2 w-full">
                     <input type="text" className="w-4/5 lg:h-10 lg:p-1" 
-                    placeholder={translateUI({lang: miscState.language, text: 'chat here'})} required 
-                    onFocus={() => miscState.setIsChatFocus(true)} onBlur={() => miscState.setIsChatFocus(false)} />
+                    placeholder={translateUI({lang: miscState.language, text: 'chat here'})} required />
                     <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                         <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
                     </button>

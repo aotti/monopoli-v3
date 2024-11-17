@@ -31,8 +31,8 @@ export interface IMiscContext {
     setHoverTooltip: Dispatch<SetStateAction<string>>,
     animation: boolean,
     setAnimation: Dispatch<SetStateAction<boolean>>,
-    isChatFocus: boolean,
-    setIsChatFocus: Dispatch<SetStateAction<boolean>>,
+    isChatFocus: 'on'|'off'|'stay',
+    setIsChatFocus: Dispatch<SetStateAction<IMiscContext['isChatFocus']>>,
     showTutorial: TutorialRoomList | TutorialGameRoom,
     setShowTutorial: Dispatch<SetStateAction<IMiscContext['showTutorial']>>,
 }

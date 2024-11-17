@@ -10,7 +10,7 @@ export const MiscProvider = ({ children }: {children: React.ReactNode}) => {
     const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
     const [hoverTooltip, setHoverTooltip] = useState<string>(null)
     const [animation, setAnimation] = useState<boolean>(true)
-    const [isChatFocus, setIsChatFocus] = useState<boolean>(false)
+    const [isChatFocus, setIsChatFocus] = useState<IMiscContext['isChatFocus']>('off')
     const [showTutorial, setShowTutorial] = useState<IMiscContext['showTutorial']>(null)
 
     useEffect(() => {

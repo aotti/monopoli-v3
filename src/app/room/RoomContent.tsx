@@ -5,7 +5,7 @@ import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
 import PlayerStats from "./components/PlayerStats";
 import RoomCard from "./components/RoomCard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 
 export default function RoomContent() {
@@ -29,24 +29,31 @@ export default function RoomContent() {
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_1' ? 'relative z-10' : ''}
                 h-[calc(100vh-52vh)] lg:h-[calc(100vh-50vh)] p-1`}>
                     <span className="border-b-2">
-                        { miscState.isChatFocus 
+                        { miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
                             ? translateUI({lang: miscState.language, text: 'chat box'}) 
                             : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
                     <div className="w-full h-[calc(100%-1rem)]">
                         {
-                            miscState.isChatFocus
+                            miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
                                 // chat box
                                 ? <ChatBox page="room" />
                                 // list of online players
                                 : <PlayerList />
                         }
                         {/* chat input */}
-                        <form className="mt-2" onSubmit={ev => ev.preventDefault()}>
+                        <form className="mt-2" onSubmit={ev => {
+                            ev.preventDefault()
+                            // set chat box toggle
+                            const formInputs = ([].slice.call(ev.currentTarget.elements) as any[]).filter(i => i.nodeName === 'INPUT')
+                            formInputs[0].value == '/on' ? miscState.setIsChatFocus('stay') : miscState.setIsChatFocus('off')
+                            formInputs[0].value = ''
+                        }}>
                             <div className="flex items-center gap-2">
                                 <input type="text" className="w-4/5 lg:h-10 lg:p-1" 
                                 placeholder={translateUI({lang: miscState.language, text: 'chat here'})} required 
-                                onFocus={() => miscState.setIsChatFocus(true)} onBlur={() => miscState.setIsChatFocus(false)} />
+                                onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} 
+                                onBlur={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off')} />
                                 <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                                     <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
                                 </button>

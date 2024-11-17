@@ -52,7 +52,7 @@ export default function CreateRoom() {
                     </div>
                     {/* money start */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_money_start" data-tooltip={tooltip.moneyStart} className="relative text-left">
+                        <label htmlFor="select_money_start" data-tooltip={tooltip.moneyStart} className="relative flex text-left">
                             <span className={`${questionMark()}`}> 
                                 {translateUI({lang: miscState.language, text: 'Money Start'})} 
                             </span>
@@ -64,7 +64,7 @@ export default function CreateRoom() {
                     </div>
                     {/* money lose */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_money_lose" data-tooltip={tooltip.moneyLose} className="relative text-left">
+                        <label htmlFor="select_money_lose" data-tooltip={tooltip.moneyLose} className="relative flex text-left">
                             <span className={`${questionMark()}`}> 
                                 {translateUI({lang: miscState.language, text: 'Money Lose'})} 
                             </span>
@@ -76,7 +76,7 @@ export default function CreateRoom() {
                     </div>
                     {/* curse random */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_curse" data-tooltip={tooltip.curse} className="relative text-left">
+                        <label htmlFor="select_curse" data-tooltip={tooltip.curse} className="relative flex text-left">
                             <span className={`${questionMark()}`}> 
                                 {translateUI({lang: miscState.language, text: 'Curse'})} 
                             </span>
