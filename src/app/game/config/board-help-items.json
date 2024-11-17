@@ -80,8 +80,8 @@
             "[15%] Get nerf tax card",
             "[10%] Get city upgrade card"
         ],
-        "debuff 65%": [
-            "[25%] Take 1 step backward",
+        "debuff 60%": [
+            "[20%] Take 1 step backward",
             "[15%] Take 2 step forward",
             "[10%] Get sad gaming dice card",
             "[8%] Get nerf parking card",

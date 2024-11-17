@@ -39,24 +39,6 @@
         "Spectate": "Nonton",
         "Delete": "Hapus",
 
-        "__ROOM LIST TUTORIAL__": "__ROOM LIST TUTORIAL__",
-        "click here to continue": "klik ini untuk lanjut",
-        "tutorial complete": "tutorial selesai",
-
-        "__PART 1__":"__PART 1__",
-        "display list of online player, if there's no one online, it will be empty 😭. the \"view\" button used to check other player stats": "menampilkan daftar online player, kalo gk ada yang online, maka kosong 😭. tombol \"view\" untuk cek stats player lain",
-        "for chat, just type in the \"chat here\" box and chat box will appear, or you can type \"/on\" to keep chat box open and \"/off\" to revert it": "untuk ngobrol, ketik di kotak \"ngobrol disini\" maka kotak ngobrol akan muncul, atau ketik \"/on\" biar kotaknya tetap muncul dan \"/off\" buat tutup",
-
-        "__PART 2__":"__PART 2__",
-        "display you/other player game stats. to upload avatar, click the \"upload your avatar\".": "menampilkan stats main kau/orang lain. buat unggah avatar, klik \"unggah avatar kau\".",
-        "\"worst lost\" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
-        
-        "__PART 3__":"__PART 3__",
-        "icon on the right is tutorial button":"ikon di kanan itu tombol tutorial",
-        "to play the game, click on \"create room\", fill the form and it'll show in the room list.":"untuk main, klik \"buat ruang\", isi form dan ruang game akan muncul di daftar ruang.",
-        "the rules: ??? text is a tooltip. on phone, just swipe + hold on the text as in this .gif:":"aturan: ??? isinya keterangan. di hp, tinggal swipe + tahan teksnya seperti di gambar:",
-        "delete button only show if the creator is you":"tombol hapus cuma muncul kalo kau pembuatnya",
-
         "__TRANSLATE BAGIAN GAME ROOM__": "__TRANSLATE BAGIAN GAME ROOM__",
         "Back to room": "Kembali",
         "help": "bantuan",
@@ -151,7 +133,7 @@
         "__AREA BUFF/DEBUFF__": "__AREA BUFF/DEBUFF__",
         "Buff/Debuff Area": "Area Buff/Debuff",
         "Normal Area (65% chance)": "Area Normal (65% kesempatan)",
-        "[25%] Take 1 step backward": "[25%] Mundur 1 langkah",
+        "[20%] Take 1 step backward": "[20%] Mundur 1 langkah",
         "[15%] Take 2 step forward": "[15%] Maju 2 langkah",
         "[10%] Get sad gaming dice card": "[10%] Kartu sad dadu gaming",
         "[8%] Get nerf parking card": "[8%] Kartu nerf parkir",
@@ -161,6 +143,41 @@
         "[20%] Get anti jail card": "[20%] Kartu nerf pajak",
         "[15%] Get nerf gaming dice card": "[15%] Kartu nerf dadu gaming",
         "[15%] Get nerf tax card": "[15%] Kartu bebas penjara",
-        "[10%] Get city upgrade card": "[10%] Kartu upgrade kota"
+        "[10%] Get city upgrade card": "[10%] Kartu upgrade kota",
+
+        "click here to continue": "klik ini untuk lanjut",
+        "tutorial complete": "tutorial selesai",
+        "__ROOM LIST TUTORIAL__": "__ROOM LIST TUTORIAL__",
+
+        "__ROOM PART 1__":"__ROOM PART 1__",
+        "display list of online player, if there's no one online, it will be empty 😭. the \"view\" button used to check other player stats": "menampilkan daftar online player, kalo gk ada yang online, maka kosong 😭. tombol \"view\" untuk cek stats player lain",
+        "for chat, just type in the \"chat here\" box and chat box will appear, or you can type \"/on\" to keep chat box open and \"/off\" to revert it": "untuk ngobrol, ketik di kotak \"ngobrol disini\" maka kotak ngobrol akan muncul, atau ketik \"/on\" biar kotaknya tetap muncul dan \"/off\" buat tutup",
+
+        "__ROOM PART 2__":"__ROOM PART 2__",
+        "display you/other player game stats. to upload avatar, click the \"upload your avatar\".": "menampilkan stats main kau/orang lain. buat unggah avatar, klik \"unggah avatar kau\".",
+        "\"worst lost\" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
+        
+        "__ROOM PART 3__":"__ROOM PART 3__",
+        "icon on the right is tutorial button":"ikon di kanan itu tombol tutorial",
+        "to play the game, click on \"create room\", fill the form and it'll show in the room list.":"untuk main, klik \"buat ruang\", isi form dan ruang game akan muncul di daftar ruang.",
+        "the rules: ??? text is a tooltip. on phone, just swipe + hold on the text as in this .gif:":"aturan: ??? isinya keterangan. di hp, tinggal swipe + tahan teksnya seperti di gambar:",
+        "delete button only show if the creator is you":"tombol hapus cuma muncul kalo kau pembuatnya",
+
+        "__GAME ROOM TUTORIAL__": "__GAME ROOM TUTORIAL__",
+
+        "__GAME PART 1__":"__GAME PART 1__",
+        "\"help\" contain info about community & chance cards, the special card effect, buff/debuff area.": "\"bantuan\" berisi info kartu dana umum & kesempatan, efek kartu khusus, area buff/debuff.",
+        "\"players\" contain info about name, money and special card (note icon).": "\"pemain\" berisi info nama, uang dan kartu khusus (ikon catatan).",
+        "\"player settings\" (gear icon)\nauto roll dice = if u tired clicking\nsell city = sell any city owned\ngame history = see all player action\nattack city = attack other player city": "\"pengaturan\" (ikon roda gigi)\ndadu otomatis = otomatis lempar dadu\njual kota = jual kota yg kau punya\ncatatan main = lihat semua aksi pemain\nserang kota = serang kota pemain lain",
+
+        "__GAME PART 2__":"__GAME PART 2__",
+        "there are 3 stage for buttons": "ada 3 tahap untuk tombol",
+        "\n1 = preparation, 2 = decide turn, 3 = play\n\"leave\" to leave the game before game start\n\"surrender\" to leave when the game is run\n\"roll turn\" to decide the turn to roll dice": "\n1 = persiapan, 2 = penentuan, 3 = main\n\"kabur\" untuk keluar sblm game dimulai\n\"menyerah\" untuk keluar saat game berjalan\n\"putar angka\" menentukan giliran lempar dadu",
+        "all tiles have tooltip. city tooltip changes after bought. other tiles only show static info, except for prison tile. it updates your dice accumulation. the 🔍 icon to see full image of tiles.": "tiap petak bisa di swipe + hold. untuk kota, info akan berubah setelah dibeli. petak lain tidak ada perubahan, kecuali penjara. karena untuk perbarui akumulasi dadu. ikon 🔍 untuk lihat gambar petak.",
+
+        "__GAME PART 3__":"__GAME PART 3__",
+        "\"back to room\" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.": "\"kembali\" pergi ke daftar ruang tanpa kabur dari game. disini juga ada tombol tutorial 😎 dan info tentang ruang ini.",
+        "if you turn on the \"game history\" on player setting, it will display a box to see all player actions.": "jika kau centang \"catatan main\" di setting pemain, akan muncul kotak berisi semua aksi pemain.",
+        "idk y its position bugged in tutorial 💀": "entahlah kenapa posisinya ngebug 💀"
     }
 }

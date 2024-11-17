@@ -2,17 +2,17 @@
     "row_1": [
         { 
             "square": 15, 
-            "type": "city",
-            "name": "Special-3", 
-            "price": 70000,
-            "img": "",
-            "info": "after purchasing, get money every visit"
+            "type": "other",
+            "name": "Community Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
         },
         { 
             "square": 16, 
-            "type": "other",
-            "name": "Community Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png" 
+            "type": "city",
+            "name": "Special-3",
+            "price": 70000, 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Yogyakarta_100-qOFnzEC7fYHBId2aKIC3fWOIWGdU5a.png",
+            "info": "Yogyakarta\nafter purchasing, get money every visit" 
         },
         { 
             "square": 17, 
@@ -23,52 +23,52 @@
         { 
             "square": 18, 
             "type": "city",
-            "name": "Magelang", 
+            "name": "Denpasar", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Bali_100-Sww22czn5DJNVh1ycYmf3t7w5aDyrj.png",
             "info": "price +10% for each upgrade"
         },
         { 
             "square": 19, 
             "type": "city",
-            "name": "Surabaya", 
+            "name": "Pulau Komodo", 
             "price": 70000,
             "img": "",
             "info": "price +10% for each upgrade"
         },
         { 
             "square": 20, 
-            "type": "city",
-            "name": "Special-4", 
-            "price": 70000,
-            "img": "",
-            "info": "after purchasing, get money every visit"
+            "type": "other",
+            "name": "Debuff Area", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png"
         },
         { 
             "square": 21, 
             "type": "city",
-            "name": "Denpasar", 
-            "price": 70000,
+            "name": "Special-4",
+            "price": 70000, 
             "img": "",
-            "info": "price +10% for each upgrade"
+            "info": "Merauke\nafter purchasing, get money every visit"
         },
         { 
             "square": 22, 
-            "type": "other",
-            "name": "Community Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png" 
+            "type": "city",
+            "name": "Makassar",
+            "price": 70000, 
+            "img": "",
+            "info": "price +10% for each upgrade" 
         },
         { 
             "square": 23, 
             "type": "other",
-            "name": "Debuff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png" 
+            "name": "Community Card",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
         },
         { 
             "square": 24, 
             "type": "other",
             "name": "Free Parking 😎", 
-            "img": "" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Parking_100-0bNthQvUZ8ZeknwzolhmI0YbKz6jWN.png" 
         }
     ],
     "row_2": [
@@ -89,7 +89,7 @@
         { 
             "square": 25, 
             "type": "city",
-            "name": "Mataram", 
+            "name": "Nusantara", 
             "price": 70000,
             "img": "",
             "info": "price +10% for each upgrade"
@@ -99,7 +99,7 @@
         { 
             "square": 13, 
             "type": "city",
-            "name": "Yogyakarta", 
+            "name": "Surabaya", 
             "price": 70000,
             "img": "",
             "info": "price +10% for each upgrade"
@@ -115,9 +115,9 @@
         { 
             "square": 26, 
             "type": "city",
-            "name": "Merauke", 
+            "name": "Pontianak", 
             "price": 70000,
-            "img": "",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Pontianak_100-ZhKtMGe0VuFTHAsLKBQu4oWcjJfuEA.png",
             "info": "price +10% for each upgrade"
         }
     ],
@@ -125,9 +125,9 @@
         { 
             "square": 12, 
             "type": "city",
-            "name": "Jakarta", 
+            "name": "Magelang", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png",
             "info": "price +10% for each upgrade"
         },
         { "type": null },
@@ -153,8 +153,8 @@
             "type": "city",
             "name": "Special-2", 
             "price": 70000,
-            "img": "",
-            "info": "after purchasing, get money every visit"
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png",
+            "info": "Jakarta\nafter purchasing, get money every visit"
         },
         { "type": null },
         { "type": null },
@@ -195,10 +195,10 @@
         { 
             "square": 7, 
             "type": "city",
-            "name": "Special-1", 
+            "name": "Bandung", 
             "price": 70000,
-            "img": "",
-            "info": "after purchasing, get money every visit"
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Bandung_100-NZHi1igo18j5x8xSTfWWtx5PNNh3sK.png",
+            "info": "price +10% for each upgrade"
         },
         { 
             "square": 6, 
@@ -211,10 +211,10 @@
         { 
             "square": 5, 
             "type": "city",
-            "name": "Padang", 
+            "name": "Special-1", 
             "price": 70000,
             "img": "",
-            "info": "price +10% for each upgrade"
+            "info": "Aceh\nafter purchasing, get money every visit"
         },
         { 
             "square": 4, 
@@ -231,9 +231,9 @@
         { 
             "square": 2, 
             "type": "city",
-            "name": "Aceh", 
+            "name": "Padang", 
             "price": 70000,
-            "img": "",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Padang_100-WWvCOlfpWXSBy3Ue9HiFBkrOk2OHu9.png",
             "info": "price +10% for each upgrade"
         },
         { 

@@ -5,7 +5,7 @@ export default function GameInfo() {
     const miscState = useMisc()
 
     return (
-        <div className="flex flex-col gap-4 text-2xs lg:text-xs">
+        <div className="flex flex-col gap-2 text-2xs lg:text-xs">
             {/* name */}
             <div>
                 <span className="text-green-400"> lele gaming </span>

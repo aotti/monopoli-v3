@@ -102,23 +102,33 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
         // ### JIKA ROWS <= 2, MAKA PILIH KANAN/KIRI, SELAIN ITU ATAS/BAWAH 
         switch(true) {
             case elementPos.top >= 200:
-                // top-25 | top-50 | top-75 | top-100
-                if(rows === 2) ['tooltip-top-25', 'tooltip-top-25-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                if(rows === 4) ['tooltip-top-50', 'tooltip-top-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                if(rows === 6) ['tooltip-top-75', 'tooltip-top-75-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                if(rows === 8) ['tooltip-top-100', 'tooltip-top-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                return
-            case elementPos.right >= 200:
-                // right-50 | right-100
-                if(rows <= 4) ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else ['tooltip-right-100', 'tooltip-right-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                return
-            case elementPos.left >= 200:
-                // left-50 | left-100
-                if(rows <= 4) ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else ['tooltip-left-100', 'tooltip-left-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                // place left / right if rows == 2
+                if(elementPos.left >= 200 && rows == 2) 
+                    ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                else if(elementPos.right >= 200 && rows == 2)
+                    ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                // place top if rows > 2
+                else {
+                    // top-25 | top-50 | top-75 | top-100
+                    if(rows === 2) ['tooltip-top-25', 'tooltip-top-25-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                    if(rows === 4) ['tooltip-top-50', 'tooltip-top-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                    if(rows === 6) ['tooltip-top-75', 'tooltip-top-75-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                    if(rows === 8) ['tooltip-top-100', 'tooltip-top-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                }
                 return
             case elementPos.bottom >= 200:
+                // place left / right if rows == 2
+                if(elementPos.left >= 200 && rows == 2) 
+                    ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                else if(elementPos.right >= 200 && rows == 2)
+                    ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                // place bottom if rows > 2
+                else {
+                    // bottom | bottom-lg
+                    ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                }
+                return
+            default: 
                 // bottom | bottom-lg
                 ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 return
