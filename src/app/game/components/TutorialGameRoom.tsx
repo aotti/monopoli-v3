@@ -52,7 +52,7 @@ export default function TutorialGameRoom() {
             text-2xs lg:text-xs lg:leading-6`}>
                 <p className="whitespace-pre-line h-[4.7rem] lg:h-[8.5rem] p-px border-b">
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[0] as any})}
-                    <img src="/img/misc/button_stages.gif" alt="game buttons" className="!inline w-[17vw] lg:w-64 !h-[3vw] lg:!h-8 mx-1" />
+                    <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/button_stages-5fwnYxqJZQrIngn2q1hRajf4Mk5i0K.gif" alt="game buttons" className="!inline w-[17vw] lg:w-64 !h-[3vw] lg:!h-8 mx-1" />
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[1] as any})}
                 </p>
                 <p className="whitespace-pre-line h-[4.5rem] lg:h-32 p-px border-t">
