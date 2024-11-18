@@ -7,7 +7,7 @@ export default function PlayerSettingGameHistory() {
     const gameState = useGame()
 
     return (
-        <div className={`absolute left-2 bottom-8 flex flex-col items-center transition-all ease-in-out duration-500
+        <div className={`absolute -left-2 bottom-8 flex flex-col items-center transition-all ease-in-out duration-500
         w-[14vw] ${gameState.showGameHistory ? 'h-[55vh]' : 'h-[5vh]'} bg-darkblue-1 border-2`}>
             {/* history content */}
             <div className="h-[45vh] overflow-y-scroll p-1">

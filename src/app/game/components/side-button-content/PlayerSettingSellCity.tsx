@@ -20,50 +20,50 @@ export default function PlayerSettingSellCity() {
                 {/* city list */}
                 <div className="flex flex-col gap-2 h-36 lg:h-[17rem] overflow-y-scroll">
                     {/* city 1 */}
-                    <form className="flex items-center justify-between" onSubmit={ev => ev.preventDefault()}>
-                        <span> jakarta </span>
-                        <span> Rp 70.000 </span>
-                        <div className="mr-2">
+                    <form className="grid grid-cols-5 gap-1 items-center" onSubmit={ev => ev.preventDefault()}>
+                        <span className="col-span-2"> jakarta </span>
+                        <span className="col-span-2"> Rp 170.000 </span>
+                        <div className="w-fit">
                             <button type="submit" className="bg-primary border-8bit-primary">
                                 {translateUI({lang: miscState.language, text: 'sell'})}
                             </button>
                         </div>
                     </form>
                     {/* city 2 */}
-                    <form className="flex items-center justify-between" onSubmit={ev => ev.preventDefault()}>
-                        <span> bandung </span>
-                        <span> Rp 70.000 </span>
-                        <div className="mr-2">
+                    <form className="grid grid-cols-5 gap-1 items-center" onSubmit={ev => ev.preventDefault()}>
+                        <span className="col-span-2"> bandung </span>
+                        <span className="col-span-2"> Rp 70.000 </span>
+                        <div className="w-fit">
                             <button type="submit" className="bg-primary border-8bit-primary">
                                 {translateUI({lang: miscState.language, text: 'sell'})}
                             </button>
                         </div>
                     </form>
                     {/* city 3 */}
-                    <form className="flex items-center justify-between" onSubmit={ev => ev.preventDefault()}>
-                        <span> semarang </span>
-                        <span> Rp 70.000 </span>
-                        <div className="mr-2">
+                    <form className="grid grid-cols-5 gap-1 items-center" onSubmit={ev => ev.preventDefault()}>
+                        <span className="col-span-2"> semarang </span>
+                        <span className="col-span-2"> Rp 70.000 </span>
+                        <div className="w-fit">
                             <button type="submit" className="bg-primary border-8bit-primary">
                                 {translateUI({lang: miscState.language, text: 'sell'})}
                             </button>
                         </div>
                     </form>
                     {/* city 4 */}
-                    <form className="flex items-center justify-between" onSubmit={ev => ev.preventDefault()}>
-                        <span> jokja </span>
-                        <span> Rp 70.000 </span>
-                        <div className="mr-2">
+                    <form className="grid grid-cols-5 gap-1 items-center" onSubmit={ev => ev.preventDefault()}>
+                        <span className="col-span-2"> yogyakarta </span>
+                        <span className="col-span-2"> Rp 170.000 </span>
+                        <div className="w-fit">
                             <button type="submit" className="bg-primary border-8bit-primary">
                                 {translateUI({lang: miscState.language, text: 'sell'})}
                             </button>
                         </div>
                     </form>
                     {/* city 5 */}
-                    <form className="flex items-center justify-between" onSubmit={ev => ev.preventDefault()}>
-                        <span> depok </span>
-                        <span> Rp 70.000 </span>
-                        <div className="mr-2">
+                    <form className="grid grid-cols-5 gap-1 items-center" onSubmit={ev => ev.preventDefault()}>
+                        <span className="col-span-2"> depok </span>
+                        <span className="col-span-2"> Rp 70.000 </span>
+                        <div className="w-fit">
                             <button type="submit" className="bg-primary border-8bit-primary">
                                 {translateUI({lang: miscState.language, text: 'sell'})}
                             </button>

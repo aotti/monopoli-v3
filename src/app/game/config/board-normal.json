@@ -40,7 +40,8 @@
             "square": 20, 
             "type": "other",
             "name": "Debuff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png"
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
+            "info": "60% chance get debuff"
         },
         { 
             "square": 21, 
@@ -68,7 +69,8 @@
             "square": 24, 
             "type": "other",
             "name": "Free Parking 😎", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Parking_100-0bNthQvUZ8ZeknwzolhmI0YbKz6jWN.png" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Parking_100-0bNthQvUZ8ZeknwzolhmI0YbKz6jWN.png",
+            "info": "go to anywhere except prison" 
         }
     ],
     "row_2": [
@@ -76,7 +78,8 @@
             "square": 14, 
             "type": "other",
             "name": "Buff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
+            "info": "100% chance get buff"
         },
         { "type": null },
         { "type": null },
@@ -176,7 +179,8 @@
             "square": 10, 
             "type": "other",
             "name": "Get Arrested 👮", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Jail_100l-ICZXioK3ZAtyBzFw1EDulpESLGnpYt.png" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Jail_100l-ICZXioK3ZAtyBzFw1EDulpESLGnpYt.png",
+            "info": "accumulation\ndice 1 of 6"
         },
         { 
             "square": 9, 
@@ -226,7 +230,8 @@
             "square": 3, 
             "type": "other",
             "name": "Debuff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
+            "info": "60% chance get debuff"  
         },
         { 
             "square": 2, 
@@ -240,7 +245,8 @@
             "square": 1, 
             "type": "other",
             "name": "Start line", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Start_100-wIOOcS7Dm9xTo36ZgtEHTNabPzjoz1.gif" 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Start_100-wIOOcS7Dm9xTo36ZgtEHTNabPzjoz1.gif",
+            "info": "get 25k when passing or staying" 
         }
     ]
 }

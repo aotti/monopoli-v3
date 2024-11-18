@@ -157,8 +157,8 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const miscState = useMisc()
     const gameState = useGame()
     // tile data
-    type TileOtherType = {name: string, img: string}
-    const { name, img } = data as TileOtherType 
+    type TileOtherType = {name: string, img: string, info: string}
+    const { name, img, info } = data as TileOtherType 
 
     return (
         <div>

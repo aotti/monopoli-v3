@@ -129,8 +129,13 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
                 }
                 return
             default: 
+                // place left / right if rows == 2
+                if(elementPos.right >= 200 && rows == 2)
+                    ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                else if(elementPos.left >= 200 && rows == 2) 
+                    ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // bottom | bottom-lg
-                ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                else ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 return
         }
     }
