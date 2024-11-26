@@ -3,18 +3,10 @@ import { useMisc } from "../../../context/MiscContext";
 import { fetcher, fetcherOptions, moneyFormat, qS, translateUI } from "../../../helper/helper";
 import { IGameContext, ILoggedUsers, IPlayer, IResponse } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
-import { useEffect, useRef } from "react";
 
 export default function PlayerStats({ playerData, onlinePlayers }: {playerData: IPlayer, onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
     const gameState = useGame()
-    // avatar ref
-    // const avatarRef = useRef<HTMLImageElement>() 
-    // useEffect(() => {
-    //     console.log('my player info updated', gameState.myPlayerInfo);
-    //     if(gameState.myPlayerInfo.avatar) 
-    //         avatarRef.current.src = gameState.myPlayerInfo.avatar
-    // }, [gameState.myPlayerInfo])
 
     return (
         <>
