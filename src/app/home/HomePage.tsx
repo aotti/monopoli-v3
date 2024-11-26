@@ -21,7 +21,7 @@ export default function HomePage() {
     const gameState = useGame()
 
     useEffect(() => {
-        const resetData = location.search.match('reset=true')[0].split('=')[1]
+        const resetData = location.search.match('reset=true')
         if(resetData) {
             // remove local storages
             localStorage.removeItem('accessToken')
