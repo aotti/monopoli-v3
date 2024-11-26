@@ -7,10 +7,9 @@ import ScreenPortraitWarning from "../../components/ScreenPortraitWarning"
 import { useMisc } from "../../context/MiscContext"
 import LoadingPage from "../../components/LoadingPage"
 import { useGame } from "../../context/GameContext"
-import { Suspense, useEffect } from "react"
+import { useEffect } from "react"
 import { checkAccessToken, qS } from "../../helper/helper"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
 
 const retroFont = Press_Start_2P({
     subsets: ['latin'],
@@ -21,8 +20,8 @@ export default function HomePage() {
     const miscState = useMisc()
     const gameState = useGame()
 
-    const resetData = useSearchParams().get('reset') == 'true'
     useEffect(() => {
+        const resetData = location.search.match('reset=true')[0].split('=')[1]
         if(resetData) {
             // remove local storages
             localStorage.removeItem('accessToken')
@@ -41,26 +40,24 @@ export default function HomePage() {
     }, [gameState.onlinePlayers])
 
     return (
-        <Suspense>
-            <div className={`${retroFont.className} text-white text-xs lg:text-sm`}>
-                {/* padding .5rem */}
-                <div className="p-2 bg-darkblue-2 h-screen w-screen">
-                    <header>
-                        <HeaderContent />
-                    </header>
-        
-                    <main>
-                        {miscState.isLoading 
+        <div className={`${retroFont.className} text-white text-xs lg:text-sm`}>
+            {/* padding .5rem */}
+            <div className="p-2 bg-darkblue-2 h-screen w-screen">
+                <header>
+                    <HeaderContent />
+                </header>
+    
+                <main>
+                    {miscState.isLoading 
+                    ? <LoadingPage />
+                    : gameState.myPlayerInfo && gameState.onlinePlayers
                         ? <LoadingPage />
-                        : gameState.myPlayerInfo && gameState.onlinePlayers
-                            ? <LoadingPage />
-                            : <HomeContent />}
-                    </main>
-                </div>
-                {/* orientation portrait warning */}
-                <ScreenPortraitWarning />
-                <Link id="gotoRoom" href={'/room'} hidden={true}></Link>
+                        : <HomeContent />}
+                </main>
             </div>
-        </Suspense>
+            {/* orientation portrait warning */}
+            <ScreenPortraitWarning />
+            <Link id="gotoRoom" href={'/room'} hidden={true}></Link>
+        </div>
     )
 }
