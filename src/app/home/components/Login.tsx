@@ -1,9 +1,20 @@
-import Link from "next/link"
 import { useMisc } from "../../../context/MiscContext"
-import { qS, translateUI } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256 } from "../../../helper/helper"
+import { FormEvent, useEffect, useRef } from "react"
+import { IGameContext, IMiscContext, IResponse, IUser } from "../../../helper/types"
+import { useGame } from "../../../context/GameContext"
+import ResultMessage from "./ResultMessage"
+import FormButtons from "../../../components/FormButtons"
 
 export default function Login() {
     const miscState = useMisc()
+    const gameState = useGame()
+
+    // input focus
+    const inputFocus = useRef<HTMLInputElement>()
+    useEffect(() => {
+        inputFocus.current.focus()
+    }, [miscState.showModal])
 
     return (
         <div id="login_modal" className={`${miscState.showModal == 'login' ? 'block' : 'hidden'} bg-darkblue-3 border-8bit-modal p-2 
@@ -13,46 +24,99 @@ export default function Login() {
                 <span> Login </span>
             </div>
             {/* modal body */}
-            <div>
-                <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => {
-                    ev.preventDefault()
-                    // hide the modal
-                    miscState.setShowModal(null)
-                    const link = qS('#gotRoom') as HTMLAnchorElement
-                    link.click()
-                }}>
-                    {/* username */}
-                    <div className="flex justify-between">
-                        <label htmlFor="username" className="w-min"> Username </label>
-                        <input type="text" className="w-2/3 px-1" id="username" maxLength={10} required />
-                    </div>
-                    {/* password */}
-                    <div className="flex justify-between">
-                        <label htmlFor="password" className="w-min"> Password </label>
-                        <input type="password" className="w-2/3 px-1 !text-2xs" id="password" maxLength={16} required />
-                    </div>
-                    {/* message */}
-                    <div className="flex justify-between">
-                        {/* error = text-red-300 | success = text-green-300 */}
-                        <p id="result_message" className="mx-auto text-center"></p>
-                    </div>
-                    {/* submit */}
-                    <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1" onClick={() => {
-                            // set false to give zoom-out animate class
-                            miscState.setAnimation(false); 
-                            // timeout to wait the animation zoom-out
-                            setTimeout(() => miscState.setShowModal(null), 200) 
-                        }}> 
-                            {translateUI({lang: miscState.language, text: 'Close'})} 
-                        </button>
-                        <button type="submit" className="text-green-300 p-1"> 
-                            Login 
-                        </button>
-                        <Link id="gotRoom" href={'/room'} hidden={true}></Link>
-                    </div>
-                </form>
-            </div>
+            <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => userLogin(ev, miscState, gameState)}>
+                {/* username */}
+                <div className="flex justify-between">
+                    <label htmlFor="username" className="w-min"> Username </label>
+                    <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder="max 10 letters" autoComplete="off" required />
+                </div>
+                {/* password */}
+                <div className="flex justify-between">
+                    <label htmlFor="password" className="w-min"> Password </label>
+                    <input type="password" className="w-2/3 px-1 !text-2xs" id="password" minLength={8} maxLength={16} placeholder="max 16 letters" required />
+                </div>
+                {/* message */}
+                <ResultMessage id="result_login" />
+                {/* submit */}
+                <div className="flex justify-between mx-6">
+                    <FormButtons text="Login" />
+                </div>
+            </form>
         </div>
     )
+}
+
+async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+
+    // result message
+    const resultMessage = qS('#result_login')
+    resultMessage.className = 'mx-auto text-center text-2xs lg:text-[12px]'
+    resultMessage.textContent = ''
+    // submit button
+    const loginButton = qS('#login_button') as HTMLInputElement
+    // input value container
+    const inputValues: Required<Pick<IUser, 'username'|'password'>> = {
+        username: null,
+        password: null
+    }
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName == 'INPUT') {
+            // filter inputs
+            if(setInputValue('username', input)) inputValues.username = input.value.trim()
+            else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
+            // error
+            else {
+                resultMessage.classList.add('text-red-600')
+                resultMessage.textContent = errorLoginRegister(input.id)
+                return
+            }
+        }
+    }
+    // submit button loading
+    const tempButtonText = loginButton.textContent
+    loginButton.textContent = 'Loading'
+    loginButton.disabled = true
+    // fetch
+    const loginFetchOptions = fetcherOptions({method: 'POST', body: JSON.stringify(inputValues)})
+    const loginResponse: IResponse = await (await fetcher('/login', loginFetchOptions)).json()
+    // response
+    switch(loginResponse.status) {
+        case 200: 
+            resultMessage.classList.add('text-green-400')
+            resultMessage.textContent = `✅ moving to room list..`
+            // save access token
+            localStorage.setItem('accessToken', loginResponse.data[0].token)
+            delete loginResponse.data[0].token
+            // set my player data
+            gameState.setMyPlayerInfo(loginResponse.data[0].player)
+            // set online players
+            gameState.setOnlinePlayers(loginResponse.data[0].onlinePlayers)
+            localStorage.setItem('onlinePlayers', JSON.stringify(loginResponse.data[0].onlinePlayers))
+            // submit button normal
+            loginButton.textContent = tempButtonText
+            loginButton.removeAttribute('disabled')
+            // empty inputs
+            for(let j=0; j<formInputs.length; j++) {
+                const input = formInputs.item(j) as HTMLInputElement
+                if(input.nodeName == 'INPUT') input.value = ''
+            }
+            // set false to give zoom-out animate class
+            miscState.setAnimation(false); 
+            // timeout to wait the animation zoom-out
+            miscState.setShowModal(null)
+            return
+        // error
+        default: 
+            // submit button normal
+            loginButton.textContent = tempButtonText
+            loginButton.removeAttribute('disabled')
+            // result message
+            resultMessage.classList.add('text-red-600')
+            resultMessage.textContent = `❌ ${loginResponse.status}: ${loginResponse.message}`
+            return
+    }
 }

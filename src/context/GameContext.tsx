@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { IGameContext } from "../helper/types";
+import { IGameContext, ILoggedUsers, IPlayer } from "../helper/types";
 
 const GameContext = createContext<IGameContext>(null)
 
@@ -15,6 +15,16 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [openPlayerSetting, setOpenPlayerSetting] = useState(false)
     const [displaySettingItem, setDisplaySettingItem] = useState<IGameContext['displaySettingItem']>(null)
     const [showGameHistory, setShowGameHistory] = useState(false)
+    // player
+    const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
+    const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
+    const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>(null)
+
+    useEffect(() => {
+        // set online players if exist
+        const getOnlinePlayers = localStorage.getItem('onlinePlayers')
+        if(getOnlinePlayers) setOnlinePlayers(JSON.parse(getOnlinePlayers))
+    }, [])
 
     const states: IGameContext = {
         // board
@@ -33,6 +43,13 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setDisplaySettingItem: setDisplaySettingItem,
         showGameHistory: showGameHistory,
         setShowGameHistory: setShowGameHistory,
+        // player
+        myPlayerInfo: myPlayerInfo,
+        setMyPlayerInfo: setMyPlayerInfo,
+        otherPlayerInfo: otherPlayerInfo,
+        setOtherPlayerInfo: setOtherPlayerInfo,
+        onlinePlayers: onlinePlayers,
+        setOnlinePlayers: setOnlinePlayers,
     }
 
     return (

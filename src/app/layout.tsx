@@ -13,9 +13,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const accessSecret = process.env.ACCESS_TOKEN_SECRET
+
   return (
     <html lang="en">
-      <MiscProvider>
+      <MiscProvider accessSecret={accessSecret}>
         <GameProvider>
           <body>{children}</body>
         </GameProvider>

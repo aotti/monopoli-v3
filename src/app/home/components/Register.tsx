@@ -1,8 +1,18 @@
-import { translateUI } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256, translateUI } from "../../../helper/helper"
 import { useMisc } from "../../../context/MiscContext"
+import { FormEvent, useEffect, useRef } from "react";
+import { IUser, IResponse } from "../../../helper/types";
+import ResultMessage from "./ResultMessage";
+import FormButtons from "../../../components/FormButtons";
 
 export default function Register() {
     const miscState = useMisc()
+
+    // input focus
+    const inputFocus = useRef<HTMLInputElement>()
+    useEffect(() => {
+        inputFocus.current.focus()
+    }, [miscState.showModal])
 
     return ( 
         <div id="register_modal" className={`${miscState.showModal == 'register' ? 'block' : 'hidden'} bg-darkblue-3 border-8bit-modal p-2
@@ -12,49 +22,106 @@ export default function Register() {
                 <span> {translateUI({lang: miscState.language, text: 'Create Account'})} </span>
             </div>
             {/* modal body */}
-            <div>
-                <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => ev.preventDefault()}>
-                    {/* username */}
-                    <div className="flex justify-between">
-                        <label htmlFor="username" className="w-min"> Username </label>
-                        <input type="text" className="w-2/3 px-1" id="username" maxLength={10} required />
-                    </div>
-                    {/* password */}
-                    <div className="flex justify-between">
-                        <label htmlFor="password" className="w-min"> Password </label>
-                        <input type="password" className="w-2/3 px-1 !text-2xs" id="password" maxLength={16} required />
-                    </div>
-                    {/* confirm password */}
-                    <div className="flex justify-between">
-                        <label htmlFor="confirm_password" className="w-min"> {translateUI({lang: miscState.language, text: 'Confirm Password'})} </label>
-                        <input type="password" className="w-2/3 px-1 !text-2xs" id="confirm_password" maxLength={16} required />
-                    </div>
-                    {/* name */}
-                    <div className="flex justify-between">
-                        <label htmlFor="display_name" className="w-min"> {translateUI({lang: miscState.language, text: 'Name'})} </label>
-                        <input type="text" className="w-2/3 px-1" id="display_name" maxLength={12} required />
-                    </div>
-                    {/* message */}
-                    <div className="flex justify-between">
-                        {/* error = text-red-300 | success = text-green-300 */}
-                        <p id="result_message" className="mx-auto text-center"></p>
-                    </div>
-                    {/* submit */}
-                    <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1" onClick={() => { 
-                            // set false to give zoom-out animate class
-                            miscState.setAnimation(false); 
-                            // timeout to wait the animation zoom-out
-                            setTimeout(() => miscState.setShowModal(null), 200) 
-                        }}> 
-                            {translateUI({lang: miscState.language, text: 'Close'})} 
-                        </button>
-                        <button type="submit" className="text-green-300 p-1"> 
-                            {translateUI({lang: miscState.language, text: 'Create'})} 
-                        </button>
-                    </div>
-                </form>
-            </div>
+            <form className="flex flex-col gap-2 lg:gap-4" onSubmit={userRegister}>
+                {/* username */}
+                <div className="flex justify-between">
+                    <label htmlFor="username" className="w-min"> Username </label>
+                    <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder="max 10 letters"  autoComplete="off" required />
+                </div>
+                {/* password */}
+                <div className="flex justify-between">
+                    <label htmlFor="password" className="w-min"> Password </label>
+                    <input type="password" className="w-2/3 px-1 !text-2xs" id="password" minLength={8} maxLength={16} placeholder="max 16 letters" required />
+                </div>
+                {/* confirm password */}
+                <div className="flex justify-between">
+                    <label htmlFor="confirm_password" className="w-min"> {translateUI({lang: miscState.language, text: 'Confirm Password'})} </label>
+                    <input type="password" className="w-2/3 px-1 !text-2xs" id="confirm_password" maxLength={16} placeholder="max 16 letters" required />
+                </div>
+                {/* name */}
+                <div className="flex justify-between">
+                    <label htmlFor="display_name" className="w-min"> {translateUI({lang: miscState.language, text: 'Name'})} </label>
+                    <input type="text" className="w-2/3 px-1" id="display_name" minLength={4} maxLength={12} placeholder="max 12 letters" required />
+                </div>
+                {/* message */}
+                <ResultMessage id="result_register" />
+                {/* submit */}
+                <div className="flex justify-between mx-6">
+                    <FormButtons text="Register" />
+                </div>
+            </form>
         </div>
     )
+}
+
+async function userRegister(ev: FormEvent<HTMLFormElement>) {
+    ev.preventDefault()
+
+    // result message
+    const resultMessage = qS('#result_register')
+    resultMessage.className = 'mx-auto text-center text-2xs lg:text-[12px]'
+    resultMessage.textContent = ''
+    // submit button
+    const registerButton = qS('#register_button') as HTMLInputElement
+    // input value container
+    const inputValues: Required<Omit<IUser, 'photo'>> = {
+        username: null,
+        password: null,
+        confirm_password: null,
+        display_name: null
+    }
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName == 'INPUT') {
+            // filter inputs
+            if(setInputValue('username', input)) inputValues.username = input.value.trim()
+            else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
+            else if(setInputValue('confirm_password', input)) inputValues.confirm_password = sha256(input.value.trim())
+            else if(setInputValue('display_name', input)) inputValues.display_name = input.value.trim()
+            // error
+            else {
+                resultMessage.classList.add('text-red-600')
+                resultMessage.textContent = errorLoginRegister(input.id)
+                return
+            }
+        }
+    }
+    // confirm password
+    if(inputValues.password != inputValues.confirm_password) {
+        resultMessage.classList.add('text-red-600')
+        resultMessage.textContent = 'confirm password doesnt match!'
+        return
+    }
+    // confirm password matched
+    delete inputValues.confirm_password
+    // submit button loading
+    const tempButtonText = registerButton.textContent
+    registerButton.textContent = 'Loading'
+    registerButton.disabled = true
+    // fetch
+    const registerFetchOptions = fetcherOptions({method: 'POST', body: JSON.stringify(inputValues)})
+    const registerResponse: IResponse = await (await fetcher('/register', registerFetchOptions)).json()
+    // response
+    switch(registerResponse.status) {
+        // success
+        case 201: 
+            resultMessage.classList.add('text-green-400')
+            resultMessage.textContent = `✅ '${registerResponse.data[0].display_name}' registered!`
+            // submit button normal
+            registerButton.textContent = tempButtonText
+            registerButton.removeAttribute('disabled')
+            // empty inputs
+            for(let j=0; j<formInputs.length; j++) {
+                const input = formInputs.item(j) as HTMLInputElement
+                if(input.nodeName == 'INPUT') input.value = ''
+            }
+            return
+        // error
+        default: 
+            resultMessage.classList.add('text-red-600')
+            resultMessage.textContent = `❌ ${registerResponse.status}: ${registerResponse.message}`
+            return
+    }
 }

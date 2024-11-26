@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect } from "react";
 import { useMisc } from "../../../context/MiscContext";
 import { applyTooltipEvent, qS, questionMark, translateUI } from "../../../helper/helper";
 import Link from "next/link";
+import FormButtons from "../../../components/FormButtons";
 
 export default function CreateRoom() {
     const miscState = useMisc()
@@ -117,17 +118,7 @@ export default function CreateRoom() {
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1" onClick={() => {
-                            // set false to give zoom-out animate class
-                            miscState.setAnimation(false); 
-                            // timeout to wait the animation zoom-out
-                            setTimeout(() => miscState.setShowModal(null), 200) 
-                        }}> 
-                            {translateUI({lang: miscState.language, text: 'Close'})} 
-                        </button>
-                        <button type="submit" className="text-green-300 p-1"> 
-                            {translateUI({lang: miscState.language, text: 'Create'})} 
-                        </button>
+                        <FormButtons text="Create" />
                         <Link id="gotoGame" href={'/game'} hidden={true}></Link>
                     </div>
                 </form>

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { applyTooltipEvent, clickOutsideElement, translateUI } from "../../helper/helper"
+import { applyTooltipEvent, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -15,6 +15,7 @@ import GameNotif from "./components/board/GameNotif"
 import Link from "next/link"
 import RollNumber from "./components/board/RollNumber"
 import TutorialGameRoom from "./components/TutorialGameRoom"
+import { clickOutsideElement } from "../../helper/click-outside"
 
 export default function GameContent() {
     const miscState = useMisc()

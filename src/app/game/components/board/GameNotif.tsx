@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { clickOutsideElement } from "../../../../helper/helper"
+import { clickOutsideElement } from "../../../../helper/click-outside"
 import { useMisc } from "../../../../context/MiscContext"
 import { useGame } from "../../../../context/GameContext"
 

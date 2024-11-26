@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { applyTooltipEvent, clickOutsideElement, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
+import { clickOutsideElement } from "../../../../helper/click-outside"
 
 export default function PlayerSection() {
     const miscState = useMisc()

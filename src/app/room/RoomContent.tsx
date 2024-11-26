@@ -1,18 +1,22 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, qSA, translateUI } from "../../helper/helper";
+import { applyTooltipEvent, translateUI } from "../../helper/helper";
 import ChatBox from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
 import PlayerStats from "./components/PlayerStats";
 import RoomCard from "./components/RoomCard";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
+import { useGame } from "../../context/GameContext";
 
 export default function RoomContent() {
     const miscState = useMisc()
+    const gameState = useGame()
+    const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
+
     const roomRules = [
         `board: normal;dice: 2;start: 75k;lose: -25k;mode: 5 laps;curse: 5%`,
-        `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5%`,
+        `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5~10%`,
         `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`
     ]
     // tooltip (the element must have position: relative)
@@ -39,7 +43,7 @@ export default function RoomContent() {
                                 // chat box
                                 ? <ChatBox page="room" />
                                 // list of online players
-                                : <PlayerList />
+                                : <PlayerList onlinePlayers={onlinePlayers} />
                         }
                         {/* chat input */}
                         <form className="mt-2" onSubmit={ev => {
@@ -65,7 +69,7 @@ export default function RoomContent() {
                 {/* tutorial: relative z-10 */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_2' ? 'relative z-10' : ''}
                 h-[calc(100vh-65vh)] lg:h-[calc(100vh-60vh)] p-1`}>
-                    <PlayerStats />
+                    <PlayerStats playerData={otherPlayerInfo || myPlayerInfo} onlinePlayers={onlinePlayers} />
                 </div>
             </div>
             {/* room list */}

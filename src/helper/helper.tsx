@@ -1,6 +1,8 @@
-import { MutableRefObject, PointerEvent, useEffect } from "react";
-import { ITranslate } from "./types";
+import { PointerEvent } from "react";
+import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, IResponse, ITranslate, VerifyTokenReturn, VerifyTokenType } from "./types";
 import translateUI_data from '../config/translate-ui.json'
+import { createHash } from "crypto";
+import { jwtVerify } from "jose";
 
 export function translateUI(params: ITranslate) {
     const { lang, text, lowercase } = params
@@ -37,23 +39,160 @@ export function moneyFormat(number: number) {
     return formatter.format(number)
 }
 
-export function clickOutsideElement(ref: MutableRefObject<any>, handler: () => void) {
-    useEffect(() => {
-        const listener = (ev: Event) => {
-            // do nothing if clicking ref's element or descendent elements
-            if(!ref?.current || ref.current.contains(ev.target)) return
+export function catchError<T=any>(promise: Promise<T>): Promise<[undefined, T] | [Error]> {
+    return promise
+        .then(data => {
+            return [undefined, data] as [undefined, T]
+        })
+        .catch(error => {
+            return [error]
+        })
+}
 
-            handler()
+type InputType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
+export function setInputValue(input: InputType, element: HTMLInputElement) {
+    return element.id == input && filterInput(element.id, element.value)
+}
+
+export function filterInput(input: InputType, value: string) {
+    // username = 4~10 | password = 8~16 | display_name = 4~12
+    switch(input) {
+        // filter uuid
+        case 'uuid': 
+            const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+            return value.match(uuidv4_regex)
+        // letter & number
+        case 'username': 
+            return value.match(/^[a-z0-9]{4,10}$/)
+        // letter, number, whitespace, symbol (.,#-+@) 
+        case 'password': 
+        case 'confirm_password':
+            return value.match(/^[a-z0-9\s.,#\-+@]{8,16}$/)
+        // letter, number, whitespace
+        case 'display_name': 
+            return value.match(/^[a-z0-9\s]{4,12}$/)
+        // must have monopoli-profiles url
+        case 'avatar': 
+            return value.match(/monopoli-profiles/)
+    }
+}
+
+/**
+ * @returns encrypted text
+ */
+export function sha256(text: string) {
+    const hash = createHash('sha256').update(text).digest('hex')
+    return hash
+}
+
+export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
+export function fetcherOptions(args: FetchOptionsType) {
+    const { method, credentials } = args
+    // get access token
+    const accessToken = localStorage.getItem('accessToken')
+    // headers
+    const headers = credentials 
+                    // auth
+                    ? method == 'GET'
+                        // GET will only have authorization
+                        ? { 'authorization': `Bearer ${accessToken}` }
+                        // POST, PUT, DELETE with auth
+                        : { 'content-type': 'application/json',
+                            'authorization': `Bearer ${accessToken}` }
+                    // POST, PUT, DELETE register/login
+                    : { 'content-type': 'application/json' }
+    switch(method) {
+        case 'GET': 
+            if(credentials) 
+                return { method: method, headers: headers }
+            // public
+            return { method: method }
+        case 'POST': return { method: method, headers: headers, body: args.body }
+        case 'PUT': return { method: method, headers: headers, body: args.body }
+        case 'DELETE': return { method: method, headers: headers, body: args.body }
+    }
+}
+
+export function fetcher(endpoint: string, options: RequestInit) {
+    const host = `${window.location.origin}/api`
+    const url = host + endpoint
+    return fetch(url, options)
+}
+
+export function errorLoginRegister(input: string) {
+    switch (input) {
+        case 'username':
+            return `${input}: length must be 4 to 10 | only letter and number allowed!`
+        case 'password': 
+        case 'confirm_password':
+            return `${input}: length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed!`
+        case 'display_name':
+            return `name: length must be 4 to 12 | only letter, number and spaces allowed!`
+        default: 
+            return `unknown input: ${input}`
+    }
+}
+
+/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+export function verifyAccessToken<T extends VerifyTokenType>(args: T): Promise<VerifyTokenReturn<T>>
+export async function verifyAccessToken(args: VerifyTokenType): Promise<any> {
+    // verify the token
+    const encodedSecret = new TextEncoder().encode(args.secret)
+    const [error, data] = await catchError(jwtVerify(args.token, encodedSecret))
+    // result
+    if(error) return [error]
+    switch(args.action) {
+        case 'verify-only': return [null, true]
+        case 'verify-payload': return [null, data.payload]
+    }
+}
+    
+export async function checkAccessToken(miscState: IMiscContext, gameState: IGameContext) {
+    // get access token
+    const accessToken = localStorage.getItem('accessToken')
+    // get online players
+    const onlinePlayers = localStorage.getItem('onlinePlayers')
+    // verify access token
+    const [error, data] = await verifyAccessToken({action: 'verify-payload', secret: miscState.secret, token: accessToken})
+    // access token expired / not exist
+    if(error?.name == 'JWTExpired' || !accessToken) {
+        // renew with refresh token
+        const renewFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify('')})
+        const renewResponse: IResponse = await (await fetcher('/login', renewFetchOptions)).json()
+        // response
+        switch(renewResponse.status) {
+            case 200: 
+                // save access token
+                localStorage.setItem('accessToken', renewResponse.data[0].token)
+                delete renewResponse.data[0].token
+                // set my player data
+                gameState.setMyPlayerInfo(renewResponse.data[0].player)
+                // set online players
+                gameState.setOnlinePlayers(renewResponse.data[0].onlinePlayers)
+                localStorage.setItem('onlinePlayers', JSON.stringify(renewResponse.data[0].onlinePlayers))
+                break
+            default: 
+                // remove local storages
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('onlinePlayers')
+                break
         }
-
-        // event listener
-        document.addEventListener('click', listener);
-        document.addEventListener('touchstart', listener);
-        return () => {
-            document.removeEventListener('click', listener);
-            document.removeEventListener('touchstart', listener);
-        };
-    }, [ref, handler])
+        miscState.setIsLoading(false)
+    }
+    // auto login access token
+    else {
+        // set my player info
+        gameState.setMyPlayerInfo({
+            display_name: data.display_name,
+            game_played: data.game_played,
+            worst_money_lost: data.worst_money_lost,
+            avatar: data.avatar
+        })
+        // set online players
+        gameState.setOnlinePlayers(JSON.parse(onlinePlayers))
+        miscState.setIsLoading(false)
+    }
 }
 
 /**

@@ -4,6 +4,13 @@ import { Press_Start_2P } from "next/font/google"
 import HeaderContent from "../../components/HeaderContent"
 import HomeContent from "../home/HomeContent"
 import ScreenPortraitWarning from "../../components/ScreenPortraitWarning"
+import { useMisc } from "../../context/MiscContext"
+import LoadingPage from "../../components/LoadingPage"
+import { useGame } from "../../context/GameContext"
+import { useEffect } from "react"
+import { checkAccessToken, qS } from "../../helper/helper"
+import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
 const retroFont = Press_Start_2P({
     subsets: ['latin'],
@@ -11,6 +18,29 @@ const retroFont = Press_Start_2P({
 })
 
 export default function HomePage() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    const resetData = useSearchParams().get('reset') == 'true'
+    useEffect(() => {
+        if(resetData) {
+            // remove local storages
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('onlinePlayers')
+        }
+        // check token for auto login
+        if(miscState.secret) checkAccessToken(miscState, gameState)
+    }, [miscState.secret])
+
+    // navigate to room list
+    useEffect(() => {
+        if(gameState.onlinePlayers) {
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom.click()
+        }
+    }, [gameState.onlinePlayers])
+    console.log(miscState.isLoading, gameState.myPlayerInfo, gameState.onlinePlayers);
+    
 
     return (
         <div className={`${retroFont.className} text-white text-xs lg:text-sm`}>
@@ -21,11 +51,16 @@ export default function HomePage() {
                 </header>
     
                 <main>
-                    <HomeContent />
+                    {miscState.isLoading 
+                    ? <LoadingPage />
+                    : gameState.myPlayerInfo && gameState.onlinePlayers
+                        ? <LoadingPage />
+                        : <HomeContent />}
                 </main>
             </div>
             {/* orientation portrait warning */}
             <ScreenPortraitWarning />
+            <Link id="gotoRoom" href={'/room'} hidden={true}></Link>
         </div>
     )
 }
