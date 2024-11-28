@@ -161,9 +161,9 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
     // get online players
     const onlinePlayers = localStorage.getItem('onlinePlayers')
     // verify access token
-    const [error, data] = await verifyAccessToken({action: 'verify-payload', secret: miscState.secret, token: accessToken})
+    const [error, data] = await verifyAccessToken({action: 'verify-payload', secret: miscState.secret, token: accessToken})    
     // access token expired / not exist
-    if(error?.name == 'JWTExpired' || !accessToken) {
+    if(error || !accessToken) {
         // renew with refresh token
         const renewFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify('')})
         const renewResponse: IResponse = await (await fetcher('/login', renewFetchOptions)).json()
