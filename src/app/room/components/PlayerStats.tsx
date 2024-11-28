@@ -3,6 +3,8 @@ import { useMisc } from "../../../context/MiscContext";
 import { fetcher, fetcherOptions, moneyFormat, qS, translateUI } from "../../../helper/helper";
 import { IGameContext, ILoggedUsers, IPlayer, IResponse } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
+import { FormEvent } from "react";
+import Link from "next/link";
 
 export default function PlayerStats({ playerData, onlinePlayers }: {playerData: IPlayer, onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
@@ -27,17 +29,20 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         await avatarUpdate(playerData.display_name, data.url, gameState)
                     }}>
                         {({ open }) => {
+                            const uploadAvatarText = translateUI({lang: miscState.language, text: 'upload your avatar'})
+                            const uploadAvatarClass = `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-['${uploadAvatarText.replaceAll(/\s/g, '_')}']`
                             return (
-                                <button type="button" id="upload_avatar" className="h-full hover:bg-black/20" onClick={() => open('local')}>
-                                    <CldImage id="avatar" src={playerData.avatar || '#'} alt={translateUI({lang: miscState.language, text: 'upload your avatar'})} 
+                                <button type="button" id="upload_avatar" className={`relative h-full ${uploadAvatarClass}`} onClick={() => open('local')}>
+                                    <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" 
                                     className="!w-full hover:text-2xs hover:break-all hover:text-balance" width={125} height={0} />
                                 </button>
                             )
                         }}
                     </CldUploadWidget>
                     {/* logout */}
-                    <form className="text-center mt-2" onSubmit={ev => ev.preventDefault()}>
-                        <button type="submit" className="bg-darkblue-1 border-8bit-text"> logout </button>
+                    <form className="text-center mt-2" onSubmit={ev => userLogout(ev, gameState)}>
+                        <button type="submit" id="logout_button" className="bg-darkblue-1 border-8bit-text"> logout </button>
+                        <Link id="gotoHome" href={'/'} />
                     </form>
                 </div>
                 {/* stats */}
@@ -109,6 +114,41 @@ async function avatarUpdate(display_name: string, avatar_url: string, gameState:
             uploadButton.removeAttribute('disabled')
             // result message
             avatarImg.alt = `${avatarResponse.status}: ${avatarResponse.message}`
+            return
+    }
+}
+
+async function userLogout(ev: FormEvent<HTMLFormElement>, gameState: IGameContext) {
+    ev.preventDefault()
+
+    // submit button
+    const logoutButton = qS('#logout_button') as HTMLInputElement
+    logoutButton.textContent = '.'
+    const loggingOut = setInterval((counter = 0) => {
+        counter < 3 ? logoutButton.textContent += '.' : logoutButton.textContent = '.'
+    }, 1000);
+    
+    // fetch
+    const logoutFetchOptions = fetcherOptions({method: 'POST', credentials: true})
+    const logoutResponse: IResponse = await (await fetcher('/logout', logoutFetchOptions)).json()
+    // response
+    switch(logoutResponse.status) {
+        case 200: 
+            // stop interval
+            clearInterval(loggingOut)
+            logoutButton.textContent = 'logout'
+            // remove all local storage
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('onlinePlayers')
+            // remove my player & online player state
+            gameState.setMyPlayerInfo(null)
+            gameState.setOnlinePlayers(null)
+            // move to home
+            const gotoHome = qS('#gotoHome') as HTMLAnchorElement
+            gotoHome.click()
+            return
+        default: 
+            logoutButton.textContent = `error${logoutResponse.status}`
             return
     }
 }

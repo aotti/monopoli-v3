@@ -1,8 +1,8 @@
 import { PointerEvent } from "react";
-import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, IResponse, ITranslate, VerifyTokenReturn, VerifyTokenType } from "./types";
+import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, IPlayer, IResponse, ITranslate, IVerifyTokenOnly, IVerifyTokenPayload, VerifyTokenReturn, VerifyTokenType } from "./types";
 import translateUI_data from '../config/translate-ui.json'
 import { createHash } from "crypto";
-import { jwtVerify } from "jose";
+import { JWTPayload, jwtVerify } from "jose";
 
 export function translateUI(params: ITranslate) {
     const { lang, text, lowercase } = params
@@ -135,8 +135,12 @@ export function errorLoginRegister(input: string) {
 
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
-export function verifyAccessToken<T extends VerifyTokenType>(args: T): Promise<VerifyTokenReturn<T>>
-export async function verifyAccessToken(args: VerifyTokenType): Promise<any> {
+/**
+ * @returns [null, data] or [error]
+ */
+export function verifyAccessToken(args: IVerifyTokenOnly): Promise<[null, boolean] | [Error]>
+export function verifyAccessToken(args: IVerifyTokenPayload): Promise<[null, IPlayer & JWTPayload] | [Error]>
+export async function verifyAccessToken(args: VerifyTokenType) {
     // verify the token
     const encodedSecret = new TextEncoder().encode(args.secret)
     const [error, data] = await catchError(jwtVerify(args.token, encodedSecret))
@@ -147,7 +151,10 @@ export async function verifyAccessToken(args: VerifyTokenType): Promise<any> {
         case 'verify-payload': return [null, data.payload]
     }
 }
-    
+
+/**
+ * @description only used for checking access token on auto login
+ */
 export async function checkAccessToken(miscState: IMiscContext, gameState: IGameContext) {
     // get access token
     const accessToken = localStorage.getItem('accessToken')

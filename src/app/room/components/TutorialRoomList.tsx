@@ -10,7 +10,7 @@ export default function TutorialRoomList() {
             `for chat, just type in the "chat here" box and chat box will appear, or you can type "/on" to keep chat box open and "/off" to revert it`
         ],
         part_2: [
-            `display you/other player game stats. to upload avatar, click the "upload your avatar".`,
+            `display you/other player game stats. to upload avatar, click the "upload your avatar". after upload your avatar, please re-login to make sure the avatar is updated.`,
             `"worst lost" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.`
         ],
         part_3: [

@@ -143,14 +143,14 @@ export interface IVerifyTokenOnly {
     token: string,
 }
 
-interface IVerifyTokenPayload {
+export interface IVerifyTokenPayload {
     action: 'verify-payload', 
     secret: string, 
     token: string,
 }
 
 export type VerifyTokenType = IVerifyTokenOnly | IVerifyTokenPayload
-export type VerifyTokenReturn<T> = ReturnType<() => (T extends IVerifyTokenOnly ? [null, boolean] : [null, IPlayer & JWTPayload]) | [Error]>
+export type VerifyTokenReturn = ReturnType<() => (VerifyTokenType extends IVerifyTokenOnly ? [null, boolean] : [null, IPlayer & JWTPayload]) | [Error]>
 
 // response
 export interface IResponse<T = any> {
