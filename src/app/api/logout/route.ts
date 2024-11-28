@@ -1,3 +1,5 @@
+"use server"
+
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { IResponse } from "../../../helper/types";
@@ -5,6 +7,8 @@ import { IResponse } from "../../../helper/types";
 export async function POST(req: NextRequest) {
     // api action
     const action = 'user logout'
+    console.log(action);
+    
     // check refresh token
     const refreshToken = cookies().get('refreshToken')?.value
     // access & refresh token empty

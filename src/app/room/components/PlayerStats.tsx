@@ -32,7 +32,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             const uploadAvatarText = translateUI({lang: miscState.language, text: 'upload your avatar'})
                             const uploadAvatarClass = `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-[attr(data-text)]`
                             return (
-                                <button type="button" id="upload_avatar" data-text={uploadAvatarText} className={`relative h-full ${uploadAvatarClass}`} onClick={() => open('local')}>
+                                <button type="button" id="upload_avatar" data-text={uploadAvatarText} className={`relative w-full h-full ${uploadAvatarClass}`} onClick={() => open('local')}>
                                     <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" 
                                     className="!w-full hover:text-2xs hover:break-all hover:text-balance" width={125} height={0} />
                                 </button>
@@ -41,8 +41,8 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                     </CldUploadWidget>
                     {/* logout */}
                     <form className="text-center mt-2" onSubmit={ev => userLogout(ev, gameState)}>
-                        <button type="submit" id="logout_button" className="bg-darkblue-1 border-8bit-text"> logout </button>
-                        <Link id="gotoHome" href={'/'} />
+                        <button type="submit" id="logout_button" className="min-w-4 bg-darkblue-1 border-8bit-text"> logout </button>
+                        <Link id="gotoHome" href={location.origin}></Link>
                     </form>
                 </div>
                 {/* stats */}
@@ -121,11 +121,20 @@ async function avatarUpdate(display_name: string, avatar_url: string, gameState:
 async function userLogout(ev: FormEvent<HTMLFormElement>, gameState: IGameContext) {
     ev.preventDefault()
 
+    // home button
+    const gotoHome = qS('#gotoHome') as HTMLAnchorElement
     // submit button
     const logoutButton = qS('#logout_button') as HTMLInputElement
     logoutButton.textContent = '.'
     const loggingOut = setInterval((counter = 0) => {
-        counter < 3 ? logoutButton.textContent += '.' : logoutButton.textContent = '.'
+        if(counter < 3) {
+            logoutButton.textContent += '.'
+            counter++
+        }
+        else {
+            logoutButton.textContent = '.'
+            counter = 0
+        }
     }, 1000);
     
     // fetch
@@ -140,11 +149,9 @@ async function userLogout(ev: FormEvent<HTMLFormElement>, gameState: IGameContex
             // remove all local storage
             localStorage.removeItem('accessToken')
             localStorage.removeItem('onlinePlayers')
-            // remove my player & online player state
             gameState.setMyPlayerInfo(null)
             gameState.setOnlinePlayers(null)
-            // move to home
-            const gotoHome = qS('#gotoHome') as HTMLAnchorElement
+            // go to home
             gotoHome.click()
             return
         default: 
