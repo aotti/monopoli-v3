@@ -29,8 +29,9 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         await avatarUpdate(playerData.display_name, data.url, gameState)
                     }}>
                         {({ open }) => {
-                            const uploadAvatarText = miscState.language == 'english' ? 'upload_your_avatar' : 'unggah_avatar_kau!'
-                            const uploadAvatarClass = `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-['${uploadAvatarText}']`
+                            const uploadAvatarClass = miscState.language == 'english' 
+                                                ? `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-['upload_your_avatar']`
+                                                : `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-['unggah_avatar_kau!']`
                             return (
                                 <button type="button" id="upload_avatar" className={`relative h-full ${uploadAvatarClass}`} onClick={() => open('local')}>
                                     <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" 
