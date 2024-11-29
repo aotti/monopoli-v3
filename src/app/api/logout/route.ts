@@ -1,8 +1,4 @@
-"use server"
-
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { IResponse } from "../../../helper/types";
 import LogoutController from "./LogoutController";
 
 export async function POST(req: NextRequest) {

@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function PlayerStats({ playerData, onlinePlayers }: {playerData: IPlayer, onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
     const gameState = useGame()
+    const isUploadAllowed = playerData.display_name == gameState.myPlayerInfo.display_name ? true : false
 
     return (
         <>
@@ -32,7 +33,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             const uploadAvatarText = translateUI({lang: miscState.language, text: 'upload your avatar'})
                             const uploadAvatarClass = `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-[attr(data-text)]`
                             return (
-                                <button type="button" id="upload_avatar" data-text={uploadAvatarText} className={`relative w-full h-full ${uploadAvatarClass}`} onClick={() => open('local')}>
+                                <button type="button" id="upload_avatar" data-text={uploadAvatarText} className={`relative w-full h-full ${isUploadAllowed ? uploadAvatarClass : ''}`} onClick={() => open('local')} disabled={!isUploadAllowed}>
                                     <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" 
                                     className="!w-full hover:text-2xs hover:break-all hover:text-balance" width={125} height={0} />
                                 </button>
@@ -40,10 +41,14 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         }}
                     </CldUploadWidget>
                     {/* logout */}
-                    <form className="text-center mt-2" onSubmit={ev => userLogout(ev, gameState)}>
-                        <button type="submit" id="logout_button" className="min-w-4 bg-darkblue-1 border-8bit-text"> logout </button>
-                        <Link id="gotoHome" href={location.origin}></Link>
-                    </form>
+                    {
+                    playerData.display_name == gameState.myPlayerInfo.display_name
+                        ? <form className="text-center mt-2" onSubmit={ev => userLogout(ev, gameState)}>
+                            <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text"> logout </button>
+                            <Link id="gotoHome" href={location.origin}></Link>
+                        </form>
+                        : null
+                    }
                 </div>
                 {/* stats */}
                 <div className="lg:flex lg:flex-col lg:gap-4">

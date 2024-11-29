@@ -167,14 +167,14 @@
         "__GAME ROOM TUTORIAL__": "__GAME ROOM TUTORIAL__",
 
         "__GAME PART 1__":"__GAME PART 1__",
-        "\"help\" contain info about community & chance cards, the special card effect, buff/debuff area.": "\"bantuan\" berisi info kartu dana umum & kesempatan, efek kartu khusus, area buff/debuff.",
+        "\"help\" contain info about community & chance cards, special card effect, buff/debuff area.": "\"bantuan\" berisi info kartu dana umum & kesempatan, efek kartu khusus, area buff/debuff.",
         "\"players\" contain info about name, money and special card (note icon).": "\"pemain\" berisi info nama, uang dan kartu khusus (ikon catatan).",
         "\"player settings\" (gear icon)\nauto roll dice = if u tired clicking\nsell city = sell any city owned\ngame history = see all player action\nattack city = attack other player city": "\"pengaturan\" (ikon roda gigi)\ndadu otomatis = otomatis lempar dadu\njual kota = jual kota yg kau punya\ncatatan main = lihat semua aksi pemain\nserang kota = serang kota pemain lain",
 
         "__GAME PART 2__":"__GAME PART 2__",
         "there are 3 stage before play": "ada 3 tahap sebelum main",
         "\n1 = preparation, 2 = decide turn, 3 = play\n\"leave\" to leave the game before game start\n\"surrender\" to leave when the game is run\n\"roll turn\" to decide the turn to roll dice": "\n1 = persiapan, 2 = penentuan, 3 = main\n\"kabur\" untuk keluar sblm game dimulai\n\"menyerah\" untuk keluar saat game berjalan\n\"putar angka\" menentukan giliran lempar dadu",
-        "all tiles have tooltip. city tooltip changes after bought. other tiles only static info, but prison. the 🔍 icon to see full image of tiles.": "tiap petak bisa di swipe + hold. untuk kota, info berubah setelah dibeli. petak lain tidak ada perubahan, kecuali penjara. ikon 🔍 untuk lihat gambar petak.",
+        "all tiles have tooltip. city tooltip changes after bought. other tiles only static info, but prison. the 🔍 icon to see full image of tiles.": "tiap petak bisa di swipe + tahan. untuk kota, info berubah setelah dibeli. petak lain tidak ada perubahan, kecuali penjara. ikon 🔍 untuk lihat gambar petak.",
 
         "__GAME PART 3__":"__GAME PART 3__",
         "\"back to room\" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.": "\"kembali\" pergi ke daftar ruang tanpa kabur dari game. disini juga ada tombol tutorial 😎 dan info tentang ruang ini.",

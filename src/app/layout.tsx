@@ -1,3 +1,4 @@
+import PubNub from 'pubnub'
 import { GameProvider } from '../context/GameContext'
 import { MiscProvider } from '../context/MiscContext'
 import './globals.css'
@@ -14,10 +15,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const accessSecret = process.env.ACCESS_TOKEN_SECRET
+  // pubnub settings
+  const pubnubSubSetting = {
+    subscribeKey: process.env.PUBNUB_SUB_KEY,
+    uuid: process.env.PUBNUB_UUID
+  }
 
   return (
     <html lang="en">
-      <MiscProvider accessSecret={accessSecret}>
+      <MiscProvider accessSecret={accessSecret} pubnubSubSetting={pubnubSubSetting}>
         <GameProvider>
           <body>{children}</body>
         </GameProvider>

@@ -8,6 +8,7 @@ import RoomCard from "./components/RoomCard";
 import { useEffect } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
+import PubNub, { Listener } from "pubnub";
 
 export default function RoomContent() {
     const miscState = useMisc()
@@ -23,6 +24,31 @@ export default function RoomContent() {
     useEffect(() => {
         applyTooltipEvent()
     }, [])
+
+    // pubnub subscribe
+    useEffect(() => {
+        console.log(miscState.pubnubSub);
+        
+        if(miscState.pubnubSub) {
+            const pubnub = new PubNub(miscState.pubnubSub)
+            // subscribe
+            const roomlist_channel = ['monopoli-roomlist']
+            const onlineplayer_channel = ['monopoli-onlineplayer']
+            pubnub.subscribe({ channels: [...roomlist_channel, ...onlineplayer_channel] })
+            // get published message
+            const publishedMessage: Listener = {
+                message: (data) => {
+                    console.log('pubnub',data.message)
+                }
+            }
+            pubnub.addListener(publishedMessage)
+            // unsub and remove listener
+            return () => {
+                pubnub.unsubscribe({ channels: [...roomlist_channel, ...onlineplayer_channel] })
+                pubnub.removeListener(publishedMessage)
+            }
+        }
+    }, [miscState.pubnubSub])
 
     return (
         <div className="flex gap-2">

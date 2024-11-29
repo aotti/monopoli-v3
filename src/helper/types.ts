@@ -22,6 +22,15 @@ export interface ITooltip {
 }
 
 // context
+export interface IMiscProvider {
+    accessSecret: string, 
+    pubnubSubSetting: {
+        subscribeKey: string,
+        uuid: string
+    }, 
+    children: React.ReactNode
+}
+
 type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
 type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
@@ -39,6 +48,8 @@ export interface IMiscContext {
     setSecret: Dispatch<SetStateAction<string>>,
     isLoading: boolean,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
+    pubnubSub: IMiscProvider['pubnubSubSetting'],
+    setPubnubSub: Dispatch<SetStateAction<IMiscProvider['pubnubSubSetting']>>,
 }
 
 export interface IGameContext {
@@ -180,6 +191,7 @@ export interface IPlayer {
     game_played: number,
     worst_money_lost: number,
     avatar: string,
+    token?: string
 }
 
 // helper
