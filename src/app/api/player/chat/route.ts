@@ -1,18 +1,13 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { IPlayer, IResponse } from "../../../helper/types";
-import PlayerController from "./PlayerController";
+import { IResponse } from "../../../../helper/types";
+import PlayerController from "../PlayerController";
 
-// to prevent GET method cache
-export const dynamic = 'force-dynamic'
-
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
     // api action
-    const action = 'user get stats'
-    // query
-    const payload: Partial<IPlayer> = {
-        display_name: req.nextUrl.searchParams.get('display_name')
-    }
+    const action = 'user send chat'
+    // client payload
+    const payload = await req.json()
     // check authorization
     const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
     if(!accessToken) {
@@ -30,7 +25,7 @@ export async function GET(req: NextRequest) {
     payload.token = accessToken
     // process
     const playerController = new PlayerController()
-    const result = await playerController.viewPlayer(action, payload as IPlayer)
+    const result = await playerController.sendChat(action, payload)
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

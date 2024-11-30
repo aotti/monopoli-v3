@@ -22,6 +22,15 @@ export interface ITooltip {
 }
 
 // context
+export interface IMiscProvider {
+    accessSecret: string, 
+    pubnubSubSetting: {
+        subscribeKey: string,
+        uuid: string
+    }, 
+    children: React.ReactNode
+}
+
 type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
 type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
@@ -39,6 +48,10 @@ export interface IMiscContext {
     setSecret: Dispatch<SetStateAction<string>>,
     isLoading: boolean,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
+    pubnubSub: IMiscProvider['pubnubSubSetting'],
+    setPubnubSub: Dispatch<SetStateAction<IMiscProvider['pubnubSubSetting']>>,
+    messageItems: Omit<IChat, 'channel'|'token'>[],
+    setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
 }
 
 export interface IGameContext {
@@ -175,11 +188,22 @@ export interface IUser {
 }
 
 // player
-export interface IPlayer {
+interface ITokenPayload {
+    token?: string
+}
+
+export interface IPlayer extends ITokenPayload {
     display_name: string,
     game_played: number,
     worst_money_lost: number,
-    avatar: string,
+    avatar: string
+}
+
+export interface IChat extends ITokenPayload {
+    channel: 'monopoli-roomlist',
+    display_name: string,
+    message_text: string,
+    time: string
 }
 
 // helper

@@ -28,6 +28,13 @@ export function qS(el: string) {
 export function qSA(el: string) {
     return document.querySelectorAll(el)
 }
+/**
+ * @param el element tag
+ * @returns new html element
+ */
+export function cE(el: string) {
+    return document.createElement(el)
+}
 
 export function moneyFormat(number: number) {
     const formatter = new Intl.NumberFormat('id-ID', {
@@ -49,7 +56,7 @@ export function catchError<T=any>(promise: Promise<T>): Promise<[undefined, T] |
         })
 }
 
-type InputType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
+type InputType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'|'channel'|'message_text'|'time'
 export function setInputValue(input: InputType, element: HTMLInputElement) {
     return element.id == input && filterInput(element.id, element.value)
 }
@@ -74,6 +81,15 @@ export function filterInput(input: InputType, value: string) {
         // must have monopoli-profiles url
         case 'avatar': 
             return value.match(/monopoli-profiles/)
+        // websocket message channel
+        case 'channel': 
+            return value.match(/monopoli-roomlist|monopoli-gameroom-\d{1,3}$/)
+        // message text can have letter, number, whitespace, symbol (.,#-+@)
+        case 'message_text': 
+            return value.match(/^[a-z0-9\s.,#\-+=@?!]{1,60}$/)
+        // time of chat
+        case 'time': 
+            return value.match(/^[\d{2}:\d{2}]{5}$/)
     }
 }
 

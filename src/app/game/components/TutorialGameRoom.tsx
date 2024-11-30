@@ -6,7 +6,7 @@ export default function TutorialGameRoom() {
     // tutorial text
     const tutorialText = {
         part_1: [
-            `"help" contain info about community & chance cards, the special card effect, buff/debuff area.`,
+            `"help" contain info about community & chance cards, special card effect, buff/debuff area.`,
             `"players" contain info about name, money and special card (note icon).`,
             `"player settings" (gear icon)\nauto roll dice = if u tired clicking\nsell city = sell any city owned\ngame history = see all player action\nattack city = attack other player city`
         ],
@@ -28,7 +28,7 @@ export default function TutorialGameRoom() {
             <div className={`${miscState.showTutorial == 'tutorial_gameroom_1' ? 'block' : 'hidden'}
             absolute top-0 lg:top-[15%] right-16 lg:right-20 w-3/4 lg:w-2/5`}>
                 {/* help */}
-                <p className="text-balance whitespace-pre">
+                <p className="text-wrap whitespace-pre">
                     {translateUI({lang: miscState.language, text: tutorialText.part_1[0] as any})}
                 </p>
                 <hr className="my-1" />

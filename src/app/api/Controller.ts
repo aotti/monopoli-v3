@@ -3,11 +3,36 @@ import { DatabaseQueries } from "../../helper/DatabaseQueries";
 import { filterInput, verifyAccessToken } from "../../helper/helper";
 import { ILoggedUsers, IPlayer, IResponse, IToken, IUser, TokenPayloadType } from "../../helper/types";
 import { cookies } from "next/headers";
+import PubNub from "pubnub";
 
 export default class Controller {
     protected dq = new DatabaseQueries()
     // log users online
     private static loggedUsers: ILoggedUsers[] = []
+    // pubnub for publish
+    private pubnub: PubNub
+
+    constructor() {
+        // initialize pubnub
+        this.pubnub = new PubNub({
+            subscribeKey: process.env.PUBNUB_SUB_KEY,
+            publishKey: process.env.PUBNUB_PUB_KEY,
+            userId: process.env.PUBNUB_UUID
+        })
+    }
+    
+    protected pubnubPublishData<T>(data: T) {
+        return {
+            props: {...data}
+        }
+    }
+
+    protected async pubnubPublish<T extends PubNub.Payload>(channel: string, data: T) {
+        await this.pubnub.publish({
+            channel: channel,
+            message: data
+        })
+    }
 
     protected filterPayload<T>(action: string, payload: T) {
         // log the action
@@ -20,6 +45,8 @@ export default class Controller {
             case 'user register': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user login': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user avatar update': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'user get stats': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])
@@ -44,6 +71,18 @@ export default class Controller {
         }
     }
 
+    protected async getOnlinePlayers(data: IPlayer) {
+        const logData: Omit<ILoggedUsers, 'timeout_token'> = {
+            display_name: data.display_name,
+            status: 'online'
+        }
+        // renew my player
+        const renewMyPlayer = await this.logOnlineUsers('renew', logData)
+        // if null, log my player
+        const logMyPlayer = !renewMyPlayer ? await this.logOnlineUsers('log', logData) : null
+        return renewMyPlayer || logMyPlayer
+    }
+
     protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Omit<ILoggedUsers, 'timeout_token'>) {
         if(action == 'log') {
             // create token for timeout
@@ -60,7 +99,8 @@ export default class Controller {
             return Controller.loggedUsers
         }
         else if(action == 'out') {
-
+            Controller.loggedUsers = Controller.loggedUsers.filter(p => p.display_name != payload.display_name)
+            return Controller.loggedUsers
         }
         else if(action == 'renew') {
             // create token for timeout
@@ -128,7 +168,7 @@ export default class Controller {
     /**
      * @param payload embedded access token to payload in route
      * @description verify access / refresh token
-     * @returns verified token & payload
+     * @returns verified token & get payload | error if no refresh token
      */
     protected async getTokenPayload(payload: {token: string}): Promise<IResponse<{tpayload: IPlayer, token: string}>> {
         // if current access token isnt expired, set to null
