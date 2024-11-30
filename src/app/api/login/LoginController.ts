@@ -38,7 +38,7 @@ export default class LoginController extends Controller {
             const onlinePlayers = await this.logOnlineUsers('log', logData)
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
-            this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
             // generate refresh token
             const refreshToken = await this.generateToken({type: 'refresh', payload: data[0]})
             // save refresh token
@@ -80,7 +80,7 @@ export default class LoginController extends Controller {
         const onlinePlayers = await this.getOnlinePlayers(renewData)
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
-        this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+        await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
         // set result
         const resultData = {
             player: renewData,

@@ -21,9 +21,11 @@ export default class Controller {
     }
 
     protected async pubnubPublish<T extends PubNub.Payload>(channel: string, data: T) {
-        await this.pubnub.publish({
+        this.pubnub.publish({
             channel: channel,
             message: data
+        }, (status, res) => {
+            console.log(status, res);
         })
     }
 
