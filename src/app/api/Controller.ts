@@ -10,21 +10,14 @@ export default class Controller {
     // log users online
     private static loggedUsers: ILoggedUsers[] = []
     // pubnub for publish
-    private pubnub: PubNub
-
-    constructor() {
-        // initialize pubnub
-        this.pubnub = new PubNub({
-            subscribeKey: process.env.PUBNUB_SUB_KEY,
-            publishKey: process.env.PUBNUB_PUB_KEY,
-            userId: process.env.PUBNUB_UUID
-        })
-    }
+    private pubnub = new PubNub({
+        subscribeKey: process.env.PUBNUB_SUB_KEY,
+        publishKey: process.env.PUBNUB_PUB_KEY,
+        userId: process.env.PUBNUB_UUID
+    })
     
     protected pubnubPublishData<T>(data: T) {
-        return {
-            props: {...data}
-        }
+        return { props: {...data} }
     }
 
     protected async pubnubPublish<T extends PubNub.Payload>(channel: string, data: T) {

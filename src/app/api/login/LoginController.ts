@@ -47,7 +47,8 @@ export default class LoginController extends Controller {
                 domain: req.nextUrl.hostname,
                 maxAge: 604800 * 2, // 1 week * 2
                 httpOnly: true,
-                sameSite: 'strict'
+                sameSite: 'none',
+                secure: true
             })
             // generate access token
             const accessToken = await this.generateToken({type: 'access', payload: data[0], expire: '10min'})

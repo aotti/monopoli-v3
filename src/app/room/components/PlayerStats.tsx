@@ -131,15 +131,14 @@ async function userLogout(ev: FormEvent<HTMLFormElement>, gameState: IGameContex
     // submit button
     const logoutButton = qS('#logout_button') as HTMLInputElement
     logoutButton.textContent = '.'
-    const loggingOut = setInterval((counter = 0) => {
-        if(counter < 3) {
-            logoutButton.textContent += '.'
-            counter++
-        }
-        else {
+    let counter = 0
+    const loggingOut = setInterval(() => {
+        if(counter === 3) {
             logoutButton.textContent = '.'
             counter = 0
         }
+        logoutButton.textContent += '.'
+        counter++
     }, 1000);
     
     // fetch

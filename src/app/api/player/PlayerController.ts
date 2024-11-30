@@ -32,7 +32,7 @@ export default class PlayerController extends Controller {
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
             // publish online players
             const onlineplayerChannel = 'monopoli-onlineplayer'
-            this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
             // set result
             const resultData = {
                 player: data[0],
@@ -77,7 +77,7 @@ export default class PlayerController extends Controller {
             // publish online players
             const publishData = this.pubnubPublishData({onlinePlayers: JSON.stringify(onlinePlayers)})
             const onlineplayerChannel = 'monopoli-onlineplayer'
-            this.pubnubPublish(onlineplayerChannel, publishData)
+            await this.pubnubPublish(onlineplayerChannel, publishData)
             // set result
             const resultData = {
                 avatar: data[0].avatar,
@@ -98,10 +98,12 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
+        console.log('get token payload')
 
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+        console.log('filtered payload')
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
         // publish chat
@@ -109,7 +111,7 @@ export default class PlayerController extends Controller {
             chat: JSON.stringify(payload), 
             onlinePlayers: JSON.stringify(onlinePlayers)
         })
-        this.pubnubPublish(payload.channel, publishData)
+        await this.pubnubPublish(payload.channel, publishData)
         // set result
         const resultData = {
             token: token
