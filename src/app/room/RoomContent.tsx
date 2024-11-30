@@ -5,16 +5,21 @@ import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
 import PlayerStats from "./components/PlayerStats";
 import RoomCard from "./components/RoomCard";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
 import { IChat } from "../../helper/types";
+import { clickOutsideElement } from "../../helper/click-outside";
 
 export default function RoomContent() {
     const miscState = useMisc()
     const gameState = useGame()
     const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
+
+    // chat input ref
+    const chatFocusRef = useRef()
+    clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
 
     const roomRules = [
         `board: normal;dice: 2;start: 75k;lose: -25k;mode: 5 laps;curse: 5%`,
@@ -58,10 +63,9 @@ export default function RoomContent() {
     const roomlistChannel = ['monopoli-roomlist']
     const onlineplayerChannel = ['monopoli-onlineplayer']
     useEffect(() => {
-        if(miscState.pubnubSub) {
-            const pubnub = new PubNub(miscState.pubnubSub)
+        if(miscState.pubnub) {
             // subscribe
-            pubnub.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+            miscState.pubnub.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
             // get published message
             const publishedMessage: Listener = {
                 message: (data) => {
@@ -79,14 +83,14 @@ export default function RoomContent() {
                     }
                 }
             }
-            pubnub.addListener(publishedMessage)
+            miscState.pubnub.addListener(publishedMessage)
             // unsub and remove listener
             return () => {
-                pubnub.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
-                pubnub.removeListener(publishedMessage)
+                miscState.pubnub.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+                miscState.pubnub.removeListener(publishedMessage)
             }
         }
-    }, [miscState.pubnubSub])
+    }, [miscState.pubnub])
 
     return (
         <div className="flex gap-2">
@@ -110,12 +114,11 @@ export default function RoomContent() {
                                 : <PlayerList onlinePlayers={onlinePlayers} />
                         }
                         {/* chat input */}
-                        <form className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
+                        <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
                             <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
                             <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
-                            onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} 
-                            onBlur={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off')} />
+                            onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
                             <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                                 <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
                             </button>

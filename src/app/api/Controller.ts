@@ -25,7 +25,7 @@ export default class Controller {
             channel: channel,
             message: data
         }, (status, res) => {
-            console.log(status, res);
+            console.log('publish', status.statusCode);
         })
     }
 

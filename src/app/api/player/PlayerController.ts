@@ -98,12 +98,10 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-        console.log('get token payload')
 
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
-        console.log('filtered payload')
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
         // publish chat
@@ -112,7 +110,6 @@ export default class PlayerController extends Controller {
             onlinePlayers: JSON.stringify(onlinePlayers)
         })
         await this.pubnubPublish(payload.channel, publishData)
-        console.log('pubnub publish')
         // set result
         const resultData = {
             token: token

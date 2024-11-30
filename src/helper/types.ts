@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import translateUI_data from '../config/translate-ui.json'
 import { PostgrestError } from "@supabase/supabase-js";
 import { JWTPayload } from "jose";
+import PubNub from "pubnub";
 
 // translate language
 export interface ITranslate {
@@ -49,8 +50,7 @@ export interface IMiscContext {
     setSecret: Dispatch<SetStateAction<string>>,
     isLoading: boolean,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
-    pubnubSub: IMiscProvider['pubnubSubSetting'],
-    setPubnubSub: Dispatch<SetStateAction<IMiscProvider['pubnubSubSetting']>>,
+    pubnub: PubNub,
     messageItems: Omit<IChat, 'channel'|'token'>[],
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
 }
