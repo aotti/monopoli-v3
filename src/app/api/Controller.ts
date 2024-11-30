@@ -20,6 +20,12 @@ export default class Controller {
             userId: process.env.PUBNUB_UUID
         })
     }
+    
+    protected pubnubPublishData<T>(data: T) {
+        return {
+            props: {...data}
+        }
+    }
 
     protected async pubnubPublish<T extends PubNub.Payload>(channel: string, data: T) {
         await this.pubnub.publish({
@@ -40,6 +46,7 @@ export default class Controller {
             case 'user login': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user avatar update': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user get stats': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])
@@ -161,7 +168,7 @@ export default class Controller {
     /**
      * @param payload embedded access token to payload in route
      * @description verify access / refresh token
-     * @returns verified token & get payload
+     * @returns verified token & get payload | error if no refresh token
      */
     protected async getTokenPayload(payload: {token: string}): Promise<IResponse<{tpayload: IPlayer, token: string}>> {
         // if current access token isnt expired, set to null

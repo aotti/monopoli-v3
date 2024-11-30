@@ -50,6 +50,8 @@ export interface IMiscContext {
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     pubnubSub: IMiscProvider['pubnubSubSetting'],
     setPubnubSub: Dispatch<SetStateAction<IMiscProvider['pubnubSubSetting']>>,
+    messageItems: Omit<IChat, 'channel'|'token'>[],
+    setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
 }
 
 export interface IGameContext {
@@ -186,12 +188,22 @@ export interface IUser {
 }
 
 // player
-export interface IPlayer {
+interface ITokenPayload {
+    token?: string
+}
+
+export interface IPlayer extends ITokenPayload {
     display_name: string,
     game_played: number,
     worst_money_lost: number,
-    avatar: string,
-    token?: string
+    avatar: string
+}
+
+export interface IChat extends ITokenPayload {
+    channel: 'monopoli-roomlist',
+    display_name: string,
+    message_text: string,
+    time: string
 }
 
 // helper

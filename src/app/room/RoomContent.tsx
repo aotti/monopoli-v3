@@ -1,6 +1,6 @@
 import { useMisc } from "../../context/MiscContext";
 import { applyTooltipEvent, translateUI } from "../../helper/helper";
-import ChatBox from "../../components/ChatBox";
+import ChatBox, { sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
 import PlayerStats from "./components/PlayerStats";
@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
+import { IChat } from "../../helper/types";
 
 export default function RoomContent() {
     const miscState = useMisc()
@@ -26,25 +27,36 @@ export default function RoomContent() {
     }, [])
 
     // pubnub subscribe
+    const roomlistChannel = ['monopoli-roomlist']
+    const onlineplayerChannel = ['monopoli-onlineplayer']
     useEffect(() => {
-        console.log(miscState.pubnubSub);
-        
         if(miscState.pubnubSub) {
             const pubnub = new PubNub(miscState.pubnubSub)
             // subscribe
-            const roomlist_channel = ['monopoli-roomlist']
-            const onlineplayer_channel = ['monopoli-onlineplayer']
-            pubnub.subscribe({ channels: [...roomlist_channel, ...onlineplayer_channel] })
+            pubnub.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
             // get published message
             const publishedMessage: Listener = {
                 message: (data) => {
                     console.log('pubnub',data.message)
+                    const getMessage = data.message as PubNub.Payload & {props: {chat, onlinePlayers}}
+                    // add chat
+                    if(getMessage.props.chat) {
+                        const chatData = JSON.parse(getMessage.props.chat) as Omit<IChat, 'channel'|'token'>
+                        miscState.setMessageItems(data => [...data, chatData])
+                        console.log('message item set');
+                    }
+                    // save online player
+                    if(getMessage.props.onlinePlayers) {
+                        const onlinePlayersData = getMessage.props.onlinePlayers
+                        gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
+                        console.log('online player set');
+                    }
                 }
             }
             pubnub.addListener(publishedMessage)
             // unsub and remove listener
             return () => {
-                pubnub.unsubscribe({ channels: [...roomlist_channel, ...onlineplayer_channel] })
+                pubnub.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
                 pubnub.removeListener(publishedMessage)
             }
         }
@@ -72,22 +84,15 @@ export default function RoomContent() {
                                 : <PlayerList onlinePlayers={onlinePlayers} />
                         }
                         {/* chat input */}
-                        <form className="mt-2" onSubmit={ev => {
-                            ev.preventDefault()
-                            // set chat box toggle
-                            const formInputs = ([].slice.call(ev.currentTarget.elements) as any[]).filter(i => i.nodeName === 'INPUT')
-                            formInputs[0].value == '/on' ? miscState.setIsChatFocus('stay') : miscState.setIsChatFocus('off')
-                            formInputs[0].value = ''
-                        }}>
-                            <div className="flex items-center gap-2">
-                                <input type="text" className="w-4/5 lg:h-10 lg:p-1" 
-                                placeholder={translateUI({lang: miscState.language, text: 'chat here'})} required 
-                                onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} 
-                                onBlur={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off')} />
-                                <button type="submit" className="w-6 lg:w-10 active:opacity-50">
-                                    <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
-                                </button>
-                            </div>
+                        <form className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
+                            <input type="hidden" id="display_name" value={gameState.myPlayerInfo.display_name} />
+                            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
+                            placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
+                            onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} 
+                            onBlur={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off')} />
+                            <button type="submit" className="w-6 lg:w-10 active:opacity-50">
+                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
+                            </button>
                         </form>
                     </div>
                 </div>
