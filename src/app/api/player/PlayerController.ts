@@ -112,6 +112,7 @@ export default class PlayerController extends Controller {
             onlinePlayers: JSON.stringify(onlinePlayers)
         })
         await this.pubnubPublish(payload.channel, publishData)
+        console.log('pubnub publish')
         // set result
         const resultData = {
             token: token
