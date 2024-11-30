@@ -1,5 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, translateUI } from "../../helper/helper";
+import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
@@ -24,7 +24,35 @@ export default function RoomContent() {
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
-    }, [])
+
+        // remove player from player list if token expired
+        if(gameState.onlinePlayers && miscState.secret) {
+            const updatePlayerList = async () => {
+                const getPlayersToken = gameState.onlinePlayers.map(v => v.timeout_token)
+                for(let token of getPlayersToken) {
+                    const [error, verify] = await verifyAccessToken({action: 'verify-only', token: token, secret: miscState.secret})
+                    if(error) {
+                        gameState.setOnlinePlayers(data => {
+                            const newOnlinePlayers = data.filter(v => v.timeout_token != token)
+                            return newOnlinePlayers
+                        })
+                    }
+                }
+            }
+    
+            // listener for update player lsit
+            document.body.tabIndex = 0
+            document.body.addEventListener('click', updatePlayerList)
+            document.body.addEventListener('keyup', updatePlayerList)
+            document.body.addEventListener('blur', updatePlayerList)
+    
+            return () => {
+                document.body.removeEventListener('click', updatePlayerList)
+                document.body.removeEventListener('keyup', updatePlayerList)
+                document.body.removeEventListener('blur', updatePlayerList)
+            }
+        }
+    }, [gameState.onlinePlayers])
 
     // pubnub subscribe
     const roomlistChannel = ['monopoli-roomlist']
@@ -37,19 +65,17 @@ export default function RoomContent() {
             // get published message
             const publishedMessage: Listener = {
                 message: (data) => {
-                    console.log('pubnub',data.message)
                     const getMessage = data.message as PubNub.Payload & {props: {chat, onlinePlayers}}
                     // add chat
                     if(getMessage.props.chat) {
                         const chatData = JSON.parse(getMessage.props.chat) as Omit<IChat, 'channel'|'token'>
                         miscState.setMessageItems(data => [...data, chatData])
-                        console.log('message item set');
                     }
-                    // save online player
+                    // update online player
                     if(getMessage.props.onlinePlayers) {
                         const onlinePlayersData = getMessage.props.onlinePlayers
+                        localStorage.setItem('onlinePlayers', onlinePlayersData)
                         gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
-                        console.log('online player set');
                     }
                 }
             }
