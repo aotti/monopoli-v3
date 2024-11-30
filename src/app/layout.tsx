@@ -18,7 +18,7 @@ export default function RootLayout({
   // pubnub settings
   const pubnubSubSetting = {
     subscribeKey: process.env.PUBNUB_SUB_KEY,
-    uuid: process.env.PUBNUB_UUID
+    userId: process.env.PUBNUB_UUID
   }
 
   return (

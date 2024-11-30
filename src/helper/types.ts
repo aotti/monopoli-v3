@@ -26,7 +26,7 @@ export interface IMiscProvider {
     accessSecret: string, 
     pubnubSubSetting: {
         subscribeKey: string,
-        uuid: string
+        userId: string
     }, 
     children: React.ReactNode
 }
