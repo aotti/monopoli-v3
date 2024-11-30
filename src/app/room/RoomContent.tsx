@@ -111,7 +111,7 @@ export default function RoomContent() {
                         }
                         {/* chat input */}
                         <form className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
-                            <input type="hidden" id="display_name" value={gameState.myPlayerInfo.display_name} />
+                            <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
                             <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
                             onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} 
