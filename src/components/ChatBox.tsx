@@ -1,4 +1,4 @@
-import { FormEvent } from "react"
+import { FormEvent, useEffect } from "react"
 import { useGame } from "../context/GameContext"
 import { useMisc } from "../context/MiscContext"
 import { cE, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
@@ -7,15 +7,21 @@ import { IChat, IMiscContext, IResponse } from "../helper/types"
 export default function ChatBox({ page }: {page: 'room'|'game'}) {
     const miscState = useMisc()
     const gameState = useGame()
+
+    // scroll to bottom
+    useEffect(() => {
+        const chatContainer = qS('#chat_container')
+        if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
+    }, [miscState.messageItems])
     
     return (
         page == 'room'
             // room list
-            ? <div className="h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2">
+            ? <div id="chat_container" className="h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2">
                 <ChatContainer />
             </div>
             // game room
-            : <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
+            : <div id="chat_container" className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
             absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
             text-left [writing-mode:horizontal-tb] p-1 overflow-y-scroll overflow-x-hidden
             bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
@@ -37,7 +43,7 @@ function ChatContainer() {
     const miscState = useMisc()
 
     return (
-        <div id="chat_container">
+        <div>
             {miscState.messageItems.map((v,i) => 
                 <div key={i} className={`${v.display_name == 'system' ? 'text-green-400' : ''} 
                 hover:bg-darkblue-3/30 text-2xs lg:text-xs py-1`}>

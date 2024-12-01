@@ -1,3 +1,4 @@
+import pubnub from "../../config/pubnub";
 import RoomPage from "./RoomPage";
 import { Metadata } from "next";
 
@@ -9,6 +10,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
+    // pubnub settings
+    const pubnubSetting = {
+      subscribeKey: process.env.PUBNUB_SUB_KEY,
+      publishKey: process.env.PUBNUB_PUB_KEY,
+      userId: process.env.PUBNUB_UUID
+    }
 
-    return <RoomPage />
+    return <RoomPage pubnubSetting={pubnubSetting} />
 }

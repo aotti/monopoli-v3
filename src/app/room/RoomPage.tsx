@@ -15,7 +15,7 @@ const retroFont = Press_Start_2P({
     weight: ['400']
 })
 
-export default function RoomPage() {
+export default function RoomPage({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
     
@@ -34,7 +34,7 @@ export default function RoomPage() {
     
                 <main>
                     {gameState.myPlayerInfo && gameState.onlinePlayers
-                        ? <RoomContent />
+                        ? <RoomContent pubnubSetting={pubnubSetting} />
                         : <LoadingPage />}
                 </main>
             </div>

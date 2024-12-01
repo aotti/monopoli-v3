@@ -25,11 +25,6 @@ export interface ITooltip {
 // context
 export interface IMiscProvider {
     accessSecret: string, 
-    pubnubSubSetting: {
-        subscribeKey: string,
-        publishKey: string,
-        userId: string
-    }, 
     children: React.ReactNode
 }
 
@@ -50,7 +45,6 @@ export interface IMiscContext {
     setSecret: Dispatch<SetStateAction<string>>,
     isLoading: boolean,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
-    pubnub: PubNub,
     messageItems: Omit<IChat, 'channel'|'token'>[],
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
 }

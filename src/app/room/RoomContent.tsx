@@ -11,8 +11,9 @@ import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
 import { IChat } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
+import pubnub from "../../config/pubnub";
 
-export default function RoomContent() {
+export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
     const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
@@ -26,11 +27,44 @@ export default function RoomContent() {
         `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5~10%`,
         `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`
     ]
-    // tooltip (the element must have position: relative)
+
+    const pubnubClient = pubnub(pubnubSetting)
+    // pubnub subscribe
+    const roomlistChannel = ['monopoli-roomlist']
+    const onlineplayerChannel = ['monopoli-onlineplayer']
     useEffect(() => {
+        // tooltip (the element must have position: relative)
         applyTooltipEvent()
 
-        // remove player from player list if token expired
+        // subscribe
+        pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+        // get published message
+        const publishedMessage: Listener = {
+            message: (data) => {
+                const getMessage = data.message as PubNub.Payload & {props: {chat, onlinePlayers}}
+                // add chat
+                if(getMessage.props.chat) {
+                    const chatData = JSON.parse(getMessage.props.chat) as Omit<IChat, 'channel'|'token'>
+                    miscState.setMessageItems(data => [...data, chatData])
+                }
+                // update online player
+                if(getMessage.props.onlinePlayers) {
+                    const onlinePlayersData = getMessage.props.onlinePlayers
+                    localStorage.setItem('onlinePlayers', onlinePlayersData)
+                    gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
+                }
+            }
+        }
+        pubnubClient.addListener(publishedMessage)
+        // unsub and remove listener
+        return () => {
+            pubnubClient.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+            pubnubClient.removeListener(publishedMessage)
+        }
+    }, [])
+
+    // remove player from player list if token expired
+    useEffect(() => {
         if(gameState.onlinePlayers && miscState.secret) {
             const updatePlayerList = async () => {
                 const getPlayersToken = gameState.onlinePlayers.map(v => v.timeout_token)
@@ -58,39 +92,6 @@ export default function RoomContent() {
             }
         }
     }, [gameState.onlinePlayers])
-
-    // pubnub subscribe
-    const roomlistChannel = ['monopoli-roomlist']
-    const onlineplayerChannel = ['monopoli-onlineplayer']
-    useEffect(() => {
-        if(miscState.pubnub) {
-            // subscribe
-            miscState.pubnub.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
-            // get published message
-            const publishedMessage: Listener = {
-                message: (data) => {
-                    const getMessage = data.message as PubNub.Payload & {props: {chat, onlinePlayers}}
-                    // add chat
-                    if(getMessage.props.chat) {
-                        const chatData = JSON.parse(getMessage.props.chat) as Omit<IChat, 'channel'|'token'>
-                        miscState.setMessageItems(data => [...data, chatData])
-                    }
-                    // update online player
-                    if(getMessage.props.onlinePlayers) {
-                        const onlinePlayersData = getMessage.props.onlinePlayers
-                        localStorage.setItem('onlinePlayers', onlinePlayersData)
-                        gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
-                    }
-                }
-            }
-            miscState.pubnub.addListener(publishedMessage)
-            // unsub and remove listener
-            return () => {
-                miscState.pubnub.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
-                miscState.pubnub.removeListener(publishedMessage)
-            }
-        }
-    }, [miscState.pubnub])
 
     return (
         <div className="flex gap-2">

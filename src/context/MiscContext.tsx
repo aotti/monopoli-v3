@@ -3,11 +3,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { IChat, IMiscContext, IMiscProvider, ITranslate } from "../helper/types";
 import { translateUI } from "../helper/helper";
-import PubNub from "pubnub";
 
 const MiscContext = createContext<IMiscContext>(null)
 
-export const MiscProvider = ({ accessSecret, pubnubSubSetting, children }: IMiscProvider) => {
+export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
     const [language, setLanguage] = useState<ITranslate['lang']>('english')
     const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
     const [animation, setAnimation] = useState<boolean>(true)
@@ -15,8 +14,6 @@ export const MiscProvider = ({ accessSecret, pubnubSubSetting, children }: IMisc
     const [showTutorial, setShowTutorial] = useState<IMiscContext['showTutorial']>(null)
     const [secret, setSecret] = useState<string>(accessSecret)
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    // pubnub setting
-    const pubnub = new PubNub(pubnubSubSetting)
     // message items
     const systemMessage = {
         display_name: 'system',
@@ -46,7 +43,6 @@ export const MiscProvider = ({ accessSecret, pubnubSubSetting, children }: IMisc
         setSecret: setSecret,
         isLoading: isLoading,
         setIsLoading: setIsLoading,
-        pubnub: pubnub,
         messageItems: messageItems,
         setMessageItems: setMessageItems,
     }

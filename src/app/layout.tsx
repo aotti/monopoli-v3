@@ -15,16 +15,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const accessSecret = process.env.ACCESS_TOKEN_SECRET
-  // pubnub settings
-  const pubnubSubSetting = {
-    subscribeKey: process.env.PUBNUB_SUB_KEY,
-    publishKey: process.env.PUBNUB_PUB_KEY,
-    userId: process.env.PUBNUB_UUID
-  }
 
   return (
     <html lang="en">
-      <MiscProvider accessSecret={accessSecret} pubnubSubSetting={pubnubSubSetting}>
+      <MiscProvider accessSecret={accessSecret}>
         <GameProvider>
           <body>{children}</body>
         </GameProvider>
