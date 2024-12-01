@@ -75,7 +75,7 @@ export default class PlayerController extends Controller {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
             // publish online players
-            const publishData = this.pubnubPublishData({onlinePlayers: JSON.stringify(onlinePlayers)})
+            const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
             const onlineplayerChannel = 'monopoli-onlineplayer'
             await this.pubnubPublish(onlineplayerChannel, publishData)
             // set result
@@ -105,10 +105,11 @@ export default class PlayerController extends Controller {
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
         // publish chat
-        const publishData = this.pubnubPublishData({
-            chat: JSON.stringify(payload), 
+        payload
+        const publishData = {
+            ...payload, 
             onlinePlayers: JSON.stringify(onlinePlayers)
-        })
+        }
         await this.pubnubPublish(payload.channel, publishData)
         // set result
         const resultData = {

@@ -15,10 +15,10 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
     const [secret, setSecret] = useState<string>(accessSecret)
     const [isLoading, setIsLoading] = useState<boolean>(true)
     // message items
-    const systemMessage = {
+    const systemMessage: Omit<IChat, 'channel'|'token'> = {
         display_name: 'system',
         message_text: translateUI({lang: language, text: 'only player in this room can see the chat'}),
-        time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
+        message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
     }
     const [messageItems, setMessageItems] = useState<Omit<IChat, 'channel'|'token'>[]>([systemMessage])
 

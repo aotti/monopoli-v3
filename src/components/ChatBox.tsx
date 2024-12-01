@@ -55,13 +55,13 @@ function ChatContainer() {
 }
 
 function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}) {
-    const {display_name, message_text, time} = messageData
+    const {display_name, message_text, message_time} = messageData
 
     return (
         <>
             <span className="text-orange-200"> {display_name}: </span>
             <span> {message_text} </span>
-            <small className={display_name == 'system' ? 'text-white' : 'text-green-400'}> {time} </small>
+            <small className={display_name == 'system' ? 'text-white' : 'text-green-400'}> {message_time} </small>
         </>
     )
 }
@@ -75,7 +75,7 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
         channel: 'monopoli-roomlist',
         display_name: null,
         message_text: null,
-        time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
+        message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
     }
     // get input elements
     const formInputs = ev.currentTarget.elements

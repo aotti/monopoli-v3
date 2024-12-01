@@ -41,15 +41,19 @@ export default function RoomContent() {
         // get published message
         const publishedMessage: ListenerParameters = {
             message: (data) => {
-                const getMessage = data.message as Pubnub.MessageEvent & {props: {chat, onlinePlayers}}
+                const getMessage = data.message as Pubnub.MessageEvent & IChat & {onlinePlayers: string}
                 // add chat
-                if(getMessage.props.chat) {
-                    const chatData = JSON.parse(getMessage.props.chat) as Omit<IChat, 'channel'|'token'>
+                if(getMessage.message_text) {
+                    const chatData: Omit<IChat, 'channel'|'token'> = {
+                        display_name: getMessage.display_name,
+                        message_text: getMessage.message_text,
+                        message_time: getMessage.message_time
+                    }
                     miscState.setMessageItems(data => [...data, chatData])
                 }
                 // update online player
-                if(getMessage.props.onlinePlayers) {
-                    const onlinePlayersData = getMessage.props.onlinePlayers
+                if(getMessage.onlinePlayers) {
+                    const onlinePlayersData = getMessage.onlinePlayers
                     localStorage.setItem('onlinePlayers', onlinePlayersData)
                     gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
                 }

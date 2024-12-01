@@ -14,11 +14,7 @@ export default class Controller {
         subscribeKey: process.env.PUBNUB_SUB_KEY,
         publishKey: process.env.PUBNUB_PUB_KEY,
         userId: process.env.PUBNUB_UUID
-      })
-    
-    protected pubnubPublishData<T>(data: T) {
-        return { props: {...data} }
-    }
+    })
 
     protected async pubnubPublish(channel: string, data: any) {
         this.pubnubServer.publish({

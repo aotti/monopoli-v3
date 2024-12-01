@@ -198,7 +198,7 @@ export interface IChat extends ITokenPayload {
     channel: 'monopoli-roomlist',
     display_name: string,
     message_text: string,
-    time: string
+    message_time: string
 }
 
 // helper
