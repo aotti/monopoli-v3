@@ -1,4 +1,3 @@
-import pubnub from "../../config/pubnub";
 import RoomPage from "./RoomPage";
 import { Metadata } from "next";
 

@@ -9,6 +9,8 @@ import { useGame } from "../../context/GameContext";
 import { useEffect } from "react";
 import { useMisc } from "../../context/MiscContext";
 import { checkAccessToken } from "../../helper/helper";
+import Pubnub from "pubnub";
+import { PubNubProvider } from "pubnub-react";
 
 const retroFont = Press_Start_2P({
     subsets: ['latin'],
@@ -18,6 +20,9 @@ const retroFont = Press_Start_2P({
 export default function RoomPage({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
+
+    // pubnub
+    const pubnubClient = new Pubnub(pubnubSetting)
     
     // check token for auto login
     useEffect(() => {
@@ -32,11 +37,13 @@ export default function RoomPage({ pubnubSetting }) {
                     <HeaderContent />
                 </header>
     
-                <main>
-                    {gameState.myPlayerInfo && gameState.onlinePlayers
-                        ? <RoomContent pubnubSetting={pubnubSetting} />
-                        : <LoadingPage />}
-                </main>
+                <PubNubProvider client={pubnubClient}>
+                    <main>
+                        {gameState.myPlayerInfo && gameState.onlinePlayers
+                            ? <RoomContent />
+                            : <LoadingPage />}
+                    </main>
+                </PubNubProvider>
             </div>
             {/* orientation portrait warning */}
             <ScreenPortraitWarning />

@@ -3,15 +3,14 @@ import { DatabaseQueries } from "../../helper/DatabaseQueries";
 import { filterInput, verifyAccessToken } from "../../helper/helper";
 import { ILoggedUsers, IPlayer, IResponse, IToken, IUser, TokenPayloadType } from "../../helper/types";
 import { cookies } from "next/headers";
-import PubNub from "pubnub";
-import pubnub from "../../config/pubnub";
+import Pubnub from "pubnub";
 
 export default class Controller {
     protected dq = new DatabaseQueries()
     // log users online
     private static loggedUsers: ILoggedUsers[] = []
     // pubnub for publish
-    private pubnubServer = pubnub({
+    private pubnubServer = new Pubnub({
         subscribeKey: process.env.PUBNUB_SUB_KEY,
         publishKey: process.env.PUBNUB_PUB_KEY,
         userId: process.env.PUBNUB_UUID
@@ -21,7 +20,7 @@ export default class Controller {
         return { props: {...data} }
     }
 
-    protected async pubnubPublish<T extends PubNub.Payload>(channel: string, data: T) {
+    protected async pubnubPublish(channel: string, data: any) {
         this.pubnubServer.publish({
             channel: channel,
             message: data

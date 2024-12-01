@@ -8,12 +8,12 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import PubNub, { Listener } from "pubnub";
 import { IChat } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
-import pubnub from "../../config/pubnub";
+import Pubnub, { ListenerParameters } from "pubnub";
+import { usePubNub } from "pubnub-react";
 
-export default function RoomContent({ pubnubSetting }) {
+export default function RoomContent() {
     const miscState = useMisc()
     const gameState = useGame()
     const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
@@ -28,7 +28,7 @@ export default function RoomContent({ pubnubSetting }) {
         `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`
     ]
 
-    const pubnubClient = pubnub(pubnubSetting)
+    const pubnubClient = usePubNub()
     // pubnub subscribe
     const roomlistChannel = ['monopoli-roomlist']
     const onlineplayerChannel = ['monopoli-onlineplayer']
@@ -39,9 +39,9 @@ export default function RoomContent({ pubnubSetting }) {
         // subscribe
         pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
         // get published message
-        const publishedMessage: Listener = {
+        const publishedMessage: ListenerParameters = {
             message: (data) => {
-                const getMessage = data.message as PubNub.Payload & {props: {chat, onlinePlayers}}
+                const getMessage = data.message as Pubnub.MessageEvent & {props: {chat, onlinePlayers}}
                 // add chat
                 if(getMessage.props.chat) {
                     const chatData = JSON.parse(getMessage.props.chat) as Omit<IChat, 'channel'|'token'>
