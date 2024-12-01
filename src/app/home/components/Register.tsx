@@ -1,7 +1,7 @@
 import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256, translateUI } from "../../../helper/helper"
 import { useMisc } from "../../../context/MiscContext"
 import { FormEvent, useEffect, useRef } from "react";
-import { IUser, IResponse } from "../../../helper/types";
+import { IUser, IResponse, IMiscContext } from "../../../helper/types";
 import ResultMessage from "./ResultMessage";
 import FormButtons from "../../../components/FormButtons";
 
@@ -22,7 +22,7 @@ export default function Register() {
                 <span> {translateUI({lang: miscState.language, text: 'Create Account'})} </span>
             </div>
             {/* modal body */}
-            <form className="flex flex-col gap-2 lg:gap-4" onSubmit={userRegister}>
+            <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => userRegister(ev, miscState)}>
                 {/* username */}
                 <div className="flex justify-between">
                     <label htmlFor="username" className="w-min"> Username </label>
@@ -54,7 +54,7 @@ export default function Register() {
     )
 }
 
-async function userRegister(ev: FormEvent<HTMLFormElement>) {
+async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext) {
     ev.preventDefault()
 
     // result message
@@ -76,14 +76,14 @@ async function userRegister(ev: FormEvent<HTMLFormElement>) {
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName == 'INPUT') {
             // filter inputs
-            if(setInputValue('username', input)) inputValues.username = input.value.trim()
+            if(setInputValue('username', input)) inputValues.username = input.value.trim().toLowerCase()
             else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
             else if(setInputValue('confirm_password', input)) inputValues.confirm_password = sha256(input.value.trim())
-            else if(setInputValue('display_name', input)) inputValues.display_name = input.value.trim()
+            else if(setInputValue('display_name', input)) inputValues.display_name = input.value.trim().toLowerCase()
             // error
             else {
                 resultMessage.classList.add('text-red-600')
-                resultMessage.textContent = errorLoginRegister(input.id)
+                resultMessage.textContent = errorLoginRegister(input.id, miscState.language)
                 return
             }
         }

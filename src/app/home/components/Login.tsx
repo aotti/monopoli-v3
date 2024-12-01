@@ -66,12 +66,12 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName == 'INPUT') {
             // filter inputs
-            if(setInputValue('username', input)) inputValues.username = input.value.trim()
+            if(setInputValue('username', input)) inputValues.username = input.value.trim().toLowerCase()
             else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
             // error
             else {
                 resultMessage.classList.add('text-red-600')
-                resultMessage.textContent = errorLoginRegister(input.id)
+                resultMessage.textContent = errorLoginRegister(input.id, miscState.language)
                 return
             }
         }

@@ -85,11 +85,17 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
             // toggle chat box (for room list)
             if(input.value == '/on') {
                 miscState.setIsChatFocus('stay')
+                inputValues.display_name = 'system'
+                inputValues.message_text = translateUI({lang: miscState.language, text: '✅ chat box will persist'})
+                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
                 messageInput.value = ''
                 return
             }
             else if(input.value == '/off') {
                 miscState.setIsChatFocus('off')
+                inputValues.display_name = 'system'
+                inputValues.message_text = translateUI({lang: miscState.language, text: '❌ chat box back to normal'})
+                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
                 messageInput.value = ''
                 return
             }
@@ -98,10 +104,8 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
             else if(setInputValue('message_text', input)) inputValues.message_text = input.value.trim()
             // error
             else {
-                console.log('error', inputValues);
-                
                 inputValues.display_name = 'system'
-                inputValues.message_text = 'only letter, number, spaces and symbols .,#-+=@?! allowed'
+                inputValues.message_text = translateUI({lang: miscState.language, text: 'only letter, number, spaces and symbols .,#-+=@?! allowed'})
                 miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
                 messageInput.value = ''
                 return

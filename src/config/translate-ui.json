@@ -179,6 +179,14 @@
         "__GAME PART 3__":"__GAME PART 3__",
         "\"back to room\" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.": "\"kembali\" pergi ke daftar ruang tanpa kabur dari game. disini juga ada tombol tutorial 😎 dan info tentang ruang ini.",
         "if you turn on the \"game history\" on player setting, it will display a box to see all player actions.": "jika kau centang \"catatan main\" di setting pemain, akan muncul kotak berisi semua aksi pemain.",
-        "i hate css 💀": "css pantek 💀"
+        "i hate css 💀": "css pantek 💀",
+
+        "__SYSTEM MESSAGE__": "__SYSTEM MESSAGE__",
+        "length must be 4 to 10 | only letter and number allowed": "panjang harus 4~10 | hanya huruf dan angka",
+        "length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed": "panjang harus 8~16 | hanya huruf, angka, spasi dan simbol .,#-+@",
+        "name: length must be 4 to 12 | only letter, number and spaces allowed": "nama: panjang harus 4~12 | hanya huruf, angka dan spasi",
+        "only letter, number, spaces and symbols .,#-+=@?! allowed": "hanya huruf, angka, spasi dan simbol .,#-+=@?!",
+        "✅ chat box will persist": "✅ kotak obrolan akan tetap ada",
+        "❌ chat box back to normal": "❌ kotak obrolan kembali normal"
     }
 }

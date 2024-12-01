@@ -70,14 +70,14 @@ export function filterInput(input: InputType, value: string) {
             return value.match(uuidv4_regex)
         // letter & number
         case 'username': 
-            return value.match(/^[a-z0-9]{4,10}$/)
+            return value.match(/^[a-zA-Z0-9]{4,10}$/)
         // letter, number, whitespace, symbol (.,#-+@) 
         case 'password': 
         case 'confirm_password':
-            return value.match(/^[a-z0-9\s.,#\-+@]{8,16}$/)
+            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/)
         // letter, number, whitespace
         case 'display_name': 
-            return value.match(/^[a-z0-9\s]{4,12}$/)
+            return value.match(/^[a-zA-Z0-9\s]{4,12}$/)
         // must have monopoli-profiles url
         case 'avatar': 
             return value.match(/monopoli-profiles/)
@@ -86,7 +86,7 @@ export function filterInput(input: InputType, value: string) {
             return value.match(/monopoli-roomlist|monopoli-gameroom-\d{1,3}$/)
         // message text can have letter, number, whitespace, symbol (.,#-+@)
         case 'message_text': 
-            return value.match(/^[a-z0-9\s.,#\-+=@?!]{1,60}$/)
+            return value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/)
         // time of chat
         case 'message_time': 
             return value.match(/^[\d{2}:\d{2}]{4,5}$/)
@@ -135,15 +135,15 @@ export function fetcher(endpoint: string, options: RequestInit) {
     return fetch(url, options)
 }
 
-export function errorLoginRegister(input: string) {
+export function errorLoginRegister(input: string, language: ITranslate['lang']) {
     switch (input) {
         case 'username':
-            return `${input}: length must be 4 to 10 | only letter and number allowed!`
+            return `${input}: ${translateUI({lang: language, text: 'length must be 4 to 10 | only letter and number allowed'})}`
         case 'password': 
         case 'confirm_password':
-            return `${input}: length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed!`
+            return `${input}: ${translateUI({lang: language, text: 'length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed'})}`
         case 'display_name':
-            return `name: length must be 4 to 12 | only letter, number and spaces allowed!`
+            return translateUI({lang: language, text: `name: length must be 4 to 12 | only letter, number and spaces allowed`})
         default: 
             return `unknown input: ${input}`
     }

@@ -17,16 +17,19 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
     // message items
     const systemMessage: Omit<IChat, 'channel'|'token'> = {
         display_name: 'system',
-        message_text: translateUI({lang: language, text: 'only player in this room can see the chat'}),
+        message_text: 'only player in this room can see the chat',
         message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
     }
-    const [messageItems, setMessageItems] = useState<Omit<IChat, 'channel'|'token'>[]>([systemMessage])
+    const [messageItems, setMessageItems] = useState<Omit<IChat, 'channel'|'token'>[]>([])
 
     useEffect(() => {
         // get language setting
         const storedLanguage = localStorage.getItem('language') as ITranslate['lang']
         setLanguage(storedLanguage)
-    }, [])
+        // system message
+        systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
+        setMessageItems(data => [...data, systemMessage])
+    }, [language])
 
     const states: IMiscContext = {
         language: language,
