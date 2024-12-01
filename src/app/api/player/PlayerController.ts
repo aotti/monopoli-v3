@@ -105,12 +105,13 @@ export default class PlayerController extends Controller {
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
         // publish chat
-        payload
         const publishData = {
             ...payload, 
             onlinePlayers: JSON.stringify(onlinePlayers)
         }
-        await this.pubnubPublish(payload.channel, publishData)
+        const isPublished = await this.pubnubPublish(payload.channel, publishData)
+        console.log(isPublished);
+        
         // set result
         const resultData = {
             token: token

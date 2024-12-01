@@ -17,11 +17,9 @@ export default class Controller {
     })
 
     protected async pubnubPublish(channel: string, data: any) {
-        this.pubnubServer.publish({
+        return this.pubnubServer.publish({
             channel: channel,
             message: data
-        }, (status, res) => {
-            console.log('publish', status.statusCode);
         })
     }
 
