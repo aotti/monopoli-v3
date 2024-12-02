@@ -14,7 +14,7 @@ export default function PlayerList({ onlinePlayers }: {onlinePlayers: ILoggedUse
             {onlinePlayers.map((v, i) => 
                 <form key={i} className="flex justify-between" onSubmit={ev => viewPlayerStats(ev, gameState)}>
                     <input type="text" id="display_name" value={v.display_name} className="w-3/5 lg:w-3/4 bg-transparent text-white pointer-events-none" readOnly />
-                    <button type="submit" className="bg-primary border-8bit-primary"> 
+                    <button type="submit" className="bg-primary border-8bit-primary active:opacity-75"> 
                         {translateUI({lang: miscState.language, text: 'view'})} 
                     </button>
                 </form>

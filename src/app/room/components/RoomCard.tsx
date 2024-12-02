@@ -61,13 +61,13 @@ export default function RoomCard({ roomRules }: {roomRules: string}) {
                 </div>
                 {/* spectate */}
                 <div className="flex text-right p-2 lg:mt-2">
-                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success">
+                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75">
                         {translateUI({lang: miscState.language, text: 'Join'})}
                     </button>
-                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary">
+                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75">
                         {translateUI({lang: miscState.language, text: 'Spectate'})}
                     </button>
-                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-darkblue-1 border-8bit-text">
+                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-darkblue-1 border-8bit-text active:opacity-75">
                         {translateUI({lang: miscState.language, text: 'Delete'})}
                     </button>
                 </div>

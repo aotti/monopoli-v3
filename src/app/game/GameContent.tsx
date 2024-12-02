@@ -37,14 +37,14 @@ export default function GameContent() {
             {/* tutorial: relative z-10 */}
             <div className={`${miscState.showTutorial == 'tutorial_gameroom_3' ? 'relative z-10' : ''}
             flex flex-col gap-2 lg:gap-6 self-start mt-6 mx-2 w-20 lg:w-24 h-[calc(100%-5rem)]`}>
-                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs">
+                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs active:opacity-75" draggable={false}>
                     <span data-tooltip={'back to room, not leave game'} className="relative"> 
                         {translateUI({lang: miscState.language, text: 'Back to room'})} 
                     </span>
                 </Link>
                 {/* tutorial button */}
                 <div data-tooltip="tutorial" className="relative w-6 lg:w-8">
-                    <button type="button" onClick={() => miscState.setShowTutorial('tutorial_gameroom_1')}>
+                    <button type="button" className="active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_gameroom_1')}>
                         <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" draggable={false} />
                     </button>
                 </div>

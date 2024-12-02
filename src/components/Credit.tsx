@@ -7,7 +7,7 @@ export default function Credit() {
     return (
         <>
             <div className="absolute top-2 left-4">
-                <button type="button" className="bg-darkblue-1 border-8bit-text" onClick={() => setShowCredit(true)}> 
+                <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => setShowCredit(true)}> 
                     credit 
                 </button>
             </div>

@@ -44,7 +44,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                     {
                     playerData.display_name == gameState.myPlayerInfo.display_name
                         ? <form className="text-center mt-2" onSubmit={ev => userLogout(ev, gameState)}>
-                            <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text"> logout </button>
+                            <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75"> logout </button>
                             <Link id="gotoHome" href={location.origin}></Link>
                         </form>
                         : null

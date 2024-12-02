@@ -125,7 +125,7 @@ export default function RoomContent() {
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
                             onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
                             <button type="submit" className="w-6 lg:w-10 active:opacity-50">
-                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
+                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                             </button>
                         </form>
                     </div>
@@ -145,7 +145,7 @@ export default function RoomContent() {
                 <div className="flex gap-4 w-full h-fit text-center p-2">
                     {/* tutorial button */}
                     <div data-tooltip="tutorial" className="w-8 my-auto">
-                        <button type="button" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
+                        <button type="button" className="active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
                             <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" draggable={false} />
                         </button>
                     </div>

@@ -20,7 +20,7 @@ export default function HeaderContent() {
             {/* translate button */}
             <div data-tooltip={miscState.language == 'english' ? '🇮🇩 indonesia' : '🇬🇧  inggris'} 
             className="absolute top-2 w-8 lg:w-10 right-4">
-                <button type="button" id="translate" 
+                <button type="button" id="translate" className="active:opacity-75"
                 onClick={() => miscState.setLanguage(lang => {
                     const chosenLang = lang == 'english' ? 'indonesia' : 'english'
                     // save the language in localstorage

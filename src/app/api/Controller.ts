@@ -160,28 +160,25 @@ export default class Controller {
      * @returns verified token & get payload | error if no refresh token
      */
     protected async getTokenPayload(payload: {token: string}): Promise<IResponse<{tpayload: IPlayer, token: string}>> {
-        // if current access token isnt expired, set to null
-        let newAccessToken: string = null
+        // verify access token
+        const [error, data] = await verifyAccessToken({
+            action: 'verify-payload',
+            secret: process.env.ACCESS_TOKEN_SECRET,
+            token: payload.token
+        })
         // access token expired / not exist
-        if(!payload.token) {
+        if(!payload.token || error) {
             // get refresh token
             const refreshToken = cookies().get('refreshToken').value
             // verify token & renew access token
             const isVerified = await this.renewAccessToken(refreshToken)
             // token expired / not exist
             if(!isVerified) return this.respond(403, `forbidden`, [])
-            // refresh token verified
+            // get payload from refresh token (100% no error cuz renew)
             const [accessToken, renewData] = isVerified
-            payload.token = accessToken
-            // set new access token
-            newAccessToken = accessToken
+            return this.respond(200, 'get token payload', [{ tpayload: renewData, token: accessToken }])
         }
-        // get payload from access token (100% no error cuz renew)
-        const [error, data] = await verifyAccessToken({
-            action: 'verify-payload',
-            secret: process.env.ACCESS_TOKEN_SECRET,
-            token: payload.token
-        })
-        return this.respond(200, 'get token payload', [{ tpayload: data, token: newAccessToken }])
+        // if current access token isnt expired, set to null
+        return this.respond(200, 'get token payload', [{ tpayload: data, token: null }])
     }
 }

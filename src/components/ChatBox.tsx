@@ -32,7 +32,7 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
                     <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                     placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
                     <button type="submit" className="w-6 lg:w-10 active:opacity-50">
-                        <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" />
+                        <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                     </button>
                 </form>
             </div>
