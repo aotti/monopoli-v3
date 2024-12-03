@@ -6,7 +6,7 @@ export default function TutorialGameRoom() {
     // tutorial text
     const tutorialText = {
         part_1: [
-            `"help" contain info about community & chance cards, special card effect, buff/debuff area.`,
+            `"help" contain info about community & chance cards, special card, buff/debuff area.`,
             `"players" contain info about name, money and special card (note icon).`,
             `"player settings" (gear icon)\nauto roll dice = if u tired clicking\nsell city = sell any city owned\ngame history = see all player action\nattack city = attack other player city`
         ],

@@ -53,7 +53,7 @@
         ],
         "5%": ["City upgrade card"]
     },
-    "card_effect": {
+    "special_card": {
         "reminder": [
             "Each card can only be used once",
             "Cannot have 2 same card, if you get 2x anti tax card it'll only count as 1"

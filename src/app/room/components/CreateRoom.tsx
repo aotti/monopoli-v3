@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function CreateRoom() {
     const miscState = useMisc()
     // form pages
-    const [createRoomPage, setCreateRoomPage] = useState<1|2>(2)
+    const [createRoomPage, setCreateRoomPage] = useState<1|2>(1)
     // tooltip
     const tooltip = {
         moneyStart: translateUI({lang: miscState.language, text: 'money that player have on start'}),
@@ -45,6 +45,15 @@ export default function CreateRoom() {
                     <div className="flex justify-between">
                         <label htmlFor="password" className=""> Password </label>
                         <input type="text" className="w-36 lg:w-48 px-1" id="password" minLength={3} maxLength={8} placeholder="optional" />
+                    </div>
+                    {/* select mode */}
+                    <div className="flex justify-between">
+                        <label htmlFor="select_mode" className=""> Mode </label>
+                        <select id="select_mode" className="w-32 lg:w-44">
+                            <option value="survive"> survive </option>
+                            <option value="5 laps"> 5 laps </option>
+                            <option value="7 laps"> 7 laps </option>
+                        </select>
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
@@ -126,15 +135,6 @@ export default function CreateRoom() {
                             <option value="2"> 2 </option>
                             <option value="3"> 3 </option>
                             <option value="4"> 4 </option>
-                        </select>
-                    </div>
-                    {/* select mode */}
-                    <div className="flex justify-between">
-                        <label htmlFor="select_mode" className=""> Mode </label>
-                        <select id="select_mode" className="w-32 lg:w-44">
-                            <option value="survive"> survive </option>
-                            <option value="5 laps"> 5 laps </option>
-                            <option value="7 laps"> 7 laps </option>
                         </select>
                     </div>
                     {/* message */}

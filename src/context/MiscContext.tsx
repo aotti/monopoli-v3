@@ -27,8 +27,10 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
         const storedLanguage = localStorage.getItem('language') as ITranslate['lang']
         setLanguage(storedLanguage)
         // system message
-        systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
-        setMessageItems(data => [...data, systemMessage])
+        if(language == storedLanguage) {
+            systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
+            setMessageItems(data => [...data, systemMessage])
+        }
     }, [language])
 
     const states: IMiscContext = {

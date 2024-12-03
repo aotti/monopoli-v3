@@ -10,7 +10,7 @@ export default function HelpSection() {
     // cards
     const communityCards = board_help_items.community_card
     const chanceCards = board_help_items.chance_card
-    const cardEffect = board_help_items.card_effect
+    const specialCard = board_help_items.special_card
     const buffdebuffArea = board_help_items.area_items
 
     return (
@@ -27,7 +27,7 @@ export default function HelpSection() {
                 {/* kartu kesempatan */}
                 <ListWithTabs title="Chance Card" data={chanceCards} />
                 {/* efek kartu */}
-                <ListWithTabs title="Card Effect" data={cardEffect} />
+                <ListWithTabs title="Special Card" data={specialCard} />
                 {/* buff debuff */}
                 <ListWithTabs title="Buff/Debuff Area" data={buffdebuffArea} />
             </ol>

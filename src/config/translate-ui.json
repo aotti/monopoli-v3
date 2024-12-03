@@ -22,6 +22,7 @@
         "worst lost": "terburuk",
         "online": "online",
         "playing": "bermain",
+        "away": "pergi",
         "Room List": "Daftar Ruang",
         "Create Room": "Buat Ruang",
         "Board": "Papan",
@@ -120,7 +121,7 @@
         "You get a surprise money of 200.000": "Anda mendapatkan uang kaget sebanyak 200.000",
 
         "__EFEK KARTU__": "__EFEK KARTU__",
-        "Card Effect": "Efek Kartu",
+        "Special Card": "Kartu Spesial",
         "Each card can only be used once": "Semua kartu hanya 1x pakai lalu hangus",
         "Cannot have 2 same card, if you get 2x anti tax card it'll only count as 1": "Tidak bisa punya 2 kartu yg sama, kalo kau punya kartu anti pajak lalu dapat lagi, tetap dihitung 1",
         "Anti Jail = when you step on jail tile, you can avoid imprisoned effect": "Bebas Penjara = ya sesuai namanya lah ya... #h3h3",
@@ -169,7 +170,7 @@
         "__GAME ROOM TUTORIAL__": "__GAME ROOM TUTORIAL__",
 
         "__GAME PART 1__":"__GAME PART 1__",
-        "\"help\" contain info about community & chance cards, special card effect, buff/debuff area.": "\"bantuan\" berisi info kartu dana umum & kesempatan, efek kartu khusus, area buff/debuff.",
+        "\"help\" contain info about community & chance cards, special card, buff/debuff area.": "\"bantuan\" berisi info dana umum & kesempatan, kartu khusus, area buff/debuff.",
         "\"players\" contain info about name, money and special card (note icon).": "\"pemain\" berisi info nama, uang dan kartu khusus (ikon catatan).",
         "\"player settings\" (gear icon)\nauto roll dice = if u tired clicking\nsell city = sell any city owned\ngame history = see all player action\nattack city = attack other player city": "\"pengaturan\" (ikon roda gigi)\ndadu otomatis = otomatis lempar dadu\njual kota = jual kota yg kau punya\ncatatan main = lihat semua aksi pemain\nserang kota = serang kota pemain lain",
 

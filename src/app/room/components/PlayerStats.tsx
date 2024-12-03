@@ -1,7 +1,7 @@
 import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { useMisc } from "../../../context/MiscContext";
 import { fetcher, fetcherOptions, moneyFormat, qS, translateUI } from "../../../helper/helper";
-import { IGameContext, ILoggedUsers, IPlayer, IResponse } from "../../../helper/types";
+import { IGameContext, ILoggedUsers, IMiscContext, IPlayer, IResponse } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
 import { FormEvent } from "react";
 import Link from "next/link";
@@ -43,7 +43,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                     {/* logout */}
                     {
                     playerData.display_name == gameState.myPlayerInfo.display_name
-                        ? <form className="text-center mt-2" onSubmit={ev => userLogout(ev, gameState)}>
+                        ? <form className="text-center mt-2" onSubmit={ev => userLogout(ev, miscState, gameState)}>
                             <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75"> logout </button>
                             <Link id="gotoHome" href={location.origin}></Link>
                         </form>
@@ -67,7 +67,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             {onlinePlayers.map(v => 
                                 v.display_name == playerData.display_name
                                 ? translateUI({lang: miscState.language, text: v.status})
-                                : null
+                                : translateUI({lang: miscState.language, text: 'away'})
                             )} 
                         </p>
                     </div>
@@ -123,7 +123,7 @@ async function avatarUpdate(display_name: string, avatar_url: string, gameState:
     }
 }
 
-async function userLogout(ev: FormEvent<HTMLFormElement>, gameState: IGameContext) {
+async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
 
     // home button
@@ -155,6 +155,8 @@ async function userLogout(ev: FormEvent<HTMLFormElement>, gameState: IGameContex
             localStorage.removeItem('onlinePlayers')
             gameState.setMyPlayerInfo(null)
             gameState.setOnlinePlayers(null)
+            // set modal to null
+            miscState.setShowModal(null)
             // go to home
             gotoHome.click()
             return
