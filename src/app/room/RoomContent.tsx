@@ -8,7 +8,7 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { IChat } from "../../helper/types";
+import { IChat, ICreateRoom } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import Pubnub, { ListenerParameters } from "pubnub";
 import { usePubNub } from "pubnub-react";
@@ -32,16 +32,22 @@ export default function RoomContent() {
     // pubnub subscribe
     const roomlistChannel = ['monopoli-roomlist']
     const onlineplayerChannel = ['monopoli-onlineplayer']
+    const createroomChannel = ['monopoli-createroom']
+    // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
         // tooltip (the element must have position: relative)
         applyTooltipEvent()
 
+        // ### get room list
+        // ### get room list
+
         // subscribe
-        pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+        pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel, ...createroomChannel] })
         // get published message
         const publishedMessage: ListenerParameters = {
             message: (data) => {
-                const getMessage = data.message as Pubnub.MessageEvent & IChat & {onlinePlayers: string}
+                type GetMessageType = Pubnub.MessageEvent & IChat & ICreateRoom['list'] & {onlinePlayers: string}
+                const getMessage = data.message as GetMessageType
                 // add chat
                 if(getMessage.message_text) {
                     const chatData: Omit<IChat, 'channel'|'token'> = {
@@ -56,6 +62,21 @@ export default function RoomContent() {
                     const onlinePlayersData = getMessage.onlinePlayers
                     localStorage.setItem('onlinePlayers', onlinePlayersData)
                     gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
+                }
+                // room created
+                if(getMessage.creator) {
+                    // split max player from rules
+                    const playerMax = getMessage.rules.match(/max: \d/)[0].split(': ')[1]
+                    const rules = getMessage.rules.match(/.*(?=;max)/)[0]
+                    // set to room list
+                    gameState.setRoomList(room => [...room, {
+                        creator: getMessage.creator,
+                        room_name: getMessage.room_name,
+                        room_password: getMessage.room_password,
+                        player_count: getMessage.player_count,
+                        player_max: +playerMax,
+                        rules: rules
+                    }])
                 }
             }
         }
@@ -178,11 +199,7 @@ export default function RoomContent() {
                     text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
                     overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
                     {/* card */}
-                    <RoomCard roomRules={roomRules[0]} />
-                    {/* card */}
-                    <RoomCard roomRules={roomRules[1]} />
-                    {/* card */}
-                    <RoomCard roomRules={roomRules[2]} />
+                    {gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)}
                 </div>
             </div>
             

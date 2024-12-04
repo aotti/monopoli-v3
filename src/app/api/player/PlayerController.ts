@@ -10,6 +10,7 @@ export default class PlayerController extends Controller {
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
         if(tokenPayload.status !== 200) return tokenPayload
         // token payload data
+        delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
         
         // filter payload
@@ -51,6 +52,7 @@ export default class PlayerController extends Controller {
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
         if(tokenPayload.status !== 200) return tokenPayload
         // token payload data
+        delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
 
         // filter payload

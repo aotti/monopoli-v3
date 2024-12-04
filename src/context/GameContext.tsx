@@ -19,6 +19,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>(null)
+    // room
+    const [roomList, setRoomList] = useState([])
 
     useEffect(() => {
         // set online players if exist
@@ -50,6 +52,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setOtherPlayerInfo: setOtherPlayerInfo,
         onlinePlayers: onlinePlayers,
         setOnlinePlayers: setOnlinePlayers,
+        // room
+        roomList: roomList,
+        setRoomList: setRoomList,
     }
 
     return (

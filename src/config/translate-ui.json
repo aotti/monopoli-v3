@@ -26,7 +26,7 @@
         "Room List": "Daftar Ruang",
         "Create Room": "Buat Ruang",
         "Board": "Papan",
-        "2 Way": "2 Jalur",
+        "2 way": "2 jalur",
         "Dice": "Dadu",
         "Money Start": "Uang Mulai",
         "money that player have on start": "uang yang pemain dapat diawal main",
@@ -187,8 +187,10 @@
         "__SYSTEM MESSAGE__": "__SYSTEM MESSAGE__",
         "length must be 4 to 10 | only letter and number allowed": "panjang harus 4~10 | hanya huruf dan angka",
         "length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed": "panjang harus 8~16 | hanya huruf, angka, spasi dan simbol .,#-+@",
+        "length must be 3 to 8 | only letter, number, spaces and symbols .,#-+@ allowed": "panjang harus 3~8 | hanya huruf, angka, spasi dan simbol .,#-+@",
         "name: length must be 4 to 12 | only letter, number and spaces allowed": "nama: panjang harus 4~12 | hanya huruf, angka dan spasi",
         "only letter, number, spaces and symbols .,#-+=@?! allowed": "hanya huruf, angka, spasi dan simbol .,#-+=@?!",
+        "value doesnt match": "tidak ada pilihan itu!",
         "✅ chat box will persist": "✅ kotak obrolan akan tetap ada",
         "❌ chat box back to normal": "❌ kotak obrolan kembali normal"
     }

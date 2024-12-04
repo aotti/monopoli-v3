@@ -1,13 +1,19 @@
 import { useEffect } from "react"
 import { useMisc } from "../../../context/MiscContext"
 import { applyTooltipEvent, translateUI } from "../../../helper/helper"
+import { ICreateRoom } from "../../../helper/types"
 
-export default function RoomCard({ roomRules }: {roomRules: string}) {
+export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) {
     const miscState = useMisc()
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
     }, [])
+
+    // modify curse text
+    const getCurse = roomData.rules.match(/curse: \d{1,2}/)[0].split(': ')[1]
+    const setCurseRange = +getCurse > 5 ? `curse: 5~${getCurse}%` : `curse: ${getCurse}%`
+    const modifiedRules = roomData.rules.replace(/curse: \d{1,2}/, setCurseRange)
 
     return (
         <div className="w-[calc(100%-52.5%)] h-56 lg:h-60 border-2">
@@ -18,7 +24,7 @@ export default function RoomCard({ roomRules }: {roomRules: string}) {
                         <span> {translateUI({lang: miscState.language, text: 'Name'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="room_name" className="bg-transparent text-white w-3/5 border-b border-b-white" value={'lele gaming'} readOnly />
+                    <input type="text" id="room_name" className="bg-transparent text-white w-3/5 border-b border-b-white" value={roomData.room_name} readOnly />
                 </div>
                 {/* rules */}
                 <div className="flex justify-between p-2">
@@ -28,11 +34,11 @@ export default function RoomCard({ roomRules }: {roomRules: string}) {
                     </label>
                     <div className="w-3/5 border-b border-b-white">
                         {/* hover rules */}
-                        <p data-tooltip={roomRules.replaceAll(';', '\n')} className="relative w-full text-center bg-transparent" > 
+                        <p data-tooltip={modifiedRules.replaceAll(';', '\n')} className="relative w-full text-center bg-transparent" > 
                             ??? 
                         </p>
                         {/* input */}
-                        <input type="hidden" value={roomRules} readOnly />
+                        <input type="hidden" value={roomData.rules} readOnly />
                     </div>
                 </div>
                 {/* player count */}
@@ -41,7 +47,7 @@ export default function RoomCard({ roomRules }: {roomRules: string}) {
                         <span> {translateUI({lang: miscState.language, text: 'Count'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" value={'1 player(s)'} readOnly />
+                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" value={`${roomData.player_count} player(s)`} readOnly />
                 </div>
                 {/* max player */}
                 <div className="flex justify-between p-2">
@@ -49,7 +55,7 @@ export default function RoomCard({ roomRules }: {roomRules: string}) {
                         <span> {translateUI({lang: miscState.language, text: 'Max'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="max_player" className="bg-transparent text-white w-3/5 border-b border-b-white" value={'4 player(s)'} readOnly />
+                    <input type="text" id="max_player" className="bg-transparent text-white w-3/5 border-b border-b-white" value={`${roomData.player_max} player(s)`} readOnly />
                 </div>
                 {/* creator */}
                 <div className="flex justify-between p-2">
@@ -57,7 +63,7 @@ export default function RoomCard({ roomRules }: {roomRules: string}) {
                         <span> {translateUI({lang: miscState.language, text: 'Creator'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="creator" className="bg-transparent text-white w-3/5 border-b border-b-white" value={'dengkul'} readOnly />
+                    <input type="text" id="creator" className="bg-transparent text-white w-3/5 border-b border-b-white" value={roomData.creator} readOnly />
                 </div>
                 {/* spectate */}
                 <div className="flex text-right p-2 lg:mt-2">

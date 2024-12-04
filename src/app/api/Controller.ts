@@ -31,11 +31,14 @@ export default class Controller {
         let [filterStatus, filterMessage] = [false, 'payload is not filtered yet']
         // matching filter
         switch(action) {
+            // player
             case 'user register': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user login': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user avatar update': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user get stats': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
+            // room
+            case 'room create': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])

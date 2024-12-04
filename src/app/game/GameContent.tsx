@@ -45,7 +45,7 @@ export default function GameContent() {
                 {/* tutorial button */}
                 <div data-tooltip="tutorial" className="relative w-6 lg:w-8">
                     <button type="button" className="active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_gameroom_1')}>
-                        <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" draggable={false} />
+                        <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" loading="lazy" draggable={false} />
                     </button>
                 </div>
                 {/* game info */}

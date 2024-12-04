@@ -136,7 +136,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 gameState.setShowTileImage('city');
                 setTimeout(() => gameState.setShowTileImage(null), 3000);
             }}>
-                <img src="https://img.icons8.com/?id=83218&format=png&color=000000" alt="" />
+                <img src="https://img.icons8.com/?id=83218&format=png&color=000000" alt="" loading="lazy" />
             </button>
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
@@ -148,7 +148,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                     } 
                 </p>
             </div>
-            <img src={img} alt={name} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
+            <img src={img} alt={name} className={`${gameState.showTileImage == 'city' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} loading="lazy" draggable={false} />
         </div>
     )
 }
@@ -168,7 +168,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
                 gameState.setShowTileImage('other');
                 setTimeout(() => gameState.setShowTileImage(null), 3000);
             }}>
-                <img src="https://img.icons8.com/?id=83218&format=png&color=000000" alt="" />
+                <img src="https://img.icons8.com/?id=83218&format=png&color=000000" alt="" loading="lazy" />
             </button>
             <div className="font-mono absolute ml-px mt-[8.5vh] w-[7.1vw] h-[6.75vh]
             bg-darkblue-4/90 text-black text-center">
@@ -176,7 +176,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
                     {translateUI({lang: miscState.language, text: name as any})} 
                 </p>
             </div>
-            <img src={img} alt={name} className={`${gameState.showTileImage == 'other' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} draggable={false} />
+            <img src={img} alt={name} className={`${gameState.showTileImage == 'other' ? 'relative' : ''} w-[7.5vw] h-[15.5vh]`} loading="lazy" draggable={false} />
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import { PointerEvent } from "react";
-import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, IPlayer, IResponse, ITranslate, IVerifyTokenOnly, IVerifyTokenPayload, VerifyTokenReturn, VerifyTokenType } from "./types";
+import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, InputIDType, IPlayer, IResponse, ITranslate, IVerifyTokenOnly, IVerifyTokenPayload, VerifyTokenReturn, VerifyTokenType } from "./types";
 import translateUI_data from '../config/translate-ui.json'
 import { createHash } from "crypto";
 import { JWTPayload, jwtVerify } from "jose";
@@ -56,14 +56,14 @@ export function catchError<T=any>(promise: Promise<T>): Promise<[undefined, T] |
         })
 }
 
-type InputType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'|'channel'|'message_text'|'message_time'
-export function setInputValue(input: InputType, element: HTMLInputElement) {
+export function setInputValue(input: InputIDType, element: HTMLInputElement) {
     return element.id == input && filterInput(element.id, element.value)
 }
 
-export function filterInput(input: InputType, value: string) {
+export function filterInput(input: InputIDType, value: string) {
     // username = 4~10 | password = 8~16 | display_name = 4~12
     switch(input) {
+        // ====== PLAYER TYPE ======
         // filter uuid
         case 'uuid': 
             const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
@@ -76,11 +76,15 @@ export function filterInput(input: InputType, value: string) {
         case 'confirm_password':
             return value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/)
         // letter, number, whitespace
+        case 'creator':
+        case 'room_name': // create room 'name'
         case 'display_name': 
             return value.match(/^[a-zA-Z0-9\s]{4,12}$/)
         // must have monopoli-profiles url
         case 'avatar': 
             return value.match(/monopoli-profiles/)
+
+        // ====== CHAT TYPE ======
         // websocket message channel
         case 'channel': 
             return value.match(/monopoli-roomlist|monopoli-gameroom-\d{1,3}$/)
@@ -90,6 +94,55 @@ export function filterInput(input: InputType, value: string) {
         // time of chat
         case 'message_time': 
             return value.match(/^[\d{2}:\d{2}]{4,5}$/)
+
+        // ====== CREATE ROOM TYPE ======
+        case 'room_password':
+            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/)
+        case 'select_mode':
+            return value.match(/^[survive|5 laps|7 laps]+$/)
+        case 'select_board':
+            return value.match(/^[normal|delta|2 way|2 jalur]+$/i)
+        case 'select_dice':
+            return value.match(/1$|2$/)
+        case 'select_money_start':
+            return value.match(/50000$|75000$|100000$/)
+        case 'select_money_lose':
+            return value.match(/25000$|50000$|75000$/)
+        case 'select_curse':
+            return value.match(/5$|10$|15$/)
+        case 'select_max_player':
+            return value.match(/2$|3$|4$/)
+    }
+}
+
+export function errorLoginRegister(input: string, language: ITranslate['lang']) {
+    switch (input) {
+        case 'username':
+            return `${input}: ${translateUI({lang: language, text: 'length must be 4 to 10 | only letter and number allowed'})}`
+        case 'password': 
+        case 'confirm_password':
+            return `${input}: ${translateUI({lang: language, text: 'length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed'})}`
+        case 'display_name':
+            return translateUI({lang: language, text: `name: length must be 4 to 12 | only letter, number and spaces allowed`})
+        default: 
+            return `unknown input: ${input}`
+    }
+}
+
+export function errorCreateRoom(input: string, language: ITranslate['lang']) {
+    switch(input) {
+        case 'room_name':
+            return translateUI({lang: language, text: `name: length must be 4 to 12 | only letter, number and spaces allowed`})
+        case 'room_password':
+            return `${input}: ${translateUI({lang: language, text: 'length must be 3 to 8 | only letter, number, spaces and symbols .,#-+@ allowed'})}`
+        case 'select_mode':
+        case 'select_board':
+        case 'select_dice':
+        case 'select_money_start':
+        case 'select_money_lose':
+        case 'select_curse':
+        case 'select_max_player':
+            return `${input}: ${translateUI({lang: language, text: 'value doesnt match'})}`
     }
 }
 
@@ -133,20 +186,6 @@ export function fetcher(endpoint: string, options: RequestInit) {
     const host = `${window.location.origin}/api`
     const url = host + endpoint
     return fetch(url, options)
-}
-
-export function errorLoginRegister(input: string, language: ITranslate['lang']) {
-    switch (input) {
-        case 'username':
-            return `${input}: ${translateUI({lang: language, text: 'length must be 4 to 10 | only letter and number allowed'})}`
-        case 'password': 
-        case 'confirm_password':
-            return `${input}: ${translateUI({lang: language, text: 'length must be 8 to 16 | only letter, number, spaces and symbols .,#-+@ allowed'})}`
-        case 'display_name':
-            return translateUI({lang: language, text: `name: length must be 4 to 12 | only letter, number and spaces allowed`})
-        default: 
-            return `unknown input: ${input}`
-    }
 }
 
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */

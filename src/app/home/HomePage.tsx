@@ -1,6 +1,5 @@
 "use client"
 
-import { Press_Start_2P } from "next/font/google"
 import HeaderContent from "../../components/HeaderContent"
 import HomeContent from "../home/HomeContent"
 import ScreenPortraitWarning from "../../components/ScreenPortraitWarning"
@@ -10,11 +9,6 @@ import { useGame } from "../../context/GameContext"
 import { useEffect } from "react"
 import { checkAccessToken, qS } from "../../helper/helper"
 import Link from "next/link"
-
-const retroFont = Press_Start_2P({
-    subsets: ['latin'],
-    weight: ['400']
-})
 
 export default function HomePage() {
     const miscState = useMisc()
@@ -40,7 +34,7 @@ export default function HomePage() {
     }, [gameState.onlinePlayers])
 
     return (
-        <div className={`${retroFont.className} text-white text-xs lg:text-sm`}>
+        <div className="text-white text-xs lg:text-sm">
             {/* padding .5rem */}
             <div className="p-2 bg-darkblue-2 h-screen w-screen">
                 <header>

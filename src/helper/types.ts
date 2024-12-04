@@ -73,6 +73,9 @@ export interface IGameContext {
     setOtherPlayerInfo: Dispatch<SetStateAction<IPlayer>>,
     onlinePlayers: ILoggedUsers[],
     setOnlinePlayers: Dispatch<SetStateAction<ILoggedUsers[]>>,
+    // room
+    roomList: ICreateRoom['list'][],
+    setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -167,6 +170,12 @@ export interface IResponse<T = any> {
     data: T[];
 }
 
+// input ID
+type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
+type ChatType = 'channel'|'message_text'|'message_time'
+type CreateRoomType = 'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'
+export type InputIDType = PlayerType|ChatType|CreateRoomType
+
 // user
 export interface ILoggedUsers {
     display_name: string,
@@ -199,6 +208,38 @@ export interface IChat extends ITokenPayload {
     display_name: string,
     message_text: string,
     message_time: string
+}
+
+// create room
+export interface ICreateRoom {
+    input: {
+        creator: string,
+        room_name: string,
+        room_password: string,
+        select_mode: string,
+        select_board: string,
+        select_dice: string,
+        select_money_start: string,
+        select_money_lose: string,
+        select_curse: string,
+        select_max_player: string,
+        token?: string,
+    },
+    payload: {
+        creator: string,
+        room_name: string,
+        room_password: string,
+        money_start: number,
+        rules: string,
+    },
+    list: {
+        creator: string,
+        room_name: string,
+        room_password: string,
+        player_count: number,
+        player_max: number,
+        rules: string,
+    }
 }
 
 // helper

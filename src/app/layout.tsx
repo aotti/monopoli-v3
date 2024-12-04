@@ -3,11 +3,17 @@ import { GameProvider } from '../context/GameContext'
 import { MiscProvider } from '../context/MiscContext'
 import './globals.css'
 import { Viewport } from 'next'
+import { Press_Start_2P } from 'next/font/google'
 
 export const viewport: Viewport = {
   initialScale: 1,
   width: 'device-width'
 }
+
+const retroFont = Press_Start_2P({
+    subsets: ['latin'],
+    weight: ['400']
+})
 
 export default function RootLayout({
   children,
@@ -20,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <MiscProvider accessSecret={accessSecret}>
         <GameProvider>
-          <body>{children}</body>
+          <body className={`${retroFont.className}`}>{children}</body>
         </GameProvider>
       </MiscProvider>
     </html>
