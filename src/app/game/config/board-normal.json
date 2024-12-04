@@ -11,7 +11,7 @@
             "type": "city",
             "name": "Special-3",
             "price": 70000, 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Yogyakarta_100-qOFnzEC7fYHBId2aKIC3fWOIWGdU5a.png",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Yogyakarta_100_Revision-KB4e6LbRMrtfeOaUDQhWIimu7nWOlV.png",
             "info": "Yogyakarta\nafter purchase, get money every visit" 
         },
         { 
@@ -130,7 +130,7 @@
             "type": "city",
             "name": "Magelang", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100-OLcDQN0yl8e2rUsVWSttPvzhgi928t.png",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100_Revision-fUbfBTaoCf35NafcQvpa9dP7TQa7R6.png",
             "info": "price +10% for each upgrade"
         },
         { "type": null },
@@ -156,7 +156,7 @@
             "type": "city",
             "name": "Special-2", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100-8zYGN5DMUuQppV5dMcYRPRfMuHOWG2.png",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100_Revision-W32qQihw3gfXiL84wk0e8UHN9wSU9j.png",
             "info": "Jakarta\nafter purchase, get money every visit"
         },
         { "type": null },
@@ -193,7 +193,7 @@
             "type": "city",
             "name": "Cursed-1", 
             "price": 70000,
-            "img": "",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Lawang_Sewu_100-OgKDUcfqHVUE1cmvSilsFZvU1DzRlX.png",
             "info": "lose money every visit"
         },
         { 

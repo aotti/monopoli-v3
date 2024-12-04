@@ -161,7 +161,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const { name, img, info } = data as TileOtherType 
 
     return (
-        <div>
+        <div data-tooltip={info ? info : null} className="relative flex">
             <button type="button" className="absolute mt-0.5 lg:mt-1 ml-[5.8vw] 
             w-3 lg:w-4 bg-darkblue-4 rounded-bl-md"
             onClick={() => {

@@ -64,11 +64,11 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         {/* KALO UDAH MASUK GAME ROOM BARU BISA APDET */}
                         <p> status: </p>
                         <p className="text-green-400"> 
-                            {onlinePlayers.map(v => 
+                            {onlinePlayers.length > 0 ? onlinePlayers.map(v => 
                                 v.display_name == playerData.display_name
                                 ? translateUI({lang: miscState.language, text: v.status})
-                                : translateUI({lang: miscState.language, text: 'away'})
-                            )} 
+                                : null
+                            ) : translateUI({lang: miscState.language, text: 'away'})} 
                         </p>
                     </div>
                 </div>
