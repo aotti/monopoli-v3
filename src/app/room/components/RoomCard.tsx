@@ -2,9 +2,11 @@ import { useEffect } from "react"
 import { useMisc } from "../../../context/MiscContext"
 import { applyTooltipEvent, translateUI } from "../../../helper/helper"
 import { ICreateRoom } from "../../../helper/types"
+import { useGame } from "../../../context/GameContext"
 
 export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) {
     const miscState = useMisc()
+    const gameState = useGame()
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
@@ -18,13 +20,16 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
     return (
         <div className="w-[calc(100%-52.5%)] h-56 lg:h-60 border-2">
             <form onSubmit={ev => ev.preventDefault()}>
+                {/* room id */}
+                <input type="hidden" id="room_id" defaultValue={(roomData as any).id || roomData.room_id} />
                 {/* room name */}
                 <div className="flex justify-between p-2">
                     <label className="flex justify-between grow">
                         <span> {translateUI({lang: miscState.language, text: 'Name'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="room_name" className="bg-transparent text-white w-3/5 border-b border-b-white" value={roomData.room_name} readOnly />
+                    <input type="text" id="room_name" className="bg-transparent text-white w-3/5 border-b border-b-white" 
+                    defaultValue={(roomData as any).name || roomData.room_name} readOnly />
                 </div>
                 {/* rules */}
                 <div className="flex justify-between p-2">
@@ -38,7 +43,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                             ??? 
                         </p>
                         {/* input */}
-                        <input type="hidden" value={roomData.rules} readOnly />
+                        <input type="hidden" defaultValue={roomData.rules} readOnly />
                     </div>
                 </div>
                 {/* player count */}
@@ -47,7 +52,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Count'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" value={`${roomData.player_count} player(s)`} readOnly />
+                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_count} player(s)`} readOnly />
                 </div>
                 {/* max player */}
                 <div className="flex justify-between p-2">
@@ -55,7 +60,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Max'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="max_player" className="bg-transparent text-white w-3/5 border-b border-b-white" value={`${roomData.player_max} player(s)`} readOnly />
+                    <input type="text" id="max_player" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_max} player(s)`} readOnly />
                 </div>
                 {/* creator */}
                 <div className="flex justify-between p-2">
@@ -63,7 +68,8 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Creator'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="creator" className="bg-transparent text-white w-3/5 border-b border-b-white" value={roomData.creator} readOnly />
+                    <input type="text" id="creator" className="bg-transparent text-white w-3/5 border-b border-b-white" 
+                    defaultValue={(roomData as any).display_name || roomData.creator} readOnly />
                 </div>
                 {/* spectate */}
                 <div className="flex text-right p-2 lg:mt-2">
@@ -73,9 +79,13 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                     <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75">
                         {translateUI({lang: miscState.language, text: 'Spectate'})}
                     </button>
-                    <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-darkblue-1 border-8bit-text active:opacity-75">
-                        {translateUI({lang: miscState.language, text: 'Delete'})}
-                    </button>
+                    {// only show delete if its my room
+                        gameState.myPlayerInfo.display_name == ((roomData as any).display_name || roomData.creator)
+                            ? <button type="button" className="w-16 lg:w-24 text-2xs lg:text-xs bg-darkblue-1 border-8bit-text active:opacity-75">
+                                {translateUI({lang: miscState.language, text: 'Delete'})}
+                            </button>
+                            : null
+                    }
                 </div>
             </form>
         </div>

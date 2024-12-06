@@ -61,7 +61,7 @@ export default class PlayerController extends Controller {
         // set payload for db query
         const queryObject: IQueryUpdate = {
             table: 'players',
-            selectColumn: this.dq.columnSelector('players', 4),
+            selectColumn: this.dq.columnSelector('players', 6),
             whereColumn: 'display_name',
             whereValue: payload.display_name,
             get updateColumn() {

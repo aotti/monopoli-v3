@@ -30,7 +30,7 @@ export default function CreateRoom() {
                 <span> {translateUI({lang: miscState.language, text: 'Create Room'})} </span>
             </div>
             {/* modal body */}
-            <form onSubmit={ev => createRoom(ev, miscState, gameState)}>
+            <form onSubmit={ev => createRoom(ev, miscState, gameState)} noValidate>
                 {/* part 1 */}
                 <div className={`${createRoomPage === 1 ? 'flex' : 'hidden'} flex-col gap-2 lg:gap-4 my-auto`}>
                     {/* set room name */}
@@ -97,8 +97,7 @@ export default function CreateRoom() {
                             <p id="selected_money_start"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_start" 
-                        step={25000} min={50000} max={100000} defaultValue={75000} required 
-                        onChange={ev => displaySelectedRange(ev)} />
+                        step={25000} min={50000} max={100000} defaultValue={75000} onChange={ev => displaySelectedRange(ev)} />
                     </div>
                     {/* money lose */}
                     <div className="flex justify-between">
@@ -109,8 +108,7 @@ export default function CreateRoom() {
                             <p id="selected_money_lose"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_money_lose" 
-                        step={25000} min={25000} max={75000} defaultValue={75000} required 
-                        onChange={ev => displaySelectedRange(ev)} />
+                        step={25000} min={25000} max={75000} defaultValue={75000} onChange={ev => displaySelectedRange(ev)} />
                     </div>
                     {/* curse random */}
                     <div className="flex justify-between">
@@ -121,8 +119,7 @@ export default function CreateRoom() {
                             <p id="selected_curse"></p>
                         </label>
                         <input type="range" className="w-32 lg:w-44 px-1" id="select_curse" 
-                        step={5} min={5} max={15} defaultValue={5} required 
-                        onChange={ev => displaySelectedRange(ev)} />
+                        step={5} min={5} max={15} defaultValue={5} onChange={ev => displaySelectedRange(ev)} />
                     </div>
                     {/* max player */}
                     <div className="flex justify-between">
@@ -176,7 +173,8 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
     const resultMessage = qS('#result_message')
     resultMessage.className = 'mx-auto text-center text-2xs lg:text-[12px]'
     resultMessage.textContent = ''
-    
+    // submit button
+    const createButton = qS('#create_room') as HTMLInputElement
     // input value container
     const inputValues: ICreateRoom['input'] = {
         creator: gameState.myPlayerInfo.display_name,
@@ -196,8 +194,21 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName.match(/INPUT|SELECT/)) {
             // filter inputs
-            if(setInputValue('room_name', input)) inputValues.room_name = input.value.trim().toLowerCase()
-            else if(setInputValue('room_password', input)) inputValues.room_password = input.value.trim()
+            if(setInputValue('room_name', input)) {
+                // check room list 
+                if(gameState.roomList.length > 0) {
+                    const roomName = input.value.trim().toLowerCase()
+                    const isRoomNameExist = gameState.roomList.map(v => v.room_name).indexOf(roomName)
+                    // room name exist
+                    if(isRoomNameExist !== -1) {
+                        resultMessage.classList.add('text-red-600')
+                        resultMessage.textContent = translateUI({lang: miscState.language, text: 'name: this room name already exist'})
+                        return
+                    }
+                }
+                inputValues.room_name = input.value.trim().toLowerCase()
+            }
+            else if(setInputValue('room_password', input)) inputValues.room_password = input.value == '' ? null : input.value.trim()
             else if(setInputValue('select_mode', input)) inputValues.select_mode = input.value.trim().toLowerCase()
             else if(setInputValue('select_board', input)) inputValues.select_board = input.value.trim().toLowerCase()
             else if(setInputValue('select_dice', input)) inputValues.select_dice = `${input.value}`
@@ -213,21 +224,40 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             }
         }
     }
+    // submit button loading
+    const tempButtonText = createButton.textContent
+    createButton.textContent = 'Loading'
+    createButton.disabled = true
     // fetch
     const createRoomFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
     const createRoomResponse: IResponse = await (await fetcher('/room', createRoomFetchOptions)).json()
     // response
     switch(createRoomResponse.status) {
         case 200: 
-            // ### set rules data for game
-            // ### set rules data for game
+            // save access token
+            if(createRoomResponse.data[0].token) {
+                localStorage.setItem('accessToken', createRoomResponse.data[0].token)
+                delete createRoomResponse.data[0].token
+            }
             // hide the modal
             miscState.setShowModal(null)
             // move to game room
             const link = qS('#gotoGame') as HTMLAnchorElement
             link.click()
+            // submit button normal
+            createButton.textContent = tempButtonText
+            createButton.removeAttribute('disabled')
             return
         default: 
+            // submit button normal
+            createButton.textContent = tempButtonText
+            createButton.removeAttribute('disabled')
+            // special for room name error
+            if(typeof createRoomResponse.message == 'string' && createRoomResponse.message.match('name:')) {
+                resultMessage.classList.add('text-red-600')
+                resultMessage.textContent = translateUI({lang: miscState.language, text: createRoomResponse.message as any})
+                return
+            }
             // result message
             resultMessage.classList.add('text-red-600')
             resultMessage.textContent = `❌ ${createRoomResponse.status}: ${createRoomResponse.message}`

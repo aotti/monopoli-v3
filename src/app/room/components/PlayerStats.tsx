@@ -1,6 +1,6 @@
 import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { useMisc } from "../../../context/MiscContext";
-import { fetcher, fetcherOptions, moneyFormat, qS, translateUI } from "../../../helper/helper";
+import { fetcher, fetcherOptions, moneyFormat, qS, resetAllData, translateUI } from "../../../helper/helper";
 import { IGameContext, ILoggedUsers, IMiscContext, IPlayer, IResponse } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
 import { FormEvent } from "react";
@@ -9,7 +9,13 @@ import Link from "next/link";
 export default function PlayerStats({ playerData, onlinePlayers }: {playerData: IPlayer, onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
     const gameState = useGame()
+
     const isUploadAllowed = playerData.display_name == gameState.myPlayerInfo.display_name ? true : false
+    // set my player status
+    const getMyData = onlinePlayers.length > 0 ? onlinePlayers.map(v => v.display_name).indexOf(playerData.display_name) : -1
+    const amOnline = getMyData === -1 
+                    ? translateUI({lang: miscState.language, text: 'away'}) 
+                    : translateUI({lang: miscState.language, text: onlinePlayers[getMyData].status})
 
     return (
         <>
@@ -34,7 +40,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             const uploadAvatarClass = `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-[attr(data-text)]`
                             return (
                                 <button type="button" id="upload_avatar" data-text={uploadAvatarText} className={`relative w-full h-full ${isUploadAllowed ? uploadAvatarClass : ''}`} onClick={() => open('local')} disabled={!isUploadAllowed}>
-                                    <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" 
+                                    <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" priority 
                                     className="!w-full hover:text-2xs hover:break-all hover:text-balance" width={125} height={0} />
                                 </button>
                             )
@@ -61,15 +67,8 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         <p className="text-red-400"> {moneyFormat(playerData.worst_money_lost)} </p>
                     </div>
                     <div>
-                        {/* KALO UDAH MASUK GAME ROOM BARU BISA APDET */}
                         <p> status: </p>
-                        <p className="text-green-400"> 
-                            {onlinePlayers.length > 0 ? onlinePlayers.map(v => 
-                                v.display_name == playerData.display_name
-                                ? translateUI({lang: miscState.language, text: v.status})
-                                : null
-                            ) : translateUI({lang: miscState.language, text: 'away'})} 
-                        </p>
+                        <p className="text-green-400"> {amOnline} </p>
                     </div>
                 </div>
             </div>
@@ -150,11 +149,8 @@ async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             // stop interval
             clearInterval(loggingOut)
             logoutButton.textContent = 'logout'
-            // remove all local storage
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('onlinePlayers')
-            gameState.setMyPlayerInfo(null)
-            gameState.setOnlinePlayers(null)
+            // reset all data
+            resetAllData(gameState)
             // set modal to null
             miscState.setShowModal(null)
             // go to home

@@ -191,6 +191,7 @@
         "name: length must be 4 to 12 | only letter, number and spaces allowed": "nama: panjang harus 4~12 | hanya huruf, angka dan spasi",
         "only letter, number, spaces and symbols .,#-+=@?! allowed": "hanya huruf, angka, spasi dan simbol .,#-+=@?!",
         "value doesnt match": "tidak ada pilihan itu!",
+        "name: this room name already exist": "nama: nama ruang sudah ada!",
         "✅ chat box will persist": "✅ kotak obrolan akan tetap ada",
         "❌ chat box back to normal": "❌ kotak obrolan kembali normal"
     }

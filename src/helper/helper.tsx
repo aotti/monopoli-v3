@@ -97,7 +97,8 @@ export function filterInput(input: InputIDType, value: string) {
 
         // ====== CREATE ROOM TYPE ======
         case 'room_password':
-            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/)
+            const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
+            return itsOptional
         case 'select_mode':
             return value.match(/^[survive|5 laps|7 laps]+$/)
         case 'select_board':
@@ -156,7 +157,7 @@ export function sha256(text: string) {
 
 export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
 export function fetcherOptions(args: FetchOptionsType) {
-    const { method, credentials } = args
+    const { method, credentials, setCache } = args
     // get access token
     const accessToken = localStorage.getItem('accessToken')
     // headers
@@ -170,12 +171,15 @@ export function fetcherOptions(args: FetchOptionsType) {
                             'authorization': `Bearer ${accessToken}` }
                     // POST, PUT, DELETE register/login
                     : { 'content-type': 'application/json' }
+    // cache
+    const cache = setCache ? { cache: 'no-store' } : null
+    // method
     switch(method) {
         case 'GET': 
             if(credentials) 
-                return { method: method, headers: headers }
+                return { method: method, headers: headers, ...cache }
             // public
-            return { method: method }
+            return { method: method, ...cache }
         case 'POST': return { method: method, headers: headers, body: args.body }
         case 'PUT': return { method: method, headers: headers, body: args.body }
         case 'DELETE': return { method: method, headers: headers, body: args.body }
@@ -186,6 +190,17 @@ export function fetcher(endpoint: string, options: RequestInit) {
     const host = `${window.location.origin}/api`
     const url = host + endpoint
     return fetch(url, options)
+}
+
+export function resetAllData(gameState: IGameContext) {
+    // remove all local storage
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('onlinePlayers')
+    // remove player info
+    gameState.setMyPlayerInfo(null)
+    gameState.setOnlinePlayers(null)
+    // remove room list
+    gameState.setRoomList([])
 }
 
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */

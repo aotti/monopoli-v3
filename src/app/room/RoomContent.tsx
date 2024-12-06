@@ -1,5 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
+import { applyTooltipEvent, fetcher, fetcherOptions, qS, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
@@ -8,7 +8,7 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { IChat, ICreateRoom } from "../../helper/types";
+import { IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import Pubnub, { ListenerParameters } from "pubnub";
 import { usePubNub } from "pubnub-react";
@@ -22,12 +22,6 @@ export default function RoomContent() {
     const chatFocusRef = useRef()
     clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
 
-    const roomRules = [
-        `board: normal;dice: 2;start: 75k;lose: -25k;mode: 5 laps;curse: 5%`,
-        `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5~10%`,
-        `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`
-    ]
-
     const pubnubClient = usePubNub()
     // pubnub subscribe
     const roomlistChannel = ['monopoli-roomlist']
@@ -37,9 +31,8 @@ export default function RoomContent() {
     useEffect(() => {
         // tooltip (the element must have position: relative)
         applyTooltipEvent()
-
-        // ### get room list
-        // ### get room list
+        // get room list
+        getRoomList(gameState)
 
         // subscribe
         pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel, ...createroomChannel] })
@@ -70,6 +63,7 @@ export default function RoomContent() {
                     const rules = getMessage.rules.match(/.*(?=;max)/)[0]
                     // set to room list
                     gameState.setRoomList(room => [...room, {
+                        room_id: getMessage.room_id,
                         creator: getMessage.creator,
                         room_name: getMessage.room_name,
                         room_password: getMessage.room_password,
@@ -199,7 +193,16 @@ export default function RoomContent() {
                     text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
                     overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
                     {/* card */}
-                    {gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)}
+                    {gameState.roomList.length > 0
+                        ? gameState.roomList.map((room, i) => {
+                            console.log(i, gameState.roomList)
+                            return <RoomCard key={i} roomData={room} />
+                        })
+                        : <div className="m-auto">
+                            <span id="result_message"> there is no game </span>
+                            <img src="https://img.icons8.com/?id=-70EdELqFxwn&format=png&color=000000" className="inline w-10" loading="lazy" />
+                        </div>
+                    }
                 </div>
             </div>
             
@@ -210,4 +213,36 @@ export default function RoomContent() {
             </div>
         </div>
     )
+}
+
+async function getRoomList(gameState: IGameContext) {
+    // result message
+    const resultMessage = qS('#result_message')
+    // fetch
+    const getRoomFetchOptions = fetcherOptions({method: 'GET', credentials: true, setCache: true})
+    const getRoomResponse: IResponse = await (await fetcher('/room', getRoomFetchOptions)).json()
+    // response
+    switch(getRoomResponse.status) {
+        case 200: 
+            // save access token
+            if(getRoomResponse.data[0].token) {
+                localStorage.setItem('accessToken', getRoomResponse.data[0].token)
+                delete getRoomResponse.data[0].token
+            }
+            // get rooms data
+            const rooms = getRoomResponse.data[0].rooms as ICreateRoom['list'][]
+            for(let room of rooms) {
+                // split max player from rules
+                const playerMax = room.rules.match(/max: \d/)[0].split(': ')[1]
+                const rules = room.rules.match(/.*(?=;max)/)[0]
+                room.player_max = +playerMax
+                room.rules = rules
+                // set room list
+                gameState.setRoomList(data => [...data, room])
+            }
+            return
+        default: 
+            resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
+            return
+    }
 }

@@ -7,7 +7,7 @@ import { useMisc } from "../../context/MiscContext"
 import LoadingPage from "../../components/LoadingPage"
 import { useGame } from "../../context/GameContext"
 import { useEffect } from "react"
-import { checkAccessToken, qS } from "../../helper/helper"
+import { checkAccessToken, qS, resetAllData } from "../../helper/helper"
 import Link from "next/link"
 
 export default function HomePage() {
@@ -17,9 +17,8 @@ export default function HomePage() {
     useEffect(() => {
         const resetData = location.search.match('reset=true')
         if(resetData) {
-            // remove local storages
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('onlinePlayers')
+            // reset all data
+            resetAllData(gameState)
         }
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)

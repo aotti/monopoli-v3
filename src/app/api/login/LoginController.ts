@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
-import { ILoggedUsers, IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
+import { IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
 import Controller from "../Controller";
 import { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
 
 export default class LoginController extends Controller {
 
@@ -31,11 +30,7 @@ export default class LoginController extends Controller {
         }
         else if(data) {
             // log user
-            const logData: Omit<ILoggedUsers, 'timeout_token'> = {
-                display_name: data[0].display_name,
-                status: 'online'
-            }
-            const onlinePlayers = await this.logOnlineUsers('log', logData)
+            const onlinePlayers = await this.getOnlinePlayers(data[0])
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
             await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
@@ -54,6 +49,7 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: data[0],
                 token: accessToken,
+                // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -84,7 +80,8 @@ export default class LoginController extends Controller {
         const resultData = {
             player: renewData,
             token: accessToken,
-            onlinePlayers: onlinePlayers
+            // in case client-side not subscribe yet cuz still loading
+            onlinePlayers: onlinePlayers  
         }
         result = this.respond(200, `${action} success`, [resultData])
         // return result

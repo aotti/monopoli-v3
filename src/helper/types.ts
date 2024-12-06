@@ -115,14 +115,18 @@ export interface IQueryUpdate extends IQueryBuilder {
 }
 
 // fetch
+export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'DELETE'}
+
 interface IFetchWithoutBody {
     method: Extract<RequestInitMod['method'], 'GET'>,
-    credentials?: boolean
+    credentials?: boolean,
+    setCache?: boolean,
 }
 interface IFetchWithBody {
     method: Exclude<RequestInitMod['method'], 'GET'>,
     body?: RequestInitMod['body'],
-    credentials?: boolean
+    credentials?: boolean,
+    setCache?: boolean,
 }
 interface IFetchOptions {
     without: Omit<IFetchWithoutBody, 'credentials'> & {headers?: RequestInitMod['headers']},
@@ -130,7 +134,6 @@ interface IFetchOptions {
 }
 export type FetchOptionsType = IFetchWithBody | IFetchWithoutBody
 export type FetchOptionsReturnType<T> = ReturnType<() => T extends IFetchWithoutBody ? IFetchOptions['without'] : IFetchOptions['with']>
-export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'DELETE'}
 
 // token
 export type TokenPayloadType = ExcludeOptionalKeys<IUser> | ExcludeOptionalKeys<IPlayer>
@@ -213,6 +216,7 @@ export interface IChat extends ITokenPayload {
 // create room
 export interface ICreateRoom {
     input: {
+        room_id?: number,
         creator: string,
         room_name: string,
         room_password: string,
@@ -233,6 +237,7 @@ export interface ICreateRoom {
         rules: string,
     },
     list: {
+        room_id: number,
         creator: string,
         room_name: string,
         room_password: string,

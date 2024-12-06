@@ -3,9 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { IPlayer, IResponse } from "../../../helper/types";
 import PlayerController from "./PlayerController";
 
-// to prevent GET method cache
-export const dynamic = 'force-dynamic'
-
 export async function GET(req: NextRequest) {
     // api action
     const action = 'user get stats'
