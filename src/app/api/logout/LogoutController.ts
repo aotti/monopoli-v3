@@ -38,7 +38,10 @@ export default class LogoutController extends Controller {
         const onlinePlayers = await this.logOnlineUsers('out', logData)
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
-        this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+        console.log(isPublished);
+        
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // return result
         return result = this.respond(200, `${action} success`, [])
     }

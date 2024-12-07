@@ -33,7 +33,10 @@ export default class LoginController extends Controller {
             const onlinePlayers = await this.getOnlinePlayers(data[0])
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
-            await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // generate refresh token
             const refreshToken = await this.generateToken({type: 'refresh', payload: data[0]})
             // save refresh token
@@ -75,7 +78,10 @@ export default class LoginController extends Controller {
         const onlinePlayers = await this.getOnlinePlayers(renewData)
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
-        await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+        console.log(isPublished);
+        
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // set result
         const resultData = {
             player: renewData,

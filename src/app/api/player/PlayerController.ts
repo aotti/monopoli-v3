@@ -33,7 +33,10 @@ export default class PlayerController extends Controller {
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
             // publish online players
             const onlineplayerChannel = 'monopoli-onlineplayer'
-            await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 player: data[0],
@@ -79,7 +82,10 @@ export default class PlayerController extends Controller {
             // publish online players
             const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
             const onlineplayerChannel = 'monopoli-onlineplayer'
-            await this.pubnubPublish(onlineplayerChannel, publishData)
+            const isPublished = await this.pubnubPublish(onlineplayerChannel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 avatar: data[0].avatar,
@@ -114,6 +120,7 @@ export default class PlayerController extends Controller {
         const isPublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isPublished);
         
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // set result
         const resultData = {
             token: token

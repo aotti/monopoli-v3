@@ -69,7 +69,10 @@ export default class RoomController extends Controller {
                 ...data[0] as ICreateRoom['list'],
                 onlinePlayers: JSON.stringify(onlinePlayers)
             }
-            await this.pubnubPublish(createroomChannel, publishData)
+            const isPublished = await this.pubnubPublish(createroomChannel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 token: token

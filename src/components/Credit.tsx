@@ -34,7 +34,7 @@ export default function Credit() {
                         <p className="flex justify-between">
                             <span> Acan </span>
                             <span className="border-b-4 border-dotted border-green-400 grow -mt-1 mx-2"></span>
-                            <span> orang jokja </span>
+                            <span> tester </span>
                         </p>
                         <div className="text-center">
                             <button type="button" className="text-white p-2" onClick={() => setShowCredit(false)}> Close </button>
