@@ -20,6 +20,8 @@ export default function RoomPage({ pubnubSetting }) {
     
     // check token for auto login
     useEffect(() => {
+        console.log('check access token - room');
+        
         if(miscState.secret) checkAccessToken(miscState, gameState)
     }, [miscState.secret])
     

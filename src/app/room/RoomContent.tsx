@@ -24,9 +24,10 @@ export default function RoomContent() {
 
     const pubnubClient = usePubNub()
     // pubnub subscribe
-    const roomlistChannel = ['monopoli-roomlist']
-    const onlineplayerChannel = ['monopoli-onlineplayer']
-    const createroomChannel = ['monopoli-createroom']
+    const roomlistChannel = 'monopoli-roomlist'
+    const onlineplayerChannel = 'monopoli-onlineplayer'
+    const createroomChannel = 'monopoli-createroom'
+    const deleteroomChannel = 'monopoli-deleteroom'
     // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
         // tooltip (the element must have position: relative)
@@ -35,12 +36,14 @@ export default function RoomContent() {
         getRoomList(gameState)
 
         // subscribe
-        pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel, ...createroomChannel] })
+        pubnubClient.subscribe({ 
+            channels: [roomlistChannel, onlineplayerChannel, createroomChannel, deleteroomChannel] 
+        })
         // get published message
         const publishedMessage: ListenerParameters = {
             message: (data) => {
-                type GetMessageType = Pubnub.MessageEvent & IChat & ICreateRoom['list'] & {onlinePlayers: string}
-                const getMessage = data.message as GetMessageType
+                type GetMessageType = {onlinePlayers: string, roomCreated: ICreateRoom['list'], roomsLeft:  ICreateRoom['list'][]}
+                const getMessage = data.message as Pubnub.MessageEvent & IChat & GetMessageType
                 // add chat
                 if(getMessage.message_text) {
                     const chatData: Omit<IChat, 'channel'|'token'> = {
@@ -49,6 +52,10 @@ export default function RoomContent() {
                         message_time: getMessage.message_time
                     }
                     miscState.setMessageItems(data => [...data, chatData])
+                    // play notif sound
+                    const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
+                    if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
+                        soundMessageNotif.play()
                 }
                 // update online player
                 if(getMessage.onlinePlayers) {
@@ -57,27 +64,23 @@ export default function RoomContent() {
                     gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
                 }
                 // room created
-                if(getMessage.creator) {
-                    // split max player from rules
-                    const playerMax = getMessage.rules.match(/max: \d/)[0].split(': ')[1]
-                    const rules = getMessage.rules.match(/.*(?=;max)/)[0]
+                if(getMessage.roomCreated) {
                     // set to room list
-                    gameState.setRoomList(room => [...room, {
-                        room_id: getMessage.room_id,
-                        creator: getMessage.creator,
-                        room_name: getMessage.room_name,
-                        room_password: getMessage.room_password,
-                        player_count: getMessage.player_count,
-                        player_max: +playerMax,
-                        rules: rules
-                    }])
+                    gameState.setRoomList(room => [...room, getMessage.roomCreated])
+                }
+                // room deleted
+                if(getMessage.roomsLeft) {
+                    // set rooms left
+                    gameState.setRoomList(getMessage.roomsLeft)
                 }
             }
         }
         pubnubClient.addListener(publishedMessage)
         // unsub and remove listener
         return () => {
-            pubnubClient.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+            pubnubClient.unsubscribe({ 
+                channels: [roomlistChannel, onlineplayerChannel, createroomChannel, deleteroomChannel] 
+            })
             pubnubClient.removeListener(publishedMessage)
         }
     }, [])
@@ -194,10 +197,7 @@ export default function RoomContent() {
                     overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
                     {/* card */}
                     {gameState.roomList.length > 0
-                        ? gameState.roomList.map((room, i) => {
-                            console.log(i, gameState.roomList)
-                            return <RoomCard key={i} roomData={room} />
-                        })
+                        ? gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)
                         : <div className="m-auto">
                             <span id="result_message"> there is no game </span>
                             <img src="https://img.icons8.com/?id=-70EdELqFxwn&format=png&color=000000" className="inline w-10" loading="lazy" />
@@ -219,7 +219,7 @@ async function getRoomList(gameState: IGameContext) {
     // result message
     const resultMessage = qS('#result_message')
     // fetch
-    const getRoomFetchOptions = fetcherOptions({method: 'GET', credentials: true, setCache: true})
+    const getRoomFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
     const getRoomResponse: IResponse = await (await fetcher('/room', getRoomFetchOptions)).json()
     // response
     switch(getRoomResponse.status) {

@@ -82,7 +82,7 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
             else if(setInputValue('display_name', input)) inputValues.display_name = input.value.trim().toLowerCase()
             // error
             else {
-                resultMessage.classList.add('text-red-600')
+                resultMessage.classList.add('text-red-300')
                 resultMessage.textContent = errorLoginRegister(input.id, miscState.language)
                 return
             }
@@ -90,7 +90,7 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
     }
     // confirm password
     if(inputValues.password != inputValues.confirm_password) {
-        resultMessage.classList.add('text-red-600')
+        resultMessage.classList.add('text-red-300')
         resultMessage.textContent = 'confirm password doesnt match!'
         return
     }
@@ -120,7 +120,7 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
             return
         // error
         default: 
-            resultMessage.classList.add('text-red-600')
+            resultMessage.classList.add('text-red-300')
             resultMessage.textContent = `❌ ${registerResponse.status}: ${registerResponse.message}`
             return
     }

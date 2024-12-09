@@ -53,8 +53,8 @@ export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
-    showNotif: 'normal'|'with_button',
-    setShowNotif: Dispatch<SetStateAction<IGameContext['showNotif']>>,
+    showGameNotif: 'normal'|'with_button',
+    setShowGameNotif: Dispatch<SetStateAction<IGameContext['showGameNotif']>>,
     rollNumber: 'dice'|'turn',
     setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
     // side buttons
@@ -73,9 +73,18 @@ export interface IGameContext {
     setOtherPlayerInfo: Dispatch<SetStateAction<IPlayer>>,
     onlinePlayers: ILoggedUsers[],
     setOnlinePlayers: Dispatch<SetStateAction<ILoggedUsers[]>>,
-    // room
+    spectator: boolean,
+    setSpectator: Dispatch<SetStateAction<boolean>>,
+    // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
+    roomError: string,
+    setRoomError: Dispatch<SetStateAction<string>>,
+    roomInputPassword: string,
+    setRoomInputPassword: Dispatch<SetStateAction<string>>,
+    // game
+    myCurrentGame: number,
+    setMyCurrentGame: Dispatch<SetStateAction<number>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -120,13 +129,13 @@ export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'
 interface IFetchWithoutBody {
     method: Extract<RequestInitMod['method'], 'GET'>,
     credentials?: boolean,
-    setCache?: boolean,
+    noCache?: boolean,
 }
 interface IFetchWithBody {
     method: Exclude<RequestInitMod['method'], 'GET'>,
     body?: RequestInitMod['body'],
     credentials?: boolean,
-    setCache?: boolean,
+    noCache?: boolean,
 }
 interface IFetchOptions {
     without: Omit<IFetchWithoutBody, 'credentials'> & {headers?: RequestInitMod['headers']},
@@ -176,8 +185,9 @@ export interface IResponse<T = any> {
 // input ID
 type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
 type ChatType = 'channel'|'message_text'|'message_time'
-type CreateRoomType = 'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'
-export type InputIDType = PlayerType|ChatType|CreateRoomType
+type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'
+type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType
 
 // user
 export interface ILoggedUsers {
@@ -203,7 +213,7 @@ export interface IPlayer extends ITokenPayload {
     display_name: string,
     game_played: number,
     worst_money_lost: number,
-    avatar: string
+    avatar: string,
 }
 
 export interface IChat extends ITokenPayload {
@@ -213,7 +223,7 @@ export interface IChat extends ITokenPayload {
     message_time: string
 }
 
-// create room
+// room
 export interface ICreateRoom {
     input: {
         room_id?: number,
@@ -244,6 +254,19 @@ export interface ICreateRoom {
         player_count: number,
         player_max: number,
         rules: string,
+        status: 'prepare'|'playing',
+    }
+}
+
+export interface IJoinRoom {
+    input: {
+        action?: 'room join',
+        room_id: string,
+        room_password: string,
+        confirm_room_password?: string,
+        display_name: string,
+        money_start: string,
+        token?: string,
     }
 }
 

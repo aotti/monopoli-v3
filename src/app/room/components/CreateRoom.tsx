@@ -201,7 +201,7 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
                     const isRoomNameExist = gameState.roomList.map(v => v.room_name).indexOf(roomName)
                     // room name exist
                     if(isRoomNameExist !== -1) {
-                        resultMessage.classList.add('text-red-600')
+                        resultMessage.classList.add('text-red-300')
                         resultMessage.textContent = translateUI({lang: miscState.language, text: 'name: this room name already exist'})
                         return
                     }
@@ -218,7 +218,7 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             else if(setInputValue('select_max_player', input)) inputValues.select_max_player = `${input.value}`
             // error
             else {
-                resultMessage.classList.add('text-red-600')
+                resultMessage.classList.add('text-red-300')
                 resultMessage.textContent = errorCreateRoom(input.id, miscState.language)
                 return
             }
@@ -254,12 +254,12 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             createButton.removeAttribute('disabled')
             // special for room name error
             if(typeof createRoomResponse.message == 'string' && createRoomResponse.message.match('name:')) {
-                resultMessage.classList.add('text-red-600')
+                resultMessage.classList.add('text-red-300')
                 resultMessage.textContent = translateUI({lang: miscState.language, text: createRoomResponse.message as any})
                 return
             }
             // result message
-            resultMessage.classList.add('text-red-600')
+            resultMessage.classList.add('text-red-300')
             resultMessage.textContent = `❌ ${createRoomResponse.status}: ${createRoomResponse.message}`
             return
     }

@@ -19,6 +19,7 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
             // room list
             ? <div id="chat_container" className="h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2">
                 <ChatContainer />
+                <audio id="sound_message_notif" src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/message_notif-DgTswdqDvWjUqgZhXNsbgl9c6DAWPg.mp3"></audio>
             </div>
             // game room
             : <div id="chat_container" className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
@@ -35,6 +36,7 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
                         <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                     </button>
                 </form>
+                <audio id="sound_message_notif" src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/message_notif-DgTswdqDvWjUqgZhXNsbgl9c6DAWPg.mp3"></audio>
             </div>
     )
 }

@@ -1,4 +1,4 @@
-import { ICreateRoom, IQueryInsert, IQuerySelect, IResponse } from "../../../helper/types";
+import { ICreateRoom, IJoinRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 
 export default class RoomController extends Controller {
@@ -53,20 +53,34 @@ export default class RoomController extends Controller {
             }
         }
         // run query
-        const {data, error} = await this.dq.insert(queryObject as IQueryInsert)
+        const {data, error} = await this.dq.insert<ICreateRoom['list']>(queryObject as IQueryInsert)
         if(error) {
-            // player not found error
-            if(error.code == 'P0001') result = this.respond(403, 'forbidden', [])
+            // player not found error / already created room
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
             // other error
             else result = this.respond(500, error.message, [])
         }
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            // publish online players
+            // split max player from rules
+            const playerMax = data[0].rules.match(/max: \d/)[0].split(': ')[1]
+            const rules = data[0].rules.match(/.*(?=;max)/)[0]
+            // create new room data
+            const newRoomData: ICreateRoom['list'] = {
+                room_id: data[0].room_id,
+                creator: data[0].creator,
+                room_name: data[0].room_name,
+                room_password: data[0].room_password,
+                player_count: data[0].player_count,
+                player_max: +playerMax,
+                rules: rules,
+                status: data[0].status
+            }
+            // publish realtime data
             const createroomChannel = 'monopoli-createroom'
             const publishData = {
-                ...data[0] as ICreateRoom['list'],
+                roomCreated: newRoomData,
                 onlinePlayers: JSON.stringify(onlinePlayers)
             }
             const isPublished = await this.pubnubPublish(createroomChannel, publishData)
@@ -128,6 +142,140 @@ export default class RoomController extends Controller {
             // set result
             const resultData = {
                 rooms: extractedData,
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
+    async joinRoom(action: string, payload: IJoinRoom['input']) {
+        let result: IResponse
+        
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+        // set payload for db query , , , 
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_join_room',
+            function_args: {
+                tmp_room_id: +payload.room_id,
+                tmp_room_password: payload.room_password,
+                tmp_display_name: payload.display_name,
+                tmp_money_start: +payload.money_start,
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
+        if(error) {
+            // player already join / wrong password
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
+        }
+        else {
+            // renew log online player
+            const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            // publish realtime data
+            const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
+            const onlineplayerChannel = 'monopoli-onlineplayer'
+            const isPublished = await this.pubnubPublish(onlineplayerChannel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                joinData: data[0],
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+    
+    async softDelete(action: string, payload: ICreateRoom['input']) {
+        let result: IResponse
+        
+        // return result
+        return result
+    }
+
+    async hardDelete(action: string, payload: ICreateRoom['input'] & {display_name}) {
+        let result: IResponse
+
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+        // check the creator and the deletor (lemao)
+        if(payload.creator != payload.display_name) return this.respond(403, 'forbidden', [])
+        // set payload for db query
+        const queryObject: IQuerySelect = {
+            table: 'rooms',
+            function: 'mnp_delete_room',
+            function_args: {
+                tmp_creator: payload.creator,
+                tmp_name: payload.room_name
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.select<ICreateRoom['list']>(queryObject)
+        if(error) {
+            // room not found
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
+        }
+        else {
+            // renew log online player
+            const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            // new rooms left data
+            const newRoomsLeft: ICreateRoom['list'][] = []
+            data.forEach(v => {
+                // split max player from rules
+                const playerMax = v.rules.match(/max: \d/)[0].split(': ')[1]
+                const rules = v.rules.match(/.*(?=;max)/)[0]
+                // push data
+                newRoomsLeft.push({
+                    room_id: v.room_id,
+                    creator: v.creator,
+                    room_name: v.room_name,
+                    room_password: v.room_password,
+                    player_count: v.player_count,
+                    player_max: +playerMax,
+                    rules: rules,
+                    status: v.status
+                })
+            })
+            // publish realtime data
+            const deleteroomChannel = 'monopoli-deleteroom'
+            const publishData = {
+                roomsLeft: newRoomsLeft,
+                onlinePlayers: JSON.stringify(onlinePlayers)
+            }
+            const isPublished = await this.pubnubPublish(deleteroomChannel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                deleted_room: payload.room_name,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])

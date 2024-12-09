@@ -30,6 +30,8 @@ export default function GameContent() {
     // game history ref
     const gameHistoryRef = useRef()
     clickOutsideElement(gameHistoryRef, () => gameState.setShowGameHistory(false))
+    // return spectator to false
+    const spectatorLeave = () => gameState.setSpectator(false)
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
@@ -37,7 +39,7 @@ export default function GameContent() {
             {/* tutorial: relative z-10 */}
             <div className={`${miscState.showTutorial == 'tutorial_gameroom_3' ? 'relative z-10' : ''}
             flex flex-col gap-2 lg:gap-6 self-start mt-6 mx-2 w-20 lg:w-24 h-[calc(100%-5rem)]`}>
-                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs active:opacity-75" draggable={false}>
+                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs active:opacity-75" onClick={spectatorLeave} draggable={false}>
                     <span data-tooltip={'back to room, not leave game'} className="relative"> 
                         {translateUI({lang: miscState.language, text: 'Back to room'})} 
                     </span>
@@ -66,20 +68,22 @@ export default function GameContent() {
                 <BoardNormal />
                 {/* <BoardDelta /> */}
                 {/* <BoardTwoWay /> */}
-                {/* game buttons */}
-                <div className="absolute top-[45%] w-full text-2xs lg:text-xs">
-                    <div className="flex flex-col gap-2 lg:gap-3 mx-auto w-fit px-2 text-center">
-                        <GameButtons />
+                {/* game buttons */
+                gameState.spectator
+                    ? null
+                    : <div className="absolute top-[45%] w-full text-2xs lg:text-xs">
+                        <div className="flex flex-col gap-2 lg:gap-3 mx-auto w-fit px-2 text-center">
+                            <GameButtons />
+                        </div>
                     </div>
-                </div>
+                }
                 {/* game notif + roll number */}
-                <div className={`${gameState.showNotif || gameState.rollNumber ? 'block' : 'hidden'} 
+                <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'hidden'} 
                 absolute h-full w-full text-center text-2xs lg:text-xs`}>
-                    <GameNotif />
                     {
                         gameState.rollNumber !== null
                             ? <RollNumber />
-                            : null
+                            : <GameNotif />
                     }
                 </div>
             </section>

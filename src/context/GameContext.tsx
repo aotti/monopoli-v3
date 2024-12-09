@@ -8,7 +8,7 @@ const GameContext = createContext<IGameContext>(null)
 export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // board
     const [showTileImage, setShowTileImage] = useState<IGameContext['showTileImage']>(null)
-    const [showNotif, setShowNotif] = useState<IGameContext['showNotif']>(null)
+    const [showGameNotif, setShowGameNotif] = useState<IGameContext['showGameNotif']>(null)
     const [rollNumber, setRollNumber] = useState<IGameContext['rollNumber']>(null)
     // side buttons
     const [gameSideButton, setGameSideButton] = useState<IGameContext['gameSideButton']>(null)
@@ -19,8 +19,13 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>(null)
+    const [spectator, setSpectator] = useState(false)
     // room
     const [roomList, setRoomList] = useState([])
+    const [roomError, setRoomError] = useState<string>(null)
+    const [roomInputPassword, setRoomInputPassword] = useState<string>(null)
+    // game
+    const [myCurrentGame, setMyCurrentGame] = useState<number>(null)
 
     useEffect(() => {
         // set online players if exist
@@ -32,8 +37,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         // board
         showTileImage: showTileImage,
         setShowTileImage: setShowTileImage,
-        showNotif: showNotif,
-        setShowNotif: setShowNotif,
+        showGameNotif: showGameNotif,
+        setShowGameNotif: setShowGameNotif,
         rollNumber: rollNumber,
         setRollNumber: setRollNumber,
         // side buttons
@@ -52,9 +57,18 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setOtherPlayerInfo: setOtherPlayerInfo,
         onlinePlayers: onlinePlayers,
         setOnlinePlayers: setOnlinePlayers,
+        spectator: spectator,
+        setSpectator: setSpectator,
         // room
         roomList: roomList,
         setRoomList: setRoomList,
+        roomError: roomError,
+        setRoomError: setRoomError,
+        roomInputPassword: roomInputPassword,
+        setRoomInputPassword: setRoomInputPassword,
+        // game
+        myCurrentGame: myCurrentGame,
+        setMyCurrentGame: setMyCurrentGame,
     }
 
     return (

@@ -4,6 +4,7 @@ import { filterInput, verifyAccessToken } from "../../helper/helper";
 import { ILoggedUsers, IPlayer, IResponse, IToken, IUser, TokenPayloadType } from "../../helper/types";
 import { cookies } from "next/headers";
 import Pubnub from "pubnub";
+import { NextRequest } from "next/server";
 
 export default class Controller {
     protected dq = new DatabaseQueries()
@@ -39,6 +40,8 @@ export default class Controller {
             case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
             // room
             case 'room create': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'room hard delete': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'room join': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])
@@ -104,6 +107,21 @@ export default class Controller {
             Controller.loggedUsers[renewUser].timeout_token = loggedToken
             return Controller.loggedUsers
         }
+    }
+
+    /**
+     * @description check authorization header token 
+     */
+    checkAuthorization(req: NextRequest) {
+        const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
+        if(!accessToken) {
+            // check refresh token
+            const refreshToken = cookies().get('refreshToken')?.value
+            // access & refresh token empty
+            if(!refreshToken) 
+                return this.respond(403, 'forbidden', [])
+        }
+        return this.respond(200, 'token ok', [{accessToken: accessToken}])
     }
     
     protected generateToken<T extends IToken>(args: T): Promise<string>

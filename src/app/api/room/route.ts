@@ -1,26 +1,17 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { IResponse } from "../../../helper/types";
 import RoomController from "./RoomController";
+import Controller from "../Controller";
 
 export async function GET(req: NextRequest) {
     // api action
     const action = 'room get list'
     // check authorization
-    const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
-    if(!accessToken) {
-        // check refresh token
-        const refreshToken = cookies().get('refreshToken')?.value
-        // access & refresh token empty
-        if(!refreshToken) 
-            return NextResponse.json<IResponse>({
-                status: 403,
-                message: 'forbidden',
-                data: []
-            }, {status: 403})
-    }
+    const controller = new Controller()
+    const isAuth = controller.checkAuthorization(req)
+    // token empty
+    if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
-    const payload = { token: accessToken }
+    const payload = { token: isAuth.data[0].accessToken }
     // process
     const roomController = new RoomController()
     const result = await roomController.getRooms(action, payload as any)
@@ -34,23 +25,56 @@ export async function POST(req: NextRequest) {
     // client payload
     const payload = await req.json()
     // check authorization
-    const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
-    if(!accessToken) {
-        // check refresh token
-        const refreshToken = cookies().get('refreshToken')?.value
-        // access & refresh token empty
-        if(!refreshToken) 
-            return NextResponse.json<IResponse>({
-                status: 403,
-                message: 'forbidden',
-                data: []
-            }, {status: 403})
-    }
+    const controller = new Controller()
+    const isAuth = controller.checkAuthorization(req)
+    // token empty
+    if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
-    payload.token = accessToken
+    payload.token = isAuth.data[0].accessToken
     // process
     const roomController = new RoomController()
     const result = await roomController.create(action, payload)
+    // return data to client
+    return NextResponse.json(result, {status: result.status})
+}
+
+export async function PUT(req: NextRequest) {
+    // client payload
+    const payload = await req.json()
+    // check authorization
+    const controller = new Controller()
+    const isAuth = controller.checkAuthorization(req)
+    // token empty
+    if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
+    // token exist, add to payload
+    payload.token = isAuth.data[0].accessToken
+    // get action
+    const action = payload.action
+    delete payload.action
+    // process
+    const roomController = new RoomController()
+    const result = action == 'room join' 
+                ? await roomController.joinRoom(action, payload)
+                : await roomController.softDelete(action, payload)
+    // return data to client
+    return NextResponse.json(result, {status: result.status})
+}
+
+export async function DELETE(req: NextRequest) {
+    // api action
+    const action = 'room hard delete'
+    // client payload
+    const payload = await req.json()
+    // check authorization
+    const controller = new Controller()
+    const isAuth = controller.checkAuthorization(req)
+    // token empty
+    if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
+    // token exist, add to payload
+    payload.token = isAuth.data[0].accessToken
+    // process
+    const roomController = new RoomController()
+    const result = await roomController.hardDelete(action, payload)
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

@@ -103,13 +103,13 @@ async function avatarUpdate(display_name: string, avatar_url: string, gameState:
                 delete avatarResponse.data[0].token
             }
             // set my player data
-            const newAvatar: IPlayer = {
-                display_name: gameState.myPlayerInfo.display_name,
-                game_played: gameState.myPlayerInfo.game_played,
-                worst_money_lost: gameState.myPlayerInfo.worst_money_lost,
-                avatar: avatarResponse.data[0].avatar,
-            }
-            gameState.setMyPlayerInfo(newAvatar)
+            gameState.setMyPlayerInfo(info => {
+                const newAvatar: IPlayer = {
+                    ...info,
+                    avatar: avatarResponse.data[0].avatar,
+                }
+                return newAvatar
+            })
             // submit button normal
             uploadButton.removeAttribute('disabled')
             return

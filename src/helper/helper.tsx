@@ -96,23 +96,30 @@ export function filterInput(input: InputIDType, value: string) {
             return value.match(/^[\d{2}:\d{2}]{4,5}$/)
 
         // ====== CREATE ROOM TYPE ======
+        case 'room_id': 
+            return value.match(/\d+/)
         case 'room_password':
+        case 'confirm_room_password': 
             const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
             return itsOptional
         case 'select_mode':
-            return value.match(/^[survive|5 laps|7 laps]+$/)
+            return value.match(/^survive$|^5 laps$|^7 laps$/)
         case 'select_board':
-            return value.match(/^[normal|delta|2 way|2 jalur]+$/i)
+            return value.match(/^normal$|^delta$|^2 way$|^2 jalur$/i)
         case 'select_dice':
-            return value.match(/1$|2$/)
+            return value.match(/^1$|^2$/)
+        case 'money_start':
         case 'select_money_start':
-            return value.match(/50000$|75000$|100000$/)
+            return value.match(/^50000$|^75000$|^100000$/)
         case 'select_money_lose':
-            return value.match(/25000$|50000$|75000$/)
+            return value.match(/^25000$|^50000$|^75000$/)
         case 'select_curse':
-            return value.match(/5$|10$|15$/)
+            return value.match(/^5$|^10$|^15$/)
         case 'select_max_player':
-            return value.match(/2$|3$|4$/)
+            return value.match(/^2$|^3$|^4$/)
+        // ====== JOIN ROOM TYPE ======
+        case 'rules': 
+            return value.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
     }
 }
 
@@ -136,6 +143,7 @@ export function errorCreateRoom(input: string, language: ITranslate['lang']) {
             return translateUI({lang: language, text: `name: length must be 4 to 12 | only letter, number and spaces allowed`})
         case 'room_password':
             return `${input}: ${translateUI({lang: language, text: 'length must be 3 to 8 | only letter, number, spaces and symbols .,#-+@ allowed'})}`
+        case 'room_id':
         case 'select_mode':
         case 'select_board':
         case 'select_dice':
@@ -157,7 +165,7 @@ export function sha256(text: string) {
 
 export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
 export function fetcherOptions(args: FetchOptionsType) {
-    const { method, credentials, setCache } = args
+    const { method, credentials, noCache } = args
     // get access token
     const accessToken = localStorage.getItem('accessToken')
     // headers
@@ -172,7 +180,7 @@ export function fetcherOptions(args: FetchOptionsType) {
                     // POST, PUT, DELETE register/login
                     : { 'content-type': 'application/json' }
     // cache
-    const cache = setCache ? { cache: 'no-store' } : null
+    const cache = noCache ? { cache: 'no-store' } : null
     // method
     switch(method) {
         case 'GET': 

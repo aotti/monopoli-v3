@@ -31,7 +31,7 @@ export default class PlayerController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            // publish online players
+            // publish realtime data
             const onlineplayerChannel = 'monopoli-onlineplayer'
             const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
             console.log(isPublished);
@@ -79,7 +79,7 @@ export default class PlayerController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            // publish online players
+            // publish realtime data
             const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
             const onlineplayerChannel = 'monopoli-onlineplayer'
             const isPublished = await this.pubnubPublish(onlineplayerChannel, publishData)

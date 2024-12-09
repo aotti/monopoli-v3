@@ -15,11 +15,10 @@ export default function HomePage() {
     const gameState = useGame()
 
     useEffect(() => {
+        // get url params
         const resetData = location.search.match('reset=true')
-        if(resetData) {
-            // reset all data
-            resetAllData(gameState)
-        }
+        // reset all data
+        if(resetData) resetAllData(gameState)
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
     }, [miscState.secret])
