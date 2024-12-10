@@ -202,7 +202,7 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
                     // room name exist
                     if(isRoomNameExist !== -1) {
                         resultMessage.classList.add('text-red-300')
-                        resultMessage.textContent = translateUI({lang: miscState.language, text: 'name: this room name already exist'})
+                        resultMessage.textContent = translateUI({lang: miscState.language, text: 'name: room name already exist'})
                         return
                     }
                 }
@@ -213,7 +213,7 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             else if(setInputValue('select_board', input)) inputValues.select_board = input.value.trim().toLowerCase()
             else if(setInputValue('select_dice', input)) inputValues.select_dice = `${input.value}`
             else if(setInputValue('select_money_start', input)) inputValues.select_money_start = `${input.value}`
-            else if(setInputValue('select_money_lose', input)) inputValues.select_money_lose = `-${input.value}`
+            else if(setInputValue('select_money_lose', input)) inputValues.select_money_lose = `${input.value}`
             else if(setInputValue('select_curse', input)) inputValues.select_curse = `${input.value}`
             else if(setInputValue('select_max_player', input)) inputValues.select_max_player = `${input.value}`
             // error

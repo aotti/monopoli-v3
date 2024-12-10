@@ -1,11 +1,10 @@
 import { cookies } from "next/headers";
 import { IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
 import Controller from "../Controller";
-import { NextRequest } from "next/server";
 
 export default class LoginController extends Controller {
 
-    async login(action: string, payload: Pick<IUser, 'username'|'password'>, req: NextRequest) {
+    async login(action: string, payload: Pick<IUser, 'username'|'password'>) {
         let result: IResponse
 
         // filter payload
@@ -31,9 +30,10 @@ export default class LoginController extends Controller {
         else if(data) {
             // log user
             const onlinePlayers = await this.getOnlinePlayers(data[0])
+            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -42,7 +42,6 @@ export default class LoginController extends Controller {
             // save refresh token
             cookies().set('refreshToken', refreshToken, { 
                 path: '/',
-                domain: req.nextUrl.hostname,
                 maxAge: 604800 * 2, // 1 week * 2
                 httpOnly: true,
                 sameSite: 'strict',
@@ -53,7 +52,7 @@ export default class LoginController extends Controller {
                 player: data[0],
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
-                onlinePlayers: onlinePlayers
+                onlinePlayers: onlinePlayers.data
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -76,9 +75,10 @@ export default class LoginController extends Controller {
         const [accessToken, renewData] = isVerified
         // renew/log online player
         const onlinePlayers = await this.getOnlinePlayers(renewData)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
-        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
         console.log(isPublished);
         
         if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -87,7 +87,7 @@ export default class LoginController extends Controller {
             player: renewData,
             token: accessToken,
             // in case client-side not subscribe yet cuz still loading
-            onlinePlayers: onlinePlayers  
+            onlinePlayers: onlinePlayers.data
         }
         result = this.respond(200, `${action} success`, [resultData])
         // return result

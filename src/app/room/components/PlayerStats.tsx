@@ -13,7 +13,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
     const isUploadAllowed = playerData.display_name == gameState.myPlayerInfo.display_name ? true : false
     // set my player status
     const getMyData = onlinePlayers.length > 0 ? onlinePlayers.map(v => v.display_name).indexOf(playerData.display_name) : -1
-    const amOnline = getMyData === -1 
+    const isMeOnline = getMyData === -1 
                     ? translateUI({lang: miscState.language, text: 'away'}) 
                     : translateUI({lang: miscState.language, text: onlinePlayers[getMyData].status})
 
@@ -68,7 +68,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                     </div>
                     <div>
                         <p> status: </p>
-                        <p className="text-green-400"> {amOnline} </p>
+                        <p className="text-green-400"> {isMeOnline} </p>
                     </div>
                 </div>
             </div>

@@ -31,9 +31,10 @@ export default class PlayerController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish realtime data
             const onlineplayerChannel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -79,8 +80,9 @@ export default class PlayerController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish realtime data
-            const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
+            const publishData = {onlinePlayers: JSON.stringify(onlinePlayers.data)}
             const onlineplayerChannel = 'monopoli-onlineplayer'
             const isPublished = await this.pubnubPublish(onlineplayerChannel, publishData)
             console.log(isPublished);
@@ -112,10 +114,11 @@ export default class PlayerController extends Controller {
         if(filteredPayload.status !== 200) return filteredPayload
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // publish chat
         const publishData = {
             ...payload, 
-            onlinePlayers: JSON.stringify(onlinePlayers)
+            onlinePlayers: JSON.stringify(onlinePlayers.data)
         }
         const isPublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isPublished);

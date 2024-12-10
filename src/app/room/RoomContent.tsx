@@ -10,10 +10,9 @@ import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
 import { IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
-import Pubnub, { ListenerParameters } from "pubnub";
-import { usePubNub } from "pubnub-react";
+import PubNub, { Listener } from "pubnub";
 
-export default function RoomContent() {
+export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
     const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
@@ -22,7 +21,8 @@ export default function RoomContent() {
     const chatFocusRef = useRef()
     clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
 
-    const pubnubClient = usePubNub()
+    // pubnub
+    const pubnubClient = new PubNub(pubnubSetting)
     // pubnub subscribe
     const roomlistChannel = 'monopoli-roomlist'
     const onlineplayerChannel = 'monopoli-onlineplayer'
@@ -40,11 +40,12 @@ export default function RoomContent() {
             channels: [roomlistChannel, onlineplayerChannel, createroomChannel, deleteroomChannel] 
         })
         // get published message
-        const publishedMessage: ListenerParameters = {
+        const publishedMessage: Listener = {
             message: (data) => {
                 type GetMessageType = {onlinePlayers: string, roomCreated: ICreateRoom['list'], roomsLeft:  ICreateRoom['list'][]}
-                const getMessage = data.message as Pubnub.MessageEvent & IChat & GetMessageType
+                const getMessage = data.message as PubNub.Payload & IChat & GetMessageType
                 // add chat
+                const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
                 if(getMessage.message_text) {
                     const chatData: Omit<IChat, 'channel'|'token'> = {
                         display_name: getMessage.display_name,
@@ -53,7 +54,6 @@ export default function RoomContent() {
                     }
                     miscState.setMessageItems(data => [...data, chatData])
                     // play notif sound
-                    const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
                     if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
                         soundMessageNotif.play()
                 }
@@ -231,14 +231,12 @@ async function getRoomList(gameState: IGameContext) {
             }
             // get rooms data
             const rooms = getRoomResponse.data[0].rooms as ICreateRoom['list'][]
+            // set room list
             for(let room of rooms) {
-                // split max player from rules
-                const playerMax = room.rules.match(/max: \d/)[0].split(': ')[1]
-                const rules = room.rules.match(/.*(?=;max)/)[0]
-                room.player_max = +playerMax
-                room.rules = rules
-                // set room list
                 gameState.setRoomList(data => [...data, room])
+                // check if my current game exist
+                const joinedRoom = +localStorage.getItem('joinedRoom')
+                if((room as any).id == joinedRoom) gameState.setMyCurrentGame(joinedRoom)
             }
             return
         default: 

@@ -14,7 +14,7 @@
 
         "__TRANSLATE BAGIAN ROOM LIST__": "__TRANSLATE BAGIAN ROOM LIST__",
         "chat box": "kotak obrolan",
-        "player list": "daftar player",
+        "player list": "daftar pemain",
         "view": "lihat",
         "chat here": "ngobrol gan",
         "upload your avatar": "unggah avatar kau!",
@@ -34,10 +34,11 @@
         "player lose if the money less than this limit": "pemain kalah jika uangnya lewati batas ini",
         "Curse": "Kutukan",
         "cursed tile price will go up/down around this %": "harga petak terkutuk akan naik/turun diantara % ini",
-        "Max Player": "Pemain Maks",
-        "Count": "Jumlah",
-        "Max": "Maks",
         "Rules": "Aturan",
+        "Count": "Jumlah",
+        "player(s)": "pemain",
+        "Max Player": "Pemain Maks",
+        "Max": "Maks",
         "Creator": "Pembuat",
         "Join": "Gabung",
         "Spectate": "Nonton",
@@ -191,7 +192,7 @@
         "name: length must be 4 to 12 | only letter, number and spaces allowed": "nama: panjang harus 4~12 | hanya huruf, angka dan spasi",
         "only letter, number, spaces and symbols .,#-+=@?! allowed": "hanya huruf, angka, spasi dan simbol .,#-+=@?!",
         "value doesnt match": "tidak ada pilihan itu!",
-        "name: this room name already exist": "nama: nama ruang sudah ada!",
+        "name: room name already exist": "nama: nama ruang sudah ada!",
         "✅ chat box will persist": "✅ kotak obrolan akan tetap ada",
         "❌ chat box back to normal": "❌ kotak obrolan kembali normal"
     }

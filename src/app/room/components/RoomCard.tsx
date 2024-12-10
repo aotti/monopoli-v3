@@ -65,7 +65,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Count'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_count} player(s)`} readOnly />
+                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_count} ${translateUI({lang: miscState.language, text: 'player(s)'})}`} readOnly />
                 </div>
                 {/* max player */}
                 <div className="flex justify-between p-2">
@@ -73,7 +73,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Max'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="player_max" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_max} player(s)`} readOnly />
+                    <input type="text" id="player_max" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_max} ${translateUI({lang: miscState.language, text: 'player(s)'})}`} readOnly />
                 </div>
                 {/* creator */}
                 <div className="flex justify-between p-2">

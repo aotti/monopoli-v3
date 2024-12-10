@@ -98,7 +98,7 @@ export type PG_PromiseType<Data> = Promise<{ data: Data[] | null, error: Postgre
  */
 interface IQueryBuilder {
     table: 'users'|'players'|'rooms'|'games';
-    selectColumn?: string | number;
+    selectColumn?: string;
     function?: string;
     function_args?: {[key: string]: string | number | boolean};
     order?: [string, 'asc' | 'desc']

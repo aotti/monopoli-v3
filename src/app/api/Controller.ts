@@ -1,17 +1,15 @@
 import { jwtVerify, SignJWT } from "jose";
 import { DatabaseQueries } from "../../helper/DatabaseQueries";
 import { filterInput, verifyAccessToken } from "../../helper/helper";
-import { ILoggedUsers, IPlayer, IResponse, IToken, IUser, TokenPayloadType } from "../../helper/types";
+import { ILoggedUsers, IPlayer, IResponse, IToken, TokenPayloadType } from "../../helper/types";
 import { cookies } from "next/headers";
-import Pubnub from "pubnub";
 import { NextRequest } from "next/server";
+import PubNub from "pubnub";
 
 export default class Controller {
     protected dq = new DatabaseQueries()
-    // log users online
-    private static loggedUsers: ILoggedUsers[] = []
     // pubnub for publish
-    private pubnubServer = new Pubnub({
+    private pubnubServer = new PubNub({
         subscribeKey: process.env.PUBNUB_SUB_KEY,
         publishKey: process.env.PUBNUB_PUB_KEY,
         userId: process.env.PUBNUB_UUID
@@ -73,39 +71,76 @@ export default class Controller {
         }
         // renew my player
         const renewMyPlayer = await this.logOnlineUsers('renew', logData)
-        // if null, log my player
-        const logMyPlayer = !renewMyPlayer ? await this.logOnlineUsers('log', logData) : null
-        return renewMyPlayer || logMyPlayer
+        console.log({renewMyPlayer});
+        
+        if(renewMyPlayer.status === 200) return renewMyPlayer
+        // if data empty, log my player
+        const logMyPlayer = await this.logOnlineUsers('log', logData)
+        console.log({logMyPlayer});
+        
+        if(logMyPlayer.status === 200) return logMyPlayer
     }
 
     protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Omit<ILoggedUsers, 'timeout_token'>) {
+        const getLoggedUsers = cookies().get('loggedUsers')?.value
+        let loggedUsers: ILoggedUsers[] = getLoggedUsers ? JSON.parse(getLoggedUsers) : []
+
+        // logging users
         if(action == 'log') {
+            // check if user exist
+            const isUserExist = loggedUsers.map(v => v.display_name).indexOf(payload.display_name)
+            if(isUserExist !== -1) {
+                // check if token expired
+                const [error, verify] = await verifyAccessToken({
+                    action: 'verify-only', 
+                    token: loggedUsers[isUserExist].timeout_token, 
+                    secret: process.env.ACCESS_TOKEN_SECRET
+                })
+                // token not expired yet
+                if(verify) return this.respond(403, 'this account is online', [])
+            }
+            // token expired
             // create token for timeout
             const loggedToken = await this.generateAccessToken(payload as any, '5min')
-            // check if user exist
-            const isUserExist = Controller.loggedUsers.map(v => v.display_name).indexOf(payload.display_name)
-            if(isUserExist !== -1) return Controller.loggedUsers
-            // user not exist log user + token
-            Controller.loggedUsers.push({
+            // log the user
+            loggedUsers.push({
                 display_name: payload.display_name,
                 status: payload.status,
                 timeout_token: loggedToken
             })
-            return Controller.loggedUsers
+            // update cookie
+            updateLoggedUsersCookie()
+            return this.respond(200, 'user logged', loggedUsers)
         }
+        // remove user
         else if(action == 'out') {
-            Controller.loggedUsers = Controller.loggedUsers.filter(p => p.display_name != payload.display_name)
-            return Controller.loggedUsers
+            loggedUsers = loggedUsers.filter(p => p.display_name != payload.display_name)
+            // update cookie
+            updateLoggedUsersCookie()
+            return this.respond(200, 'user logged', loggedUsers)
         }
+        // renew user timeout token
         else if(action == 'renew') {
             // create token for timeout
             const loggedToken = await this.generateAccessToken(payload as any, '5min')
             // renew if user still logged
-            const renewUser = Controller.loggedUsers.map(user => user.display_name).indexOf(payload.display_name)
-            if(renewUser === -1) return null
+            const renewUser = loggedUsers.map(user => user.display_name).indexOf(payload.display_name)
+            if(renewUser === -1) return this.respond(403, 'user not renew', [])
             // update my token
-            Controller.loggedUsers[renewUser].timeout_token = loggedToken
-            return Controller.loggedUsers
+            loggedUsers[renewUser].timeout_token = loggedToken
+            // update cookie
+            updateLoggedUsersCookie()
+            return this.respond(200, 'user logged', loggedUsers)
+        }
+
+        // update cookies
+        function updateLoggedUsersCookie() {
+            cookies().set('loggedUsers', JSON.stringify(loggedUsers), {
+                path: '/',
+                maxAge: 604800 * 2, // 1 week * 2
+                httpOnly: true,
+                sameSite: 'strict',
+            })
         }
     }
 

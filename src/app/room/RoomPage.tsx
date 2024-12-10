@@ -8,20 +8,13 @@ import { useGame } from "../../context/GameContext";
 import { useEffect } from "react";
 import { useMisc } from "../../context/MiscContext";
 import { checkAccessToken } from "../../helper/helper";
-import Pubnub from "pubnub";
-import { PubNubProvider } from "pubnub-react";
 
 export default function RoomPage({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
-
-    // pubnub
-    const pubnubClient = new Pubnub(pubnubSetting)
     
     // check token for auto login
     useEffect(() => {
-        console.log('check access token - room');
-        
         if(miscState.secret) checkAccessToken(miscState, gameState)
     }, [miscState.secret])
     
@@ -33,13 +26,11 @@ export default function RoomPage({ pubnubSetting }) {
                     <HeaderContent />
                 </header>
     
-                <PubNubProvider client={pubnubClient}>
-                    <main>
-                        {gameState.myPlayerInfo && gameState.onlinePlayers
-                            ? <RoomContent />
-                            : <LoadingPage />}
-                    </main>
-                </PubNubProvider>
+                <main>
+                    {gameState.myPlayerInfo && gameState.onlinePlayers
+                        ? <RoomContent pubnubSetting={pubnubSetting} />
+                        : <LoadingPage />}
+                </main>
             </div>
             {/* orientation portrait warning */}
             <ScreenPortraitWarning />

@@ -1,16 +1,25 @@
+import { cookies } from "next/headers";
 import { ICreateRoom, IJoinRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 
 export default class RoomController extends Controller {
-    private static tempRoomList: string[] = []
-
     private filterRoomList(room_name: string) {
+        // get room list
+        const getRoomListCookie = cookies().get('tempRoomList')?.value
+        const tempRoomList: any[] = getRoomListCookie ? JSON.parse(getRoomListCookie) : []
         // check if room name is already exist
-        const isRoomNameExist = RoomController.tempRoomList.indexOf(room_name)
+        const isRoomNameExist = tempRoomList.indexOf(room_name)
         if(isRoomNameExist !== -1) return this.respond(400, 'name: room name already exist', [])
         // push to temp room list
-        RoomController.tempRoomList.push(room_name)
-        return this.respond(200, 'room name ok', [])
+        tempRoomList.push(room_name)
+        // save to cookie
+        cookies().set('tempRoomList', JSON.stringify(tempRoomList), {
+            path: '/',
+            maxAge: 604800 * 2, // 1 week * 2
+            httpOnly: true,
+            sameSite: 'strict',
+        })
+        return this.respond(200, 'room name ok', tempRoomList)
     }
 
     async create(action: string, payload: ICreateRoom['input']) {
@@ -38,7 +47,7 @@ export default class RoomController extends Controller {
             room_name: payload.room_name,
             room_password: payload.room_password,
             money_start: +select_money_start,
-            rules: `board: ${select_board};dice: ${select_dice};start: ${select_money_start};lose: ${select_money_lose};mode: ${select_mode};curse: ${select_curse};max: ${select_max_player}`
+            rules: `board: ${select_board};dice: ${select_dice};start: ${select_money_start};lose: ${-select_money_lose};mode: ${select_mode};curse: ${select_curse};max: ${select_max_player}`
         }
         // set payload for db query
         const queryObject: Partial<IQueryInsert> = {
@@ -63,6 +72,7 @@ export default class RoomController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            if(onlinePlayers.status !== 200) return onlinePlayers
             // split max player from rules
             const playerMax = data[0].rules.match(/max: \d/)[0].split(': ')[1]
             const rules = data[0].rules.match(/.*(?=;max)/)[0]
@@ -81,7 +91,7 @@ export default class RoomController extends Controller {
             const createroomChannel = 'monopoli-createroom'
             const publishData = {
                 roomCreated: newRoomData,
-                onlinePlayers: JSON.stringify(onlinePlayers)
+                onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
             const isPublished = await this.pubnubPublish(createroomChannel, publishData)
             console.log(isPublished);
@@ -139,6 +149,15 @@ export default class RoomController extends Controller {
                 }
                 return tempNewData
             }) as ICreateRoom['list'][]
+            // modify extracted data
+            for(let exData of extractedData) {
+                // split max player from rules
+                const playerMax = exData.rules.match(/max: \d/)[0].split(': ')[1]
+                const rules = exData.rules.match(/.*(?=;max)/)[0]
+                // add player max & modify rules
+                exData.player_max = +playerMax
+                exData.rules = rules
+            }
             // set result
             const resultData = {
                 rooms: extractedData,
@@ -185,10 +204,10 @@ export default class RoomController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish realtime data
-            const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
             const onlineplayerChannel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayerChannel, publishData)
+            const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -245,6 +264,7 @@ export default class RoomController extends Controller {
         else {
             // renew log online player
             const onlinePlayers = await this.getOnlinePlayers(tpayload)
+            if(onlinePlayers.status !== 200) return onlinePlayers
             // new rooms left data
             const newRoomsLeft: ICreateRoom['list'][] = []
             data.forEach(v => {
@@ -267,7 +287,7 @@ export default class RoomController extends Controller {
             const deleteroomChannel = 'monopoli-deleteroom'
             const publishData = {
                 roomsLeft: newRoomsLeft,
-                onlinePlayers: JSON.stringify(onlinePlayers)
+                onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
             const isPublished = await this.pubnubPublish(deleteroomChannel, publishData)
             console.log(isPublished);
