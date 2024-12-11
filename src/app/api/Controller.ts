@@ -5,6 +5,22 @@ import { ILoggedUsers, IPlayer, IResponse, IToken, TokenPayloadType } from "../.
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import PubNub from "pubnub";
+import { createClient } from "redis";
+
+// redis
+const redisClient = createClient({
+    username: 'default',
+    password: process.env.REDIS_PASS,
+    socket: {
+        host: 'redis-16533.c334.asia-southeast2-1.gce.redns.redis-cloud.com',
+        port: 16533,
+        timeout: 10_000 // 10 seconds
+    }
+});
+// listener
+redisClient.on('error', err => console.log('Redis Client Error', err));
+// connect to redis
+redisClient.connect().catch(err => console.log(err))
 
 export default class Controller {
     protected dq = new DatabaseQueries()
@@ -20,6 +36,36 @@ export default class Controller {
             channel: channel,
             message: data
         })
+    }
+
+    constructor() {
+        // this.redisReset('loggedPlayers')
+    }
+
+    /**
+     * @description used for log online users & room names
+     */
+    protected async redisSet(key: string, value: any[]) {
+        // set new data
+        const setResult = await redisClient.set(key, JSON.stringify(value));
+        return setResult
+    }
+
+    /**
+     * @description used for retrieve logged online users & room names
+     * @returns JSON.parse value
+     */
+    protected async redisGet(key: string) {
+        // get existing data
+        const getResult = await redisClient.get(key);
+        return JSON.parse(getResult) as any[] || []
+    }
+
+    protected async redisReset(key: string) {
+        // reset existing data
+        const resetResult = await redisClient.del(key)
+        console.log(resetResult);
+        
     }
 
     protected filterPayload<T>(action: string, payload: T) {
@@ -71,76 +117,99 @@ export default class Controller {
         }
         // renew my player
         const renewMyPlayer = await this.logOnlineUsers('renew', logData)
-        console.log({renewMyPlayer});
-        
-        if(renewMyPlayer.status === 200) return renewMyPlayer
+        if(renewMyPlayer.status === 200 || renewMyPlayer.status === 400) return renewMyPlayer
         // if data empty, log my player
         const logMyPlayer = await this.logOnlineUsers('log', logData)
-        console.log({logMyPlayer});
-        
         if(logMyPlayer.status === 200) return logMyPlayer
     }
 
     protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Omit<ILoggedUsers, 'timeout_token'>) {
-        const getLoggedUsers = cookies().get('loggedUsers')?.value
-        let loggedUsers: ILoggedUsers[] = getLoggedUsers ? JSON.parse(getLoggedUsers) : []
-
+        const getLoggedPlayers = await this.redisGet('loggedPlayers')
+        let loggedPlayers: ILoggedUsers[] = getLoggedPlayers.length > 0 ? getLoggedPlayers : []
+        // check players token each request
+        if(loggedPlayers.length > 0) {
+            const getPlayersToken = loggedPlayers.map(v => v.timeout_token)
+            // verify players token
+            for(let token of getPlayersToken) {
+                const [error, verify] = await verifyAccessToken({
+                    action: 'verify-only', 
+                    token: token, 
+                    secret: process.env.ACCESS_TOKEN_SECRET
+                })
+                // filter expired players
+                if(error) loggedPlayers = loggedPlayers.filter(v => v.timeout_token != token)
+            }
+        }
         // logging users
         if(action == 'log') {
             // check if user exist
-            const isUserExist = loggedUsers.map(v => v.display_name).indexOf(payload.display_name)
-            if(isUserExist !== -1) {
-                // check if token expired
-                const [error, verify] = await verifyAccessToken({
-                    action: 'verify-only', 
-                    token: loggedUsers[isUserExist].timeout_token, 
-                    secret: process.env.ACCESS_TOKEN_SECRET
-                })
-                // token not expired yet
-                if(verify) return this.respond(403, 'this account is online', [])
-            }
+            const isUserExist = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
+            // match the token
+            const isTokenMatch = matchTimeoutToken(isUserExist)
+            // for renew, if token match = proceed to renew
+            // for log, if token match = dont log player
+            if(isTokenMatch) return this.respond(403, 'this account is online', [])
+            console.log(action, isTokenMatch);
+            
             // token expired
             // create token for timeout
-            const loggedToken = await this.generateAccessToken(payload as any, '5min')
-            // log the user
-            loggedUsers.push({
+            const timeoutToken = await this.generateAccessToken(payload as any, '5min')
+            // log the player
+            loggedPlayers.push({
                 display_name: payload.display_name,
                 status: payload.status,
-                timeout_token: loggedToken
+                timeout_token: timeoutToken
             })
-            // update cookie
-            updateLoggedUsersCookie()
-            return this.respond(200, 'user logged', loggedUsers)
+            // save timeout token for identifier
+            cookies().set('timeoutToken', timeoutToken, { 
+                path: '/',
+                maxAge: 604800 * 2, // 1 week * 2
+                httpOnly: true,
+                sameSite: 'strict',
+            })
+            // save to redis
+            await this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
         }
         // remove user
         else if(action == 'out') {
-            loggedUsers = loggedUsers.filter(p => p.display_name != payload.display_name)
-            // update cookie
-            updateLoggedUsersCookie()
-            return this.respond(200, 'user logged', loggedUsers)
+            loggedPlayers = loggedPlayers.filter(p => p.display_name != payload.display_name)
+            // save to redis
+            this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
         }
         // renew user timeout token
         else if(action == 'renew') {
             // create token for timeout
             const loggedToken = await this.generateAccessToken(payload as any, '5min')
             // renew if user still logged
-            const renewUser = loggedUsers.map(user => user.display_name).indexOf(payload.display_name)
-            if(renewUser === -1) return this.respond(403, 'user not renew', [])
+            const renewUser = loggedPlayers.map(user => user.display_name).indexOf(payload.display_name)
+            if(renewUser === -1) return this.respond(403, 'nothing to renew', [])
+            // match the token
+            const isTokenMatch = matchTimeoutToken(renewUser)
+            console.log(action, isTokenMatch);
+            
+            // for renew, if token match = proceed to renew
+            // for log, if token match = dont log player
+            if(!isTokenMatch) return this.respond(400, 'this account is online', [])
             // update my token
-            loggedUsers[renewUser].timeout_token = loggedToken
-            // update cookie
-            updateLoggedUsersCookie()
-            return this.respond(200, 'user logged', loggedUsers)
+            loggedPlayers[renewUser].timeout_token = loggedToken
+            // save to redis
+            await this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
         }
 
-        // update cookies
-        function updateLoggedUsersCookie() {
-            cookies().set('loggedUsers', JSON.stringify(loggedUsers), {
-                path: '/',
-                maxAge: 604800 * 2, // 1 week * 2
-                httpOnly: true,
-                sameSite: 'strict',
-            })
+        /**
+         * @description match timeout token as identifier for user
+         */
+        function matchTimeoutToken(index: number) {
+            const getTimeoutToken = cookies().get('timeoutToken')?.value
+            if(getTimeoutToken && getTimeoutToken == loggedPlayers[index]?.timeout_token)
+                return true
+            return false
         }
     }
 

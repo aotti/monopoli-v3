@@ -1,12 +1,11 @@
 import { cookies } from "next/headers";
 import { ILoggedUsers, IPlayer, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
-import { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
 export default class LogoutController extends Controller {
 
-    async logout(action: string, req: NextRequest) {
+    async logout(action: string) {
         console.log(action);
         
         let result: IResponse
@@ -21,21 +20,27 @@ export default class LogoutController extends Controller {
         const verify = await jwtVerify<IPlayer>(refreshToken, secret)
         // token expired
         if(!verify?.payload) return result = this.respond(403, 'forbidden', [])
+        // set player secret to empty
+        cookies().set('timeoutToken', '', {
+            path: '/',
+            maxAge: 0, // expire & remove in 0 seconds
+            httpOnly: true,
+            sameSite: 'strict',
+        })
         // set refresh token to empty
         cookies().set('refreshToken', '', { 
             path: '/',
-            domain: req.nextUrl.hostname,
-            maxAge: 0, // 1 week * 2
+            maxAge: 0, // expire & remove in 0 seconds
             httpOnly: true,
             sameSite: 'strict'
         })
         // remove player from log
         // renew log online player
-        const logData: Omit<ILoggedUsers, 'timeout_token'> = {
+        const logData: Partial<ILoggedUsers> = {
             display_name: verify.payload.display_name,
             status: 'online'
         }
-        const onlinePlayers = await this.logOnlineUsers('out', logData)
+        const onlinePlayers = await this.logOnlineUsers('out', logData as ILoggedUsers)
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
         const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})

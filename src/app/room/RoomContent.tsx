@@ -234,10 +234,9 @@ async function getRoomList(gameState: IGameContext) {
             // set room list
             for(let room of rooms) {
                 gameState.setRoomList(data => [...data, room])
-                // check if my current game exist
-                const joinedRoom = +localStorage.getItem('joinedRoom')
-                if((room as any).id == joinedRoom) gameState.setMyCurrentGame(joinedRoom)
             }
+            // set my current game
+            gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
             return
         default: 
             resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`

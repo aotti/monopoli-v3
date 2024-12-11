@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react"
 import { useMisc } from "../../../context/MiscContext"
 import { applyTooltipEvent, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper"
-import { ICreateRoom, IGameContext, IJoinRoom, IPlayer, IResponse } from "../../../helper/types"
+import { ICreateRoom, IGameContext, IJoinRoom, IMiscContext, IPlayer, IResponse } from "../../../helper/types"
 import { useGame } from "../../../context/GameContext"
 import Link from "next/link"
 
@@ -30,7 +30,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
 
     return (
         <div className={`relative w-[calc(100%-52.5%)] h-56 lg:h-60 border-2 ${roomStatusColor}`}>
-            <form onSubmit={ev => manageFormSubmits(ev, roomId, gameState)}>
+            <form onSubmit={ev => manageFormSubmits(ev, roomId, miscState, gameState)}>
                 {/* room id */}
                 <input type="hidden" id="room_id" defaultValue={roomId} />
                 <input type="hidden" id={`room_password_${roomId}`} />
@@ -174,7 +174,7 @@ function getInputPassword(roomId: number, setShowInputPassword) {
     setShowInputPassword(false)
 }
 
-function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, gameState: IGameContext) {
+function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     // submitter
     const submitterId = (ev.nativeEvent as any).submitter.id
@@ -190,7 +190,7 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, gameS
 
     switch(submitterId) {
         // join room function
-        case `join_button_${roomId}`: joinRoom(formInputs, roomId, gameState); break
+        case `join_button_${roomId}`: joinRoom(formInputs, roomId, miscState, gameState); break
         // spectate room function
         case `spectate_button_${roomId}`: spectateRoom(roomId, gameState); break
         // delete room function
@@ -218,7 +218,7 @@ function spectateRoom(roomId: number, gameState: IGameContext) {
     deleteButton ? deleteButton.removeAttribute('disabled') : null
 }
 
-async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, gameState: IGameContext) {
+async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // submit buttons
     const joinButton = qS(`#join_button_${roomId}`) as HTMLButtonElement
     const spectateButton = qS(`#spectate_button_${roomId}`) as HTMLButtonElement
@@ -286,7 +286,6 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
     switch(joinRoomResponse.status) {
         case 200: 
             // set joined room
-            localStorage.setItem('joinedRoom', roomId.toString())
             gameState.setMyCurrentGame(roomId)
             // move to game room
             const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
