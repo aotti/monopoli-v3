@@ -13,9 +13,9 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
         applyTooltipEvent()
     }, [])
 
-    const roomId = (roomData as any).id as number || roomData.room_id
-    const roomConfirmPassword = (roomData as any).password as string || roomData.room_password
-    const roomCreator = (roomData as any).display_name as string || roomData.creator
+    const roomId = roomData.room_id
+    const roomConfirmPassword = roomData.room_password
+    const roomCreator = roomData.creator
     // check if room have password
     const isRoomLocked = roomConfirmPassword ? `🔒` : ''
     // modify curse text
@@ -65,7 +65,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Count'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_count} ${translateUI({lang: miscState.language, text: 'player(s)'})}`} readOnly />
+                    <input type="text" id="player_count" className="bg-transparent text-white w-3/5 border-b border-b-white" value={`${roomData?.player_count} ${translateUI({lang: miscState.language, text: 'player(s)'})}`} readOnly />
                 </div>
                 {/* max player */}
                 <div className="flex justify-between p-2">

@@ -36,7 +36,9 @@ export default class RoomController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-        
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
@@ -75,9 +77,6 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            if(onlinePlayers.status !== 200) return onlinePlayers
             // split max player from rules
             const playerMax = data[0].rules.match(/max: \d/)[0].split(': ')[1]
             const rules = data[0].rules.match(/.*(?=;max)/)[0]
@@ -135,37 +134,25 @@ export default class RoomController extends Controller {
         // set payload for db query
         const queryObject: IQuerySelect = {
             table: 'rooms',
-            selectColumn: this.dq.columnSelector('rooms', 1234567)
+            function: 'mnp_get_rooms_and_mygame'
         }
         // run query
-        const {data, error} = await this.dq.select(queryObject)
+        const {data, error} = await this.dq.select<ICreateRoom['server']>(queryObject)
         if(error) {
             result = this.respond(500, error.message, [])
         }
         else {
-            // extract display_name from creator_id
-            // convert object data to 2d array [[key, value]]
-            const extractData = data.map(v => Object.entries(v))
-            // convert extract data to object
-            const extractedData = extractData.map(temp => {
-                const tempExtractData = temp.map(v => v[1] && typeof v[1] == 'object' ? Object.entries(v[1]).flat() : v )
-                const tempNewData = {}
-                for(let [key, value] of tempExtractData) {
-                    tempNewData[key] = value 
-                }
-                return tempNewData
-            }) as ICreateRoom['list'][]
             // modify extracted data
-            for(let exData of extractedData) {
+            for(let d of data) {
                 // split max player from rules
-                const playerMax = exData.rules.match(/max: \d/)[0].split(': ')[1]
-                const rules = exData.rules.match(/.*(?=;max)/)[0]
+                const playerMax = d.rules.match(/max: \d/)[0].split(': ')[1]
+                const rules = d.rules.match(/.*(?=;max)/)[0]
                 // add player max & modify rules
-                exData.player_max = +playerMax
-                exData.rules = rules
+                d.player_max = +playerMax
+                d.rules = rules
                 // push to temp room list to prevent duplicate room name
-                for(let [key, value] of Object.entries(exData)) {
-                    if(key == 'name') {
+                for(let [key, value] of Object.entries(d)) {
+                    if(key == 'room_name') {
                         // filter room name
                         const filterRoomList = await this.filterRoomList('push', value as string)
                         if(filterRoomList.status !== 200) continue
@@ -174,19 +161,24 @@ export default class RoomController extends Controller {
             }
             // get joined room from cookie
             const getJoinedRoom = cookies().get('joinedRoom')?.value
-            // delete cookie if expired
-            if(!getJoinedRoom) cookies().set('joinedRoom', '', {
-                path: '/',
-                maxAge: 0, // expire & remove in 0 seconds
-                httpOnly: true,
-                sameSite: 'strict',
-            })
+            // set joined room if exist
+            let isMyGameExist: number = null
+            if(!getJoinedRoom) {
+                isMyGameExist = data.map((v, i) => v.player_list.match(tpayload.display_name) ? i : null).filter(i => i !== null)[0]
+                if(isMyGameExist && isMyGameExist !== -1) 
+                    cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
+                        path: '/',
+                        maxAge: 604800 * 2, // 1 week * 2
+                        httpOnly: true,
+                        sameSite: 'strict',
+                    })
+            }
             // match joined room with room list
-            const isJoinedRoomExist = extractedData.map((v: any) => v.id).indexOf(getJoinedRoom)
+            const isJoinedRoomExist = data.map(v => v.room_id).indexOf(isMyGameExist || +getJoinedRoom)
             // set result
             const resultData = {
-                currentGame: isJoinedRoomExist !== -1 ? (extractedData[isJoinedRoomExist] as any).id : null,
-                rooms: extractedData,
+                currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
+                rooms: data,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -204,7 +196,9 @@ export default class RoomController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
@@ -228,12 +222,14 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish realtime data
-            const onlineplayerChannel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            const joinplayerChannel = 'monopoli-joinplayer'
+            const publishData = {
+                joinedPlayers: data[0].player_count,
+                joinedRoomId: data[0].room_id,
+                onlinePlayers: JSON.stringify(onlinePlayers.data)
+            }
+            const isPublished = await this.pubnubPublish(joinplayerChannel, publishData)
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -271,7 +267,9 @@ export default class RoomController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
@@ -295,9 +293,6 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            if(onlinePlayers.status !== 200) return onlinePlayers
             // remove room name from list
             await this.filterRoomList('out', payload.room_name)
             // new rooms left data

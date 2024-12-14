@@ -8,7 +8,7 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
+import { GetMessageType, IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 
@@ -27,6 +27,7 @@ export default function RoomContent({ pubnubSetting }) {
     const roomlistChannel = 'monopoli-roomlist'
     const onlineplayerChannel = 'monopoli-onlineplayer'
     const createroomChannel = 'monopoli-createroom'
+    const joinplayerChannel = 'monopoli-joinplayer'
     const deleteroomChannel = 'monopoli-deleteroom'
     // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
@@ -37,12 +38,11 @@ export default function RoomContent({ pubnubSetting }) {
 
         // subscribe
         pubnubClient.subscribe({ 
-            channels: [roomlistChannel, onlineplayerChannel, createroomChannel, deleteroomChannel] 
+            channels: [roomlistChannel, onlineplayerChannel, createroomChannel, joinplayerChannel, deleteroomChannel] 
         })
         // get published message
         const publishedMessage: Listener = {
             message: (data) => {
-                type GetMessageType = {onlinePlayers: string, roomCreated: ICreateRoom['list'], roomsLeft:  ICreateRoom['list'][]}
                 const getMessage = data.message as PubNub.Payload & IChat & GetMessageType
                 // add chat
                 const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
@@ -67,6 +67,18 @@ export default function RoomContent({ pubnubSetting }) {
                 if(getMessage.roomCreated) {
                     // set to room list
                     gameState.setRoomList(room => [...room, getMessage.roomCreated])
+                }
+                // player join
+                if(getMessage.joinedRoomId) {
+                    // update room list
+                    gameState.setRoomList(rooms => {
+                        const updatedRooms = [...rooms]
+                        // find joined room
+                        const findJoined = rooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
+                        if(findJoined !== -1) updatedRooms[findJoined].player_count = getMessage.joinedPlayers
+                        // return rooms
+                        return updatedRooms
+                    })
                 }
                 // room deleted
                 if(getMessage.roomsLeft) {
@@ -233,7 +245,9 @@ async function getRoomList(gameState: IGameContext) {
             const rooms = getRoomResponse.data[0].rooms as ICreateRoom['list'][]
             // set room list
             for(let room of rooms) {
-                gameState.setRoomList(data => [...data, room])
+                gameState.setRoomList(data => [...data, room].filter((obj1, i, arr) => 
+                    arr.findLastIndex(obj2 => obj2.room_name == obj1.room_name) === i
+                ))
             }
             // set my current game
             gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)

@@ -14,6 +14,7 @@ const redisClient = createClient({
     socket: {
         host: 'redis-16533.c334.asia-southeast2-1.gce.redns.redis-cloud.com',
         port: 16533,
+        connectTimeout: 5_000, // 5 seconds
         timeout: 10_000 // 10 seconds
     }
 });
@@ -148,7 +149,7 @@ export default class Controller {
             const isTokenMatch = matchTimeoutToken(isUserExist)
             // for renew, if token match = proceed to renew
             // for log, if token match = dont log player
-            if(isTokenMatch) return this.respond(403, 'this account is online', [])
+            if(isTokenMatch) return this.respond(400, 'account in use', [])
             console.log(action, isTokenMatch);
             
             // token expired
@@ -183,7 +184,7 @@ export default class Controller {
         // renew user timeout token
         else if(action == 'renew') {
             // create token for timeout
-            const loggedToken = await this.generateAccessToken(payload as any, '5min')
+            const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // renew if user still logged
             const renewUser = loggedPlayers.map(user => user.display_name).indexOf(payload.display_name)
             if(renewUser === -1) return this.respond(403, 'nothing to renew', [])
@@ -193,9 +194,16 @@ export default class Controller {
             
             // for renew, if token match = proceed to renew
             // for log, if token match = dont log player
-            if(!isTokenMatch) return this.respond(400, 'this account is online', [])
+            if(!isTokenMatch) return this.respond(400, 'account in use', [])
             // update my token
-            loggedPlayers[renewUser].timeout_token = loggedToken
+            loggedPlayers[renewUser].timeout_token = timeoutToken
+            // update timeout token for identifier
+            cookies().set('timeoutToken', timeoutToken, { 
+                path: '/',
+                maxAge: 604800 * 2, // 1 week * 2
+                httpOnly: true,
+                sameSite: 'strict',
+            })
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response

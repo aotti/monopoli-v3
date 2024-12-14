@@ -12,7 +12,9 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-        
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
@@ -29,9 +31,6 @@ export default class PlayerController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish realtime data
             const onlineplayerChannel = 'monopoli-onlineplayer'
             const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
@@ -58,7 +57,9 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
@@ -78,9 +79,6 @@ export default class PlayerController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            if(onlinePlayers.status !== 200) return onlinePlayers
             // publish realtime data
             const publishData = {onlinePlayers: JSON.stringify(onlinePlayers.data)}
             const onlineplayerChannel = 'monopoli-onlineplayer'
@@ -108,13 +106,12 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-
-        // filter payload
-        const filteredPayload = this.filterPayload(action, payload)
-        if(filteredPayload.status !== 200) return filteredPayload
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
         if(onlinePlayers.status !== 200) return onlinePlayers
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
         // publish chat
         const publishData = {
             ...payload, 

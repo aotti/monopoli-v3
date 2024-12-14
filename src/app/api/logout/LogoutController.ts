@@ -20,8 +20,21 @@ export default class LogoutController extends Controller {
         const verify = await jwtVerify<IPlayer>(refreshToken, secret)
         // token expired
         if(!verify?.payload) return result = this.respond(403, 'forbidden', [])
+        // remove player from log
+        const logData: Partial<ILoggedUsers> = {
+            display_name: verify.payload.display_name,
+            status: 'online'
+        }
+        const onlinePlayers = await this.logOnlineUsers('out', logData as ILoggedUsers)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // set player secret to empty
         cookies().set('timeoutToken', '', {
+            path: '/',
+            maxAge: 0, // expire & remove in 0 seconds
+            httpOnly: true,
+            sameSite: 'strict',
+        })
+        cookies().set('joinedRoom', '', {
             path: '/',
             maxAge: 0, // expire & remove in 0 seconds
             httpOnly: true,
@@ -34,13 +47,6 @@ export default class LogoutController extends Controller {
             httpOnly: true,
             sameSite: 'strict'
         })
-        // remove player from log
-        // renew log online player
-        const logData: Partial<ILoggedUsers> = {
-            display_name: verify.payload.display_name,
-            status: 'online'
-        }
-        const onlinePlayers = await this.logOnlineUsers('out', logData as ILoggedUsers)
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
         const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})

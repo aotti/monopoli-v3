@@ -22,6 +22,15 @@ export interface ITooltip {
     arrow: ['top'|'left'|'right'|'bottom', 'start'|'middle'|'end'],
 }
 
+// pubnub message
+export type GetMessageType = {
+    onlinePlayers: string, 
+    roomCreated: ICreateRoom['list'], 
+    roomsLeft:  ICreateRoom['list'][],
+    joinedPlayers: number,
+    joinedRoomId: number,
+}
+
 // context
 export interface IMiscProvider {
     accessSecret: string, 
@@ -253,6 +262,17 @@ export interface ICreateRoom {
         room_password: string,
         player_count: number,
         player_max: number,
+        rules: string,
+        status: 'prepare'|'playing',
+    },
+    server: {
+        room_id: number,
+        creator: string,
+        room_name: string,
+        room_password: string,
+        player_count: number,
+        player_max: number,
+        player_list: string,
         rules: string,
         status: 'prepare'|'playing',
     }
