@@ -148,12 +148,14 @@ export default function RoomContent({ pubnubSetting }) {
                                 // list of online players
                                 : <PlayerList onlinePlayers={onlinePlayers} />
                         }
-                        {/* chat input */}
+                        {/* chat form */}
                         <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
+                            {/* inputs */}
                             <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
                             <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
                             onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
+                            {/* submit chat */}
                             <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                                 <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                             </button>

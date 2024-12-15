@@ -87,7 +87,7 @@ export function filterInput(input: InputIDType, value: string) {
         // ====== CHAT TYPE ======
         // websocket message channel
         case 'channel': 
-            return value.match(/monopoli-roomlist|monopoli-gameroom-\d{1,3}$/)
+            return value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/)
         // message text can have letter, number, whitespace, symbol (.,#-+@)
         case 'message_text': 
             return value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/)

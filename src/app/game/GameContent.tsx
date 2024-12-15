@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { applyTooltipEvent, translateUI } from "../../helper/helper"
+import { applyTooltipEvent, qS, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -16,22 +16,65 @@ import Link from "next/link"
 import RollNumber from "./components/board/RollNumber"
 import TutorialGameRoom from "./components/TutorialGameRoom"
 import { clickOutsideElement } from "../../helper/click-outside"
+import PubNub, { Listener } from "pubnub"
+import { IChat } from "../../helper/types"
 
-export default function GameContent() {
+export default function GameContent({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
     // click outside element
     const gameSideButtonRef = useRef()
     clickOutsideElement(gameSideButtonRef, () => gameState.setGameSideButton(null))
-    // tooltip (the element must have position: relative)
-    useEffect(() => {
-        applyTooltipEvent()
-    }, [])
     // game history ref
     const gameHistoryRef = useRef()
     clickOutsideElement(gameHistoryRef, () => gameState.setShowGameHistory(false))
     // return spectator to false
     const spectatorLeave = () => gameState.setSpectator(false)
+
+    // game room id
+    const [gameRoomId, setGameRoomId] = useState<string>(null)
+    // pubnub
+    const pubnubClient = new PubNub(pubnubSetting)
+    // tooltip (the element must have position: relative)
+    useEffect(() => {
+        applyTooltipEvent()
+
+        const gameroomParam = location.search.match(/id=\d+$/)[0].split('=')[1]
+        setGameRoomId(gameroomParam)
+        // pubnub channels
+        const gameroomChannel = `monopoli-gameroom-${gameroomParam}`
+        // subscribe
+        pubnubClient.subscribe({ 
+            channels: [gameroomChannel] 
+        })
+        // get published message
+        const publishedMessage: Listener = {
+            message: (data) => {
+                const getMessage = data.message as PubNub.Payload & IChat
+                // add chat
+                const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
+                if(getMessage.message_text) {
+                    const chatData: Omit<IChat, 'channel'|'token'> = {
+                        display_name: getMessage.display_name,
+                        message_text: getMessage.message_text,
+                        message_time: getMessage.message_time
+                    }
+                    miscState.setMessageItems(data => [...data, chatData])
+                    // play notif sound
+                    if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
+                        soundMessageNotif.play()
+                }
+            }
+        }
+        pubnubClient.addListener(publishedMessage)
+        // unsub and remove listener
+        return () => {
+            pubnubClient.unsubscribe({ 
+                channels: [gameroomChannel] 
+            })
+            pubnubClient.removeListener(publishedMessage)
+        }
+    }, [])
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
@@ -107,7 +150,7 @@ export default function GameContent() {
                 {/* chat */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'chat'} setGameSideButton={gameState.setGameSideButton} />
-                    <ChatBox page="game" />
+                    <ChatBox page="game" id={gameRoomId} />
                 </div>
             </div>
 

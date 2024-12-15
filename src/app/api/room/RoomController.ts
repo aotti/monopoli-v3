@@ -165,7 +165,7 @@ export default class RoomController extends Controller {
             let isMyGameExist: number = null
             if(!getJoinedRoom) {
                 isMyGameExist = data.map((v, i) => v.player_list.match(tpayload.display_name) ? i : null).filter(i => i !== null)[0]
-                if(isMyGameExist && isMyGameExist !== -1) 
+                if(typeof isMyGameExist == 'number' && isMyGameExist !== -1) 
                     cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
                         path: '/',
                         maxAge: 604800 * 2, // 1 week * 2
@@ -174,7 +174,9 @@ export default class RoomController extends Controller {
                     })
             }
             // match joined room with room list
-            const isJoinedRoomExist = data.map(v => v.room_id).indexOf(isMyGameExist || +getJoinedRoom)
+            const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
+            console.log(isMyGameExist, getJoinedRoom, isJoinedRoomExist);
+            
             // set result
             const resultData = {
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,

@@ -23,8 +23,9 @@ export default function Credit() {
             h-[calc(100vh-1rem)] w-[calc(100vw-1rem)]`}>
                 <div className="flex flex-col gap-2 justify-center bg-darkblue-1 border-8bit-text p-1">
                     {/* head */}
-                    <div className="text-center border-b-2">
+                    <div className="flex justify-between text-center border-b-2">
                         <span> credit </span>
+                        <span> v3.0.0 </span>
                     </div>
                     {/* body */}
                     <div className="flex flex-col gap-2 text-center text-green-400 w-72 lg:w-96 h-40 lg:h-52 overflow-y-scroll">

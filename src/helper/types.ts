@@ -226,7 +226,7 @@ export interface IPlayer extends ITokenPayload {
 }
 
 export interface IChat extends ITokenPayload {
-    channel: 'monopoli-roomlist',
+    channel: string,
     display_name: string,
     message_text: string,
     message_time: string
