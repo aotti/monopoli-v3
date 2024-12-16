@@ -89,6 +89,8 @@ async function leaveGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscCon
             // move to room list
             const link = qS('#gotoRoom') as HTMLAnchorElement
             link.click()
+            // set my current game
+            gameState.setMyCurrentGame(null)
             // enable submit buttons
             leaveButton.textContent = tempButtonText
             leaveButton.removeAttribute('disabled')
