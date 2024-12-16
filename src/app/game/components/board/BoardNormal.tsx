@@ -123,9 +123,13 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const { name, price, img, info } = data as TileCityType 
     // price label
     const priceText = `after:block after:content-[attr(data-price)]`
+    // get room info
+    const getGameRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
     // modify info
+    const curse = gameState.gameRoomInfo[getGameRoomInfo]?.curse
+    const curseRand = curse > 5 ? `5~${curse}%` : `5%`
     const newInfo = name.match('Cursed')
-                    ? `${name};5~10%;${info}`
+                    ? `${name};${curseRand};${info}`
                     : `${name};${info}`
 
     return (

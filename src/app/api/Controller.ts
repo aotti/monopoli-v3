@@ -87,6 +87,9 @@ export default class Controller {
             case 'room create': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'room hard delete': [filterStatus, filterMessage] = loopKeyValue(); break
             case 'room join': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'room leave': [filterStatus, filterMessage] = loopKeyValue(); break
+            // game
+            case 'game get player': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])
@@ -103,7 +106,7 @@ export default class Controller {
         }
     }
 
-    protected respond<T=any>(s: number, m: string | object, d: T[]) {
+    protected respond<T=any>(s: number, m: string, d: T[]) {
         return {
             status: s,
             message: m,
@@ -173,14 +176,6 @@ export default class Controller {
             // response
             return this.respond(200, 'user logged', loggedPlayers)
         }
-        // remove user
-        else if(action == 'out') {
-            loggedPlayers = loggedPlayers.filter(p => p.display_name != payload.display_name)
-            // save to redis
-            this.redisSet('loggedPlayers', loggedPlayers)
-            // response
-            return this.respond(200, 'user logged', loggedPlayers)
-        }
         // renew user timeout token
         else if(action == 'renew') {
             // create token for timeout
@@ -206,6 +201,14 @@ export default class Controller {
             })
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
+        }
+        // remove user
+        else if(action == 'out') {
+            loggedPlayers = loggedPlayers.filter(p => p.display_name != payload.display_name)
+            // save to redis
+            this.redisSet('loggedPlayers', loggedPlayers)
             // response
             return this.respond(200, 'user logged', loggedPlayers)
         }

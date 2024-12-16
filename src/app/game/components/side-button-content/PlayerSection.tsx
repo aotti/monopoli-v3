@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { applyTooltipEvent, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
@@ -34,42 +34,18 @@ export default function PlayerSection() {
             </div>
             {/* player list */}
             <div className="flex flex-col gap-1">
-                {/* player 1 */}
-                <div className="flex items-stretch text-center gap-1">
+                {gameState.gamePlayerInfo.map((player, i) => 
+                <div key={i} className="flex items-stretch text-center gap-1">
                     <div className="flex items-center w-[17vw] bg-darkblue-2">
-                        <span className="w-full"> dengkul lele </span>
+                        <span className="w-full"> {player.display_name} </span>
                     </div>
                     <div className="flex items-center w-[15vw] bg-darkblue-2">
-                        <span className="w-full"> Rp 750.000 </span>
+                        <span className="w-full"> {moneyFormat(player.money)} </span>
                     </div>
                     <div className="relative flex items-center bg-darkblue-2" data-tooltip={tempCards[0].replaceAll(';', '\n')}>
                         <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
                     </div>
-                </div>
-                {/* player 2 */}
-                <div className="flex items-stretch text-center gap-1">
-                    <div className="flex items-center w-[17vw] bg-darkblue-2">
-                        <span className="w-full"> tersometimes </span>
-                    </div>
-                    <div className="flex items-center w-[15vw] bg-darkblue-2">
-                        <span className="w-full"> Rp 50.000 </span>
-                    </div>
-                    <div className="relative flex items-center bg-darkblue-2" data-tooltip={tempCards[1].replaceAll(';', '\n')}>
-                        <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
-                    </div>
-                </div>
-                {/* player 3 */}
-                <div className="flex items-stretch text-center gap-1">
-                    <div className="flex items-center w-[17vw] bg-darkblue-2">
-                        <span className="w-full"> terlele </span>
-                    </div>
-                    <div className="flex items-center w-[15vw] bg-darkblue-2">
-                        <span className="w-full"> Rp 20.000 </span>
-                    </div>
-                    <div className="relative flex items-center bg-darkblue-2" data-tooltip={tempCards[2].replaceAll(';', '\n')}>
-                        <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
-                    </div>
-                </div>
+                </div>)}
             </div>
             {/* sell city box */}
             <PlayerSettingSellCity />

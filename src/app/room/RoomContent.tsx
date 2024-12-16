@@ -244,7 +244,7 @@ async function getRoomList(gameState: IGameContext) {
                 delete getRoomResponse.data[0].token
             }
             // get rooms data
-            const rooms = getRoomResponse.data[0].rooms as ICreateRoom['list'][]
+            const rooms = getRoomResponse.data[0].roomList as ICreateRoom['list'][]
             // set room list
             for(let room of rooms) {
                 gameState.setRoomList(data => [...data, room].filter((obj1, i, arr) => 
@@ -253,6 +253,8 @@ async function getRoomList(gameState: IGameContext) {
             }
             // set my current game
             gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
+            // set game room info
+            gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
             return
         default: 
             resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`

@@ -48,8 +48,8 @@ export default function CreateRoom() {
                         <label htmlFor="select_mode"> Mode </label>
                         <select id="select_mode" className="w-32 lg:w-44">
                             <option value="survive"> survive </option>
-                            <option value="5 laps"> 5 laps </option>
-                            <option value="7 laps"> 7 laps </option>
+                            <option value="5_laps"> 5 laps </option>
+                            <option value="7_laps"> 7 laps </option>
                         </select>
                     </div>
                     {/* submit */}

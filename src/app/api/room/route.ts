@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import RoomController from "./RoomController";
 import Controller from "../Controller";
+import { IResponse } from "../../../helper/types";
 
 export async function GET(req: NextRequest) {
     // api action
@@ -55,14 +56,14 @@ export async function PUT(req: NextRequest) {
     const roomController = new RoomController()
     const result = action == 'room join' 
                 ? await roomController.joinRoom(action, payload)
-                : await roomController.softDelete(action, payload)
+                : action == 'room over'
+                    ? await roomController.softDelete(action, payload)
+                    : {status: 404, message: 'request failed', data: []} as IResponse
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }
 
 export async function DELETE(req: NextRequest) {
-    // api action
-    const action = 'room hard delete'
     // client payload
     const payload = await req.json()
     // check authorization
@@ -72,9 +73,16 @@ export async function DELETE(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // get action
+    const action = payload.action
+    delete payload.action
     // process
     const roomController = new RoomController()
-    const result = await roomController.hardDelete(action, payload)
+    const result = action == 'room leave'
+                ? await roomController.leaveRoom(action, payload)
+                : action == 'room hard delete' 
+                    ? await roomController.hardDelete(action, payload)
+                    : {status: 404, message: 'request failed', data: []} as IResponse
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

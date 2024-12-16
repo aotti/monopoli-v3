@@ -1,29 +1,34 @@
+import { useGame } from "../../../context/GameContext";
 import { useMisc } from "../../../context/MiscContext";
-import { translateUI } from "../../../helper/helper";
+import { moneyFormat, translateUI } from "../../../helper/helper";
 
-export default function GameInfo() {
+export default function GameInfo({ roomId }: {roomId: number}) {
     const miscState = useMisc()
+    const gameState = useGame()
+    // get room info
+    const getGameRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(roomId)
 
     return (
         <div className="flex flex-col gap-2 text-2xs lg:text-xs">
             {/* name */}
-            <div>
-                <span className="text-green-400"> lele gaming </span>
-            </div>
-            {/* player */}
-            <div>
-                <span> {translateUI({lang: miscState.language, text: 'players'})}: </span>
-                <span className="text-green-400"> 1/4 </span>
+            <div className="flex flex-col">
+                <span> {translateUI({lang: miscState.language, text: 'Name', lowercase: true})}: </span>
+                <span className="text-green-400"> {gameState.gameRoomInfo[getGameRoomInfo]?.room_name} </span>
             </div>
             {/* mode */}
-            <div>
+            <div className="flex flex-col">
                 <span> mode: </span>
-                <span className="text-green-400"> survive </span>
+                <span className="text-green-400"> {gameState.gameRoomInfo[getGameRoomInfo]?.mode} </span>
+            </div>
+            {/* money lose */}
+            <div className="flex flex-col">
+                <span> {translateUI({lang: miscState.language, text: 'lose condition'})}: </span>
+                <span className="text-red-400"> {moneyFormat(gameState.gameRoomInfo[getGameRoomInfo]?.money_lose)} </span>
             </div>
             {/* creator */}
-            <div>
+            <div className="flex flex-col">
                 <span> {translateUI({lang: miscState.language, text: 'Creator', lowercase: true})}: </span>
-                <span className="text-green-400"> dengkul </span>
+                <span className="text-green-400"> {gameState.gameRoomInfo[getGameRoomInfo]?.creator} </span>
             </div>
         </div>
     )

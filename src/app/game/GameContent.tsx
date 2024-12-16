@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { applyTooltipEvent, qS, translateUI } from "../../helper/helper"
+import { applyTooltipEvent, fetcher, fetcherOptions, qS, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -17,11 +17,12 @@ import RollNumber from "./components/board/RollNumber"
 import TutorialGameRoom from "./components/TutorialGameRoom"
 import { clickOutsideElement } from "../../helper/click-outside"
 import PubNub, { Listener } from "pubnub"
-import { IChat } from "../../helper/types"
+import { IChat, IGameContext, IMiscContext, IResponse } from "../../helper/types"
 
 export default function GameContent({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
+    
     // click outside element
     const gameSideButtonRef = useRef()
     clickOutsideElement(gameSideButtonRef, () => gameState.setGameSideButton(null))
@@ -31,16 +32,17 @@ export default function GameContent({ pubnubSetting }) {
     // return spectator to false
     const spectatorLeave = () => gameState.setSpectator(false)
 
-    // game room id
-    const [gameRoomId, setGameRoomId] = useState<string>(null)
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting)
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
 
-        const gameroomParam = location.search.match(/id=\d+$/)[0].split('=')[1]
-        setGameRoomId(gameroomParam)
+        // get player list
+        const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
+        getPlayerInfo(gameroomParam, miscState, gameState)
+
+        gameState.setGameRoomId(gameroomParam)
         // pubnub channels
         const gameroomChannel = `monopoli-gameroom-${gameroomParam}`
         // subscribe
@@ -81,8 +83,10 @@ export default function GameContent({ pubnubSetting }) {
             {/* left side | back button, game info, game history */}
             {/* tutorial: relative z-10 */}
             <div className={`${miscState.showTutorial == 'tutorial_gameroom_3' ? 'relative z-10' : ''}
-            flex flex-col gap-2 lg:gap-6 self-start mt-6 mx-2 w-20 lg:w-24 h-[calc(100%-5rem)]`}>
-                <Link href={'/room'} className="flex items-center justify-center text-center w-20 h-10 lg:w-24 p-1 bg-primary border-8bit-primary text-2xs lg:text-xs active:opacity-75" onClick={spectatorLeave} draggable={false}>
+            flex flex-col gap-2 lg:gap-6 mt-6 mx-2 w-24 lg:w-36 h-[calc(100%-5rem)]`}>
+                <Link href={'/room'} className={`flex items-center justify-center text-center w-20 h-10 lg:w-24 bg-primary
+                border-8bit-primary text-2xs lg:text-xs active:opacity-75 ${miscState.language == 'indonesia' ? 'py-1' : ''}`} 
+                onClick={spectatorLeave} draggable={false}>
                     <span data-tooltip={'back to room, not leave game'} className="relative"> 
                         {translateUI({lang: miscState.language, text: 'Back to room'})} 
                     </span>
@@ -94,7 +98,7 @@ export default function GameContent({ pubnubSetting }) {
                     </button>
                 </div>
                 {/* game info */}
-                <GameInfo />
+                {gameState.gameRoomId ? <GameInfo roomId={gameState.gameRoomId} /> : null}
                 {/* game history */}
                 <div ref={gameHistoryRef} className={`relative top-10 lg:top-36 text-2xs lg:text-xs
                 ${gameState.displaySettingItem == 'game_history' || miscState.showTutorial == 'tutorial_gameroom_3' ? 'visible' : 'invisible'} `}>
@@ -108,9 +112,15 @@ export default function GameContent({ pubnubSetting }) {
             col-span-10 grid grid-rows-6 gap-8 justify-center 
             h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
                 {/* board */}
-                <BoardNormal />
-                {/* <BoardDelta /> */}
-                {/* <BoardTwoWay /> */}
+                {
+                    gameState.gameRoomId
+                        ? <>
+                            <BoardNormal />
+                            {/* <BoardDelta /> */}
+                            {/* <BoardTwoWay /> */}
+                        </>
+                        : null
+                }
                 {/* game buttons */
                 gameState.spectator
                     ? null
@@ -124,10 +134,11 @@ export default function GameContent({ pubnubSetting }) {
                 <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'hidden'} 
                 absolute h-full w-full text-center text-2xs lg:text-xs`}>
                     {
-                        gameState.rollNumber !== null
-                            ? <RollNumber />
-                            : <GameNotif />
+                        gameState.rollNumber
+                            ? <RollNumber roomId={gameState.gameRoomId} />
+                            : null
                     }
+                    <GameNotif />
                 </div>
             </section>
 
@@ -150,7 +161,7 @@ export default function GameContent({ pubnubSetting }) {
                 {/* chat */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'chat'} setGameSideButton={gameState.setGameSideButton} />
-                    <ChatBox page="game" id={gameRoomId} />
+                    <ChatBox page="game" id={gameState.gameRoomId} />
                 </div>
             </div>
 
@@ -170,4 +181,27 @@ function SideButtons({ text, setGameSideButton }) {
         <button type="button" className="h-full p-2 hover:bg-darkblue-4 hover:text-black"
         onClick={() => setGameSideButton(text)}> {translateUI({lang: miscState.language, text: text})} </button>
     )
+}
+
+async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // fetch
+    const getPlayerFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
+    const getPlayerResponse: IResponse = await (await fetcher(`/game?id=${roomId}`, getPlayerFetchOptions)).json()
+    // response
+    switch(getPlayerResponse.status) {
+        case 200: 
+            gameState.setGamePlayerInfo(getPlayerResponse.data)
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${getPlayerResponse.status}`
+            notifMessage.textContent = `${getPlayerResponse.message}`
+            return
+    }
 }

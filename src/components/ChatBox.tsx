@@ -4,7 +4,7 @@ import { useMisc } from "../context/MiscContext"
 import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
 import { IChat, IMiscContext, IResponse } from "../helper/types"
 
-export default function ChatBox({ page, id }: {page: 'room'|'game', id?: string}) {
+export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
     const miscState = useMisc()
     const gameState = useGame()
 
@@ -71,16 +71,20 @@ function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}
     )
 }
 
-export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, id?: string) {
+export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, id?: number) {
     ev.preventDefault()
 
     const messageInput = qS('#message_text') as HTMLInputElement
+    // set manual time
+    const date = new Date()
+    const getHours = date.getHours().toString().length == 1 ? `0${date.getHours()}` : date.getHours()
+    const getMinutes = date.getMinutes().toString().length == 1 ? `0${date.getMinutes()}` : date.getMinutes()
     // input value container
     const inputValues: IChat = {
         channel: id ? `monopoli-gameroom-${id}` : 'monopoli-roomlist',
         display_name: null,
         message_text: null,
-        message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
+        message_time: `${getHours}:${getMinutes}`
     }
     console.log(inputValues);
     

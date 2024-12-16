@@ -26,6 +26,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [roomInputPassword, setRoomInputPassword] = useState<string>(null)
     // game
     const [myCurrentGame, setMyCurrentGame] = useState<number>(null)
+    const [gameRoomId, setGameRoomId] = useState<number>(null)
+    const [gameRoomInfo, setGameRoomInfo] = useState<IGameContext['gameRoomInfo']>([])
+    const [gamePlayerInfo, setGamePlayerInfo] = useState<IGameContext['gamePlayerInfo']>([])
 
     useEffect(() => {
         // set online players if exist
@@ -69,6 +72,12 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         // game
         myCurrentGame: myCurrentGame,
         setMyCurrentGame: setMyCurrentGame,
+        gameRoomId: gameRoomId,
+        setGameRoomId: setGameRoomId,
+        gameRoomInfo: gameRoomInfo,
+        setGameRoomInfo: setGameRoomInfo,
+        gamePlayerInfo: gamePlayerInfo,
+        setGamePlayerInfo: setGamePlayerInfo,
     }
 
     return (

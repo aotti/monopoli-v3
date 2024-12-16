@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 import translateUI_data from '../config/translate-ui.json'
 import { PostgrestError } from "@supabase/supabase-js";
 import { JWTPayload } from "jose";
-import PubNub from "pubnub";
 
 // translate language
 export interface ITranslate {
@@ -58,6 +57,26 @@ export interface IMiscContext {
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
 }
 
+interface IGameRoomInfo {
+    room_id: number,
+    room_name: string,
+    creator: string,
+    mode: string,
+    board: string,
+    dice: number,
+    money_lose: number,
+    curse: number,
+}
+
+interface IGamePlayerInfo {
+    display_name: string,
+    lap: number,
+    money: number,
+    card: string,
+    city: string,
+    prison: boolean,
+}
+
 export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
@@ -94,6 +113,12 @@ export interface IGameContext {
     // game
     myCurrentGame: number,
     setMyCurrentGame: Dispatch<SetStateAction<number>>,
+    gameRoomId: number,
+    setGameRoomId: Dispatch<SetStateAction<number>>,
+    gameRoomInfo: IGameRoomInfo[],
+    setGameRoomInfo: Dispatch<SetStateAction<IGameRoomInfo[]>>,
+    gamePlayerInfo: IGamePlayerInfo[],
+    setGamePlayerInfo: Dispatch<SetStateAction<IGamePlayerInfo[]>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -142,7 +167,7 @@ interface IFetchWithoutBody {
 }
 interface IFetchWithBody {
     method: Exclude<RequestInitMod['method'], 'GET'>,
-    body?: RequestInitMod['body'],
+    body: RequestInitMod['body'],
     credentials?: boolean,
     noCache?: boolean,
 }
@@ -187,7 +212,7 @@ export type VerifyTokenReturn = ReturnType<() => (VerifyTokenType extends IVerif
 // response
 export interface IResponse<T = any> {
     status: number;
-    message: string | object;
+    message: string;
     data: T[];
 }
 
@@ -272,22 +297,20 @@ export interface ICreateRoom {
         room_password: string,
         player_count: number,
         player_max: number,
-        player_list: string,
         rules: string,
         status: 'prepare'|'playing',
+        player_list: string,
     }
 }
 
-export interface IJoinRoom {
-    input: {
-        action?: 'room join',
-        room_id: string,
-        room_password: string,
-        confirm_room_password?: string,
-        display_name: string,
-        money_start: string,
-        token?: string,
-    }
+export interface IShiftRoom {
+    action?: 'room join'|'room leave',
+    room_id: string,
+    room_password: string,
+    confirm_room_password?: string,
+    display_name: string,
+    money_start: string,
+    token?: string,
 }
 
 // helper

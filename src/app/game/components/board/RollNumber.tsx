@@ -4,13 +4,15 @@ import { IGameContext, ITranslate } from "../../../../helper/types";
 import { qS, qSA, translateUI } from "../../../../helper/helper";
 import { useMisc } from "../../../../context/MiscContext";
 
-export default function RollNumber() {
+export default function RollNumber({ roomId }: {roomId: number}) {
     const miscState = useMisc()
     const gameState = useGame()
+    // get room info
+    const getGameRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(roomId)
 
     useEffect(() => {
-        const number = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-        startAnimation(number, gameState.rollNumber, miscState.language)
+        const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
+        startAnimation(diceNumber, gameState.rollNumber, miscState.language)
         // hidden the roll after end
         setTimeout(() => gameState.setRollNumber(null), 3500);
     }, [])
@@ -18,13 +20,13 @@ export default function RollNumber() {
     return (
         gameState.rollNumber
             ? gameState.rollNumber == 'dice'
-                ? <RollDice />
+                ? <RollDice amount={gameState.gameRoomInfo[getGameRoomInfo]?.dice} />
                 : <RollTurn />
             : null
     )
 }
 
-function RollDice() {
+function RollDice({ amount }: {amount: number}) {
     const miscState = useMisc()
 
     return (
@@ -32,10 +34,16 @@ function RollDice() {
             <p> {translateUI({lang: miscState.language, text: 'roll dice'})} </p>
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">
-                {/* 1st number */}
-                <div className="slot p-2 w-9 lg:w-10 h-8 lg:h-12 overflow-y-hidden border-2"></div>
-                {/* 2nd number */}
-                <div className="slot p-2 w-9 lg:w-10 h-8 lg:h-12 overflow-y-hidden border-2"></div>
+                {// set dice amount
+                amount === 1
+                    // 1 dice
+                    ? <div className="slot p-2 w-9 lg:w-10 h-8 lg:h-12 overflow-y-hidden border-2"></div>
+                    // 2 dices
+                    : <>
+                        <div className="slot p-2 w-9 lg:w-10 h-8 lg:h-12 overflow-y-hidden border-2"></div>
+                        <div className="slot p-2 w-9 lg:w-10 h-8 lg:h-12 overflow-y-hidden border-2"></div>
+                    </>
+                }
             </div>
             {/* result */}
             <p id="dice_result" className="py-2"></p>
@@ -152,14 +160,14 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber'], lang
         });
         // roll result
         if(type == 'dice') {
-            const resultDice = qS('#dice_result')
+            const diceRollResult = qS('#dice_result')
             // get result number
             const dices = qSA('.roll-result')
-            const diceNumber = []
-            dices.forEach(dice => diceNumber.push(+dice.textContent))
+            const diceResult = []
+            dices.forEach(dice => diceResult.push(+dice.textContent))
             // display
             setTimeout(() => {
-                resultDice.textContent = `${translateUI({lang: language, text: 'your dice is'})} ${diceNumber.reduce((accumulator, currentVal) => accumulator + currentVal)}`
+                diceRollResult.textContent = `${translateUI({lang: language, text: 'your dice is'})} ${diceResult.reduce((accumulator, currentVal) => accumulator + currentVal)}`
             }, 2000);
         }
         else if(type == 'turn') {

@@ -103,9 +103,9 @@ export function filterInput(input: InputIDType, value: string) {
             const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
             return itsOptional
         case 'select_mode':
-            return value.match(/^survive$|^5 laps$|^7 laps$/)
+            return value.match(/^survive$|^5_laps$|^7_laps$/)
         case 'select_board':
-            return value.match(/^normal$|^delta$|^2 way$|^2 jalur$/i)
+            return value.match(/^normal$|^delta$|^2_way$/i)
         case 'select_dice':
             return value.match(/^1$|^2$/)
         case 'money_start':

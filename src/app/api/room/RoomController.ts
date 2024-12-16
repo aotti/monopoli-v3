@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { ICreateRoom, IJoinRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
+import { ICreateRoom, IGameContext, IShiftRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 
 export default class RoomController extends Controller {
@@ -142,7 +142,8 @@ export default class RoomController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // modify extracted data
+            const roomListInfo: IGameContext['gameRoomInfo'] = []
+            // modify data
             for(let d of data) {
                 // split max player from rules
                 const playerMax = d.rules.match(/max: \d/)[0].split(': ')[1]
@@ -150,6 +151,25 @@ export default class RoomController extends Controller {
                 // add player max & modify rules
                 d.player_max = +playerMax
                 d.rules = rules
+                // modify room info for gameRoomInfo
+                const { room_id, room_name, creator } = d
+                // split rules
+                const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+                // remove main rules
+                splitRules.splice(0, 1)
+                const [board, dice, money_start, money_lose, mode, curse] = [
+                    splitRules[0], // board
+                    +splitRules[1], // dice
+                    +splitRules[2], // money start
+                    +splitRules[3], // money lose
+                    splitRules[4], // mode
+                    +splitRules[5], // curse
+                ]
+                // fill gameRoomInfo data
+                roomListInfo.push(Object.assign({}, {
+                    room_id, room_name, creator, 
+                    board, dice, money_lose, mode, curse
+                }))
                 // push to temp room list to prevent duplicate room name
                 for(let [key, value] of Object.entries(d)) {
                     if(key == 'room_name') {
@@ -161,9 +181,10 @@ export default class RoomController extends Controller {
             }
             // get joined room from cookie
             const getJoinedRoom = cookies().get('joinedRoom')?.value
-            // set joined room if exist
+            // check if player has joined room
             let isMyGameExist: number = null
             if(!getJoinedRoom) {
+                // find in player list
                 isMyGameExist = data.map((v, i) => v.player_list.match(tpayload.display_name) ? i : null).filter(i => i !== null)[0]
                 if(typeof isMyGameExist == 'number' && isMyGameExist !== -1) 
                     cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
@@ -175,12 +196,11 @@ export default class RoomController extends Controller {
             }
             // match joined room with room list
             const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
-            console.log(isMyGameExist, getJoinedRoom, isJoinedRoomExist);
-            
             // set result
             const resultData = {
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
-                rooms: data,
+                roomListInfo: roomListInfo,
+                roomList: data,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -189,7 +209,7 @@ export default class RoomController extends Controller {
         return result
     }
 
-    async joinRoom(action: string, payload: IJoinRoom['input']) {
+    async joinRoom(action: string, payload: IShiftRoom) {
         let result: IResponse
         
         // get token payload
@@ -248,6 +268,59 @@ export default class RoomController extends Controller {
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
+    async leaveRoom(action: string, payload: IShiftRoom) {
+        let result: IResponse
+
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+        // set payload for db query
+        const queryObject: IQuerySelect = {
+            table: 'games',
+            function: 'mnp_leave_room',
+            function_args: {
+                tmp_room_id: payload.room_id,
+                tmp_display_name: payload.display_name,
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.select(queryObject)
+        if(error) {
+            // player / room not found
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
+        }
+        else {
+            // publish online players
+            const onlineplayer_channel = 'monopoli-onlineplayer'
+            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // remove joined room cookie
+            cookies().set('joinedRoom', '', {
+                path: '/',
+                maxAge: 0, // expire & remove in 0 seconds
+                httpOnly: true,
+                sameSite: 'strict',
+            })
+            // response
+            result = this.respond(200, `${action} success`, data)
         }
         // return result
         return result

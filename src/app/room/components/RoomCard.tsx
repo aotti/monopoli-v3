@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react"
 import { useMisc } from "../../../context/MiscContext"
 import { applyTooltipEvent, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper"
-import { ICreateRoom, IGameContext, IJoinRoom, IMiscContext, IPlayer, IResponse } from "../../../helper/types"
+import { ICreateRoom, IGameContext, IShiftRoom, IMiscContext, IResponse } from "../../../helper/types"
 import { useGame } from "../../../context/GameContext"
 import Link from "next/link"
 
@@ -119,14 +119,16 @@ function JoinRoomButton(
 ) {
     const miscState = useMisc()
     const gameState = useGame()
+    // set lock icon
+    const lockIcon = isRoomLocked ? `after:content-['🔒'] after:relative after:-top-px after:ml-1 after:hue-rotate-180 after:brightness-90` : ''
 
     return (
         gameState.myCurrentGame == roomId
         ? <Link href={{ pathname: '/game', query:{id: roomId} }} className="w-16 lg:w-24 text-2xs lg:text-xs text-center bg-success border-8bit-success active:opacity-75">
             {translateUI({lang: miscState.language, text: 'Join'})}
         </Link>
-        : <button type="button" id={`join_button_${roomId}`} className="w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75" onClick={() => isRoomLocked == '🔒' ? setShowInputPassword(true) : getInputPassword(roomId, setShowInputPassword)}>
-            {translateUI({lang: miscState.language, text: 'Join'})} {isRoomLocked}
+        : <button type="button" id={`join_button_${roomId}`} className={`w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75 ${lockIcon}`} onClick={() => isRoomLocked == '🔒' ? setShowInputPassword(true) : getInputPassword(roomId, setShowInputPassword)}>
+            {translateUI({lang: miscState.language, text: 'Join'})}
         </button>
     )
 }
@@ -139,8 +141,9 @@ function SpectateRoomButton({roomId, roomCreator}: {roomId: number, roomCreator:
         // only show for rooms that not mine
         gameState.myPlayerInfo.display_name == roomCreator
             ? null
-            : <button type="submit" id={`spectate_button_${roomId}`} 
-            className="w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75">
+            : <button type="submit" id={`spectate_button_${roomId}`} disabled={gameState.myCurrentGame === roomId ? true : false}
+            className={`w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75 
+            ${gameState.myCurrentGame === roomId ? 'saturate-0' : ''}`}>
                 {translateUI({lang: miscState.language, text: 'Spectate'})}
             </button>
     )
@@ -226,7 +229,7 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
     // result message
     const resultMessage: Element = qS(`#result_room_${roomId}`)
     // input value container
-    const inputValues: IJoinRoom['input'] = {
+    const inputValues: IShiftRoom = {
         action: 'room join',
         room_id: roomId.toString(),
         room_password: null, // from player input
@@ -287,6 +290,28 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
         case 200: 
             // set joined room
             gameState.setMyCurrentGame(roomId)
+            // get room info
+            const findRoomData = gameState.roomList.map(v => v.room_id).indexOf(roomId)
+            const { room_id, room_name, creator, rules } = gameState.roomList[findRoomData]
+            // split rules
+            const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+            // remove main rules
+            splitRules.splice(0, 1)
+            const [board, dice, money_start, money_lose, mode, curse] = [
+                splitRules[0], // board
+                +splitRules[1], // dice
+                +splitRules[2], // money start
+                +splitRules[3], // money lose
+                splitRules[4], // mode
+                +splitRules[5], // curse
+            ]
+            // set room info & filter to prevent duplicate
+            gameState.setGameRoomInfo(rooms => [...rooms, {
+                room_id, room_name, creator, 
+                board, mode, money_lose, curse, dice
+            }].filter((obj1, i, arr) => 
+                arr.findLastIndex(obj2 => obj2.room_name == obj1.room_name) === i
+            ))
             // move to game room
             const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
             link.click()
@@ -317,6 +342,7 @@ async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId: number
     const deleteButton = qS(`#delete_button_${roomId}`) as HTMLButtonElement
     // input value container
     const inputValues = {
+        action: 'room hard delete',
         display_name: gameState.myPlayerInfo.display_name,
         creator: null,
         room_name: null
