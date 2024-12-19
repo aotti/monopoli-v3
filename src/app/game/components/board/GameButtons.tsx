@@ -1,7 +1,7 @@
 import { FormEvent } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { fetcher, fetcherOptions, qS, translateUI } from "../../../../helper/helper"
+import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../../helper/helper"
 import { IGameContext, IMiscContext, IResponse } from "../../../../helper/types"
 
 export default function GameButtons() {
@@ -12,32 +12,16 @@ export default function GameButtons() {
     const myLap = gameState.gamePlayerInfo[findLap]?.lap
 
     return (
-        <>
+        <form className="flex flex-col gap-2 lg:gap-3 mx-auto w-fit px-2 text-center" onSubmit={ev => manageFormSubmits(ev, miscState, gameState)}>
             {/* username + laps */}
             <div className="flex justify-around mx-auto w-52 lg:w-72">
                 <p> {gameState.myPlayerInfo?.display_name} </p>
                 <p> {translateUI({lang: miscState.language, text: 'lap'})}: {myLap} </p>
             </div>
             {/* ready + leave */}
-            <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
-                <div>
-                    <button type="button" id="ready_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'ready'})} </button>
-                </div>
-                <form onSubmit={ev => leaveGameRoom(ev, miscState, gameState)}>
-                    <button type="submit" id="leave_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'leave'})} </button>
-                </form>
-            </div>
+            {gameState.gameStages == 'prepare' ? <PreparationButtons /> : null}
             {/* roll dice + roll turn */}
-            {/* <div className="relative z-10 flex gap-6 mx-auto w-52 lg:w-72">
-                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
-                onClick={() => gameState.setRollNumber('dice')}> 
-                    {translateUI({lang: miscState.language, text: 'roll dice'})} 
-                </button>
-                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
-                onClick={() => gameState.setRollNumber('turn')}> 
-                    {translateUI({lang: miscState.language, text: 'roll turn'})} 
-                </button>
-            </div> */}
+            {gameState.gameStages == 'decide' ? <DecideTurnButtons /> : null}
             {/* roll dice + surrend */}
             {/* <div className="relative z-10 flex gap-6 mx-auto w-52 lg:w-72">
                 <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'roll dice'})} </button>
@@ -45,15 +29,69 @@ export default function GameButtons() {
             </div> */}
             {/* player turn notif */}
             <div className="mx-auto">
-                <span> {miscState.language == 'english' ? `dengkul turn` : `giliran dengkul`} </span>
+                <span id="player_turn_notif" className="whitespace-pre"></span>
             </div>
-        </>
+        </form>
     )
 }
 
-async function leaveGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
+function PreparationButtons() {
+    const miscState = useMisc()
+
+    return (
+        <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
+            <div>
+                <button type="submit" id="ready_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'ready'})} </button>
+            </div>
+            <div>
+                <button type="submit" id="leave_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'leave'})} </button>
+            </div>
+        </div>
+    )
+}
+
+function DecideTurnButtons() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="relative z-10 flex gap-6 mx-auto w-52 lg:w-72">
+            <div>
+                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0" disabled> 
+                    {translateUI({lang: miscState.language, text: 'roll dice'})} 
+                </button>
+            </div>
+            <div>
+                <input type="hidden" id="rolled_number" />
+                <button type="submit" id="roll_turn_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
+                onClick={() => gameState.setRollNumber('turn')}> 
+                    {translateUI({lang: miscState.language, text: 'roll turn'})} 
+                </button>
+            </div>
+        </div>
+    )
+}
+
+function manageFormSubmits(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
-    
+    // submitter
+    const submitterId = (ev.nativeEvent as any).submitter.id
+    // form inputs
+    const formInputs = ev.currentTarget.elements
+
+    switch(submitterId) {
+        // leave room function
+        case `leave_button`: leaveGameRoom(miscState, gameState); break
+        // ready game function
+        case `ready_button`: readyGameRoom(miscState, gameState); break
+        // start game function
+        case `start_button`: startGameRoom(miscState, gameState); break
+        // start game function
+        case `roll_turn_button`: setTimeout(() => rollTurnGameRoom(formInputs, miscState, gameState), 2500); break
+    }
+}
+
+async function leaveGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -73,7 +111,7 @@ async function leaveGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscCon
         gameState.setShowGameNotif('normal')
         // error message
         notifTitle.textContent = `error 400`
-        notifMessage.textContent = `creator cannot leave this way, please delete the room to leave`
+        notifMessage.textContent = translateUI({lang: miscState.language, text: `creator cannot leave this way, please delete the room to leave`})
         return
     }
     // loading button
@@ -86,6 +124,11 @@ async function leaveGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscCon
     // response
     switch(leaveGameResponse.status) {
         case 200: 
+            // save access token
+            if(leaveGameResponse.data[0].token) {
+                localStorage.setItem('accessToken', leaveGameResponse.data[0].token)
+                delete leaveGameResponse.data[0].token
+            }
             // move to room list
             const link = qS('#gotoRoom') as HTMLAnchorElement
             link.click()
@@ -105,6 +148,166 @@ async function leaveGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscCon
             // enable submit buttons
             leaveButton.textContent = tempButtonText
             leaveButton.removeAttribute('disabled')
+            return
+    }
+}
+
+async function readyGameRoom(miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const readyButton = qS('#ready_button') as HTMLInputElement
+    // input value container
+    const inputValues = {
+        action: 'game ready player',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name
+    }
+    // loading button
+    const tempButtonText = readyButton.textContent
+    readyButton.textContent = 'Loading'
+    readyButton.disabled = true
+    // fetch
+    const readyGameFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const readyGameResponse: IResponse = await (await fetcher('/game', readyGameFetchOptions)).json()
+    // response
+    switch(readyGameResponse.status) {
+        case 200: 
+            // save access token
+            if(readyGameResponse.data[0].token) {
+                localStorage.setItem('accessToken', readyGameResponse.data[0].token)
+                delete readyGameResponse.data[0].token
+            }
+            // button for creator
+            const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo.display_name)
+            if(findCreator !== -1) {
+                readyButton.removeAttribute('disabled')
+                readyButton.id = 'start_button'
+                readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
+                return
+            }
+            // button for other
+            readyButton.textContent = tempButtonText
+            readyButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${readyGameResponse.status}`
+            notifMessage.textContent = `${readyGameResponse.message}`
+            // enable submit buttons
+            readyButton.textContent = tempButtonText
+            readyButton.removeAttribute('disabled')
+            return
+    }
+}
+
+async function startGameRoom(miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const startButton = qS('#start_button') as HTMLInputElement
+    // input value container
+    const inputValues = {
+        action: 'game start',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`
+    }
+    // loading button
+    const tempButtonText = startButton.textContent
+    startButton.textContent = 'Loading'
+    startButton.disabled = true
+    // fetch
+    const startGameFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const startGameResponse: IResponse = await (await fetcher('/game', startGameFetchOptions)).json()
+    // response
+    switch(startGameResponse.status) {
+        case 200: 
+            // save access token
+            if(startGameResponse.data[0].token) {
+                localStorage.setItem('accessToken', startGameResponse.data[0].token)
+                delete startGameResponse.data[0].token
+            }
+            // normal submit buttons
+            startButton.textContent = tempButtonText
+            startButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
+            return
+        default:
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${startGameResponse.status}`
+            notifMessage.textContent = `${startGameResponse.message}`
+            // enable submit buttons
+            startButton.textContent = tempButtonText
+            startButton.removeAttribute('disabled')
+            return
+    }
+}
+
+async function rollTurnGameRoom(formInputs, miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const rollTurnButton = qS('#roll_turn_button') as HTMLInputElement
+    // input value container
+    const inputValues = {
+        action: 'game roll turn',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        rolled_number: null
+    }
+    // get input elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName.match(/INPUT/)) {
+            // filter inputs
+            if(setInputValue('rolled_number', input)) inputValues.rolled_number = input.value.trim().toLowerCase()
+            // error
+            else {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                notifTitle.textContent = 'error 400'
+                notifMessage.textContent = `${input.id} doesnt match`
+                return
+            }
+        }
+    }
+    // loading button
+    const tempButtonText = rollTurnButton.textContent
+    rollTurnButton.textContent = 'Loading'
+    rollTurnButton.disabled = true
+    // fetch
+    const rollTurnFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const rollTurnResponse: IResponse = await (await fetcher('/game', rollTurnFetchOptions)).json()
+    // response
+    switch(rollTurnResponse.status) {
+        case 200: 
+            // save access token
+            if(rollTurnResponse.data[0].token) {
+                localStorage.setItem('accessToken', rollTurnResponse.data[0].token)
+                delete rollTurnResponse.data[0].token
+            }
+            // normal submit buttons
+            rollTurnButton.textContent = tempButtonText
+            rollTurnButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${rollTurnResponse.status}`
+            notifMessage.textContent = `${rollTurnResponse.message}`
+            // enable submit buttons
+            rollTurnButton.textContent = tempButtonText
+            rollTurnButton.removeAttribute('disabled')
             return
     }
 }

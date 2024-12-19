@@ -22,12 +22,21 @@ export interface ITooltip {
 }
 
 // pubnub message
-export type GetMessageType = {
+export type RoomListListener = {
     onlinePlayers: string, 
     roomCreated: ICreateRoom['list'], 
     roomsLeft:  ICreateRoom['list'][],
     joinedPlayers: number,
     joinedRoomId: number,
+}
+
+export type GameRoomListener = {
+    joinPlayer: IGamePlayerInfo,
+    leavePlayer: string,
+    readyPlayers: string[],
+    startGame: string,
+    fixedPlayers: number,
+    decidePlayers: Omit<IGamePlay['decide_player'], 'token'|'channel'>[],
 }
 
 // context
@@ -119,6 +128,10 @@ export interface IGameContext {
     setGameRoomInfo: Dispatch<SetStateAction<IGameRoomInfo[]>>,
     gamePlayerInfo: IGamePlayerInfo[],
     setGamePlayerInfo: Dispatch<SetStateAction<IGamePlayerInfo[]>>,
+    gameStages: 'prepare'|'decide'|'play'|'over',
+    setGameStages: Dispatch<SetStateAction<IGameContext['gameStages']>>,
+    gameFixedPlayers: number,
+    setGameFixedPlayers: Dispatch<SetStateAction<IGameContext['gameFixedPlayers']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -221,7 +234,8 @@ type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'
 type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType
+type DecideTurnType = 'rolled_number'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType
 
 // user
 export interface ILoggedUsers {
@@ -311,6 +325,25 @@ export interface IShiftRoom {
     display_name: string,
     money_start: string,
     token?: string,
+}
+
+// game
+export interface IGamePlay {
+    get_players: {
+        token?: string,
+        room_id: number,
+    },
+    ready_player: {
+        token?: string,
+        channel: string,
+        display_name: string,
+    },
+    decide_player: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        rolled_number: string,
+    }
 }
 
 // helper

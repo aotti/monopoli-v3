@@ -1,6 +1,6 @@
-import { useGame } from "../../../context/GameContext";
-import { useMisc } from "../../../context/MiscContext";
-import { moneyFormat, translateUI } from "../../../helper/helper";
+import { useGame } from "../../../../context/GameContext";
+import { useMisc } from "../../../../context/MiscContext";
+import { moneyFormat, translateUI } from "../../../../helper/helper";
 
 export default function GameInfo({ roomId }: {roomId: number}) {
     const miscState = useMisc()

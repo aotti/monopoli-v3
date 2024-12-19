@@ -176,6 +176,9 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber'], lang
             const turns = qSA('.roll-result')
             const turnNumber = []
             turns.forEach(turn => turnNumber.push(turn.textContent))
+            // set rolled number to form input
+            const rolledNumber = qS('#rolled_number') as HTMLInputElement
+            rolledNumber.value = turnNumber[0] + turnNumber[1] + turnNumber[2]
             // display
             setTimeout(() => {
                 resultTurn.textContent = `${translateUI({lang: language, text: 'your number is'})} ${+(turnNumber[0] + turnNumber[1] + turnNumber[2])}`

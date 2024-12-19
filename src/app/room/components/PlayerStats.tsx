@@ -141,7 +141,7 @@ async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
     }, 1000);
     
     // fetch
-    const logoutFetchOptions = fetcherOptions({method: 'POST', credentials: true})
+    const logoutFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify({})})
     const logoutResponse: IResponse = await (await fetcher('/logout', logoutFetchOptions)).json()
     // response
     switch(logoutResponse.status) {

@@ -179,17 +179,12 @@ function getInputPassword(roomId: number, setShowInputPassword) {
 
 function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
+    // hide tutorial
+    miscState.setShowTutorial(null)
     // submitter
     const submitterId = (ev.nativeEvent as any).submitter.id
     // form inputs
     const formInputs = ev.currentTarget.elements
-    // join room without fetch
-    if(gameState.myCurrentGame === roomId) {
-        // move to game room
-        const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
-        link.click()
-        return
-    }
 
     switch(submitterId) {
         // join room function
@@ -270,7 +265,7 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
     if(roomPassword.value != '' && roomPassword.value != inputValues.confirm_room_password) {
         gameState.setRoomError(inputValues.room_id)
         setTimeout(() => gameState.setRoomError(null), 2000);
-        resultMessage.textContent = 'wrong password'
+        resultMessage.textContent = translateUI({lang: miscState.language, text: 'wrong password'})
         return
     }
     inputValues.room_password = roomPassword.value == '' ? null : roomPassword.value
@@ -288,6 +283,11 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
     // response
     switch(joinRoomResponse.status) {
         case 200: 
+            // save access token
+            if(joinRoomResponse.data[0].token) {
+                localStorage.setItem('accessToken', joinRoomResponse.data[0].token)
+                delete joinRoomResponse.data[0].token
+            }
             // set joined room
             gameState.setMyCurrentGame(roomId)
             // get room info
@@ -325,7 +325,8 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
             // error message
             gameState.setRoomError(inputValues.room_id)
             setTimeout(() => gameState.setRoomError(null), 3000);
-            resultMessage.textContent = `${joinRoomResponse.status}: ${joinRoomResponse.message}`
+            const translateError = translateUI({lang: miscState.language, text: joinRoomResponse.message as any})
+            resultMessage.textContent = `${joinRoomResponse.status}: ${translateError || joinRoomResponse.message}`
             // enable submit buttons
             joinButton.textContent = tempButtonText
             joinButton.removeAttribute('disabled')

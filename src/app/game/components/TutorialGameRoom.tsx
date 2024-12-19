@@ -13,7 +13,7 @@ export default function TutorialGameRoom() {
         part_2: [
             `there are 3 stage before play`,
             `\n1 = preparation, 2 = decide turn, 3 = play\n"leave" to leave the game before game start\n"surrender" to leave when the game is run\n"roll turn" to decide the turn to roll dice`,
-            `all tiles have tooltip. city tooltip changes after bought. other tiles only static info, but prison. the 🔍 icon to see full image of tiles.`
+            `only click "ready" if players are ready. all tiles have tooltip. other tiles only static info, but prison. the 🔍 icon to see full image of tiles.`
         ],
         part_3: [
             `"back to room" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.`,

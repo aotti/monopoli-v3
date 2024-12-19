@@ -41,6 +41,8 @@ export default class Controller {
 
     constructor() {
         // this.redisReset('loggedPlayers')
+        // this.redisReset('readyPlayers_33')
+        // this.redisReset('decidePlayers_33')
     }
 
     /**
@@ -78,18 +80,21 @@ export default class Controller {
         // matching filter
         switch(action) {
             // player
-            case 'user register': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'user login': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'user avatar update': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'user get stats': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'user register': 
+            case 'user login': 
+            case 'user avatar update': 
+            case 'user get stats': 
             case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
             // room
-            case 'room create': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'room hard delete': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'room join': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'room create': 
+            case 'room hard delete': 
+            case 'room join': 
             case 'room leave': [filterStatus, filterMessage] = loopKeyValue(); break
             // game
-            case 'game get player': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'game get player': 
+            case 'game ready player': 
+            case 'game start': 
+            case 'game roll turn': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])

@@ -125,12 +125,14 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const priceText = `after:block after:content-[attr(data-price)]`
     // get room info
     const getGameRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-    // modify info
+    // set curse
     const curse = gameState.gameRoomInfo[getGameRoomInfo]?.curse
     const curseRand = curse > 5 ? `5~${curse}%` : `5%`
+    // modify info
+    const translateInfo = translateUI({lang: miscState.language, text: info as any})
     const newInfo = name.match('Cursed')
-                    ? `${name};${curseRand};${info}`
-                    : `${name};${info}`
+                    ? `${name};${curseRand};${translateInfo}`
+                    : `${name};${translateInfo}`
 
     return (
         <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex">
@@ -163,9 +165,10 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     // tile data
     type TileOtherType = {name: string, img: string, info: string}
     const { name, img, info } = data as TileOtherType 
+    const translateInfo = translateUI({lang: miscState.language, text: info as any})
 
     return (
-        <div data-tooltip={info ? info : null} className="relative flex">
+        <div data-tooltip={info ? translateInfo : null} className="relative flex">
             <button type="button" className="absolute mt-0.5 lg:mt-1 ml-[5.8vw] 
             w-3 lg:w-4 bg-darkblue-4 rounded-bl-md"
             onClick={() => {

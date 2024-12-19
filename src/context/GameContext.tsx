@@ -29,6 +29,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gameRoomId, setGameRoomId] = useState<number>(null)
     const [gameRoomInfo, setGameRoomInfo] = useState<IGameContext['gameRoomInfo']>([])
     const [gamePlayerInfo, setGamePlayerInfo] = useState<IGameContext['gamePlayerInfo']>([])
+    const [gameStages, setGameStages] = useState<IGameContext['gameStages']>('prepare')
+    const [gameFixedPlayers, setGameFixedPlayers] = useState<number>(null)
 
     useEffect(() => {
         // set online players if exist
@@ -36,15 +38,16 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         if(getOnlinePlayers) setOnlinePlayers(JSON.parse(getOnlinePlayers))
     }, [])
 
-    const states: IGameContext = {
-        // board
+    const boardStates = {
         showTileImage: showTileImage,
         setShowTileImage: setShowTileImage,
         showGameNotif: showGameNotif,
         setShowGameNotif: setShowGameNotif,
         rollNumber: rollNumber,
         setRollNumber: setRollNumber,
-        // side buttons
+    }
+    
+    const sideButtonStates = {
         gameSideButton: gameSideButton,
         setGameSideButton: setGameSideButton,
         openPlayerSetting: openPlayerSetting,
@@ -53,7 +56,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setDisplaySettingItem: setDisplaySettingItem,
         showGameHistory: showGameHistory,
         setShowGameHistory: setShowGameHistory,
-        // player
+    }
+
+    const playerStates = {
         myPlayerInfo: myPlayerInfo,
         setMyPlayerInfo: setMyPlayerInfo,
         otherPlayerInfo: otherPlayerInfo,
@@ -62,22 +67,43 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setOnlinePlayers: setOnlinePlayers,
         spectator: spectator,
         setSpectator: setSpectator,
-        // room
+    }
+
+    const roomStates = {
         roomList: roomList,
         setRoomList: setRoomList,
         roomError: roomError,
         setRoomError: setRoomError,
         roomInputPassword: roomInputPassword,
         setRoomInputPassword: setRoomInputPassword,
+    }
+
+    const gameStates = {
+        myCurrentGame,
+        setMyCurrentGame,
+        gameRoomId,
+        setGameRoomId,
+        gameRoomInfo,
+        setGameRoomInfo,
+        gamePlayerInfo,
+        setGamePlayerInfo,
+        gameStages,
+        setGameStages,
+        gameFixedPlayers, 
+        setGameFixedPlayers,
+    }
+
+    const states: IGameContext = {
+        // board
+        ...boardStates,
+        // side buttons
+        ...sideButtonStates,
+        // player
+        ...playerStates,
+        // room
+        ...roomStates,
         // game
-        myCurrentGame: myCurrentGame,
-        setMyCurrentGame: setMyCurrentGame,
-        gameRoomId: gameRoomId,
-        setGameRoomId: setGameRoomId,
-        gameRoomInfo: gameRoomInfo,
-        setGameRoomInfo: setGameRoomInfo,
-        gamePlayerInfo: gamePlayerInfo,
-        setGamePlayerInfo: setGamePlayerInfo,
+        ...gameStates
     }
 
     return (

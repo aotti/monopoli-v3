@@ -92,12 +92,12 @@ export default class RoomController extends Controller {
                 status: data[0].status
             }
             // publish realtime data
-            const createroomChannel = 'monopoli-createroom'
+            const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 roomCreated: newRoomData,
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
-            const isPublished = await this.pubnubPublish(createroomChannel, publishData)
+            const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -236,7 +236,8 @@ export default class RoomController extends Controller {
             }
         }
         // run query
-        const {data, error} = await this.dq.insert<ICreateRoom['list']>(queryObject as IQueryInsert)
+        type JoinRoomType = ICreateRoom['list'] & IGameContext['gamePlayerInfo'][0]
+        const {data, error} = await this.dq.insert<JoinRoomType>(queryObject as IQueryInsert)
         if(error) {
             // player already join / wrong password
             if(error.code == 'P0001') result = this.respond(403, error.message, [])
@@ -245,16 +246,31 @@ export default class RoomController extends Controller {
         }
         else {
             // publish realtime data
-            const joinplayerChannel = 'monopoli-joinplayer'
+            const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 joinedPlayers: data[0].player_count,
                 joinedRoomId: data[0].room_id,
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
-            const isPublished = await this.pubnubPublish(joinplayerChannel, publishData)
-            console.log(isPublished);
+            // roomlist publish
+            const isRoomPublished = await this.pubnubPublish(roomlistChannel, publishData)
+            console.log(isRoomPublished);
             
-            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // gameroom publish
+            const gameroomChannel = `monopoli-gameroom-${data[0].room_id}`
+            const joinPlayer: IGameContext['gamePlayerInfo'][0] = {
+                display_name: data[0].display_name,
+                money: data[0].money,
+                lap: data[0].lap,
+                card: data[0].card,
+                city: data[0].city,
+                prison: data[0].prison
+            }
+            const isGamePublished = await this.pubnubPublish(gameroomChannel, {joinPlayer})
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set joined room 
             cookies().set('joinedRoom', data[0].room_id.toString(), {
                 path: '/',
@@ -312,6 +328,12 @@ export default class RoomController extends Controller {
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // gameroom publish
+            const gameroomChannel = `monopoli-gameroom-${payload.room_id}`
+            const isGamePublished = await this.pubnubPublish(gameroomChannel, {leavePlayer: payload.display_name})
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // remove joined room cookie
             cookies().set('joinedRoom', '', {
                 path: '/',
@@ -319,8 +341,12 @@ export default class RoomController extends Controller {
                 httpOnly: true,
                 sameSite: 'strict',
             })
-            // response
-            result = this.respond(200, `${action} success`, data)
+            // set result
+            const resultData = {
+                data: data,
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
         }
         // return result
         return result
@@ -389,12 +415,12 @@ export default class RoomController extends Controller {
                 })
             })
             // publish realtime data
-            const deleteroomChannel = 'monopoli-deleteroom'
+            const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 roomsLeft: newRoomsLeft,
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
-            const isPublished = await this.pubnubPublish(deleteroomChannel, publishData)
+            const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])

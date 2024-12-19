@@ -239,8 +239,9 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
                 localStorage.setItem('accessToken', createRoomResponse.data[0].token)
                 delete createRoomResponse.data[0].token
             }
-            // hide the modal
+            // hide the modal & tutorial
             miscState.setShowModal(null)
+            miscState.setShowTutorial(null)
             // move to game room
             const link = qS('#gotoGame') as HTMLAnchorElement
             link.click()
@@ -259,8 +260,9 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
                 return
             }
             // result message
+            const translateError = translateUI({lang: miscState.language, text: createRoomResponse.message as any})
             resultMessage.classList.add('text-red-300')
-            resultMessage.textContent = `❌ ${createRoomResponse.status}: ${createRoomResponse.message}`
+            resultMessage.textContent = `❌ ${createRoomResponse.status}: ${translateError || createRoomResponse.message}`
             return
     }
 }

@@ -60,69 +60,6 @@ export function setInputValue(input: InputIDType, element: HTMLInputElement) {
     return element.id == input && filterInput(element.id, element.value)
 }
 
-export function filterInput(input: InputIDType, value: string) {
-    // username = 4~10 | password = 8~16 | display_name = 4~12
-    switch(input) {
-        // ====== PLAYER TYPE ======
-        // filter uuid
-        case 'uuid': 
-            const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-            return value.match(uuidv4_regex)
-        // letter & number
-        case 'username': 
-            return value.match(/^[a-zA-Z0-9]{4,10}$/)
-        // letter, number, whitespace, symbol (.,#-+@) 
-        case 'password': 
-        case 'confirm_password':
-            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/)
-        // letter, number, whitespace
-        case 'creator':
-        case 'room_name': // create room 'name'
-        case 'display_name': 
-            return value.match(/^[a-zA-Z0-9\s]{4,12}$/)
-        // must have monopoli-profiles url
-        case 'avatar': 
-            return value.match(/monopoli-profiles/)
-
-        // ====== CHAT TYPE ======
-        // websocket message channel
-        case 'channel': 
-            return value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/)
-        // message text can have letter, number, whitespace, symbol (.,#-+@)
-        case 'message_text': 
-            return value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/)
-        // time of chat
-        case 'message_time': 
-            return value.match(/^[\d{2}:\d{2}]{4,5}$/)
-
-        // ====== CREATE ROOM TYPE ======
-        case 'room_id': 
-            return value.match(/\d+/)
-        case 'room_password':
-        case 'confirm_room_password': 
-            const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
-            return itsOptional
-        case 'select_mode':
-            return value.match(/^survive$|^5_laps$|^7_laps$/)
-        case 'select_board':
-            return value.match(/^normal$|^delta$|^2_way$/i)
-        case 'select_dice':
-            return value.match(/^1$|^2$/)
-        case 'money_start':
-        case 'select_money_start':
-            return value.match(/^50000$|^75000$|^100000$/)
-        case 'select_money_lose':
-            return value.match(/^25000$|^50000$|^75000$/)
-        case 'select_curse':
-            return value.match(/^5$|^10$|^15$/)
-        case 'select_max_player':
-            return value.match(/^2$|^3$|^4$/)
-        // ====== JOIN ROOM TYPE ======
-        case 'rules': 
-            return value.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
-    }
-}
-
 export function errorLoginRegister(input: string, language: ITranslate['lang']) {
     switch (input) {
         case 'username':
@@ -210,9 +147,6 @@ export function resetAllData(gameState: IGameContext) {
     // remove room list
     gameState.setRoomList([])
 }
-
-/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
-/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
 /**
  * @returns [null, data] or [error]
  */
@@ -227,6 +161,75 @@ export async function verifyAccessToken(args: VerifyTokenType) {
     switch(args.action) {
         case 'verify-only': return [null, true]
         case 'verify-payload': return [null, data.payload]
+    }
+}
+
+/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+
+export function filterInput(input: InputIDType, value: string) {
+    // username = 4~10 | password = 8~16 | display_name = 4~12
+    switch(input) {
+        // ====== PLAYER TYPE ======
+        // filter uuid
+        case 'uuid': 
+            const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+            return value.match(uuidv4_regex)
+        // letter & number
+        case 'username': 
+            return value.match(/^[a-zA-Z0-9]{4,10}$/)
+        // letter, number, whitespace, symbol (.,#-+@) 
+        case 'password': 
+        case 'confirm_password':
+            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/)
+        // letter, number, whitespace
+        case 'creator':
+        case 'room_name': // create room 'name'
+        case 'display_name': 
+            return value.match(/^[a-zA-Z0-9\s]{4,12}$/)
+        // must have monopoli-profiles url
+        case 'avatar': 
+            return value.match(/monopoli-profiles/)
+
+        // ====== CHAT TYPE ======
+        // websocket message channel
+        case 'channel': 
+            return value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/)
+        // message text can have letter, number, whitespace, symbol (.,#-+@)
+        case 'message_text': 
+            return value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/)
+        // time of chat
+        case 'message_time': 
+            return value.match(/^[\d{2}:\d{2}]{4,5}$/)
+
+        // ====== CREATE ROOM TYPE ======
+        case 'room_id': 
+            return value.match(/\d+/)
+        case 'room_password':
+        case 'confirm_room_password': 
+            const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
+            return itsOptional
+        case 'select_mode':
+            return value.match(/^survive$|^5_laps$|^7_laps$/)
+        case 'select_board':
+            return value.match(/^normal$|^delta$|^2_way$/i)
+        case 'select_dice':
+            return value.match(/^1$|^2$/)
+        case 'money_start':
+        case 'select_money_start':
+            return value.match(/^50000$|^75000$|^100000$/)
+        case 'select_money_lose':
+            return value.match(/^25000$|^50000$|^75000$/)
+        case 'select_curse':
+            return value.match(/^5$|^10$|^15$/)
+        case 'select_max_player':
+            return value.match(/^2$|^3$|^4$/)
+        // ====== JOIN ROOM TYPE ======
+        case 'rules': 
+            return value.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+        // ====== ROLL TURN TYPE ======
+        case 'rolled_number': 
+            return value.match(/^[\d]{3}$/)
     }
 }
 

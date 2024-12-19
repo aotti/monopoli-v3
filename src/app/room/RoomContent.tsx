@@ -8,7 +8,7 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { GetMessageType, IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
+import { RoomListListener, IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 
@@ -26,9 +26,6 @@ export default function RoomContent({ pubnubSetting }) {
     // pubnub subscribe
     const roomlistChannel = 'monopoli-roomlist'
     const onlineplayerChannel = 'monopoli-onlineplayer'
-    const createroomChannel = 'monopoli-createroom'
-    const joinplayerChannel = 'monopoli-joinplayer'
-    const deleteroomChannel = 'monopoli-deleteroom'
     // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
         // tooltip (the element must have position: relative)
@@ -38,12 +35,12 @@ export default function RoomContent({ pubnubSetting }) {
 
         // subscribe
         pubnubClient.subscribe({ 
-            channels: [roomlistChannel, onlineplayerChannel, createroomChannel, joinplayerChannel, deleteroomChannel] 
+            channels: [roomlistChannel, onlineplayerChannel] 
         })
         // get published message
         const publishedMessage: Listener = {
             message: (data) => {
-                const getMessage = data.message as PubNub.Payload & IChat & GetMessageType
+                const getMessage = data.message as PubNub.Payload & IChat & RoomListListener
                 // add chat
                 const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
                 if(getMessage.message_text) {
@@ -91,7 +88,7 @@ export default function RoomContent({ pubnubSetting }) {
         // unsub and remove listener
         return () => {
             pubnubClient.unsubscribe({ 
-                channels: [roomlistChannel, onlineplayerChannel, createroomChannel, deleteroomChannel] 
+                channels: [roomlistChannel, onlineplayerChannel] 
             })
             pubnubClient.removeListener(publishedMessage)
         }
