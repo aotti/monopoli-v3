@@ -64,6 +64,8 @@ export default function RoomContent({ pubnubSetting }) {
                 if(getMessage.roomCreated) {
                     // set to room list
                     gameState.setRoomList(room => [...room, getMessage.roomCreated])
+                    // set game room info
+                    gameState.setGameRoomInfo(rooms => [...rooms, getMessage.roomInfo])
                 }
                 // player join
                 if(getMessage.joinedRoomId) {
@@ -72,7 +74,12 @@ export default function RoomContent({ pubnubSetting }) {
                         const updatedRooms = [...rooms]
                         // find joined room
                         const findJoined = rooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
-                        if(findJoined !== -1) updatedRooms[findJoined].player_count = getMessage.joinedPlayers
+                        if(findJoined !== -1) {
+                            // update player count
+                            updatedRooms[findJoined].player_count = getMessage.joinedPlayers
+                            // update disabled characters
+                            updatedRooms[findJoined].characters = getMessage.disabledCharacters
+                        }
                         // return rooms
                         return updatedRooms
                     })
@@ -186,6 +193,8 @@ export default function RoomContent({ pubnubSetting }) {
                     <div className="text-right w-2/5">
                         <button type="button" className="border-8bit-primary bg-primary active:opacity-75"
                         onClick={() => {
+                            // close join modal
+                            miscState.setShowJoinModal(null)
                             // to give zoom-in animate class
                             miscState.setAnimation(true); 
                             // show the modal

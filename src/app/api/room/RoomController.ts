@@ -47,14 +47,15 @@ export default class RoomController extends Controller {
         if(filterRoomList.status !== 200) return filterRoomList
         // destruct rules props
         const { select_board, select_dice, select_money_start, select_money_lose, 
-            select_mode, select_curse, select_max_player } = payload
+            select_mode, select_curse, select_max_player, select_character } = payload
         // alter input to match db function
         const payloadValues: Omit<ICreateRoom['payload'], 'player_count'> = {
             creator: payload.creator,
             room_name: payload.room_name,
             room_password: payload.room_password,
             money_start: +select_money_start,
-            rules: `board: ${select_board};dice: ${select_dice};start: ${select_money_start};lose: ${-select_money_lose};mode: ${select_mode};curse: ${select_curse};max: ${select_max_player}`
+            rules: `board: ${select_board};dice: ${select_dice};start: ${select_money_start};lose: ${-select_money_lose};mode: ${select_mode};curse: ${select_curse};max: ${select_max_player}`,
+            character: payload.select_character
         }
         // set payload for db query
         const queryObject: Partial<IQueryInsert> = {
@@ -65,7 +66,8 @@ export default class RoomController extends Controller {
                 tmp_name: payloadValues.room_name,
                 tmp_password: payloadValues.room_password,
                 tmp_money_start: payloadValues.money_start,
-                tmp_rules: payloadValues.rules
+                tmp_rules: payloadValues.rules,
+                tmp_character: payloadValues.character
             }
         }
         // run query
@@ -77,6 +79,8 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
+            // disable selected character
+            await this.redisSet(`disabled_characters_${data[0].room_id}`, [payload.select_character])
             // split max player from rules
             const playerMax = data[0].rules.match(/max: \d/)[0].split(': ')[1]
             const rules = data[0].rules.match(/.*(?=;max)/)[0]
@@ -89,12 +93,33 @@ export default class RoomController extends Controller {
                 player_count: data[0].player_count,
                 player_max: +playerMax,
                 rules: rules,
-                status: data[0].status
+                status: data[0].status,
+                characters: [payload.select_character],
+            }
+            // split rules
+            const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+            // remove main rules
+            splitRules.splice(0, 1)
+            const [board, dice, money_start, money_lose, mode, curse] = [
+                splitRules[0], // board
+                +splitRules[1], // dice
+                +splitRules[2], // money start
+                +splitRules[3], // money lose
+                splitRules[4], // mode
+                +splitRules[5], // curse
+            ]
+            // data for gameRoomInfo
+            const newGameRoomInfo: IGameContext['gameRoomInfo'][0] = {
+                room_id: data[0].room_id,
+                room_name: data[0].room_name,
+                creator: data[0].creator,
+                board, dice, money_lose, mode, curse
             }
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 roomCreated: newRoomData,
+                roomInfo: newGameRoomInfo,
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
             const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
@@ -110,6 +135,7 @@ export default class RoomController extends Controller {
             })
             // set result
             const resultData = {
+                currentGame: data[0].room_id,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -137,7 +163,8 @@ export default class RoomController extends Controller {
             function: 'mnp_get_rooms_and_mygame'
         }
         // run query
-        const {data, error} = await this.dq.select<ICreateRoom['server']>(queryObject)
+        type GetRoomsType = ICreateRoom['server'] & ICreateRoom['list']
+        const {data, error} = await this.dq.select<GetRoomsType>(queryObject)
         if(error) {
             result = this.respond(500, error.message, [])
         }
@@ -153,6 +180,10 @@ export default class RoomController extends Controller {
                 d.rules = rules
                 // modify room info for gameRoomInfo
                 const { room_id, room_name, creator } = d
+                // get disabled characters
+                const getDisabledCharacters = await this.redisGet(`disabled_characters_${room_id}`)
+                // update room list characters data
+                d.characters = getDisabledCharacters
                 // split rules
                 const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
                 // remove main rules
@@ -224,7 +255,11 @@ export default class RoomController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
-        // set payload for db query , , , 
+        // check disabled characters
+        const getDisabledCharacters = await this.redisGet(`disabled_characters_${payload.room_id}`)
+        const isCharacterDisabled = getDisabledCharacters.indexOf(payload.select_character)
+        if(isCharacterDisabled !== -1) return this.respond(400, 'someone has chosen this character', [])
+        // set payload for db query
         const queryObject: Partial<IQueryInsert> = {
             table: 'games',
             function: 'mnp_join_room',
@@ -233,6 +268,7 @@ export default class RoomController extends Controller {
                 tmp_room_password: payload.room_password,
                 tmp_display_name: payload.display_name,
                 tmp_money_start: +payload.money_start,
+                tmp_character: payload.select_character,
             }
         }
         // run query
@@ -245,11 +281,14 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
+            // update disabled characters
+            await this.redisSet(`disabled_characters_${payload.room_id}`, [...getDisabledCharacters, payload.select_character])
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 joinedPlayers: data[0].player_count,
                 joinedRoomId: data[0].room_id,
+                disabledCharacters: [...getDisabledCharacters, payload.select_character],
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
             // roomlist publish
@@ -261,6 +300,7 @@ export default class RoomController extends Controller {
             const gameroomChannel = `monopoli-gameroom-${data[0].room_id}`
             const joinPlayer: IGameContext['gamePlayerInfo'][0] = {
                 display_name: data[0].display_name,
+                character: data[0].character,
                 money: data[0].money,
                 lap: data[0].lap,
                 card: data[0].card,
@@ -396,9 +436,13 @@ export default class RoomController extends Controller {
         else {
             // remove room name from list
             await this.filterRoomList('out', payload.room_name)
+            // remove disabled characters
+            await this.redisReset(`disabled_characters_${payload.room_id}`)
             // new rooms left data
             const newRoomsLeft: ICreateRoom['list'][] = []
-            data.forEach(v => {
+            data.forEach(async v => {
+                // get disabled characters
+                const getDisabledCharacters = await this.redisGet(`disabled_characters_${v.room_id}`)
                 // split max player from rules
                 const playerMax = v.rules.match(/max: \d/)[0].split(': ')[1]
                 const rules = v.rules.match(/.*(?=;max)/)[0]
@@ -411,7 +455,8 @@ export default class RoomController extends Controller {
                     player_count: v.player_count,
                     player_max: +playerMax,
                     rules: rules,
-                    status: v.status
+                    status: v.status,
+                    characters: getDisabledCharacters
                 })
             })
             // publish realtime data

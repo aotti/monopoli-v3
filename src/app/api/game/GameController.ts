@@ -6,30 +6,15 @@ export default class GameController extends Controller {
         let filterResult: IResponse = null
         // get token payload
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
-        if(tokenPayload.status !== 200) 
-            return filterResult = {
-                status: tokenPayload.status,
-                message: tokenPayload.message,
-                data: tokenPayload.data
-            }
+        if(tokenPayload.status !== 200) return tokenPayload
         // token payload data
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload)
-        if(onlinePlayers.status !== 200) 
-            return filterResult = {
-                status: onlinePlayers.status,
-                message: onlinePlayers.message,
-                data: onlinePlayers.data
-            }
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
-        if(filteredPayload.status !== 200) 
-            return filterResult = {
-                status: filteredPayload.status,
-                message: filteredPayload.message,
-                data: filteredPayload.data
-            }
+        if(filteredPayload.status !== 200) return filteredPayload
         // return success
         return filterResult = {
             status: 200,

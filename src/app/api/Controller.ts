@@ -14,14 +14,16 @@ const redisClient = createClient({
     socket: {
         host: 'redis-16533.c334.asia-southeast2-1.gce.redns.redis-cloud.com',
         port: 16533,
-        connectTimeout: 5_000, // 5 seconds
-        timeout: 10_000 // 10 seconds
+        connectTimeout: 2_000, // 5 seconds
+        timeout: 10_000, // 10 seconds
     }
 });
 // listener
 redisClient.on('error', err => console.log('Redis Client Error', err));
 // connect to redis
-redisClient.connect().catch(err => console.log(err))
+redisClient.connect()
+.then(res => console.log('redis connected'))
+.catch(err => console.log(err))
 
 export default class Controller {
     protected dq = new DatabaseQueries()
@@ -43,6 +45,9 @@ export default class Controller {
         // this.redisReset('loggedPlayers')
         // this.redisReset('readyPlayers_33')
         // this.redisReset('decidePlayers_33')
+        // this.redisSet('disabled_characters_32', [
+        //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
+        // ])
     }
 
     /**

@@ -70,12 +70,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     }
 
     const roomStates = {
-        roomList: roomList,
-        setRoomList: setRoomList,
-        roomError: roomError,
-        setRoomError: setRoomError,
-        roomInputPassword: roomInputPassword,
-        setRoomInputPassword: setRoomInputPassword,
+        roomList, setRoomList,
+        roomError, setRoomError,
+        roomInputPassword, setRoomInputPassword,
     }
 
     const gameStates = {

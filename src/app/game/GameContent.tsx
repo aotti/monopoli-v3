@@ -263,13 +263,12 @@ async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState:
                         rollTurnButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
                     }
                 }
-                playerTurnNotif.textContent = decidePlayersRank.join('\n')
+                playerTurnNotif ? playerTurnNotif.textContent = decidePlayersRank.join('\n') : null
                 return
             }
             // set prepare players
             else if(getPlayerResponse.data[0]?.preparePlayers) {
-                const playerTurnNotif = qS('#player_turn_notif')
-                playerTurnNotif.textContent = `${getPlayerResponse.data[0].preparePlayers.length} player(s) ready`
+                playerTurnNotif ? playerTurnNotif.textContent = `${getPlayerResponse.data[0].preparePlayers.length} player(s) ready` : null
                 // if > 2 players ready, set notif
                 if(getPlayerResponse.data[0].preparePlayers.length >= 2) {
                     // show notif

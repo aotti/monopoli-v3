@@ -4,6 +4,7 @@ import { applyTooltipEvent, fetcher, fetcherOptions, qS, setInputValue, translat
 import { ICreateRoom, IGameContext, IShiftRoom, IMiscContext, IResponse } from "../../../helper/types"
 import { useGame } from "../../../context/GameContext"
 import Link from "next/link"
+import SelectCharacter from "./SelectCharacter"
 
 export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) {
     const miscState = useMisc()
@@ -14,8 +15,8 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
     }, [])
 
     const roomId = roomData.room_id
-    const roomConfirmPassword = roomData.room_password
-    const roomCreator = roomData.creator
+    const roomConfirmPassword = roomData.room_password || ''
+    const roomCreator = roomData.creator || ''
     // check if room have password
     const isRoomLocked = roomConfirmPassword ? `🔒` : ''
     // modify curse text
@@ -32,9 +33,10 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
         <div className={`relative w-[calc(100%-52.5%)] h-56 lg:h-60 border-2 ${roomStatusColor}`}>
             <form onSubmit={ev => manageFormSubmits(ev, roomId, miscState, gameState)}>
                 {/* room id */}
-                <input type="hidden" id="room_id" defaultValue={roomId} />
+                <input type="hidden" id="room_id" value={roomId} />
                 <input type="hidden" id={`room_password_${roomId}`} />
-                <input type="hidden" id="confirm_room_password" defaultValue={roomConfirmPassword} />
+                <input type="hidden" id="confirm_room_password" value={roomConfirmPassword} />
+                <input type="hidden" id={`select_character_${roomId}`} />
                 {/* room name */}
                 <div className="flex justify-between p-2">
                     <label className="flex justify-between grow">
@@ -42,7 +44,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> : </span>
                     </label>
                     <input type="text" id="room_name" className="bg-transparent text-white w-3/5 border-b border-b-white" 
-                    defaultValue={(roomData as any).name || roomData.room_name} readOnly />
+                    value={roomData.room_name || ''} readOnly />
                 </div>
                 {/* rules */}
                 <div className="flex justify-between p-2">
@@ -56,7 +58,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                             ??? 
                         </p>
                         {/* input */}
-                        <input type="hidden" id="rules" defaultValue={roomData.rules} readOnly />
+                        <input type="hidden" id="rules" value={roomData.rules || ''} readOnly />
                     </div>
                 </div>
                 {/* player count */}
@@ -73,7 +75,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> {translateUI({lang: miscState.language, text: 'Max'})} </span>
                         <span> : </span>
                     </label>
-                    <input type="text" id="player_max" className="bg-transparent text-white w-3/5 border-b border-b-white" defaultValue={`${roomData.player_max} ${translateUI({lang: miscState.language, text: 'player(s)'})}`} readOnly />
+                    <input type="text" id="player_max" className="bg-transparent text-white w-3/5 border-b border-b-white" value={`${roomData.player_max} ${translateUI({lang: miscState.language, text: 'player(s)'})}`} readOnly />
                 </div>
                 {/* creator */}
                 <div className="flex justify-between p-2">
@@ -82,7 +84,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                         <span> : </span>
                     </label>
                     <input type="text" id="creator" className="bg-transparent text-white w-3/5 border-b border-b-white" 
-                    defaultValue={roomCreator} readOnly />
+                    value={roomCreator} readOnly />
                 </div>
                 <div className="flex text-right p-2 lg:mt-2">
                     {/* join button */}
@@ -99,16 +101,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
             w-[20vw] lg:p-1 text-center bg-darkblue-1 border-8bit-text`}>
                 <p id={`result_room_${roomId}`}></p>
             </div>
-            {/* input password */}
-            <div className={`${showInputPassword ? 'flex' : 'hidden'} flex-col gap-1 absolute top-[15vh] lg:top-[10vh] left-[5vw] w-[20vw] 
-            lg:p-1 text-center bg-darkblue-1 border-8bit-text`}>
-                <p> input room password: </p>
-                <div className="flex gap-1">
-                    <input type="text" id={`input_password_${roomId}`} className="w-full px-1" minLength={3} maxLength={8} placeholder="password" />
-                    <button type="button" className="w-10 lg:w-16" 
-                    onClick={() => getInputPassword(roomId, setShowInputPassword)}> ok </button>
-                </div>
-            </div>
+            <JoinRoomPrompt roomId={roomId} showInputPassword={showInputPassword} setShowInputPassword={setShowInputPassword} />
         </div>
     )
 }
@@ -121,13 +114,20 @@ function JoinRoomButton(
     const gameState = useGame()
     // set lock icon
     const lockIcon = isRoomLocked ? `after:content-['🔒'] after:relative after:-top-px after:ml-1 after:hue-rotate-180 after:brightness-90` : ''
+    // join handler
+    const joinHandler = () => {
+        // show the modal
+        miscState.setShowJoinModal(`join_room_${roomId}`) 
+        // show input password
+        if(isRoomLocked == '🔒') setShowInputPassword(true)
+    }
 
     return (
         gameState.myCurrentGame == roomId
         ? <Link href={{ pathname: '/game', query:{id: roomId} }} className="w-16 lg:w-24 text-2xs lg:text-xs text-center bg-success border-8bit-success active:opacity-75">
             {translateUI({lang: miscState.language, text: 'Join'})}
         </Link>
-        : <button type="button" id={`join_button_${roomId}`} className={`w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75 ${lockIcon}`} onClick={() => isRoomLocked == '🔒' ? setShowInputPassword(true) : getInputPassword(roomId, setShowInputPassword)}>
+        : <button type="button" id={`join_button_${roomId}`} className={`w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75 ${lockIcon}`} onClick={joinHandler}>
             {translateUI({lang: miscState.language, text: 'Join'})}
         </button>
     )
@@ -163,18 +163,69 @@ function DeleteRoomButton({roomId, roomCreator}: {roomId: number, roomCreator: s
     )
 }
 
-function getInputPassword(roomId: number, setShowInputPassword) {
-    // get input password
-    const inputPassword = qS(`#input_password_${roomId}`) as HTMLInputElement
+function JoinRoomPrompt({ roomId, showInputPassword, setShowInputPassword }) {
+    const miscState = useMisc()
+    const gameState = useGame()
+    // find room data
+    const findRoomData = gameState.roomList.map(v => v.room_id).indexOf(roomId)
+
+    return (
+        <div className={`${miscState.showJoinModal ? 'flex' : 'hidden'} absolute top-0 z-20 bg-black/50 items-center justify-center text-left h-full w-full`}>
+            <form onSubmit={ev => joinPromptInputs(ev, roomId, miscState, setShowInputPassword)} 
+            className={`${miscState.showJoinModal == `join_room_${roomId}` ? 'flex' : 'hidden'} flex-col justify-center gap-2 bg-darkblue-1 w-full h-full`}>
+                {/* select character */}
+                <SelectCharacter disabledCharacters={gameState.roomList[findRoomData].characters} />
+                {/* input password */}
+                <div className={`${showInputPassword ? 'flex' : 'hidden'} flex-col gap-1 mx-auto w-3/4 lg:p-1 text-center`}>
+                    <label htmlFor={`input_password_${roomId}`}> room password: </label>
+                    <div className="flex gap-1">
+                        <input type="text" id={`input_password_${roomId}`} className="w-full px-1" minLength={3} maxLength={8} placeholder="password" />
+                    </div>
+                </div>
+                {/* submit */}
+                <div className="flex justify-between mx-6">
+                    <button type="button" className="text-red-300 p-1 active:opacity-75"
+                    onClick={() => {miscState.setShowJoinModal(null); setShowInputPassword(false)}}> 
+                        {translateUI({lang: miscState.language, text: 'Close'})} 
+                    </button>
+                    <button type="submit" className="text-green-300 p-1 active:opacity-75"> 
+                        {translateUI({lang: miscState.language, text: 'Next'})} 
+                    </button>
+                </div>
+            </form>
+        </div>
+    )
+}
+
+function joinPromptInputs(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, setShowInputPassword) {
+    ev.preventDefault()
+    // input value container
+    const inputValues = {
+        character: null,
+        room_password: null
+    }
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName.match(/INPUT/) && input.type != 'radio') {
+            // dont lowercase link
+            if(input.id == 'select_character') inputValues.character = input.value.trim()
+            else if(input.id == `input_password_${roomId}`) inputValues.room_password = input.value.trim().toLowerCase()
+        }
+    }
+    // fill input element values
+    const selectCharacter = qS(`#select_character_${roomId}`) as HTMLInputElement
     const roomPassword = qS(`#room_password_${roomId}`) as HTMLInputElement
-    // fill input value
-    roomPassword.value = inputPassword.value
-    // join button
+    selectCharacter.value = inputValues.character
+    roomPassword.value = inputValues.room_password
+    // submit join form
     const joinButton = qS(`#join_button_${roomId}`) as HTMLInputElement
     joinButton.type = 'submit' // to trigger form submit
     joinButton.click()
-    // close input password
-    setShowInputPassword(false)
+    // close join prompt
+    setShowInputPassword ? setShowInputPassword(false) : null
+    miscState.setShowJoinModal(null)
 }
 
 function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
@@ -230,7 +281,8 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
         room_password: null, // from player input
         confirm_room_password: null, // from input value
         display_name: gameState.myPlayerInfo.display_name,
-        money_start: null
+        money_start: null,
+        select_character: null
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {
@@ -244,7 +296,7 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
             }
             else if(setInputValue('confirm_room_password', input)) inputValues.confirm_room_password = input.value.trim().toLowerCase()
             // skip other inputs
-            else if(input.id.match(/room_id|room_name|room_password_\d+|player_count|player_max|creator/)) continue
+            else if(input.id.match(/room_id|room_name|room_password_\d+|player_count|player_max|creator|select_character/)) continue
             // error
             else {
                 if(resultMessage) {
@@ -259,6 +311,9 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
             }
         }
     }
+    // set character value
+    const selectCharacter = qS(`#select_character_${roomId}`) as HTMLInputElement
+    inputValues.select_character = selectCharacter.value
     // matching password
     const roomPassword = qS(`#room_password_${inputValues.room_id}`) as HTMLInputElement
     // password doesnt match
@@ -332,6 +387,8 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
             joinButton.removeAttribute('disabled')
             spectateButton ? spectateButton.removeAttribute('disabled') : null
             deleteButton ? deleteButton.removeAttribute('disabled') : null
+            // set join button type back to BUTTON
+            joinButton.type = 'button'
             return
     }
 }
@@ -346,6 +403,7 @@ async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId: number
         action: 'room hard delete',
         display_name: gameState.myPlayerInfo.display_name,
         creator: null,
+        room_id: null,
         room_name: null
     }
     // get input elements
@@ -353,10 +411,11 @@ async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId: number
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName.match(/INPUT/)) {
             // filter inputs
-            if(setInputValue('room_name', input)) inputValues.room_name = input.value.trim().toLowerCase()
+            if(setInputValue('room_id', input)) inputValues.room_id = input.value.trim().toLowerCase()
+            else if(setInputValue('room_name', input)) inputValues.room_name = input.value.trim().toLowerCase()
             else if(setInputValue('creator', input)) inputValues.creator = input.value.trim().toLowerCase()
             // skip other inputs
-            else if(input.id.match(/room_id|room_password|player_count|player_max|rules/)) continue
+            else if(input.id.match(/room_password|player_count|player_max|rules|select_character/)) continue
             // error
             else {
                 deleteButton.classList.add('text-red-600')

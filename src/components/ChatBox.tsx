@@ -86,8 +86,6 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
         message_text: null,
         message_time: `${getHours}:${getMinutes}`
     }
-    console.log(inputValues);
-    
     // get input elements
     const formInputs = ev.currentTarget.elements
     for(let i=0; i<formInputs.length; i++) {

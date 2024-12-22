@@ -88,6 +88,7 @@ export function errorCreateRoom(input: string, language: ITranslate['lang']) {
         case 'select_money_lose':
         case 'select_curse':
         case 'select_max_player':
+        case 'select_character':
             return `${input}: ${translateUI({lang: language, text: 'value doesnt match'})}`
     }
 }
@@ -174,62 +175,64 @@ export function filterInput(input: InputIDType, value: string) {
         // filter uuid
         case 'uuid': 
             const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-            return value.match(uuidv4_regex)
+            return value ? value.match(uuidv4_regex) : null
         // letter & number
         case 'username': 
-            return value.match(/^[a-zA-Z0-9]{4,10}$/)
+            return value ? value.match(/^[a-zA-Z0-9]{4,10}$/) : null
         // letter, number, whitespace, symbol (.,#-+@) 
         case 'password': 
         case 'confirm_password':
-            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/)
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/) : null
         // letter, number, whitespace
         case 'creator':
         case 'room_name': // create room 'name'
         case 'display_name': 
-            return value.match(/^[a-zA-Z0-9\s]{4,12}$/)
+            return value ? value.match(/^[a-zA-Z0-9\s]{4,12}$/) : null
         // must have monopoli-profiles url
         case 'avatar': 
-            return value.match(/monopoli-profiles/)
+            return value ? value.match(/monopoli-profiles/) : null
 
         // ====== CHAT TYPE ======
         // websocket message channel
         case 'channel': 
-            return value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/)
+            return value ? value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/) : null
         // message text can have letter, number, whitespace, symbol (.,#-+@)
         case 'message_text': 
-            return value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/)
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/) : null
         // time of chat
         case 'message_time': 
-            return value.match(/^[\d{2}:\d{2}]{4,5}$/)
+            return value ? value.match(/^[\d{2}:\d{2}]{4,5}$/) : null
 
         // ====== CREATE ROOM TYPE ======
         case 'room_id': 
-            return value.match(/\d+/)
+            return value ? value.match(/\d+/) : null
         case 'room_password':
         case 'confirm_room_password': 
             const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
             return itsOptional
         case 'select_mode':
-            return value.match(/^survive$|^5_laps$|^7_laps$/)
+            return value ? value.match(/^survive$|^5_laps$|^7_laps$/) : null
         case 'select_board':
-            return value.match(/^normal$|^delta$|^2_way$/i)
+            return value ? value.match(/^normal$|^delta$|^2_way$/i) : null
         case 'select_dice':
-            return value.match(/^1$|^2$/)
+            return value ? value.match(/^1$|^2$/) : null
         case 'money_start':
         case 'select_money_start':
-            return value.match(/^50000$|^75000$|^100000$/)
+            return value ? value.match(/^50000$|^75000$|^100000$/) : null
         case 'select_money_lose':
-            return value.match(/^25000$|^50000$|^75000$/)
+            return value ? value.match(/^25000$|^50000$|^75000$/) : null
         case 'select_curse':
-            return value.match(/^5$|^10$|^15$/)
+            return value ? value.match(/^5$|^10$|^15$/) : null
         case 'select_max_player':
-            return value.match(/^2$|^3$|^4$/)
+            return value ? value.match(/^2$|^3$|^4$/) : null
+        case 'select_character':
+            return value ? value.match(/lvu1slpqdkmigp40.public.blob.vercel-storage.com\/characters/) : null
         // ====== JOIN ROOM TYPE ======
         case 'rules': 
-            return value.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+            return value ? value.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/) : null
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
-            return value.match(/^[\d]{3}$/)
+            return value ? value.match(/^[\d]{3}$/) : null
     }
 }
 

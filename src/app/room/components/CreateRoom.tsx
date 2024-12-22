@@ -4,12 +4,13 @@ import { applyTooltipEvent, errorCreateRoom, fetcher, fetcherOptions, moneyForma
 import Link from "next/link";
 import { ICreateRoom, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
+import SelectCharacter from "./SelectCharacter";
 
 export default function CreateRoom() {
     const miscState = useMisc()
     const gameState = useGame()
     // form pages
-    const [createRoomPage, setCreateRoomPage] = useState<1|2>(1)
+    const [createRoomPage, setCreateRoomPage] = useState<1|2|3>(1)
     // tooltip
     const tooltip = {
         moneyStart: translateUI({lang: miscState.language, text: 'money that player have on start'}),
@@ -22,15 +23,15 @@ export default function CreateRoom() {
     }, [])
 
     return (
-        <div id="create_room_modal" className={`${miscState.showModal == 'create room' ? 'block' : 'hidden'} 
-            relative z-20 bg-darkblue-3 border-8bit-modal px-2
-            ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-80 lg:w-[30rem]`}>
+        <div id="create_room_modal" className={`relative z-20 bg-darkblue-3 border-8bit-modal px-2 w-80 lg:w-[30rem]
+        ${miscState.showModal == 'create room' ? 'block' : 'hidden'} 
+        ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'}`}>
             {/* modal head */}
             <div className="border-b-2 mb-2">
                 <span> {translateUI({lang: miscState.language, text: 'Create Room'})} </span>
             </div>
             {/* modal body */}
-            <form onSubmit={ev => createRoom(ev, miscState, gameState)} noValidate>
+            <form onSubmit={ev => createRoom(ev, miscState, gameState, setCreateRoomPage)} noValidate>
                 {/* part 1 */}
                 <div className={`${createRoomPage === 1 ? 'flex' : 'hidden'} flex-col gap-2 lg:gap-4 my-auto`}>
                     {/* set room name */}
@@ -130,6 +131,23 @@ export default function CreateRoom() {
                             <option value="4"> 4 </option>
                         </select>
                     </div>
+                    {/* submit */}
+                    <div className="flex justify-between mx-6">
+                        <button type="button" className="text-red-300 p-1 active:opacity-75"
+                        onClick={() => setCreateRoomPage(1)}> 
+                            {translateUI({lang: miscState.language, text: 'Back'})} 
+                        </button>
+                        <button type="button" className="text-green-300 p-1 active:opacity-75" 
+                        onClick={() => setCreateRoomPage(3)}> 
+                            {translateUI({lang: miscState.language, text: 'Next'})} 
+                        </button>
+                    </div>
+                </div>
+                
+                {/* part 3 */}
+                <div className={`${createRoomPage === 3 ? 'flex' : 'hidden'} flex-col gap-2 lg:gap-4`}>
+                    {/* select character */}
+                    <SelectCharacter disabledCharacters={[]} />
                     {/* message */}
                     <div className="flex justify-between">
                         {/* error = text-red-300 | success = text-green-300 */}
@@ -138,7 +156,7 @@ export default function CreateRoom() {
                     {/* submit */}
                     <div className="flex justify-between mx-6">
                         <button type="button" className="text-red-300 p-1 active:opacity-75"
-                        onClick={() => setCreateRoomPage(1)}> 
+                        onClick={() => setCreateRoomPage(2)}> 
                             {translateUI({lang: miscState.language, text: 'Back'})} 
                         </button>
                         <button type="submit" id="create_room" className="text-green-300 p-1 active:opacity-75"> 
@@ -167,7 +185,7 @@ function displaySelectedRange(ev: ChangeEvent<HTMLInputElement>) {
     }
 }
 
-async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
+async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext, setCreateRoomPage) {
     ev.preventDefault()
     // result message
     const resultMessage = qS('#result_message')
@@ -186,13 +204,14 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
         select_money_start: null,
         select_money_lose: null,
         select_curse: null,
-        select_max_player: null
+        select_max_player: null,
+        select_character: null
     }
     // get input elements
     const formInputs = ev.currentTarget.elements
     for(let i=0; i<formInputs.length; i++) {
         const input = formInputs.item(i) as HTMLInputElement
-        if(input.nodeName.match(/INPUT|SELECT/)) {
+        if(input.nodeName.match(/INPUT|SELECT/) && input.type != 'radio') {
             // filter inputs
             if(setInputValue('room_name', input)) {
                 // check room list 
@@ -216,6 +235,8 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             else if(setInputValue('select_money_lose', input)) inputValues.select_money_lose = `${input.value}`
             else if(setInputValue('select_curse', input)) inputValues.select_curse = `${input.value}`
             else if(setInputValue('select_max_player', input)) inputValues.select_max_player = `${input.value}`
+            // dont lowercase link
+            else if(setInputValue('select_character', input)) inputValues.select_character = input.value.trim()
             // error
             else {
                 resultMessage.classList.add('text-red-300')
@@ -239,6 +260,10 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
                 localStorage.setItem('accessToken', createRoomResponse.data[0].token)
                 delete createRoomResponse.data[0].token
             }
+            // set create room page
+            setCreateRoomPage(1)
+            // set my current game
+            gameState.setMyCurrentGame(createRoomResponse.data[0].currentGame)
             // hide the modal & tutorial
             miscState.setShowModal(null)
             miscState.setShowTutorial(null)

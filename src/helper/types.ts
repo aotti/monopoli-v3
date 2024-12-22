@@ -25,9 +25,11 @@ export interface ITooltip {
 export type RoomListListener = {
     onlinePlayers: string, 
     roomCreated: ICreateRoom['list'], 
+    roomInfo: IGameRoomInfo,
     roomsLeft:  ICreateRoom['list'][],
     joinedPlayers: number,
     joinedRoomId: number,
+    disabledCharacters: string[],
 }
 
 export type GameRoomListener = {
@@ -48,10 +50,14 @@ export interface IMiscProvider {
 type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
 type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
+    screenType: 'landscape'|'portrait',
+    setScreenType: Dispatch<SetStateAction<IMiscContext['screenType']>>,
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
-    showModal: 'login'|'register'|'create room',
+    showModal: 'login'|'register'|'create room'|'join room',
     setShowModal: Dispatch<SetStateAction<IMiscContext['showModal']>>,
+    showJoinModal: string, 
+    setShowJoinModal: Dispatch<SetStateAction<IMiscContext['showJoinModal']>>,
     animation: boolean,
     setAnimation: Dispatch<SetStateAction<boolean>>,
     isChatFocus: 'on'|'off'|'stay',
@@ -79,6 +85,7 @@ interface IGameRoomInfo {
 
 interface IGamePlayerInfo {
     display_name: string,
+    character: string,
     lap: number,
     money: number,
     card: string,
@@ -232,7 +239,7 @@ export interface IResponse<T = any> {
 // input ID
 type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
 type ChatType = 'channel'|'message_text'|'message_time'
-type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'
+type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType
@@ -285,6 +292,7 @@ export interface ICreateRoom {
         select_money_lose: string,
         select_curse: string,
         select_max_player: string,
+        select_character: string,
         token?: string,
     },
     payload: {
@@ -293,6 +301,7 @@ export interface ICreateRoom {
         room_password: string,
         money_start: number,
         rules: string,
+        character: string,
     },
     list: {
         room_id: number,
@@ -303,6 +312,7 @@ export interface ICreateRoom {
         player_max: number,
         rules: string,
         status: 'prepare'|'playing',
+        characters: string[],
     },
     server: {
         room_id: number,
@@ -324,6 +334,7 @@ export interface IShiftRoom {
     confirm_room_password?: string,
     display_name: string,
     money_start: string,
+    select_character: string,
     token?: string,
 }
 
