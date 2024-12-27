@@ -18,7 +18,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // player
     const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
-    const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>(null)
+    const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
     const [spectator, setSpectator] = useState(false)
     // room
     const [roomList, setRoomList] = useState([])
@@ -31,6 +31,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gamePlayerInfo, setGamePlayerInfo] = useState<IGameContext['gamePlayerInfo']>([])
     const [gameStages, setGameStages] = useState<IGameContext['gameStages']>('prepare')
     const [gameFixedPlayers, setGameFixedPlayers] = useState<number>(null)
+    const [gamePlayerTurns, setGamePlayerTurns] = useState<string[]>([])
+    const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
 
     useEffect(() => {
         // set online players if exist
@@ -76,18 +78,14 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     }
 
     const gameStates = {
-        myCurrentGame,
-        setMyCurrentGame,
-        gameRoomId,
-        setGameRoomId,
-        gameRoomInfo,
-        setGameRoomInfo,
-        gamePlayerInfo,
-        setGamePlayerInfo,
-        gameStages,
-        setGameStages,
-        gameFixedPlayers, 
-        setGameFixedPlayers,
+        myCurrentGame, setMyCurrentGame,
+        gameRoomId, setGameRoomId,
+        gameRoomInfo, setGameRoomInfo,
+        gamePlayerInfo, setGamePlayerInfo,
+        gameStages, setGameStages,
+        gameFixedPlayers, setGameFixedPlayers,
+        gamePlayerTurns, setGamePlayerTurns,
+        gameHistory, setGameHistory
     }
 
     const states: IGameContext = {

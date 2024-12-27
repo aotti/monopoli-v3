@@ -144,9 +144,11 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('onlinePlayers')
     // remove player info
     gameState.setMyPlayerInfo(null)
-    gameState.setOnlinePlayers(null)
+    gameState.setOnlinePlayers([])
     // remove room list
     gameState.setRoomList([])
+    // remove game stage
+    gameState.setGameStages('prepare')
 }
 /**
  * @returns [null, data] or [error]
@@ -233,6 +235,16 @@ export function filterInput(input: InputIDType, value: string) {
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
             return value ? value.match(/^[\d]{3}$/) : null
+        // ====== ROLL DICE TYPE ======
+        case 'rolled_dice': 
+            return value ? value.match(/^[\d]{1,2}$/) : null
+        // ====== TURN END TYPE ======
+        case 'pos': 
+            return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null
+        case 'lap': 
+            return value ? value.match(/^[0-9]{1,2}$/) : null
+        case 'history': 
+            return value ? value.match(/^rolled_dice: ([0-9]|1[0-2])$/) : null
     }
 }
 

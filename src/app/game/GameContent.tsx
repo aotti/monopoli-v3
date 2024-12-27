@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
 import { applyTooltipEvent, fetcher, fetcherOptions, qS, translateUI } from "../../helper/helper"
@@ -17,7 +17,9 @@ import RollNumber from "./components/board/RollNumber"
 import TutorialGameRoom from "./components/TutorialGameRoom"
 import { clickOutsideElement } from "../../helper/click-outside"
 import PubNub, { Listener } from "pubnub"
-import { GameRoomListener, IChat, IGameContext, IMiscContext, IResponse } from "../../helper/types"
+import { IGameContext, IMiscContext, IResponse } from "../../helper/types"
+import BoardTesting from "./components/board/BoardTesting"
+import { gameMessageListener } from "./helper/published-message"
 
 export default function GameContent({ pubnubSetting }) {
     const miscState = useMisc()
@@ -47,6 +49,10 @@ export default function GameContent({ pubnubSetting }) {
         getPlayerInfo(gameroomParam, miscState, gameState)
 
         gameState.setGameRoomId(gameroomParam)
+    }, [])
+
+    useEffect(() => {
+        const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
         // pubnub channels
         const gameroomChannel = `monopoli-gameroom-${gameroomParam}`
         // subscribe
@@ -55,69 +61,7 @@ export default function GameContent({ pubnubSetting }) {
         })
         // get published message
         const publishedMessage: Listener = {
-            message: (data) => {
-                const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
-                // add chat
-                const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
-                if(getMessage.message_text) {
-                    const chatData: Omit<IChat, 'channel'|'token'> = {
-                        display_name: getMessage.display_name,
-                        message_text: getMessage.message_text,
-                        message_time: getMessage.message_time
-                    }
-                    miscState.setMessageItems(data => [...data, chatData])
-                    // play notif sound
-                    if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
-                        soundMessageNotif.play()
-                }
-                // join
-                if(getMessage.joinPlayer) {
-                    gameState.setGamePlayerInfo(players => [...players, getMessage.joinPlayer])
-                }
-                // leave
-                if(getMessage.leavePlayer) {
-                    gameState.setGamePlayerInfo(players => {
-                        const playersLeft = [...players]
-                        // remove player
-                        const findLeavePlayer = playersLeft.map(v => v.display_name).indexOf(getMessage.leavePlayer)
-                        playersLeft.splice(findLeavePlayer, 1)
-                        return playersLeft
-                    })
-                }
-                const playerTurnNotif = qS('#player_turn_notif')
-                // ready
-                if(getMessage.readyPlayers) {
-                    // set players ready text
-                    playerTurnNotif.textContent = `${getMessage.readyPlayers.length} player(s) ready`
-                    // if > 2 players ready, set notif
-                    if(getMessage.readyPlayers.length >= 2) {
-                        const notifTitle = qS('#result_notif_title')
-                        const notifMessage = qS('#result_notif_message')
-                        // show notif
-                        miscState.setAnimation(true)
-                        gameState.setShowGameNotif('normal')
-                        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Preparation'})
-                        notifMessage.textContent = translateUI({lang: miscState.language, text: 'if all players are ready, room creator have to click the "start" button'})
-                    }
-                }
-                // start
-                if(getMessage.startGame) {
-                    // change game stage
-                    gameState.setGameStages('decide')
-                    // set fixed player number
-                    gameState.setGameFixedPlayers(getMessage.fixedPlayers)
-                    // remove players ready text
-                    playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'click roll turn'})
-                }
-                // decide
-                if(getMessage.decidePlayers) {
-                    // display rolled number
-                    const decidePlayersRank = []
-                    for(let dp of getMessage.decidePlayers) 
-                        decidePlayersRank.push(`${dp.rolled_number} - ${dp.display_name}`)
-                    playerTurnNotif.textContent = decidePlayersRank.join('\n')
-                }
-            }
+            message: (data) => gameMessageListener(data, miscState, gameState)
         }
         pubnubClient.addListener(publishedMessage)
         // unsub and remove listener
@@ -127,7 +71,7 @@ export default function GameContent({ pubnubSetting }) {
             })
             pubnubClient.removeListener(publishedMessage)
         }
-    }, [])
+    }, [gameState.gamePlayerInfo])
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
@@ -166,7 +110,7 @@ export default function GameContent({ pubnubSetting }) {
                 {
                     gameState.gameRoomId
                         ? <>
-                            <BoardNormal />
+                            {gameState.gamePlayerInfo.length > 0 ? <BoardNormal /> : null}
                             {/* <BoardDelta /> */}
                             {/* <BoardTwoWay /> */}
                         </>
@@ -237,48 +181,38 @@ async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState:
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
     const playerTurnNotif = qS('#player_turn_notif')
+    // button
+    const rollTurnButton = qS('#roll_turn_button') as HTMLInputElement
+    const readyButton = qS('#ready_button') as HTMLInputElement
     // fetch
     const getPlayerFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
     const getPlayerResponse: IResponse = await (await fetcher(`/game?id=${roomId}`, getPlayerFetchOptions)).json()
     // response
     switch(getPlayerResponse.status) {
         case 200: 
+            const { getPlayers, gameHistory, decidePlayers, preparePlayers, playerTurns } = getPlayerResponse.data[0]
             // set player list
-            gameState.setGamePlayerInfo(getPlayerResponse.data[0].getPlayers)
+            gameState.setGamePlayerInfo(getPlayers)
+            // set game history
+            gameState.setGameHistory(gameHistory)
             // set decide players
-            if(getPlayerResponse.data[0]?.decidePlayers) {
-                // disable roll turn button
-                const rollTurnButton = qS('#roll_turn_button') as HTMLInputElement
+            if(decidePlayers) {
                 // change game stage
-                gameState.setGameStages('decide')
+                const isGameStage = decidePlayers.length === preparePlayers.length
+                if(isGameStage) gameState.setGameStages('play')
+                else gameState.setGameStages('decide')
                 // set fixed players
-                gameState.setGameFixedPlayers(getPlayerResponse.data[0].preparePlayers.length)
+                gameState.setGameFixedPlayers(preparePlayers.length)
                 // display rolled number
-                const decidePlayersRank = []
-                for(let dp of getPlayerResponse.data[0]?.decidePlayers) {
-                    decidePlayersRank.push(`${dp.rolled_number} - ${dp.display_name}`)
-                    // check if player have rolled
-                    if(dp.display_name == gameState.myPlayerInfo.display_name) {
-                        rollTurnButton.disabled = true
-                        rollTurnButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
-                    }
-                }
-                playerTurnNotif ? playerTurnNotif.textContent = decidePlayersRank.join('\n') : null
+                displayRolledNumber()
                 return
             }
             // set prepare players
-            else if(getPlayerResponse.data[0]?.preparePlayers) {
-                playerTurnNotif ? playerTurnNotif.textContent = `${getPlayerResponse.data[0].preparePlayers.length} player(s) ready` : null
-                // if > 2 players ready, set notif
-                if(getPlayerResponse.data[0].preparePlayers.length >= 2) {
-                    // show notif
-                    miscState.setAnimation(true)
-                    gameState.setShowGameNotif('normal')
-                    notifTitle.textContent = translateUI({lang: miscState.language, text: 'Preparation'})
-                    notifMessage.textContent = translateUI({lang: miscState.language, text: 'if all players are ready, room creator have to click the "start" button'})
-                }
+            else if(preparePlayers) {
+                playerTurnNotif ? playerTurnNotif.textContent = `${preparePlayers.length} player(s) ready` : null
+                // if > 2 players ready, set start notif
+                if(preparePlayers.length >= 2) gameStartNotif()
                 // change to start button (for creator)
-                const readyButton = qS('#ready_button') as HTMLInputElement
                 const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo?.display_name)
                 if(readyButton && findCreator !== -1) {
                     readyButton.id = 'start_button'
@@ -286,7 +220,7 @@ async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState:
                     return
                 }
                 // disable button if ready is clicked (for other)
-                const isReadyClicked = getPlayerResponse.data[0]?.preparePlayers.indexOf(gameState.myPlayerInfo?.display_name)
+                const isReadyClicked = preparePlayers.indexOf(gameState.myPlayerInfo?.display_name)
                 if(readyButton && isReadyClicked !== -1) {
                     readyButton.disabled = true
                     readyButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
@@ -302,5 +236,28 @@ async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState:
             notifTitle.textContent = `error ${getPlayerResponse.status}`
             notifMessage.textContent = `${getPlayerResponse.message}`
             return
+    }
+
+    // display rolled number
+    function displayRolledNumber() {
+        const decidePlayersRank = []
+        for(let dp of getPlayerResponse.data[0]?.decidePlayers) {
+            decidePlayersRank.push(`${dp.rolled_number} - ${dp.display_name}`)
+            // check if player have rolled
+            if(rollTurnButton && dp.display_name == gameState.myPlayerInfo.display_name) {
+                rollTurnButton.disabled = true
+                rollTurnButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
+            }
+        }
+        playerTurnNotif ? playerTurnNotif.textContent = decidePlayersRank.join('\n') : null
+    }
+
+    // game start notif
+    function gameStartNotif() {
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Preparation'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'if all players are ready, room creator have to click the "start" button'})
     }
 }

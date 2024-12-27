@@ -11,11 +11,12 @@ import { useGame } from "../../context/GameContext";
 import { RoomListListener, IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
+import { roomMessageListener } from "./helper/published-message";
 
 export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
-    const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
+    const playerData = gameState.otherPlayerInfo || gameState.myPlayerInfo
 
     // chat input ref
     const chatFocusRef = useRef()
@@ -25,7 +26,6 @@ export default function RoomContent({ pubnubSetting }) {
     const pubnubClient = new PubNub(pubnubSetting)
     // pubnub subscribe
     const roomlistChannel = 'monopoli-roomlist'
-    const onlineplayerChannel = 'monopoli-onlineplayer'
     // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
         // tooltip (the element must have position: relative)
@@ -35,67 +35,17 @@ export default function RoomContent({ pubnubSetting }) {
 
         // subscribe
         pubnubClient.subscribe({ 
-            channels: [roomlistChannel, onlineplayerChannel] 
+            channels: [roomlistChannel] 
         })
         // get published message
         const publishedMessage: Listener = {
-            message: (data) => {
-                const getMessage = data.message as PubNub.Payload & IChat & RoomListListener
-                // add chat
-                const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
-                if(getMessage.message_text) {
-                    const chatData: Omit<IChat, 'channel'|'token'> = {
-                        display_name: getMessage.display_name,
-                        message_text: getMessage.message_text,
-                        message_time: getMessage.message_time
-                    }
-                    miscState.setMessageItems(data => [...data, chatData])
-                    // play notif sound
-                    if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
-                        soundMessageNotif.play()
-                }
-                // update online player
-                if(getMessage.onlinePlayers) {
-                    const onlinePlayersData = getMessage.onlinePlayers
-                    localStorage.setItem('onlinePlayers', onlinePlayersData)
-                    gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
-                }
-                // room created
-                if(getMessage.roomCreated) {
-                    // set to room list
-                    gameState.setRoomList(room => [...room, getMessage.roomCreated])
-                    // set game room info
-                    gameState.setGameRoomInfo(rooms => [...rooms, getMessage.roomInfo])
-                }
-                // player join
-                if(getMessage.joinedRoomId) {
-                    // update room list
-                    gameState.setRoomList(rooms => {
-                        const updatedRooms = [...rooms]
-                        // find joined room
-                        const findJoined = rooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
-                        if(findJoined !== -1) {
-                            // update player count
-                            updatedRooms[findJoined].player_count = getMessage.joinedPlayers
-                            // update disabled characters
-                            updatedRooms[findJoined].characters = getMessage.disabledCharacters
-                        }
-                        // return rooms
-                        return updatedRooms
-                    })
-                }
-                // room deleted
-                if(getMessage.roomsLeft) {
-                    // set rooms left
-                    gameState.setRoomList(getMessage.roomsLeft)
-                }
-            }
+            message: data => roomMessageListener(data, miscState, gameState)
         }
         pubnubClient.addListener(publishedMessage)
         // unsub and remove listener
         return () => {
             pubnubClient.unsubscribe({ 
-                channels: [roomlistChannel, onlineplayerChannel] 
+                channels: [roomlistChannel] 
             })
             pubnubClient.removeListener(publishedMessage)
         }
@@ -150,7 +100,7 @@ export default function RoomContent({ pubnubSetting }) {
                                 // chat box
                                 ? <ChatBox page="room" />
                                 // list of online players
-                                : <PlayerList onlinePlayers={onlinePlayers} />
+                                : <PlayerList onlinePlayers={gameState.onlinePlayers} />
                         }
                         {/* chat form */}
                         <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
@@ -170,7 +120,7 @@ export default function RoomContent({ pubnubSetting }) {
                 {/* tutorial: relative z-10 */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_2' ? 'relative z-10' : ''}
                 h-[calc(100vh-65vh)] lg:h-[calc(100vh-60vh)] p-1`}>
-                    <PlayerStats playerData={otherPlayerInfo || myPlayerInfo} onlinePlayers={onlinePlayers} />
+                    <PlayerStats playerData={playerData} onlinePlayers={gameState.onlinePlayers} />
                 </div>
             </div>
             {/* room list */}

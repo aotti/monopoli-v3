@@ -29,6 +29,7 @@ export type RoomListListener = {
     roomsLeft:  ICreateRoom['list'][],
     joinedPlayers: number,
     joinedRoomId: number,
+    leavePlayer: string,
     disabledCharacters: string[],
 }
 
@@ -39,6 +40,12 @@ export type GameRoomListener = {
     startGame: string,
     fixedPlayers: number,
     decidePlayers: Omit<IGamePlay['decide_player'], 'token'|'channel'>[],
+    gameStage: IGameContext['gameStages'],
+    playerTurn: string,
+    playerDice: number,
+    gameHistory: IGameHistory[],
+    playerTurns: string[],
+    playerTurnEnd: IGamePlayerInfo,
 }
 
 // context
@@ -86,11 +93,18 @@ interface IGameRoomInfo {
 interface IGamePlayerInfo {
     display_name: string,
     character: string,
+    pos: number,
     lap: number,
     money: number,
     card: string,
     city: string,
     prison: boolean,
+}
+
+interface IGameHistory {
+    room_id: number,
+    display_name: string,
+    history: string,
 }
 
 export interface IGameContext {
@@ -139,6 +153,10 @@ export interface IGameContext {
     setGameStages: Dispatch<SetStateAction<IGameContext['gameStages']>>,
     gameFixedPlayers: number,
     setGameFixedPlayers: Dispatch<SetStateAction<IGameContext['gameFixedPlayers']>>,
+    gamePlayerTurns: string[], 
+    setGamePlayerTurns: Dispatch<SetStateAction<IGameContext['gamePlayerTurns']>>,
+    gameHistory: IGameHistory[], 
+    setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -242,7 +260,9 @@ type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType
+type RollDiceType = 'rolled_dice'
+type TurnEndType = 'pos'|'lap'|'history'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType
 
 // user
 export interface ILoggedUsers {
@@ -354,6 +374,24 @@ export interface IGamePlay {
         channel: string,
         display_name: string,
         rolled_number: string,
+    },
+    roll_dice: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        rolled_dice: string,
+    },
+    turn_end: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        pos: string,
+        lap: string,
+        money: string,
+        card: string,
+        city: string,
+        prison: string,
+        history: string,
     }
 }
 

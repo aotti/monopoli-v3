@@ -23,10 +23,7 @@ export default function GameButtons() {
             {/* roll dice + roll turn */}
             {gameState.gameStages == 'decide' ? <DecideTurnButtons /> : null}
             {/* roll dice + surrend */}
-            {/* <div className="relative z-10 flex gap-6 mx-auto w-52 lg:w-72">
-                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'roll dice'})} </button>
-                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'surrender'})} </button>
-            </div> */}
+            {gameState.gameStages == 'play' ? <RollTurnButtons /> : null}
             {/* player turn notif */}
             <div className="mx-auto">
                 <span id="player_turn_notif" className="whitespace-pre"></span>
@@ -55,7 +52,7 @@ function DecideTurnButtons() {
     const gameState = useGame()
 
     return (
-        <div className="relative z-10 flex gap-6 mx-auto w-52 lg:w-72">
+        <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
             <div>
                 <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0" disabled> 
                     {translateUI({lang: miscState.language, text: 'roll dice'})} 
@@ -66,6 +63,28 @@ function DecideTurnButtons() {
                 <button type="submit" id="roll_turn_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
                 onClick={() => gameState.setRollNumber('turn')}> 
                     {translateUI({lang: miscState.language, text: 'roll turn'})} 
+                </button>
+            </div>
+        </div>
+    )
+}
+
+function RollTurnButtons() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
+            <div>
+                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
+                onClick={() => gameState.setRollNumber('dice')}> 
+                    {translateUI({lang: miscState.language, text: 'roll dice'})} 
+                </button>
+            </div>
+            <div>
+                <input type="hidden" id="rolled_dice" />
+                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> 
+                    {translateUI({lang: miscState.language, text: 'surrender'})} 
                 </button>
             </div>
         </div>
@@ -97,11 +116,14 @@ async function leaveGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     const notifMessage = qS('#result_notif_message')
     // submit button
     const leaveButton = qS('#leave_button') as HTMLInputElement
+    // get my character for remove
+    const getMyCharacter = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     // input value container
     const inputValues = {
         action: 'room leave',
         room_id: gameState.gameRoomId.toString(),
-        display_name: gameState.myPlayerInfo.display_name
+        display_name: gameState.myPlayerInfo.display_name,
+        select_character: gameState.gamePlayerInfo[getMyCharacter].character
     }
     // check is player creator
     const isCreatorLeave = gameState.gameRoomInfo.map(v => v.creator).indexOf(inputValues.display_name)

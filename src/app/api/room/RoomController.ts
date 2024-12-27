@@ -80,7 +80,7 @@ export default class RoomController extends Controller {
         }
         else {
             // disable selected character
-            await this.redisSet(`disabled_characters_${data[0].room_id}`, [payload.select_character])
+            await this.redisSet(`disabledCharacters_${data[0].room_id}`, [payload.select_character])
             // split max player from rules
             const playerMax = data[0].rules.match(/max: \d/)[0].split(': ')[1]
             const rules = data[0].rules.match(/.*(?=;max)/)[0]
@@ -181,7 +181,7 @@ export default class RoomController extends Controller {
                 // modify room info for gameRoomInfo
                 const { room_id, room_name, creator } = d
                 // get disabled characters
-                const getDisabledCharacters = await this.redisGet(`disabled_characters_${room_id}`)
+                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${room_id}`)
                 // update room list characters data
                 d.characters = getDisabledCharacters
                 // split rules
@@ -256,7 +256,7 @@ export default class RoomController extends Controller {
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
         // check disabled characters
-        const getDisabledCharacters = await this.redisGet(`disabled_characters_${payload.room_id}`)
+        const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
         const isCharacterDisabled = getDisabledCharacters.indexOf(payload.select_character)
         if(isCharacterDisabled !== -1) return this.respond(400, 'someone has chosen this character', [])
         // set payload for db query
@@ -282,7 +282,7 @@ export default class RoomController extends Controller {
         }
         else {
             // update disabled characters
-            await this.redisSet(`disabled_characters_${payload.room_id}`, [...getDisabledCharacters, payload.select_character])
+            await this.redisSet(`disabledCharacters_${payload.room_id}`, [...getDisabledCharacters, payload.select_character])
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
@@ -300,7 +300,8 @@ export default class RoomController extends Controller {
             const gameroomChannel = `monopoli-gameroom-${data[0].room_id}`
             const joinPlayer: IGameContext['gamePlayerInfo'][0] = {
                 display_name: data[0].display_name,
-                character: data[0].character,
+                character: (data[0] as any).player_character,
+                pos: data[0].pos,
                 money: data[0].money,
                 lap: data[0].lap,
                 card: data[0].card,
@@ -363,8 +364,12 @@ export default class RoomController extends Controller {
         }
         else {
             // publish online players
-            const onlineplayer_channel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            const roomlistChannel = 'monopoli-roomlist'
+            const publishData = {
+                onlinePlayers: JSON.stringify(onlinePlayers.data),
+                leavePlayer: payload.display_name
+            }
+            const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -374,6 +379,10 @@ export default class RoomController extends Controller {
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // remove chosen character
+            const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
+            const removeChosenCharacter = getDisabledCharacters.filter(char => char != payload.select_character)
+            await this.redisSet(`disabledCharacters_${payload.room_id}`, removeChosenCharacter)
             // remove joined room cookie
             cookies().set('joinedRoom', '', {
                 path: '/',
@@ -437,12 +446,12 @@ export default class RoomController extends Controller {
             // remove room name from list
             await this.filterRoomList('out', payload.room_name)
             // remove disabled characters
-            await this.redisReset(`disabled_characters_${payload.room_id}`)
+            await this.redisReset(`disabledCharacters_${payload.room_id}`)
             // new rooms left data
             const newRoomsLeft: ICreateRoom['list'][] = []
             data.forEach(async v => {
                 // get disabled characters
-                const getDisabledCharacters = await this.redisGet(`disabled_characters_${v.room_id}`)
+                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${v.room_id}`)
                 // split max player from rules
                 const playerMax = v.rules.match(/max: \d/)[0].split(': ')[1]
                 const rules = v.rules.match(/.*(?=;max)/)[0]

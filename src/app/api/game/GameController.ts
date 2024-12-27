@@ -1,4 +1,4 @@
-import { IGamePlay, IQuerySelect, IResponse } from "../../../helper/types";
+import { IGameContext, IGamePlay, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 
 export default class GameController extends Controller {
@@ -34,7 +34,7 @@ export default class GameController extends Controller {
         // set payload for db query
         const queryObject: IQuerySelect = {
             table: 'games',
-            selectColumn: this.dq.columnSelector('games', 345678),
+            selectColumn: this.dq.columnSelector('games', 3456789) + ',prison',
             whereColumn: 'room_id',
             whereValue: payload.room_id
         }
@@ -57,18 +57,24 @@ export default class GameController extends Controller {
                 }
                 return tempNewData
             })
+            // get game history
+            const getGameHistory = await this.redisGet(`gameHistory_${payload.room_id}`)
             // get ready players
             const getReadyPlayers = await this.redisGet(`readyPlayers_${payload.room_id}`)
             // get decide players
             const getDecidePlayers = await this.redisGet(`decidePlayers_${payload.room_id}`)
             // sort highest > lowest
             const sortDecidePlayers = getDecidePlayers.sort((a,b) => b.rolled_number - a.rolled_number)
+            // get player turns
+            const getPlayerTurns = await this.redisGet(`playerTurns_${payload.room_id}`)
             // set result
             const resultData = {
+                gameHistory: getGameHistory,
                 preparePlayers: getReadyPlayers.length > 0 ? getReadyPlayers.filter((v, i, arr) => arr.indexOf(v) === i) : null,
                 decidePlayers: sortDecidePlayers.length > 0 ? sortDecidePlayers.filter((obj1, i, arr) => 
                     arr.findLastIndex(obj2 => obj2.display_name == obj1.display_name) === i
                 ) : null,
+                playerTurns: getPlayerTurns.length > 0 ? getPlayerTurns : null,
                 getPlayers: extractedData,
                 token: token
             }
@@ -169,9 +175,15 @@ export default class GameController extends Controller {
             display_name: payload.display_name,
             rolled_number: +payload.rolled_number
         }].sort((a,b) => b.rolled_number - a.rolled_number)
+        // get fixed players
+        const getFixedPlayers = await this.redisGet(`readyPlayers_${roomId}`)
+        // set player turns if game stage == play
+        if(sortDecidePlayers.length === getFixedPlayers.length)
+            await this.redisSet(`playerTurns_${roomId}`, sortDecidePlayers.map(v => v.display_name))
         // publish online players
         const publishData = {
             decidePlayers: sortDecidePlayers,
+            gameStage: sortDecidePlayers.length === getFixedPlayers.length ? 'play' : 'decide',
             onlinePlayers: JSON.stringify(onlinePlayersData)
         }
         const isPublished = await this.pubnubPublish(payload.channel, publishData)
@@ -183,6 +195,109 @@ export default class GameController extends Controller {
             token: token
         }
         result = this.respond(200, `${action} success`, [resultData])
+        // return result
+        return result
+    }
+
+    async rollDice(action: string, payload: IGamePlay['roll_dice']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        // check player turn
+        const roomId = payload.channel.match(/\d+/)[0]
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.display_name) 
+            return this.respond(400, 'its not your turn', [])
+        // publish data
+        const publishData = {
+            playerTurn: payload.display_name,
+            playerDice: +payload.rolled_dice,
+            onlinePlayers: JSON.stringify(onlinePlayersData)
+        }
+        const isPublished = await this.pubnubPublish(payload.channel, publishData)
+        console.log(isPublished);
+        
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+        // set result
+        const resultData = {
+            token: token
+        }
+        result = this.respond(200, `${action} success`, [resultData])
+        // return result
+        return result
+    }
+
+    async turnEnd(action: string, payload: IGamePlay['turn_end']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_turn_end',
+            function_args: {
+                tmp_display_name: payload.display_name,
+                tmp_pos: payload.pos,
+                tmp_lap: payload.lap
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            // modify player turn end data
+            const newPlayerTurnEndData: IGameContext['gamePlayerInfo'][0] = {
+                ...data[0],
+                character: (data[0] as any).player_character
+            }
+            delete (newPlayerTurnEndData as any).player_character
+            // update game history (buy city, get cards, etc)
+            const roomId = payload.channel.match(/\d+/)[0]
+            const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            // fill game history
+            const gameHistory: IGameContext['gameHistory'] = []
+            for(let ph of payload.history.split(';')) {
+                const tempHistory = {
+                    room_id: +roomId, 
+                    display_name: payload.display_name, 
+                    history: ph
+                }
+                // save game history to redis
+                gameHistory.push(tempHistory)
+                await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, tempHistory])
+            }
+            // update player turns
+            const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+            const shiftPlayerToBack = getPlayerTurns.splice(0, 1)[0] as string
+            await this.redisSet(`playerTurns_${roomId}`, [...getPlayerTurns, shiftPlayerToBack])
+            // publish online players
+            const publishData = {
+                playerTurnEnd: newPlayerTurnEndData,
+                playerTurns: [...getPlayerTurns, shiftPlayerToBack],
+                gameHistory: [...getGameHistory, ...gameHistory],
+                onlinePlayers: JSON.stringify(onlinePlayersData)
+            }
+            const isPublished = await this.pubnubPublish(payload.channel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                // turnEndData: data[0],
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
         // return result
         return result
     }

@@ -1,13 +1,13 @@
 {
     "row_1": [
         { 
-            "square": 13, 
+            "square": 15, 
             "type": "other",
             "name": "Community Card", 
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
         },
         { 
-            "square": 14, 
+            "square": 16, 
             "type": "city",
             "name": "Special-3",
             "price": 70000, 
@@ -15,13 +15,13 @@
             "info": "<Yogyakarta>\nafter buying, get money every visit" 
         },
         { 
-            "square": 15, 
+            "square": 17, 
             "type": "other",
             "name": "Chance Card", 
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
         },
         { 
-            "square": 16, 
+            "square": 18, 
             "type": "city",
             "name": "Denpasar", 
             "price": 70000,
@@ -29,57 +29,58 @@
             "info": "price +10% for each upgrade"
         },
         { 
-            "square": 17, 
+            "square": 19, 
             "type": "city",
             "name": "Pulau Komodo", 
             "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Komodo_Island_100-meRFhDz4uZy1GVkRLe1upagPyBg1aQ.png",
+            "img": "",
             "info": "price +10% for each upgrade"
         },
         { 
-            "square": 18, 
+            "square": 20, 
             "type": "other",
             "name": "Debuff Area", 
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
             "info": "60% chance get debuff"
         },
         { 
-            "square": 19, 
+            "square": 21, 
             "type": "city",
             "name": "Special-4",
             "price": 70000, 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Makassar_100-KQI2wyZj34yZf1GIZGfx3yUuP5OcNC.png",
-            "info": "<Makassar>\nafter buying, get money every visit"
+            "img": "",
+            "info": "<Merauke>\nafter buying, get money every visit"
         },
         { 
-            "square": 20, 
+            "square": 22, 
             "type": "city",
-            "name": "Nusantara",
+            "name": "Makassar",
             "price": 70000, 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Nusantara_100-0pA4KBLsMIzIEp7tpbYbUdBAXJ73ss.png",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Makassar_100-KQI2wyZj34yZf1GIZGfx3yUuP5OcNC.png",
             "info": "price +10% for each upgrade" 
         },
         { 
-            "square": 21, 
+            "square": 23, 
             "type": "other",
             "name": "Community Card",
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
         },
         { 
-            "square": 22, 
+            "square": 24, 
             "type": "other",
             "name": "Free Parking 😎", 
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Parking_100-0bNthQvUZ8ZeknwzolhmI0YbKz6jWN.png",
             "info": "go to anywhere except prison" 
         }
     ],
-    "row_2": [
+    "row_3": [
         { 
-            "square": 12, 
-            "type": "other",
-            "name": "Buff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
-            "info": "100% chance get buff"
+            "square": 13, 
+            "type": "city",
+            "name": "Surabaya", 
+            "price": 70000,
+            "img": "",
+            "info": "price +10% for each upgrade"
         },
         { "type": null },
         { "type": null },
@@ -90,7 +91,7 @@
         { "type": null },
         { "type": null },
         { 
-            "square": 23, 
+            "square": 26, 
             "type": "city",
             "name": "Pontianak", 
             "price": 70000,
@@ -98,7 +99,7 @@
             "info": "price +10% for each upgrade"
         }
     ],
-    "row_3": [
+    "row_5": [
         { 
             "square": 11, 
             "type": "city",
@@ -116,15 +117,13 @@
         { "type": null },
         { "type": null },
         { 
-            "square": 24, 
-            "type": "city",
-            "name": "Cursed-2", 
-            "price": 70000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Backrooms_100-R3NC0fRDQ5Gmjqo3m9kyoG55wIyPaJ.png",
-            "info": "<Backrooms>\nlose money every visit"
+            "square": 28, 
+            "type": "other",
+            "name": "Chance Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
         }
     ],
-    "row_4": [
+    "row_6": [
         { 
             "square": 10, 
             "type": "other",
@@ -144,7 +143,7 @@
             "name": "Cursed-1", 
             "price": 70000,
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Lawang_Sewu_100-OgKDUcfqHVUE1cmvSilsFZvU1DzRlX.png",
-            "info": "<Lawang Sewu>\nlose money every visit"
+            "info": "lose money every visit"
         },
         { 
             "square": 7, 

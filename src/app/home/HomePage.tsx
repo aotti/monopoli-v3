@@ -21,15 +21,12 @@ export default function HomePage() {
         if(resetData) resetAllData(gameState)
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
-    }, [miscState.secret])
-
-    // navigate to room list
-    useEffect(() => {
-        if(gameState.onlinePlayers) {
+        // navigate to room list
+        if(gameState.myPlayerInfo && gameState.onlinePlayers) {
             const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
             gotoRoom.click()
         }
-    }, [gameState.onlinePlayers])
+    }, [miscState.secret, gameState.onlinePlayers])
 
     return (
         <div className="text-white text-xs lg:text-sm">

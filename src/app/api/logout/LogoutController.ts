@@ -27,6 +27,14 @@ export default class LogoutController extends Controller {
         }
         const onlinePlayers = await this.logOnlineUsers('out', logData as ILoggedUsers)
         if(onlinePlayers.status !== 200) return onlinePlayers
+        console.log('logout', onlinePlayers);
+        
+        // publish online players
+        const onlineplayer_channel = 'monopoli-onlineplayer'
+        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+        console.log(isPublished);
+        
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // set player secret to empty
         cookies().set('timeoutToken', '', {
             path: '/',
@@ -47,12 +55,6 @@ export default class LogoutController extends Controller {
             httpOnly: true,
             sameSite: 'strict'
         })
-        // publish online players
-        const onlineplayer_channel = 'monopoli-onlineplayer'
-        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers)})
-        console.log(isPublished);
-        
-        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // return result
         return result = this.respond(200, `${action} success`, [])
     }

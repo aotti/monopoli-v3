@@ -48,6 +48,9 @@ module.exports = {
         '8bit-modal': {},
         '8bit-success': {},
         '8bit-primary': {}
+      },
+      boxShadow: {
+        'inner-md': 'inset 0 4px 12px 2px rgb(0 0 0 / 0.05)'
       }
     },
   },

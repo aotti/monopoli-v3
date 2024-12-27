@@ -7,14 +7,20 @@ import LoadingPage from "../../components/LoadingPage";
 import { useGame } from "../../context/GameContext";
 import { useEffect } from "react";
 import { useMisc } from "../../context/MiscContext";
-import { checkAccessToken } from "../../helper/helper";
+import { checkAccessToken, qS } from "../../helper/helper";
+import Link from "next/link";
 
 export default function RoomPage({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
     
-    // check token for auto login
     useEffect(() => {
+        // back to home
+        if(!gameState.myPlayerInfo || !gameState.onlinePlayers) {
+            const gotoHome = qS('#gotoHome') as HTMLAnchorElement
+            gotoHome.click()
+        }
+        // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
     }, [miscState.secret])
     
@@ -34,6 +40,7 @@ export default function RoomPage({ pubnubSetting }) {
             </div>
             {/* orientation portrait warning */}
             <ScreenPortraitWarning />
+            <Link id="gotoHome" href={'/'} hidden={true}></Link>
         </div>
     )
 }

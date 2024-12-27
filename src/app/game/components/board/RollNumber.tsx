@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useGame } from "../../../../context/GameContext";
-import { IGameContext, ITranslate } from "../../../../helper/types";
-import { qS, qSA, translateUI } from "../../../../helper/helper";
+import { IGameContext, IMiscContext, IResponse } from "../../../../helper/types";
+import { fetcher, fetcherOptions, qS, qSA, translateUI } from "../../../../helper/helper";
 import { useMisc } from "../../../../context/MiscContext";
 
 export default function RollNumber({ roomId }: {roomId: number}) {
@@ -10,19 +10,23 @@ export default function RollNumber({ roomId }: {roomId: number}) {
     // get room info
     const getGameRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(roomId)
 
+    // roll animation
     useEffect(() => {
-        const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-        startAnimation(diceNumber, gameState.rollNumber, miscState.language)
-        // hidden the roll after end
-        setTimeout(() => gameState.setRollNumber(null), 3500);
-    }, [])
+        if(!gameState.rollNumber) return
+        return () => {
+            const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
+            startAnimation(diceNumber, miscState, gameState)
+            // hidden the roll after end
+            setTimeout(() => gameState.setRollNumber(null), 3500);
+        }
+    }, [gameState.rollNumber])
 
     return (
-        gameState.rollNumber
-            ? gameState.rollNumber == 'dice'
+        gameState.rollNumber == 'turn'
+            ? <RollTurn />
+            : gameState.rollNumber == 'dice'
                 ? <RollDice amount={gameState.gameRoomInfo[getGameRoomInfo]?.dice} />
-                : <RollTurn />
-            : null
+                : null
     )
 }
 
@@ -132,7 +136,7 @@ const buildItemLists = (number: number[]) => {
 }
 
 // Determine whether the player won and start the spinning animation
-const startAnimation = (number: number[], type: IGameContext['rollNumber'], language: ITranslate['lang']) => {
+const startAnimation = (number: number[], miscState: IMiscContext, gameState: IGameContext) => {
     // less than 1024 for mobile, more than 1024 for desktop
     const windowWidth = window.innerWidth
     const defaultSize = windowWidth < 1024 ? 24 : 32
@@ -147,30 +151,58 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber'], lang
     const items = document.getElementsByClassName('slot-machine__prizes');
     Array.prototype.forEach.call(items, (slot, s) => {
         slot.animate([
-            {
-            transform: "translateY(0)"
-            },
-            {
-            transform: `translateY(-${totalHeight}px)`
-            }
+            { transform: "translateY(0)" }, // from
+            { transform: `translateY(-${totalHeight}px)` } // to
         ], {
             duration: 1000 + (s * 500),
             fill: "forwards",
             easing: 'ease-in-out'
         });
         // roll result
-        if(type == 'dice') {
+        if(gameState.rollNumber == 'dice') {
             const diceRollResult = qS('#dice_result')
             // get result number
             const dices = qSA('.roll-result')
             const diceResult = []
             dices.forEach(dice => diceResult.push(+dice.textContent))
             // display
-            setTimeout(() => {
-                diceRollResult.textContent = `${translateUI({lang: language, text: 'your dice is'})} ${diceResult.reduce((accumulator, currentVal) => accumulator + currentVal)}`
+            setTimeout(async () => {
+                const diceResultReduce = +diceResult.reduce((accumulator, currentVal) => accumulator + currentVal)
+                diceRollResult.textContent = `${translateUI({lang: miscState.language, text: 'your dice is'})} ${diceResultReduce}`
+                // input values container
+                const inputValues = {
+                    action: 'game roll dice',
+                    channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+                    display_name: gameState.myPlayerInfo.display_name,
+                    rolled_dice: diceResultReduce.toString()
+                }
+                // result message
+                const notifTitle = qS('#result_notif_title')
+                const notifMessage = qS('#result_notif_message')
+                // fetch
+                const rollDiceFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+                const rollDiceResponse: IResponse = await (await fetcher('/game', rollDiceFetchOptions)).json()
+                // response
+                switch(rollDiceResponse.status) {
+                    case 200: 
+                        // save access token
+                        if(rollDiceResponse.data[0].token) {
+                            localStorage.setItem('accessToken', rollDiceResponse.data[0].token)
+                            delete rollDiceResponse.data[0].token
+                        }
+                        return
+                    default: 
+                        // show notif
+                        miscState.setAnimation(true)
+                        gameState.setShowGameNotif('normal')
+                        // error message
+                        notifTitle.textContent = `error ${rollDiceResponse.status}`
+                        notifMessage.textContent = `${rollDiceResponse.message}`
+                        return
+                }
             }, 2000);
         }
-        else if(type == 'turn') {
+        else if(gameState.rollNumber == 'turn') {
             const resultTurn = qS('#turn_result')
             // get result number
             const turns = qSA('.roll-result')
@@ -181,8 +213,111 @@ const startAnimation = (number: number[], type: IGameContext['rollNumber'], lang
             rolledNumber.value = turnNumber[0] + turnNumber[1] + turnNumber[2]
             // display
             setTimeout(() => {
-                resultTurn.textContent = `${translateUI({lang: language, text: 'your number is'})} ${+(turnNumber[0] + turnNumber[1] + turnNumber[2])}`
+                resultTurn.textContent = `${translateUI({lang: miscState.language, text: 'your number is'})} ${+(turnNumber[0] + turnNumber[1] + turnNumber[2])}`
             }, 2500);
         }
     });
+}
+
+/**
+ * @param numberTarget dice result number
+ */
+export function playerMoving(playerTurn: string, numberTarget: number, miscState: IMiscContext, gameState: IGameContext) {
+    // get player path
+    const playerPaths = qSA(`[data-player-path]`) as NodeListOf<HTMLElement>
+    // get players
+    const playerNames = qSA(`[data-player-name]`) as NodeListOf<HTMLElement>
+    // match player name
+    playerNames.forEach(player => {
+        if(player.dataset.playerName != playerTurn) return
+        // find current player
+        const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(playerTurn)
+        // moving params
+        let numberStep = 0
+        let numberLaps = gameState.gamePlayerInfo[findPlayer].lap
+        const currentPos = gameState.gamePlayerInfo[findPlayer].pos
+        const nextPos = (currentPos + numberTarget) === playerPaths.length 
+                        ? playerPaths.length 
+                        : ((currentPos + numberTarget) % playerPaths.length)
+        // move function
+        const stepInterval = setInterval(() => moving(), 750);
+
+        async function moving() {
+            // count step
+            ++numberStep
+            // stop moving
+            if(numberStep > numberTarget) {
+                clearInterval(stepInterval)
+                // turn off roll dice
+                gameState.setRollNumber(null)
+                // ====== ONLY MOVING PLAYER WILL FETCH ======
+                if(gameState.gamePlayerInfo[findPlayer].display_name != gameState.myPlayerInfo.display_name) return
+                // ====== ONLY MOVING PLAYER WILL FETCH ======
+                console.log(gameState.myPlayerInfo.display_name, 'fetching');
+                
+                // result message
+                const notifTitle = qS('#result_notif_title')
+                const notifMessage = qS('#result_notif_message')
+                // input values container
+                const inputValues = {
+                    action: 'game turn end',
+                    channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+                    display_name: gameState.gamePlayerInfo[findPlayer].display_name,
+                    pos: nextPos.toString(),
+                    lap: numberLaps.toString(),
+                    // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
+                    history: `rolled_dice: ${numberTarget}`
+                }
+                // fetch
+                const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
+                const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
+                // response
+                switch(playerTurnEndResponse.status) {
+                    case 200: 
+                        // save access token
+                        if(playerTurnEndResponse.data[0].token) {
+                            localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
+                            delete playerTurnEndResponse.data[0].token
+                        }
+                        break
+                    default: 
+                        // show notif
+                        miscState.setAnimation(true)
+                        gameState.setShowGameNotif('normal')
+                        // error message
+                        notifTitle.textContent = `error ${playerTurnEndResponse.status}`
+                        notifMessage.textContent = `${playerTurnEndResponse.message}`
+                        break
+                }
+                return
+            }
+            // moving
+            playerPaths.forEach(path => {
+                // prevent tile number == 0
+                const tempStep = currentPos + numberStep
+                const fixedNextStep = tempStep === playerPaths.length ? playerPaths.length : (tempStep % playerPaths.length)
+                // match paths & move
+                if(+path.dataset.playerPath === fixedNextStep) {
+                    gameState.setGamePlayerInfo(players => {
+                        const newPosInfo = [...players]
+                        newPosInfo[findPlayer].pos = fixedNextStep
+                        return newPosInfo
+                    })
+                    // update laps for moving player
+                    if(tempStep === playerPaths.length) {
+                        numberLaps += 1
+                        gameState.setGamePlayerInfo(players => {
+                            const newLapInfo = [...players]
+                            newLapInfo[findPlayer].lap = numberLaps
+                            return newLapInfo
+                        })
+                    }
+                }
+            })
+        }
+    })
+}
+
+function playerStopBy() {
+    
 }

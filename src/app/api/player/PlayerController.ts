@@ -32,8 +32,8 @@ export default class PlayerController extends Controller {
         }
         else {
             // publish realtime data
-            const onlineplayerChannel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            const roomlistChannel = 'monopoli-roomlist'
+            const isPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -81,8 +81,8 @@ export default class PlayerController extends Controller {
         else {
             // publish realtime data
             const publishData = {onlinePlayers: JSON.stringify(onlinePlayers.data)}
-            const onlineplayerChannel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayerChannel, publishData)
+            const roomlistChannel = 'monopoli-roomlist'
+            const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])

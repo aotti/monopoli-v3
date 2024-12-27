@@ -45,8 +45,13 @@ export default class Controller {
         // this.redisReset('loggedPlayers')
         // this.redisReset('readyPlayers_33')
         // this.redisReset('decidePlayers_33')
-        // this.redisSet('disabled_characters_32', [
+        // this.redisReset('gameHistory_33')
+        // this.redisSet('disabledCharacters_32', [
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
+        // ])
+        // this.redisSet('disabledCharacters_33', [
+        //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png',
+        //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/square-GcUfnpybETUDXjwbOxSTxdC6fkp4xb.png'
         // ])
     }
 
@@ -99,7 +104,9 @@ export default class Controller {
             case 'game get player': 
             case 'game ready player': 
             case 'game start': 
-            case 'game roll turn': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'game roll turn': 
+            case 'game roll dice': 
+            case 'game turn end': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])
@@ -218,7 +225,7 @@ export default class Controller {
         else if(action == 'out') {
             loggedPlayers = loggedPlayers.filter(p => p.display_name != payload.display_name)
             // save to redis
-            this.redisSet('loggedPlayers', loggedPlayers)
+            await this.redisSet('loggedPlayers', loggedPlayers)
             // response
             return this.respond(200, 'user logged', loggedPlayers)
         }

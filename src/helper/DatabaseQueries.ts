@@ -117,7 +117,7 @@ export class DatabaseQueries {
      * - users - id | username | password | created_at | updated_at | deleted_at
      * - players - id | user_id | display_name | game_played | worst_money_lost | avatar | updated_at | deleted_at
      * - rooms - id | creator_id | name | password | player_count | rules | status | created_at | updated_at | deleted_at
-     * - games - id | room_id | player_id | lap | money | card | city | prison | created_at | updated_at | deleted_at
+     * - games - id | room_id | player_id | character | pos | lap | money | card | city | prison | created_at | updated_at | deleted_at
      */
     columnSelector(type: 'users'|'players'|'rooms'|'games', columns: number) {
         // to save selected column 
@@ -139,7 +139,7 @@ export class DatabaseQueries {
         }
         // for direct_chats table
         else if(type === 'games') {
-            const pickerList: string[] = ['id', 'room_id', 'player_id(display_name)', 'lap', 'money', 'card', 'city', 'prison', 'created_at', 'updated_at', 'deleted_at']
+            const pickerList: string[] = ['id', 'room_id', 'player_id(display_name)', 'character', 'pos', 'lap', 'money', 'card', 'city', 'prison', 'created_at', 'updated_at', 'deleted_at']
             selectedColumns.push(columnPicker(pickerList))
         }
         // return selected columns
