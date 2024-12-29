@@ -231,7 +231,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/lvu1slpqdkmigp40.public.blob.vercel-storage.com\/characters/) : null
         // ====== JOIN ROOM TYPE ======
         case 'rules': 
-            return value ? value.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/) : null
+            return value ? value.match(/^board: (normal|delta|2_way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/) : null
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
             return value ? value.match(/^[\d]{3}$/) : null

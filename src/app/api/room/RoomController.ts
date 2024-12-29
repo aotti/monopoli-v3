@@ -97,7 +97,7 @@ export default class RoomController extends Controller {
                 characters: [payload.select_character],
             }
             // split rules
-            const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+            const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
             // remove main rules
             splitRules.splice(0, 1)
             const [board, dice, money_start, money_lose, mode, curse] = [
@@ -172,20 +172,20 @@ export default class RoomController extends Controller {
             const roomListInfo: IGameContext['gameRoomInfo'] = []
             // modify data
             for(let d of data) {
+                const { room_id, room_name, creator } = d
                 // split max player from rules
                 const playerMax = d.rules.match(/max: \d/)[0].split(': ')[1]
                 const rules = d.rules.match(/.*(?=;max)/)[0]
+                // get disabled characters
+                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${room_id}`)
                 // add player max & modify rules
                 d.player_max = +playerMax
                 d.rules = rules
-                // modify room info for gameRoomInfo
-                const { room_id, room_name, creator } = d
-                // get disabled characters
-                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${room_id}`)
                 // update room list characters data
                 d.characters = getDisabledCharacters
+                // modify room info for gameRoomInfo
                 // split rules
-                const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+                const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
                 // remove main rules
                 splitRules.splice(0, 1)
                 const [board, dice, money_start, money_lose, mode, curse] = [
@@ -449,25 +449,25 @@ export default class RoomController extends Controller {
             await this.redisReset(`disabledCharacters_${payload.room_id}`)
             // new rooms left data
             const newRoomsLeft: ICreateRoom['list'][] = []
-            data.forEach(async v => {
+            for(let d of data) {
                 // get disabled characters
-                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${v.room_id}`)
+                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${d.room_id}`)
                 // split max player from rules
-                const playerMax = v.rules.match(/max: \d/)[0].split(': ')[1]
-                const rules = v.rules.match(/.*(?=;max)/)[0]
+                const playerMax = d.rules.match(/max: \d/)[0].split(': ')[1]
+                const rules = d.rules.match(/.*(?=;max)/)[0]
                 // push data
                 newRoomsLeft.push({
-                    room_id: v.room_id,
-                    creator: v.creator,
-                    room_name: v.room_name,
-                    room_password: v.room_password,
-                    player_count: v.player_count,
+                    room_id: d.room_id,
+                    creator: d.creator,
+                    room_name: d.room_name,
+                    room_password: d.room_password,
+                    player_count: d.player_count,
                     player_max: +playerMax,
                     rules: rules,
-                    status: v.status,
+                    status: d.status,
                     characters: getDisabledCharacters
                 })
-            })
+            }
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {

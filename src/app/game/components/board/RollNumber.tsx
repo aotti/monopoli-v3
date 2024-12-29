@@ -13,12 +13,17 @@ export default function RollNumber({ roomId }: {roomId: number}) {
     // roll animation
     useEffect(() => {
         if(!gameState.rollNumber) return
-        return () => {
-            const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-            startAnimation(diceNumber, miscState, gameState)
-            // hidden the roll after end
-            setTimeout(() => gameState.setRollNumber(null), 3500);
-        }
+        const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
+        startAnimation(diceNumber, miscState, gameState)
+        // hidden the roll after end
+        setTimeout(() => gameState.setRollNumber(null), 3500);
+        // ### KALO MODE DEVELOPMENT, PAKE CARA RETURN ARROW FUNCTION
+        // return () => {
+        //     const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
+        //     startAnimation(diceNumber, miscState, gameState)
+        //     // hidden the roll after end
+        //     setTimeout(() => gameState.setRollNumber(null), 3500);
+        // }
     }, [gameState.rollNumber])
 
     return (

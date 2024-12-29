@@ -8,7 +8,7 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { RoomListListener, IChat, ICreateRoom, IGameContext, IResponse } from "../../helper/types";
+import { ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";

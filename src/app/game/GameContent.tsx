@@ -107,17 +107,16 @@ export default function GameContent({ pubnubSetting }) {
             col-span-10 grid grid-rows-6 gap-8 justify-center 
             h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
                 {/* board */}
-                {
-                    gameState.gameRoomId
-                        ? <>
-                            {gameState.gamePlayerInfo.length > 0 ? <BoardNormal /> : null}
-                            {/* <BoardDelta /> */}
-                            {/* <BoardTwoWay /> */}
-                        </>
-                        : null
+                {gameState.gameRoomId
+                    ? <>
+                        {gameState.gamePlayerInfo.length > 0 ? <BoardNormal /> : null}
+                        {/* <BoardDelta /> */}
+                        {/* <BoardTwoWay /> */}
+                    </>
+                    : null
                 }
                 {/* game buttons */
-                gameState.spectator
+                gameState.spectator || miscState.showTutorial == 'tutorial_gameroom_2'
                     ? null
                     : <div className="absolute top-[45%] w-full text-2xs lg:text-xs">
                         <GameButtons />
@@ -126,10 +125,9 @@ export default function GameContent({ pubnubSetting }) {
                 {/* game notif + roll number */}
                 <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'hidden'} 
                 absolute h-full w-full text-center text-2xs lg:text-xs`}>
-                    {
-                        gameState.rollNumber
-                            ? <RollNumber roomId={gameState.gameRoomId} />
-                            : null
+                    {gameState.rollNumber
+                        ? <RollNumber roomId={gameState.gameRoomId} />
+                        : null
                     }
                     <GameNotif />
                 </div>

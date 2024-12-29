@@ -349,7 +349,7 @@ async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, 
             const findRoomData = gameState.roomList.map(v => v.room_id).indexOf(roomId)
             const { room_id, room_name, creator, rules } = gameState.roomList[findRoomData]
             // split rules
-            const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5 laps|7 laps|survive);curse: (5|10|15)$/)
+            const splitRules = rules.match(/^board: (normal|delta|2_way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
             // remove main rules
             splitRules.splice(0, 1)
             const [board, dice, money_start, money_lose, mode, curse] = [

@@ -162,7 +162,6 @@ export default function CreateRoom() {
                         <button type="submit" id="create_room" className="text-green-300 p-1 active:opacity-75"> 
                             {translateUI({lang: miscState.language, text: 'Create'})} 
                         </button>
-                        <Link id="gotoGame" href={'/game'} hidden={true}></Link>
                     </div>
                 </div>
             </form>
@@ -267,9 +266,6 @@ async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContex
             // hide the modal & tutorial
             miscState.setShowModal(null)
             miscState.setShowTutorial(null)
-            // move to game room
-            const link = qS('#gotoGame') as HTMLAnchorElement
-            link.click()
             // submit button normal
             createButton.textContent = tempButtonText
             createButton.removeAttribute('disabled')
