@@ -59,7 +59,19 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // room deleted
     if(getMessage.roomsLeft) {
+        // set game stage to prepare
+        gameState.setGameStages('prepare')
         // set rooms left
         gameState.setRoomList(getMessage.roomsLeft)
+    }
+    // update room status
+    if(getMessage.roomGame) {
+        gameState.setRoomList(rooms => {
+            const newRoomStatus = [...rooms]
+            // find updated room
+            const findRoom = newRoomStatus.map(v => v.room_id).indexOf(getMessage.roomGame)
+            newRoomStatus[findRoom].status = 'playing'
+            return newRoomStatus
+        })
     }
 }

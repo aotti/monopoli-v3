@@ -79,6 +79,8 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
+            // set game stage
+            await this.redisSet(`gameStage_${data[0].room_id}`, ['prepare'])
             // disable selected character
             await this.redisSet(`disabledCharacters_${data[0].room_id}`, [payload.select_character])
             // split max player from rules
@@ -445,8 +447,18 @@ export default class RoomController extends Controller {
         else {
             // remove room name from list
             await this.filterRoomList('out', payload.room_name)
+            // remove game stage
+            await this.redisReset(`gameStage_${payload.room_id}`)
+            // remove ready players
+            await this.redisReset(`readyPlayers_${payload.room_id}`)
+            // remove decide players
+            await this.redisReset(`decidePlayers_${payload.room_id}`)
+            // remove player turns
+            await this.redisReset(`playerTurns_${payload.room_id}`)
             // remove disabled characters
             await this.redisReset(`disabledCharacters_${payload.room_id}`)
+            // remove game history
+            await this.redisReset(`gameHistory_${payload.room_id}`)
             // new rooms left data
             const newRoomsLeft: ICreateRoom['list'][] = []
             for(let d of data) {
@@ -478,6 +490,12 @@ export default class RoomController extends Controller {
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // gameroom publish
+            const gameroomChannel = `monopoli-gameroom-${payload.room_id}`
+            const isGamePublished = await this.pubnubPublish(gameroomChannel, {roomsLeft: newRoomsLeft})
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 deleted_room: payload.room_name,

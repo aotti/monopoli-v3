@@ -76,13 +76,13 @@ function RollTurnButtons() {
     return (
         <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
             <div>
-                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
+                <input type="hidden" id="rolled_dice" />
+                <button type="submit" id="roll_dice_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"
                 onClick={() => gameState.setRollNumber('dice')}> 
                     {translateUI({lang: miscState.language, text: 'roll dice'})} 
                 </button>
             </div>
             <div>
-                <input type="hidden" id="rolled_dice" />
                 <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> 
                     {translateUI({lang: miscState.language, text: 'surrender'})} 
                 </button>
@@ -105,8 +105,10 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, miscState: IMiscConte
         case `ready_button`: readyGameRoom(miscState, gameState); break
         // start game function
         case `start_button`: startGameRoom(miscState, gameState); break
-        // start game function
+        // roll turn function
         case `roll_turn_button`: setTimeout(() => rollTurnGameRoom(formInputs, miscState, gameState), 2500); break
+        // roll dice function
+        case `roll_dice_button`: setTimeout(() => rollDiceGameRoom(formInputs, miscState, gameState), 2500); break
     }
 }
 
@@ -271,7 +273,7 @@ async function startGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     }
 }
 
-async function rollTurnGameRoom(formInputs, miscState: IMiscContext, gameState: IGameContext) {
+async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -330,6 +332,69 @@ async function rollTurnGameRoom(formInputs, miscState: IMiscContext, gameState: 
             // enable submit buttons
             rollTurnButton.textContent = tempButtonText
             rollTurnButton.removeAttribute('disabled')
+            return
+    }
+}
+
+async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // roll dice button
+    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+    // input values container
+    const inputValues = {
+        action: 'game roll dice',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        rolled_dice: null
+    }
+    // get input elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName.match(/INPUT/)) {
+            // filter inputs
+            if(setInputValue('rolled_dice', input)) inputValues.rolled_dice = input.value.trim().toLowerCase()
+            // error
+            else {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                notifTitle.textContent = 'error 400'
+                notifMessage.textContent = `${input.id} doesnt match`
+                return
+            }
+        }
+    }
+    // loading button
+    const tempButtonText = rollDiceButton.textContent
+    rollDiceButton.textContent = 'Loading'
+    rollDiceButton.disabled = true
+    // fetch
+    const rollDiceFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const rollDiceResponse: IResponse = await (await fetcher('/game', rollDiceFetchOptions)).json()
+    // response
+    switch(rollDiceResponse.status) {
+        case 200: 
+            // save access token
+            if(rollDiceResponse.data[0].token) {
+                localStorage.setItem('accessToken', rollDiceResponse.data[0].token)
+                delete rollDiceResponse.data[0].token
+            }
+            // button to normal
+            rollDiceButton.textContent = tempButtonText
+            rollDiceButton.removeAttribute('disabled')
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${rollDiceResponse.status}`
+            notifMessage.textContent = `${rollDiceResponse.message}`
+            // button to normal
+            rollDiceButton.textContent = tempButtonText
+            rollDiceButton.removeAttribute('disabled')
             return
     }
 }

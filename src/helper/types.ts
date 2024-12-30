@@ -31,11 +31,13 @@ export type RoomListListener = {
     joinedRoomId: number,
     leavePlayer: string,
     disabledCharacters: string[],
+    roomGame: number,
 }
 
 export type GameRoomListener = {
     joinPlayer: IGamePlayerInfo,
     leavePlayer: string,
+    roomsLeft:  ICreateRoom['list'][],
     readyPlayers: string[],
     startGame: string,
     fixedPlayers: number,
@@ -186,13 +188,13 @@ export interface IQuerySelect extends IQueryBuilder {
 }
 
 export interface IQueryInsert extends IQueryBuilder {
-    get insertColumn(): Partial<IPlayer>
+    get insertColumn(): Partial<IPlayer> | Partial<ICreateRoom['list']>
 }
 
 export interface IQueryUpdate extends IQueryBuilder {
     whereColumn?: string;
     whereValue?: string | number;
-    get updateColumn(): Partial<IPlayer>
+    get updateColumn(): Partial<IPlayer> | Partial<ICreateRoom['list']>
 }
 
 // fetch

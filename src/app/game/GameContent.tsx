@@ -20,6 +20,7 @@ import PubNub, { Listener } from "pubnub"
 import { IGameContext, IMiscContext, IResponse } from "../../helper/types"
 import BoardTesting from "./components/board/BoardTesting"
 import { gameMessageListener } from "./helper/published-message"
+import GameSounds from "../../components/GameSounds"
 
 export default function GameContent({ pubnubSetting }) {
     const miscState = useMisc()
@@ -161,6 +162,9 @@ export default function GameContent({ pubnubSetting }) {
             absolute mt-1.5 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
                 <TutorialGameRoom />
             </div>
+
+            {/* game sounds */}
+            <GameSounds />
         </div>
     )
 }
@@ -188,7 +192,9 @@ async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState:
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameHistory, decidePlayers, preparePlayers, playerTurns } = getPlayerResponse.data[0]
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory } = getPlayerResponse.data[0]
+            // set game stage
+            gameState.setGameStages(gameStage)
             // set player list
             gameState.setGamePlayerInfo(getPlayers)
             // set game history
@@ -210,18 +216,19 @@ async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState:
                 playerTurnNotif ? playerTurnNotif.textContent = `${preparePlayers.length} player(s) ready` : null
                 // if > 2 players ready, set start notif
                 if(preparePlayers.length >= 2) gameStartNotif()
-                // change to start button (for creator)
-                const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo?.display_name)
-                if(readyButton && findCreator !== -1) {
-                    readyButton.id = 'start_button'
-                    readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
-                    return
-                }
                 // disable button if ready is clicked (for other)
                 const isReadyClicked = preparePlayers.indexOf(gameState.myPlayerInfo?.display_name)
                 if(readyButton && isReadyClicked !== -1) {
                     readyButton.disabled = true
                     readyButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
+                    return
+                }
+                // change to start button (for creator)
+                // creator has clicked ready
+                const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo?.display_name)
+                if(readyButton && isReadyClicked !== -1 && findCreator !== -1) {
+                    readyButton.id = 'start_button'
+                    readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
                     return
                 }
             }

@@ -1,7 +1,7 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
-import { playerMoving } from "../components/board/RollNumber"
+import { playerMoving } from "./game-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -35,6 +35,23 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             playersLeft.splice(findLeavePlayer, 1)
             return playersLeft
         })
+    }
+    // room deleted
+    if(getMessage.roomsLeft) {
+        // set game stage to prepare
+        gameState.setGameStages('prepare')
+        // set rooms left
+        gameState.setRoomList(getMessage.roomsLeft)
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = 'Room Deleted'
+        notifMessage.textContent = 'this room has been deleted, redirect to room list'
+        // redirect to room list
+        setTimeout(() => {
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom.click()
+        }, 2000)
     }
     // ready
     if(getMessage.readyPlayers) {
@@ -70,8 +87,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // roll dice
     if(getMessage.playerTurn && getMessage.playerDice) {
-        console.log(getMessage.playerTurn, getMessage.playerDice);
-        
         // move player pos
         // ### player turn = display_name
         playerMoving(getMessage.playerTurn, getMessage.playerDice, miscState, gameState)

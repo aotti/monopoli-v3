@@ -12,6 +12,7 @@ import { ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
+import GameSounds from "../../components/GameSounds";
 
 export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
@@ -181,6 +182,9 @@ export default function RoomContent({ pubnubSetting }) {
             absolute mt-1.5 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
                 <TutorialRoomList />
             </div>
+
+            {/* game sounds */}
+            <GameSounds />
         </div>
     )
 }
