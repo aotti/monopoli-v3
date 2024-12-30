@@ -106,9 +106,23 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, miscState: IMiscConte
         // start game function
         case `start_button`: startGameRoom(miscState, gameState); break
         // roll turn function
-        case `roll_turn_button`: setTimeout(() => rollTurnGameRoom(formInputs, miscState, gameState), 2500); break
+        case `roll_turn_button`: 
+            // submit button
+            const rollTurnButton = qS('#roll_turn_button') as HTMLInputElement
+            // loading button
+            const tempRollTurnText = rollTurnButton.textContent
+            rollTurnButton.textContent = 'Loading'
+            rollTurnButton.disabled = true
+            setTimeout(() => rollTurnGameRoom(formInputs, tempRollTurnText, miscState, gameState), 2500); break
         // roll dice function
-        case `roll_dice_button`: setTimeout(() => rollDiceGameRoom(formInputs, miscState, gameState), 2500); break
+        case `roll_dice_button`: 
+            // roll dice button
+            const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+            // loading button
+            const tempRollDiceText = rollDiceButton.textContent
+            rollDiceButton.textContent = 'Loading'
+            rollDiceButton.disabled = true
+            setTimeout(() => rollDiceGameRoom(formInputs, tempRollDiceText, miscState, gameState), 2500); break
     }
 }
 
@@ -273,7 +287,7 @@ async function startGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     }
 }
 
-async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, miscState: IMiscContext, gameState: IGameContext) {
+async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -303,10 +317,6 @@ async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, miscStat
             }
         }
     }
-    // loading button
-    const tempButtonText = rollTurnButton.textContent
-    rollTurnButton.textContent = 'Loading'
-    rollTurnButton.disabled = true
     // fetch
     const rollTurnFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
     const rollTurnResponse: IResponse = await (await fetcher('/game', rollTurnFetchOptions)).json()
@@ -336,7 +346,7 @@ async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, miscStat
     }
 }
 
-async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, miscState: IMiscContext, gameState: IGameContext) {
+async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -366,10 +376,6 @@ async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, miscStat
             }
         }
     }
-    // loading button
-    const tempButtonText = rollDiceButton.textContent
-    rollDiceButton.textContent = 'Loading'
-    rollDiceButton.disabled = true
     // fetch
     const rollDiceFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
     const rollDiceResponse: IResponse = await (await fetcher('/game', rollDiceFetchOptions)).json()
