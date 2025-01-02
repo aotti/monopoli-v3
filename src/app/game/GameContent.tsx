@@ -18,7 +18,6 @@ import TutorialGameRoom from "./components/TutorialGameRoom"
 import { clickOutsideElement } from "../../helper/click-outside"
 import PubNub, { Listener } from "pubnub"
 import { IGameContext, IMiscContext, IResponse } from "../../helper/types"
-import BoardTesting from "./components/board/BoardTesting"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
 

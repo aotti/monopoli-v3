@@ -106,7 +106,6 @@ export default class GameController extends Controller {
         // publish online players
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
-            onlinePlayers: JSON.stringify(onlinePlayersData)
         }
         const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isGamePublished);
@@ -140,7 +139,7 @@ export default class GameController extends Controller {
         const getReadyPlayers = await this.redisGet(`readyPlayers_${roomId}`)
         if(getReadyPlayers.length < 2) return this.respond(403, 'go get frens', [])
         // set payload for db query
-        type UpdateColumnType = Partial<ICreateRoom['list'] & {updated_at?: string}>
+        type UpdateColumnType = Partial<ICreateRoom['list'] & {updated_at: string}>
         const queryObject: IQueryUpdate = {
             table: 'rooms',
             selectColumn: this.dq.columnSelector('rooms', 7),
@@ -165,7 +164,6 @@ export default class GameController extends Controller {
             const publishData = {
                 startGame: 'start',
                 fixedPlayers: getReadyPlayers.length,
-                onlinePlayers: JSON.stringify(onlinePlayersData)
             }
             const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
             console.log(isGamePublished);
@@ -220,7 +218,6 @@ export default class GameController extends Controller {
         const publishData = {
             decidePlayers: sortDecidePlayers,
             gameStage: sortDecidePlayers.length === getFixedPlayers.length ? 'play' : 'decide',
-            onlinePlayers: JSON.stringify(onlinePlayersData)
         }
         const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isGamePublished);
@@ -261,7 +258,6 @@ export default class GameController extends Controller {
         const publishData = {
             playerTurn: payload.display_name,
             playerDice: +payload.rolled_dice,
-            onlinePlayers: JSON.stringify(onlinePlayersData)
         }
         const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isGamePublished);
@@ -278,6 +274,59 @@ export default class GameController extends Controller {
             token: token
         }
         result = this.respond(200, `${action} success`, [resultData])
+        // return result
+        return result
+    }
+
+    async surrender(action: string, payload: IGamePlay['surrender']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        // check player turn
+        const roomId = payload.channel.match(/\d+/)[0]
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] == payload.display_name) 
+            return this.respond(400, 'cant surrend when its your turn', [])
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_surrender',
+            function_args: {
+                tmp_display_name: payload.display_name
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update<IGamePlay['surrender']>(queryObject as IQueryUpdate)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            // remove player from playerTurns
+            await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns.filter(v => v != payload.display_name))
+            // publish online players
+            const publishData = {
+                surrendPlayer: data[0].display_name,
+            }
+            const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // publish to roomlist
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            console.log(isRoomPublished);
+            
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
         // return result
         return result
     }
@@ -317,6 +366,7 @@ export default class GameController extends Controller {
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
             // fill game history
             const gameHistory: IGameContext['gameHistory'] = []
+            // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
             for(let ph of payload.history.split(';')) {
                 const tempHistory = {
                     room_id: +roomId, 
@@ -338,22 +388,14 @@ export default class GameController extends Controller {
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,
                 playerTurns: getPlayerTurns,
-                gameHistory: [...getGameHistory, ...gameHistory],
-                onlinePlayers: JSON.stringify(onlinePlayersData)
+                gameHistory: [...getGameHistory, ...gameHistory]
             }
             const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-            // publish to roomlist
-            const roomlistChannel = 'monopoli-roomlist'
-            const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
-            console.log(isRoomPublished);
-            
-            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
-                // turnEndData: data[0],
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])

@@ -74,4 +74,16 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
             return newRoomStatus
         })
     }
+    // game over
+    if(getMessage.roomOverId) {
+        gameState.setRoomList(rooms => {
+            const newRoomList = [...rooms]
+            // find room over
+            const findRoom = newRoomList.map(v => v.room_id).indexOf(getMessage.roomOverId)
+            if(findRoom === -1) return newRoomList
+            // delete room
+            newRoomList.splice(findRoom, 1)
+            return newRoomList
+        })
+    }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Controller from "../Controller";
 import GameController from "./GameController";
 import { IResponse } from "../../../helper/types";
+import RoomController from "../room/RoomController";
 
 export async function GET(req: NextRequest) {
     // api action
@@ -52,15 +53,16 @@ export async function POST(req: NextRequest) {
             result = await gameController.rollDice(action, payload)
             break
         default: 
-            result = {status: 404, message: 'request failed', data: []} as IResponse
+            result = {status: 404, message: 'request failed', data: []}
     }
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }
 
-export async function  PUT(req: NextRequest) {
+export async function PUT(req: NextRequest) {
     const payload = await req.json()
     // check authorization
+    const roomController = new RoomController()
     const gameController = new GameController()
     const isAuth = gameController.checkAuthorization(req)
     // token empty
@@ -71,7 +73,13 @@ export async function  PUT(req: NextRequest) {
     const action = payload.action
     delete payload.action
     // process
-    const result = await gameController.turnEnd(action, payload)
+    let result: IResponse = null
+    switch(action) {
+        case 'game turn end': result = await gameController.turnEnd(action, payload); break
+        case 'game surrender': result = await gameController.surrender(action, payload); break
+        case 'game over': result = await roomController.softDelete(action, payload); break
+        default: result = {status: 404, message: 'request failed', data: []}
+    }
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

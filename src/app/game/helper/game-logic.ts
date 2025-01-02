@@ -6,6 +6,10 @@ import { IGameContext, IMiscContext, IResponse } from "../../../helper/types"
  * @param numberTarget dice result number
  */
 export function playerMoving(playerTurn: string, numberTarget: number, miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    const playerTurnNotif = qS('#player_turn_notif')
     // get player path
     const playerPaths = qSA(`[data-player-path]`) as NodeListOf<HTMLElement>
     // get players
@@ -23,7 +27,7 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
         const currentPos = gameState.gamePlayerInfo[findPlayer].pos
         const nextPos = (currentPos + numberTarget) === playerPaths.length 
                         ? playerPaths.length 
-                        : ((currentPos + numberTarget) % playerPaths.length)
+                        : (currentPos + numberTarget) % playerPaths.length
         // move function
         const stepInterval = setInterval(() => moving(), 750);
 
@@ -39,44 +43,10 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
                 // turn off roll dice
                 gameState.setRollNumber(null)
                 // ====== ONLY MOVING PLAYER WILL FETCH ======
+                playerTurnNotif.textContent = `${playerTurn} turn ending..`
                 if(gameState.gamePlayerInfo[findPlayer].display_name != gameState.myPlayerInfo.display_name) return
                 // ====== ONLY MOVING PLAYER WILL FETCH ======
-                console.log(gameState.myPlayerInfo.display_name, 'fetching');
-                
-                // result message
-                const notifTitle = qS('#result_notif_title')
-                const notifMessage = qS('#result_notif_message')
-                // input values container
-                const inputValues = {
-                    action: 'game turn end',
-                    channel: `monopoli-gameroom-${gameState.gameRoomId}`,
-                    display_name: gameState.gamePlayerInfo[findPlayer].display_name,
-                    pos: nextPos.toString(),
-                    lap: numberLaps.toString(),
-                    // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
-                    history: `rolled_dice: ${numberTarget}`
-                }
-                // fetch
-                const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
-                const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
-                // response
-                switch(playerTurnEndResponse.status) {
-                    case 200: 
-                        // save access token
-                        if(playerTurnEndResponse.data[0].token) {
-                            localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
-                            delete playerTurnEndResponse.data[0].token
-                        }
-                        break
-                    default: 
-                        // show notif
-                        miscState.setAnimation(true)
-                        gameState.setShowGameNotif('normal')
-                        // error message
-                        notifTitle.textContent = `error ${playerTurnEndResponse.status}`
-                        notifMessage.textContent = `${playerTurnEndResponse.message}`
-                        break
-                }
+                turnEnd()
                 return
             }
             // moving
@@ -103,9 +73,90 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
                 }
             })
         }
+
+        async function turnEnd() {
+            // input values container
+            const inputValues = {
+                action: 'game turn end',
+                channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+                display_name: gameState.gamePlayerInfo[findPlayer].display_name,
+                pos: nextPos.toString(),
+                lap: numberLaps.toString(),
+                // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
+                history: `rolled_dice: ${numberTarget}`
+            }
+            // fetch
+            const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
+            const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
+            // response
+            switch(playerTurnEndResponse.status) {
+                case 200: 
+                    // save access token
+                    if(playerTurnEndResponse.data[0].token) {
+                        localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
+                        delete playerTurnEndResponse.data[0].token
+                    }
+                    return
+                default: 
+                    // show notif
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif('normal')
+                    // error message
+                    notifTitle.textContent = `error ${playerTurnEndResponse.status}`
+                    notifMessage.textContent = `${playerTurnEndResponse.message}`
+                    return
+            }
+        }
     })
 }
 
 function playerStopBy() {
     
+}
+
+export async function gameOver(miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // get room name
+    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+    // data for update all player stats
+    const allPlayerStats = []
+    for(let player of gameState.gamePlayerInfo) 
+        allPlayerStats.push(`${player.display_name},${player.money}`)
+    // input value container
+    const inputValues = {
+        action: 'game over',
+        all_player_stats: allPlayerStats.join(';'),
+        room_id: gameState.gameRoomId.toString(),
+        room_name: gameState.gameRoomInfo[findRoom].room_name
+    }
+    // update room & all player deleted_at
+    const gameOverFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
+    const gameOverResponse: IResponse = await (await fetcher('/game', gameOverFetchOptions)).json()
+    // response
+    switch(gameOverResponse.status) {
+        case 200: 
+            // save access token
+            if(gameOverResponse.data[0].token) {
+                localStorage.setItem('accessToken', gameOverResponse.data[0].token)
+                delete gameOverResponse.data[0].token
+            }
+            // delete room
+            gameState.setRoomList(rooms => {
+                const newRoomList = [...rooms]
+                const findRoom = newRoomList.map(v => v.room_id).indexOf(gameState.gameRoomId)
+                newRoomList.splice(findRoom, 1)
+                return newRoomList
+            })
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${gameOverResponse.status}`
+            notifMessage.textContent = `${gameOverResponse.message}`
+            return
+    }
 }

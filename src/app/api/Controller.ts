@@ -106,7 +106,9 @@ export default class Controller {
             case 'game start': 
             case 'game roll turn': 
             case 'game roll dice': 
-            case 'game turn end': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'game surrender': 
+            case 'game turn end': 
+            case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])

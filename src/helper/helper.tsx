@@ -245,6 +245,15 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             return value ? value.match(/^rolled_dice: ([0-9]|1[0-2])$/) : null
+        // ====== SURRENDER TYPE ======
+        case 'money': 
+            return value ? value.match(/\d+/) : null
+        // ====== GAME OVER TYPE ======
+        case 'all_player_stats': 
+            const splitValue = value.split(';')
+            for(let sv of splitValue)
+                if(!sv.match(/\w+,\d+|\w+,-\d+/)) return null
+            return value 
     }
 }
 

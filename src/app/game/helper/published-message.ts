@@ -1,7 +1,7 @@
 import PubNub from "pubnub"
-import { GameRoomListener, IChat, IGameContext, IMiscContext } from "../../../helper/types"
-import { qS, translateUI } from "../../../helper/helper"
-import { playerMoving } from "./game-logic"
+import { GameRoomListener, IChat, IGameContext, IMiscContext, IResponse } from "../../../helper/types"
+import { fetcher, fetcherOptions, qS, translateUI } from "../../../helper/helper"
+import { gameOver, playerMoving } from "./game-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -91,6 +91,21 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // ### player turn = display_name
         playerMoving(getMessage.playerTurn, getMessage.playerDice, miscState, gameState)
     }
+    // surrender
+    if(getMessage.surrendPlayer) {
+        gameState.setGamePlayerInfo(players => {
+            const surrendPlayerInfo = [...players]
+            // find surrend player
+            const findPlayer = surrendPlayerInfo.map(v => v.display_name).indexOf(getMessage.surrendPlayer)
+            // update money & city
+            surrendPlayerInfo[findPlayer].money = -999999
+            surrendPlayerInfo[findPlayer].city = null
+            // check player alive
+            checkAlivePlayers(surrendPlayerInfo, miscState, gameState)
+            // return data
+            return surrendPlayerInfo
+        })
+    }
     // end turn
     if(getMessage.playerTurnEnd) {
         // update game history
@@ -101,9 +116,43 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // find turn end player
             const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurnEnd.display_name)
             newPlayerInfo[findPlayer] = getMessage.playerTurnEnd
+            // check player alive
+            checkAlivePlayers(newPlayerInfo, miscState, gameState)
+            // return data
             return newPlayerInfo
         })
         // show notif next player turn
         playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
+    }
+}
+
+function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
+    // notif
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // get room info
+    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+    // get alive players
+    const alivePlayers = []
+    for(let np of playersData) {
+        // check players money amount
+        if(np.money > gameState.gameRoomInfo[findRoom].money_lose) 
+            alivePlayers.push(np.display_name)
+    }
+    // if only 1 left, game over
+    if(alivePlayers.length === 1) {
+        gameState.setGameStages('over')
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        // winner message
+        notifTitle.textContent = `Game Over`
+        notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
+        setTimeout(() => {
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom ? gotoRoom.click() : null
+        }, 15_000)
+        // run game over
+        gameOver(miscState, gameState)
     }
 }

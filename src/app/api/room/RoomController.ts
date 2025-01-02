@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
-import { ICreateRoom, IGameContext, IShiftRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
+import { ICreateRoom, IGameContext, IShiftRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse, IGamePlay } from "../../../helper/types";
 import Controller from "../Controller";
 
 export default class RoomController extends Controller {
     
-    private async filterRoomList(action: 'push'|'out', room_name: string) {
+    private async filterRoomList(action: 'check'|'push'|'out', room_name: string) {
         // get room list
         const getRoomList = await this.redisGet('roomList')
         let tempRoomList = getRoomList.length > 0 ? getRoomList : []
@@ -20,11 +20,30 @@ export default class RoomController extends Controller {
             return this.respond(400, 'name: room name already exist', [])
         }
         // push to temp room list
-        if(action == 'push') tempRoomList.push(room_name)
-        // save to redis
-        await this.redisSet('roomList', tempRoomList)
+        if(action == 'push') {
+            tempRoomList.push(room_name)
+            // save to redis
+            await this.redisSet('roomList', tempRoomList)
+        }
         // return data
         return this.respond(200, 'room name ok', tempRoomList)
+    }
+
+    private async deleteRoomData(payload: any) {
+        // remove room name from list
+        await this.filterRoomList('out', payload.room_name)
+        // remove game stage
+        await this.redisReset(`gameStage_${payload.room_id}`)
+        // remove ready players
+        await this.redisReset(`readyPlayers_${payload.room_id}`)
+        // remove decide players
+        await this.redisReset(`decidePlayers_${payload.room_id}`)
+        // remove player turns
+        await this.redisReset(`playerTurns_${payload.room_id}`)
+        // remove disabled characters
+        await this.redisReset(`disabledCharacters_${payload.room_id}`)
+        // remove game history
+        await this.redisReset(`gameHistory_${payload.room_id}`)
     }
 
     async create(action: string, payload: ICreateRoom['input']) {
@@ -43,7 +62,7 @@ export default class RoomController extends Controller {
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
         // filter room name
-        const filterRoomList = await this.filterRoomList('push', payload.room_name)
+        const filterRoomList = await this.filterRoomList('check', payload.room_name)
         if(filterRoomList.status !== 200) return filterRoomList
         // destruct rules props
         const { select_board, select_dice, select_money_start, select_money_lose, 
@@ -73,12 +92,16 @@ export default class RoomController extends Controller {
         // run query
         const {data, error} = await this.dq.insert<ICreateRoom['list']>(queryObject as IQueryInsert)
         if(error) {
+            console.log('create',error.message);
+            
             // player not found error / already created room
             if(error.code == 'P0001') result = this.respond(403, error.message, [])
             // other error
             else result = this.respond(500, error.message, [])
         }
         else {
+            // push room name to redis
+            await this.filterRoomList('push', payload.room_name)
             // set game stage
             await this.redisSet(`gameStage_${data[0].room_id}`, ['prepare'])
             // disable selected character
@@ -402,13 +425,6 @@ export default class RoomController extends Controller {
         // return result
         return result
     }
-    
-    async softDelete(action: string, payload: ICreateRoom['input']) {
-        let result: IResponse
-        
-        // return result
-        return result
-    }
 
     async hardDelete(action: string, payload: ICreateRoom['input'] & {display_name}) {
         let result: IResponse
@@ -445,20 +461,7 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
-            // remove room name from list
-            await this.filterRoomList('out', payload.room_name)
-            // remove game stage
-            await this.redisReset(`gameStage_${payload.room_id}`)
-            // remove ready players
-            await this.redisReset(`readyPlayers_${payload.room_id}`)
-            // remove decide players
-            await this.redisReset(`decidePlayers_${payload.room_id}`)
-            // remove player turns
-            await this.redisReset(`playerTurns_${payload.room_id}`)
-            // remove disabled characters
-            await this.redisReset(`disabledCharacters_${payload.room_id}`)
-            // remove game history
-            await this.redisReset(`gameHistory_${payload.room_id}`)
+            await this.deleteRoomData(payload)
             // new rooms left data
             const newRoomsLeft: ICreateRoom['list'][] = []
             for(let d of data) {
@@ -499,6 +502,58 @@ export default class RoomController extends Controller {
             // set result
             const resultData = {
                 deleted_room: payload.room_name,
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
+    async softDelete(action: string, payload: IGamePlay['game_over']) {
+        let result: IResponse
+
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_gameover',
+            function_args: {
+                tmp_room_id: +payload.room_id,
+                tmp_all_player_stats: payload.all_player_stats
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update<{room_id: number}>(queryObject as IQueryUpdate)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            await this.deleteRoomData(payload)
+            // publish realtime data
+            const roomlistChannel = 'monopoli-roomlist'
+            const publishData = {
+                roomOverId: data[0].room_id,
+                onlinePlayers: JSON.stringify(onlinePlayers.data)
+            }
+            const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                data: data,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])

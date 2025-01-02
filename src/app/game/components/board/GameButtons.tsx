@@ -18,6 +18,7 @@ export default function GameButtons() {
                 <p> {gameState.myPlayerInfo?.display_name} </p>
                 <p> {translateUI({lang: miscState.language, text: 'lap'})}: {myLap} </p>
             </div>
+            {/* game over will result in null */}
             {/* ready + leave */}
             {gameState.gameStages == 'prepare' ? <PreparationButtons /> : null}
             {/* roll dice + roll turn */}
@@ -83,7 +84,7 @@ function RollTurnButtons() {
                 </button>
             </div>
             <div>
-                <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> 
+                <button type="submit" id="surrender_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> 
                     {translateUI({lang: miscState.language, text: 'surrender'})} 
                 </button>
             </div>
@@ -105,6 +106,8 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, miscState: IMiscConte
         case `ready_button`: readyGameRoom(miscState, gameState); break
         // start game function
         case `start_button`: startGameRoom(miscState, gameState); break
+        // surrender function
+        case 'surrender_button': surrenderGameRoom(miscState, gameState); break
         // roll turn function
         case `roll_turn_button`: 
             // submit button
@@ -401,6 +404,49 @@ async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButt
             // button to normal
             rollDiceButton.textContent = tempButtonText
             rollDiceButton.removeAttribute('disabled')
+            return
+    }
+}
+
+async function surrenderGameRoom(miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const surrenderButton = qS('#surrender_button') as HTMLInputElement
+    // input value container
+    const inputValues = {
+        action: 'game surrender',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        money: '-999999'
+    }
+    // loading button
+    const tempButtonText = surrenderButton.textContent
+    surrenderButton.textContent = 'Loading'
+    surrenderButton.disabled = true
+    // fetch
+    const surrenderFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
+    const surrenderResponse: IResponse = await (await fetcher('/game', surrenderFetchOptions)).json()
+    // response
+    switch(surrenderResponse.status) {
+        case 200: 
+            // save access token
+            if(surrenderResponse.data[0].token) {
+                localStorage.setItem('accessToken', surrenderResponse.data[0].token)
+                delete surrenderResponse.data[0].token
+            }
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${surrenderResponse.status}`
+            notifMessage.textContent = `${surrenderResponse.message}`
+            // enable submit buttons
+            surrenderButton.textContent = tempButtonText
+            surrenderButton.removeAttribute('disabled')
             return
     }
 }

@@ -32,6 +32,7 @@ export type RoomListListener = {
     leavePlayer: string,
     disabledCharacters: string[],
     roomGame: number,
+    roomOverId: number,
 }
 
 export type GameRoomListener = {
@@ -47,6 +48,7 @@ export type GameRoomListener = {
     playerDice: number,
     gameHistory: IGameHistory[],
     playerTurns: string[],
+    surrendPlayer: string,
     playerTurnEnd: IGamePlayerInfo,
 }
 
@@ -264,7 +266,9 @@ type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'
 type TurnEndType = 'pos'|'lap'|'history'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType
+type SurrenderType = 'money'
+type GameOverType = 'all_player_stats'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType
 
 // user
 export interface ILoggedUsers {
@@ -383,6 +387,12 @@ export interface IGamePlay {
         display_name: string,
         rolled_dice: string,
     },
+    surrender: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        money: string,
+    },
     turn_end: {
         token?: string,
         channel: string,
@@ -394,6 +404,12 @@ export interface IGamePlay {
         city: string,
         prison: string,
         history: string,
+    },
+    game_over: {
+        token?: string,
+        room_id: string,
+        room_name: string,
+        all_player_stats: string,
     }
 }
 
