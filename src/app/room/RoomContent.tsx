@@ -96,12 +96,11 @@ export default function RoomContent({ pubnubSetting }) {
                             : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
                     <div className="w-full h-[calc(100%-1rem)]">
-                        {
-                            miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
-                                // chat box
-                                ? <ChatBox page="room" />
-                                // list of online players
-                                : <PlayerList onlinePlayers={gameState.onlinePlayers} />
+                        {miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
+                            // chat box
+                            ? <ChatBox page="room" />
+                            // list of online players
+                            : <PlayerList onlinePlayers={gameState.onlinePlayers} />
                         }
                         {/* chat form */}
                         <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>

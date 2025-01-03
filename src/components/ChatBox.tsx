@@ -21,11 +21,13 @@ export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}
                 <ChatContainer />
             </div>
             // game room
-            : <div id="chat_container" className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
+            : <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
             absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
-            text-left [writing-mode:horizontal-tb] p-1 overflow-y-scroll overflow-x-hidden
+            text-left [writing-mode:horizontal-tb] p-1 
             bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
-                <ChatContainer />
+                <div id="chat_container" className="overflow-y-scroll h-[calc(100%-1.5rem)] lg:h-[calc(100%-3rem)]">
+                    <ChatContainer />
+                </div>
                 {/* chat form */}
                 <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
                 onSubmit={ev => sendChat(ev, miscState, id)}>
