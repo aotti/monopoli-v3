@@ -355,6 +355,8 @@ export default class GameController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            console.log('turn end',data[0]);
+            
             // modify player turn end data
             const newPlayerTurnEndData: IGameContext['gamePlayerInfo'][0] = {
                 ...data[0],

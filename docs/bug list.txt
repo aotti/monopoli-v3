@@ -1,4 +1,84 @@
-26 oktober 2024
+fix 26 okt 2024
 - (fix) value useState tidak reset jika berpindah halaman dgn <Link>
   value showModal setelah login tersimpan, lalu saat masuk /room 
   background hitam tetap ada
+
+fix 30 nov 2024
+- ~~username & display name harus lowercase smua~~
+- ~~huruf kapital di chat~~
+- ~~otomatis scroll ke bawah kalo ada pesan baru~~
+- ~~translate error dari system~~
+
+fix (4 des 2024)
+- ~~rules curse kurang % dan blm cek jika > 5%~~
+- ~~tombol tidak berubah **loading & disable** saat create~~
+- ~~password harus opsional~~
+- ~~method GET masih simpan cache, cara "const dynamic = 'force-dynamic'" ~~:x:
+- ~~method GET pake option cache **no-store**  ~~:white_check_mark:
+- ~~handle pubnub error status code 0~~ **tinggal testing**
+- ~~credit = tester~~
+- ~~warna text error ubah ke red-300~~
+- ~~tambah filter saat create room, tiap player hanya bisa buat 1 room~~
+- ~~room card buttons dibuat komponen sendiri agar rapih~~
+
+fix (9 des 2024)
+- ~~hindari 2 akun yg sama login di saat yang sama **(loggedPlayers)**~~
+> ***note: data static di class hanya tersimpan sementara***
+> > ~~simpen data di redis ~~
+> > ~~lakukan cek token (loggedPlayers) setiap request~~
+> > ~~jika token expired, maka hapus player dari log~~
+> > ~~buat identifier untuk membedakan perangkat login (simpan timeout token di cookie)~~
+- ~~room_name harus unique, filter di server-side **(redis)**~~
+- ~~saat delete room, filter ulang room_name list **(redis)**~~
+- ~~myCurrentGame **(unlock room setelah join)** value~~
+> > ~~get room list~~
+> > ~~cocokkan **room id (db) **dengan **room id (redis)**~~
+- ~~hanya push loggedUsers saat login, sisanya renew~~
+- ~~refactor pubnub, hapus pubnub-react~~
+- ~~player bisa join room lain walau sudah create room~~
+
+fix (11 des 2024)
+- ~~jumlah room terkadang duplikasi~~
+- ~~update credit jika tau sumbernya~~
+- ~~jumlah player_count tidak bertambah saat join~~
+- ~~cek max player saat join room~~
+- ~~getOnlinePlayers tidak boleh di eksekusi setelah query~~
+- ~~tidak bisa join room buatan sendiri **(buat function getRoomAndMyGame)**~~ ===
+- ~~tidak boleh masuk ke game room tanpa **searchParams**~~
+- ~~saat join room, pindahkan data dari room list ke game room~~
+- ~~get player data saat masuk gameroom~~
+- ~~ubah setting jam saat kirim chat~~
+- ~~saat get room, jika player punya currentGame, kirim datanya ke client~~
+- ~~tombol **spectate **harus ambil data currentGame untuk room tsb~~
+- ~~value curse input ke tooltip~~
+
+fix 16 des 2024
+- ~~saat player join/leave, nama di player list tidak berubah~~
+
+fix 20 des 2024
+- ~~migrasi useState dan useEffect  di <ScreenPortraitWarning /> ke MiscContext~~
+- ~~tambah **character** ke payload create room controller~~
+- ~~tambah **character** ke payload join room controller~~
+- ~~data gameRoomInfo tidak terbawa setelah create room~~
+- ~~disable karakter jika sudah terpilih~~
+
+testing 23 des 2024
+- ~~tambah BoardTesting untuk perpanjang gambar **(140px per gambar)**~~
+
+fix 26 des 2024
+- ~~publish onlinePlayers ke monopoli-roomlist channel~~
+- ~~tutorial game room ancur karna update board~~
+- ~~saat roll dice,player bergerak tidak sesuai giliran~~ 
+- ~~lakukan cek giliran di server-side~~
+- ~~hidden scrollbar history~~
+- ~~scroll paling bawah saat buka history~~
+
+fix 29 des 2024
+- ~~update erd database (games table)~~
+- ~~update room status saat game stage == decide (db room table)~~
+- ~~saat delete room, reset data game semua player yg join room tsb~~
+- ~~saat klik start, player yg tidak di game room gk bisa main~~
+- ~~handle tombol roll dice berulang agar tidak salah giliran~~
+> > ~~saat roll dice, ubah playerTurns jadi empty~~
+> > ~~saat end turn, splice empty dan push playerTurns~~
+- ~~tambah sound step~~

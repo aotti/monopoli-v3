@@ -436,6 +436,14 @@ async function surrenderGameRoom(miscState: IMiscContext, gameState: IGameContex
                 localStorage.setItem('accessToken', surrenderResponse.data[0].token)
                 delete surrenderResponse.data[0].token
             }
+            // update my player info (game played)
+            gameState.setMyPlayerInfo(player => {
+                const newMyPlayer = {...player}
+                newMyPlayer.game_played += 1
+                // save to local storage
+                localStorage.setItem('playerData', JSON.stringify(newMyPlayer))
+                return newMyPlayer
+            })
             return
         default: 
             // show notif

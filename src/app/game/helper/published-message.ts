@@ -134,10 +134,10 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
     const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
     // get alive players
     const alivePlayers = []
-    for(let np of playersData) {
+    for(let pd of playersData) {
         // check players money amount
-        if(np.money > gameState.gameRoomInfo[findRoom].money_lose) 
-            alivePlayers.push(np.display_name)
+        if(pd.money > gameState.gameRoomInfo[findRoom].money_lose) 
+            alivePlayers.push(pd.display_name)
     }
     // if only 1 left, game over
     if(alivePlayers.length === 1) {
@@ -145,6 +145,19 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
         // show notif
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
+        // update my player stats
+        for(let pd of playersData) {
+            if(pd.display_name == gameState.myPlayerInfo.display_name) {
+                gameState.setMyPlayerInfo(player => {
+                    const newMyPlayer = {...player}
+                    newMyPlayer.game_played += 1
+                    newMyPlayer.worst_money_lost = pd.money === -999999 ? newMyPlayer.worst_money_lost : pd.money
+                    // save to local storage
+                    localStorage.setItem('playerData', JSON.stringify(newMyPlayer))
+                    return newMyPlayer
+                })
+            }
+        }
         // winner message
         notifTitle.textContent = `Game Over`
         notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`

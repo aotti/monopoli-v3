@@ -46,6 +46,102 @@ export default class RoomController extends Controller {
         await this.redisReset(`gameHistory_${payload.room_id}`)
     }
 
+    async getRooms(action: string, payload: ICreateRoom['input']) {
+        console.log(action);
+        
+        let result: IResponse
+
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+
+        // no need filter, no payload
+        // set payload for db query
+        const queryObject: IQuerySelect = {
+            table: 'rooms',
+            function: 'mnp_get_rooms_and_mygame'
+        }
+        // run query
+        type GetRoomsType = ICreateRoom['server'] & ICreateRoom['list']
+        const {data, error} = await this.dq.select<GetRoomsType>(queryObject)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            const roomListInfo: IGameContext['gameRoomInfo'] = []
+            // modify data
+            for(let d of data) {
+                const { room_id, room_name, creator } = d
+                // split max player from rules
+                const playerMax = d.rules.match(/max: \d/)[0].split(': ')[1]
+                const rules = d.rules.match(/.*(?=;max)/)[0]
+                // get disabled characters
+                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${room_id}`)
+                // add player max & modify rules
+                d.player_max = +playerMax
+                d.rules = rules
+                // update room list characters data
+                d.characters = getDisabledCharacters
+                // modify room info for gameRoomInfo
+                // split rules
+                const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
+                // remove main rules
+                splitRules.splice(0, 1)
+                const [board, dice, money_start, money_lose, mode, curse] = [
+                    splitRules[0], // board
+                    +splitRules[1], // dice
+                    +splitRules[2], // money start
+                    +splitRules[3], // money lose
+                    splitRules[4], // mode
+                    +splitRules[5], // curse
+                ]
+                // fill gameRoomInfo data
+                roomListInfo.push(Object.assign({}, {
+                    room_id, room_name, creator, 
+                    board, dice, money_lose, mode, curse
+                }))
+                // push to temp room list to prevent duplicate room name
+                for(let [key, value] of Object.entries(d)) {
+                    if(key == 'room_name') {
+                        // filter room name
+                        const filterRoomList = await this.filterRoomList('push', value as string)
+                        if(filterRoomList.status !== 200) continue
+                    }
+                }
+            }
+            // get joined room from cookie
+            const getJoinedRoom = cookies().get('joinedRoom')?.value
+            // check if player has joined room
+            let isMyGameExist: number = null
+            if(!getJoinedRoom) {
+                // find in player list
+                isMyGameExist = data.map((v, i) => v.player_list.match(tpayload.display_name) ? i : null).filter(i => i !== null)[0]
+                if(typeof isMyGameExist == 'number' && isMyGameExist !== -1) 
+                    cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
+                        path: '/',
+                        maxAge: 604800 * 2, // 1 week * 2
+                        httpOnly: true,
+                        sameSite: 'strict',
+                    })
+            }
+            // match joined room with room list
+            const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
+            // set result
+            const resultData = {
+                currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
+                roomListInfo: roomListInfo,
+                roomList: data,
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
     async create(action: string, payload: ICreateRoom['input']) {
         let result: IResponse
 
@@ -161,102 +257,6 @@ export default class RoomController extends Controller {
             // set result
             const resultData = {
                 currentGame: data[0].room_id,
-                token: token
-            }
-            result = this.respond(200, `${action} success`, [resultData])
-        }
-        // return result
-        return result
-    }
-
-    async getRooms(action: string, payload: ICreateRoom['input']) {
-        console.log(action);
-        
-        let result: IResponse
-
-        // get token payload
-        const tokenPayload = await this.getTokenPayload({ token: payload.token })
-        if(tokenPayload.status !== 200) return tokenPayload
-        // token payload data
-        delete payload.token
-        const { tpayload, token } = tokenPayload.data[0]
-
-        // no need filter, no payload
-        // set payload for db query
-        const queryObject: IQuerySelect = {
-            table: 'rooms',
-            function: 'mnp_get_rooms_and_mygame'
-        }
-        // run query
-        type GetRoomsType = ICreateRoom['server'] & ICreateRoom['list']
-        const {data, error} = await this.dq.select<GetRoomsType>(queryObject)
-        if(error) {
-            result = this.respond(500, error.message, [])
-        }
-        else {
-            const roomListInfo: IGameContext['gameRoomInfo'] = []
-            // modify data
-            for(let d of data) {
-                const { room_id, room_name, creator } = d
-                // split max player from rules
-                const playerMax = d.rules.match(/max: \d/)[0].split(': ')[1]
-                const rules = d.rules.match(/.*(?=;max)/)[0]
-                // get disabled characters
-                const getDisabledCharacters = await this.redisGet(`disabledCharacters_${room_id}`)
-                // add player max & modify rules
-                d.player_max = +playerMax
-                d.rules = rules
-                // update room list characters data
-                d.characters = getDisabledCharacters
-                // modify room info for gameRoomInfo
-                // split rules
-                const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
-                // remove main rules
-                splitRules.splice(0, 1)
-                const [board, dice, money_start, money_lose, mode, curse] = [
-                    splitRules[0], // board
-                    +splitRules[1], // dice
-                    +splitRules[2], // money start
-                    +splitRules[3], // money lose
-                    splitRules[4], // mode
-                    +splitRules[5], // curse
-                ]
-                // fill gameRoomInfo data
-                roomListInfo.push(Object.assign({}, {
-                    room_id, room_name, creator, 
-                    board, dice, money_lose, mode, curse
-                }))
-                // push to temp room list to prevent duplicate room name
-                for(let [key, value] of Object.entries(d)) {
-                    if(key == 'room_name') {
-                        // filter room name
-                        const filterRoomList = await this.filterRoomList('push', value as string)
-                        if(filterRoomList.status !== 200) continue
-                    }
-                }
-            }
-            // get joined room from cookie
-            const getJoinedRoom = cookies().get('joinedRoom')?.value
-            // check if player has joined room
-            let isMyGameExist: number = null
-            if(!getJoinedRoom) {
-                // find in player list
-                isMyGameExist = data.map((v, i) => v.player_list.match(tpayload.display_name) ? i : null).filter(i => i !== null)[0]
-                if(typeof isMyGameExist == 'number' && isMyGameExist !== -1) 
-                    cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
-                        path: '/',
-                        maxAge: 604800 * 2, // 1 week * 2
-                        httpOnly: true,
-                        sameSite: 'strict',
-                    })
-            }
-            // match joined room with room list
-            const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
-            // set result
-            const resultData = {
-                currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
-                roomListInfo: roomListInfo,
-                roomList: data,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -388,6 +388,9 @@ export default class RoomController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else {
+            // remove from ready players
+            const getReadyPlayers = await this.redisGet(`readyPlayers_${payload.room_id}`)
+            await this.redisSet(`readyPlayers_${payload.room_id}`, getReadyPlayers.filter(v => v != payload.display_name))
             // publish online players
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {

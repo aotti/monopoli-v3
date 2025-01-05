@@ -350,6 +350,8 @@ export interface ICreateRoom {
         rules: string,
         status: 'prepare'|'playing',
         player_list: string,
+        game_played_list: string,
+        worst_money_list: string,
     }
 }
 

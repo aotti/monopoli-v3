@@ -142,6 +142,7 @@ export function resetAllData(gameState: IGameContext) {
     // remove all local storage
     localStorage.removeItem('accessToken')
     localStorage.removeItem('onlinePlayers')
+    localStorage.removeItem('playerData')
     // remove player info
     gameState.setMyPlayerInfo(null)
     gameState.setOnlinePlayers([])
@@ -280,6 +281,9 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 delete renewResponse.data[0].token
                 // set my player data
                 gameState.setMyPlayerInfo(renewResponse.data[0].player)
+                // save player data to localStorage to make sure its updated
+                // cuz data from jwt is not (game_played & worst_money)
+                localStorage.setItem('playerData', JSON.stringify(renewResponse.data[0].player))
                 // set online players
                 gameState.setOnlinePlayers(renewResponse.data[0].onlinePlayers)
                 localStorage.setItem('onlinePlayers', JSON.stringify(renewResponse.data[0].onlinePlayers))
@@ -294,13 +298,21 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
     }
     // auto login access token
     else {
-        // set my player info
-        gameState.setMyPlayerInfo({
-            display_name: data.display_name,
-            game_played: data.game_played,
-            worst_money_lost: data.worst_money_lost,
-            avatar: data.avatar
-        })
+        // check local storage
+        // set updated my player info if access token not expired
+        const getPlayerData = localStorage.getItem('playerData')
+        if(getPlayerData) {
+            gameState.setMyPlayerInfo(JSON.parse(getPlayerData))
+        }
+        else {
+            // set my player info
+            gameState.setMyPlayerInfo({
+                display_name: data.display_name,
+                game_played: data.game_played,
+                worst_money_lost: data.worst_money_lost,
+                avatar: data.avatar
+            })
+        }
         // set online players
         gameState.setOnlinePlayers(JSON.parse(onlinePlayers))
         miscState.setIsLoading(false)

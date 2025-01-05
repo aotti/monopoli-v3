@@ -70,26 +70,45 @@ export default class LoginController extends Controller {
         const isVerified = await this.renewAccessToken(refreshToken)
         // token expired / not exist
         if(!isVerified) return result = this.respond(403, `forbidden`, [])
-
         // token verified
         const [accessToken, renewData] = isVerified
-        // renew/log online player
-        const onlinePlayers = await this.getOnlinePlayers(renewData)
-        if(onlinePlayers.status !== 200) return onlinePlayers
-        // publish online players
-        const onlineplayer_channel = 'monopoli-onlineplayer'
-        const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
-        console.log(isPublished);
-        
-        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-        // set result
-        const resultData = {
-            player: renewData,
-            token: accessToken,
-            // in case client-side not subscribe yet cuz still loading
-            onlinePlayers: onlinePlayers.data
+        // set payload for db query
+        const queryObject: IQuerySelect = {
+            table: 'players',
+            selectColumn: this.dq.columnSelector('players', 45),
+            whereColumn: 'display_name',
+            whereValue: renewData.display_name
         }
-        result = this.respond(200, `${action} success`, [resultData])
+        // run query
+        const {data, error} = await this.dq.select<IPlayer>(queryObject)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            // new renew data
+            const newRenewData: IPlayer = {
+                ...renewData,
+                game_played: data[0].game_played,
+                worst_money_lost: data[0].worst_money_lost
+            }
+            // renew/log online player
+            const onlinePlayers = await this.getOnlinePlayers(renewData)
+            if(onlinePlayers.status !== 200) return onlinePlayers
+            // publish online players
+            const onlineplayer_channel = 'monopoli-onlineplayer'
+            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                player: newRenewData,
+                token: accessToken,
+                // in case client-side not subscribe yet cuz still loading
+                onlinePlayers: onlinePlayers.data
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
         // return result
         return result
     }
