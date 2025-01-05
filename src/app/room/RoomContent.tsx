@@ -1,5 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
+import { applyTooltipEvent, fetcher, fetcherOptions, qS, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
@@ -8,61 +8,46 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { IChat } from "../../helper/types";
+import { ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
-import Pubnub, { ListenerParameters } from "pubnub";
-import { usePubNub } from "pubnub-react";
+import PubNub, { Listener } from "pubnub";
+import { roomMessageListener } from "./helper/published-message";
+import GameSounds from "../../components/GameSounds";
 
-export default function RoomContent() {
+export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
     const gameState = useGame()
-    const { myPlayerInfo, otherPlayerInfo, onlinePlayers } = gameState
+    const playerData = gameState.otherPlayerInfo || gameState.myPlayerInfo
 
     // chat input ref
     const chatFocusRef = useRef()
     clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
 
-    const roomRules = [
-        `board: normal;dice: 2;start: 75k;lose: -25k;mode: 5 laps;curse: 5%`,
-        `board: 2 way;dice: 1;start: 75k;lose: -25k;mode: survive;curse: 5~10%`,
-        `board: delta;dice: 2;start: 50k;lose: -25k;mode: 7 laps;curse: 10%`
-    ]
-
-    const pubnubClient = usePubNub()
+    // pubnub
+    const pubnubClient = new PubNub(pubnubSetting)
     // pubnub subscribe
-    const roomlistChannel = ['monopoli-roomlist']
-    const onlineplayerChannel = ['monopoli-onlineplayer']
+    const roomlistChannel = 'monopoli-roomlist'
+    // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
         // tooltip (the element must have position: relative)
         applyTooltipEvent()
+        // get room list
+        getRoomList(gameState)
 
         // subscribe
-        pubnubClient.subscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+        pubnubClient.subscribe({ 
+            channels: [roomlistChannel] 
+        })
         // get published message
-        const publishedMessage: ListenerParameters = {
-            message: (data) => {
-                const getMessage = data.message as Pubnub.MessageEvent & IChat & {onlinePlayers: string}
-                // add chat
-                if(getMessage.message_text) {
-                    const chatData: Omit<IChat, 'channel'|'token'> = {
-                        display_name: getMessage.display_name,
-                        message_text: getMessage.message_text,
-                        message_time: getMessage.message_time
-                    }
-                    miscState.setMessageItems(data => [...data, chatData])
-                }
-                // update online player
-                if(getMessage.onlinePlayers) {
-                    const onlinePlayersData = getMessage.onlinePlayers
-                    localStorage.setItem('onlinePlayers', onlinePlayersData)
-                    gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
-                }
-            }
+        const publishedMessage: Listener = {
+            message: data => roomMessageListener(data, miscState, gameState)
         }
         pubnubClient.addListener(publishedMessage)
         // unsub and remove listener
         return () => {
-            pubnubClient.unsubscribe({ channels: [...roomlistChannel, ...onlineplayerChannel] })
+            pubnubClient.unsubscribe({ 
+                channels: [roomlistChannel] 
+            })
             pubnubClient.removeListener(publishedMessage)
         }
     }, [])
@@ -111,19 +96,20 @@ export default function RoomContent() {
                             : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
                     <div className="w-full h-[calc(100%-1rem)]">
-                        {
-                            miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
-                                // chat box
-                                ? <ChatBox page="room" />
-                                // list of online players
-                                : <PlayerList onlinePlayers={onlinePlayers} />
+                        {miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
+                            // chat box
+                            ? <ChatBox page="room" />
+                            // list of online players
+                            : <PlayerList onlinePlayers={gameState.onlinePlayers} />
                         }
-                        {/* chat input */}
+                        {/* chat form */}
                         <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
+                            {/* inputs */}
                             <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
                             <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
                             onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
+                            {/* submit chat */}
                             <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                                 <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                             </button>
@@ -134,7 +120,7 @@ export default function RoomContent() {
                 {/* tutorial: relative z-10 */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_2' ? 'relative z-10' : ''}
                 h-[calc(100vh-65vh)] lg:h-[calc(100vh-60vh)] p-1`}>
-                    <PlayerStats playerData={otherPlayerInfo || myPlayerInfo} onlinePlayers={onlinePlayers} />
+                    <PlayerStats playerData={playerData} onlinePlayers={gameState.onlinePlayers} />
                 </div>
             </div>
             {/* room list */}
@@ -157,6 +143,8 @@ export default function RoomContent() {
                     <div className="text-right w-2/5">
                         <button type="button" className="border-8bit-primary bg-primary active:opacity-75"
                         onClick={() => {
+                            // close join modal
+                            miscState.setShowJoinModal(null)
                             // to give zoom-in animate class
                             miscState.setAnimation(true); 
                             // show the modal
@@ -178,11 +166,13 @@ export default function RoomContent() {
                     text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
                     overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
                     {/* card */}
-                    <RoomCard roomRules={roomRules[0]} />
-                    {/* card */}
-                    <RoomCard roomRules={roomRules[1]} />
-                    {/* card */}
-                    <RoomCard roomRules={roomRules[2]} />
+                    {gameState.roomList.length > 0
+                        ? gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)
+                        : <div className="m-auto">
+                            <span id="result_message"> there is no game </span>
+                            <img src="https://img.icons8.com/?id=-70EdELqFxwn&format=png&color=000000" className="inline w-10" loading="lazy" />
+                        </div>
+                    }
                 </div>
             </div>
             
@@ -191,6 +181,42 @@ export default function RoomContent() {
             absolute mt-1.5 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
                 <TutorialRoomList />
             </div>
+
+            {/* game sounds */}
+            <GameSounds />
         </div>
     )
+}
+
+async function getRoomList(gameState: IGameContext) {
+    // result message
+    const resultMessage = qS('#result_message')
+    // fetch
+    const getRoomFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
+    const getRoomResponse: IResponse = await (await fetcher('/room', getRoomFetchOptions)).json()
+    // response
+    switch(getRoomResponse.status) {
+        case 200: 
+            // save access token
+            if(getRoomResponse.data[0].token) {
+                localStorage.setItem('accessToken', getRoomResponse.data[0].token)
+                delete getRoomResponse.data[0].token
+            }
+            // get rooms data
+            const rooms = getRoomResponse.data[0].roomList as ICreateRoom['list'][]
+            // set room list
+            for(let room of rooms) {
+                gameState.setRoomList(data => [...data, room].filter((obj1, i, arr) => 
+                    arr.findLastIndex(obj2 => obj2.room_name == obj1.room_name) === i
+                ))
+            }
+            // set my current game
+            gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
+            // set game room info
+            gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
+            return
+        default: 
+            resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
+            return
+    }
 }

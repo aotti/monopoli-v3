@@ -10,8 +10,11 @@ export default class PlayerController extends Controller {
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
         if(tokenPayload.status !== 200) return tokenPayload
         // token payload data
+        delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-        
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
@@ -28,11 +31,12 @@ export default class PlayerController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            // publish online players
-            const onlineplayerChannel = 'monopoli-onlineplayer'
-            await this.pubnubPublish(onlineplayerChannel, {onlinePlayers: JSON.stringify(onlinePlayers)})
+            // publish realtime data
+            const roomlistChannel = 'monopoli-roomlist'
+            const isPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 player: data[0],
@@ -51,15 +55,18 @@ export default class PlayerController extends Controller {
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
         if(tokenPayload.status !== 200) return tokenPayload
         // token payload data
+        delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
         // set payload for db query
         const queryObject: IQueryUpdate = {
             table: 'players',
-            selectColumn: this.dq.columnSelector('players', 4),
+            selectColumn: this.dq.columnSelector('players', 6),
             whereColumn: 'display_name',
             whereValue: payload.display_name,
             get updateColumn() {
@@ -72,12 +79,13 @@ export default class PlayerController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // renew log online player
-            const onlinePlayers = await this.getOnlinePlayers(tpayload)
-            // publish online players
-            const publishData = { onlinePlayers: JSON.stringify(onlinePlayers) }
-            const onlineplayerChannel = 'monopoli-onlineplayer'
-            await this.pubnubPublish(onlineplayerChannel, publishData)
+            // publish realtime data
+            const publishData = {onlinePlayers: JSON.stringify(onlinePlayers.data)}
+            const roomlistChannel = 'monopoli-roomlist'
+            const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
+            console.log(isPublished);
+            
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 avatar: data[0].avatar,
@@ -98,20 +106,21 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
-
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
-        // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload)
         // publish chat
         const publishData = {
             ...payload, 
-            onlinePlayers: JSON.stringify(onlinePlayers)
+            onlinePlayers: JSON.stringify(onlinePlayers.data)
         }
         const isPublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isPublished);
         
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // set result
         const resultData = {
             token: token

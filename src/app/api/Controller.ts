@@ -1,16 +1,34 @@
 import { jwtVerify, SignJWT } from "jose";
 import { DatabaseQueries } from "../../helper/DatabaseQueries";
 import { filterInput, verifyAccessToken } from "../../helper/helper";
-import { ILoggedUsers, IPlayer, IResponse, IToken, IUser, TokenPayloadType } from "../../helper/types";
+import { ILoggedUsers, IPlayer, IResponse, IToken, TokenPayloadType } from "../../helper/types";
 import { cookies } from "next/headers";
-import Pubnub from "pubnub";
+import { NextRequest } from "next/server";
+import PubNub from "pubnub";
+import { createClient } from "redis";
+
+// redis
+const redisClient = createClient({
+    username: 'default',
+    password: process.env.REDIS_PASS,
+    socket: {
+        host: 'redis-16533.c334.asia-southeast2-1.gce.redns.redis-cloud.com',
+        port: 16533,
+        connectTimeout: 2_000, // 5 seconds
+        timeout: 10_000, // 10 seconds
+    }
+});
+// listener
+redisClient.on('error', err => console.log('Redis Client Error', err));
+// connect to redis
+redisClient.connect()
+.then(res => console.log('redis connected'))
+.catch(err => console.log(err))
 
 export default class Controller {
     protected dq = new DatabaseQueries()
-    // log users online
-    private static loggedUsers: ILoggedUsers[] = []
     // pubnub for publish
-    private pubnubServer = new Pubnub({
+    private pubnubServer = new PubNub({
         subscribeKey: process.env.PUBNUB_SUB_KEY,
         publishKey: process.env.PUBNUB_PUB_KEY,
         userId: process.env.PUBNUB_UUID
@@ -23,6 +41,46 @@ export default class Controller {
         })
     }
 
+    constructor() {
+        // this.redisReset('loggedPlayers')
+        // this.redisReset('readyPlayers_33')
+        // this.redisReset('decidePlayers_33')
+        // this.redisReset('gameHistory_33')
+        // this.redisSet('disabledCharacters_32', [
+        //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
+        // ])
+        // this.redisSet('disabledCharacters_33', [
+        //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png',
+        //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/square-GcUfnpybETUDXjwbOxSTxdC6fkp4xb.png'
+        // ])
+    }
+
+    /**
+     * @description used for log online users & room names
+     */
+    protected async redisSet(key: string, value: any[]) {
+        // set new data
+        const setResult = await redisClient.set(key, JSON.stringify(value));
+        return setResult
+    }
+
+    /**
+     * @description used for retrieve logged online users & room names
+     * @returns JSON.parse value
+     */
+    protected async redisGet(key: string) {
+        // get existing data
+        const getResult = await redisClient.get(key);
+        return JSON.parse(getResult) as any[] || []
+    }
+
+    protected async redisReset(key: string) {
+        // reset existing data
+        const resetResult = await redisClient.del(key)
+        console.log(resetResult);
+        
+    }
+
     protected filterPayload<T>(action: string, payload: T) {
         // log the action
         console.log(action);
@@ -31,11 +89,26 @@ export default class Controller {
         let [filterStatus, filterMessage] = [false, 'payload is not filtered yet']
         // matching filter
         switch(action) {
-            case 'user register': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'user login': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'user avatar update': [filterStatus, filterMessage] = loopKeyValue(); break
-            case 'user get stats': [filterStatus, filterMessage] = loopKeyValue(); break
+            // player
+            case 'user register': 
+            case 'user login': 
+            case 'user avatar update': 
+            case 'user get stats': 
             case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
+            // room
+            case 'room create': 
+            case 'room hard delete': 
+            case 'room join': 
+            case 'room leave': [filterStatus, filterMessage] = loopKeyValue(); break
+            // game
+            case 'game get player': 
+            case 'game ready player': 
+            case 'game start': 
+            case 'game roll turn': 
+            case 'game roll dice': 
+            case 'game surrender': 
+            case 'game turn end': 
+            case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])
@@ -52,7 +125,7 @@ export default class Controller {
         }
     }
 
-    protected respond<T=any>(s: number, m: string | object, d: T[]) {
+    protected respond<T=any>(s: number, m: string, d: T[]) {
         return {
             status: s,
             message: m,
@@ -67,40 +140,122 @@ export default class Controller {
         }
         // renew my player
         const renewMyPlayer = await this.logOnlineUsers('renew', logData)
-        // if null, log my player
-        const logMyPlayer = !renewMyPlayer ? await this.logOnlineUsers('log', logData) : null
-        return renewMyPlayer || logMyPlayer
+        if(renewMyPlayer.status === 200 || renewMyPlayer.status === 400) return renewMyPlayer
+        // if data empty, log my player
+        const logMyPlayer = await this.logOnlineUsers('log', logData)
+        if(logMyPlayer.status === 200) return logMyPlayer
     }
 
     protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Omit<ILoggedUsers, 'timeout_token'>) {
+        const getLoggedPlayers = await this.redisGet('loggedPlayers')
+        let loggedPlayers: ILoggedUsers[] = getLoggedPlayers.length > 0 ? getLoggedPlayers : []
+        // check players token each request
+        if(loggedPlayers.length > 0) {
+            const getPlayersToken = loggedPlayers.map(v => v.timeout_token)
+            // verify players token
+            for(let token of getPlayersToken) {
+                const [error, verify] = await verifyAccessToken({
+                    action: 'verify-only', 
+                    token: token, 
+                    secret: process.env.ACCESS_TOKEN_SECRET
+                })
+                // filter expired players
+                if(error) loggedPlayers = loggedPlayers.filter(v => v.timeout_token != token)
+            }
+        }
+        // logging users
         if(action == 'log') {
-            // create token for timeout
-            const loggedToken = await this.generateAccessToken(payload as any, '5min')
             // check if user exist
-            const isUserExist = Controller.loggedUsers.map(v => v.display_name).indexOf(payload.display_name)
-            if(isUserExist !== -1) return Controller.loggedUsers
-            // user not exist log user + token
-            Controller.loggedUsers.push({
+            const isUserExist = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
+            // match the token
+            const isTokenMatch = matchTimeoutToken(isUserExist)
+            // for renew, if token match = proceed to renew
+            // for log, if token match = dont log player
+            if(isTokenMatch) return this.respond(400, 'account in use', [])
+            console.log(action, isTokenMatch);
+            
+            // token expired
+            // create token for timeout
+            const timeoutToken = await this.generateAccessToken(payload as any, '5min')
+            // log the player
+            loggedPlayers.push({
                 display_name: payload.display_name,
                 status: payload.status,
-                timeout_token: loggedToken
+                timeout_token: timeoutToken
             })
-            return Controller.loggedUsers
+            // save timeout token for identifier
+            cookies().set('timeoutToken', timeoutToken, { 
+                path: '/',
+                maxAge: 604800 * 2, // 1 week * 2
+                httpOnly: true,
+                sameSite: 'strict',
+            })
+            // save to redis
+            await this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
         }
-        else if(action == 'out') {
-            Controller.loggedUsers = Controller.loggedUsers.filter(p => p.display_name != payload.display_name)
-            return Controller.loggedUsers
-        }
+        // renew user timeout token
         else if(action == 'renew') {
             // create token for timeout
-            const loggedToken = await this.generateAccessToken(payload as any, '5min')
+            const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // renew if user still logged
-            const renewUser = Controller.loggedUsers.map(user => user.display_name).indexOf(payload.display_name)
-            if(renewUser === -1) return null
+            const renewUser = loggedPlayers.map(user => user.display_name).indexOf(payload.display_name)
+            if(renewUser === -1) return this.respond(403, 'nothing to renew', [])
+            // match the token
+            const isTokenMatch = matchTimeoutToken(renewUser)
+            console.log(action, isTokenMatch);
+            
+            // for renew, if token match = proceed to renew
+            // for log, if token match = dont log player
+            if(!isTokenMatch) return this.respond(400, 'account in use', [])
             // update my token
-            Controller.loggedUsers[renewUser].timeout_token = loggedToken
-            return Controller.loggedUsers
+            loggedPlayers[renewUser].timeout_token = timeoutToken
+            // update timeout token for identifier
+            cookies().set('timeoutToken', timeoutToken, { 
+                path: '/',
+                maxAge: 604800 * 2, // 1 week * 2
+                httpOnly: true,
+                sameSite: 'strict',
+            })
+            // save to redis
+            await this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
         }
+        // remove user
+        else if(action == 'out') {
+            loggedPlayers = loggedPlayers.filter(p => p.display_name != payload.display_name)
+            // save to redis
+            await this.redisSet('loggedPlayers', loggedPlayers)
+            // response
+            return this.respond(200, 'user logged', loggedPlayers)
+        }
+
+        /**
+         * @description match timeout token as identifier for user
+         */
+        function matchTimeoutToken(index: number) {
+            const getTimeoutToken = cookies().get('timeoutToken')?.value
+            if(getTimeoutToken && getTimeoutToken == loggedPlayers[index]?.timeout_token)
+                return true
+            return false
+        }
+    }
+
+    /**
+     * @description check authorization header token 
+     */
+    checkAuthorization(req: NextRequest) {
+        const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
+        if(!accessToken) {
+            // check refresh token
+            const refreshToken = cookies().get('refreshToken')?.value
+            // access & refresh token empty
+            if(!refreshToken) 
+                return this.respond(403, 'forbidden', [])
+        }
+        return this.respond(200, 'token ok', [{accessToken: accessToken}])
     }
     
     protected generateToken<T extends IToken>(args: T): Promise<string>

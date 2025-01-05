@@ -70,7 +70,7 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
             // error
             else {
-                resultMessage.classList.add('text-red-600')
+                resultMessage.classList.add('text-red-300')
                 resultMessage.textContent = errorLoginRegister(input.id, miscState.language)
                 return
             }
@@ -115,7 +115,7 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             loginButton.textContent = tempButtonText
             loginButton.removeAttribute('disabled')
             // result message
-            resultMessage.classList.add('text-red-600')
+            resultMessage.classList.add('text-red-300')
             resultMessage.textContent = `❌ ${loginResponse.status}: ${loginResponse.message}`
             return
     }

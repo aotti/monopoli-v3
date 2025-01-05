@@ -13,7 +13,7 @@ export default function TutorialGameRoom() {
         part_2: [
             `there are 3 stage before play`,
             `\n1 = preparation, 2 = decide turn, 3 = play\n"leave" to leave the game before game start\n"surrender" to leave when the game is run\n"roll turn" to decide the turn to roll dice`,
-            `all tiles have tooltip. city tooltip changes after bought. other tiles only static info, but prison. the 🔍 icon to see full image of tiles.`
+            `only click "ready" if players are ready. all tiles have tooltip. other tiles only static info, but prison. the 🔍 icon to see full image of tiles.`
         ],
         part_3: [
             `"back to room" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.`,
@@ -41,23 +41,23 @@ export default function TutorialGameRoom() {
                     {translateUI({lang: miscState.language, text: tutorialText.part_1[2] as any})}
                 </p>
                 <hr className="my-1" />
-                <button type="button" className="text-green-400 p-1"
+                <button type="button" className="text-green-400 px-1"
                 onClick={() => miscState.setShowTutorial('tutorial_gameroom_2')}>
                     {translateUI({lang: miscState.language, text: 'click here to continue'})}
                 </button>
             </div>
             {/* game board + buttons */}
             <div className={`${miscState.showTutorial == 'tutorial_gameroom_2' ? 'flex' : 'hidden'}
-            flex-col gap-[17.5vh] lg:gap-[15vh] absolute z-10 top-[13.5vh] lg:top-28 left-[calc(25%-1rem)] w-[calc(50%+2rem)] 
+            flex-col absolute z-10 top-[21vh] lg:top-[9.5rem] left-[calc(25%-1rem)] w-[calc(50%+2rem)] 
             text-2xs lg:text-xs lg:leading-6`}>
-                <p className="whitespace-pre-line h-[4.7rem] lg:h-[8.5rem] p-px border-b">
+                <p className="whitespace-pre-line h-[4.7rem] lg:h-[8.5rem] p-px">
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[0] as any})}
                     <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/game_stages-TPqgHHAzxrEJ3JGOlOzOCK5mhGm0Sm.gif" alt="game buttons" className="!inline w-[17vw] lg:w-64 !h-[3vw] lg:!h-8 mx-1" />
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[1] as any})}
                 </p>
-                <p className="whitespace-pre-line h-[4.5rem] lg:h-32 p-px border-t">
+                <p className="whitespace-pre-line h-[4.5rem] lg:h-32 p-px">
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[2] as any})}
-                    <button type="button" className="text-green-400 p-1"
+                    <button type="button" className="text-green-400 px-1"
                     onClick={() => miscState.setShowTutorial('tutorial_gameroom_3')}>
                         {translateUI({lang: miscState.language, text: 'click here to continue'})}
                     </button>
@@ -78,7 +78,7 @@ export default function TutorialGameRoom() {
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[2] as any})}
                 </p>
                 <hr className="my-1" />
-                <button type="button" className="text-green-400 p-1"
+                <button type="button" className="text-green-400 px-1"
                 onClick={() => miscState.setShowTutorial(null)}>
                     {translateUI({lang: miscState.language, text: 'tutorial complete'})}
                 </button>

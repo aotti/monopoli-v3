@@ -8,7 +8,7 @@ const GameContext = createContext<IGameContext>(null)
 export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // board
     const [showTileImage, setShowTileImage] = useState<IGameContext['showTileImage']>(null)
-    const [showNotif, setShowNotif] = useState<IGameContext['showNotif']>(null)
+    const [showGameNotif, setShowGameNotif] = useState<IGameContext['showGameNotif']>(null)
     const [rollNumber, setRollNumber] = useState<IGameContext['rollNumber']>(null)
     // side buttons
     const [gameSideButton, setGameSideButton] = useState<IGameContext['gameSideButton']>(null)
@@ -18,7 +18,21 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // player
     const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
-    const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>(null)
+    const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
+    const [spectator, setSpectator] = useState(false)
+    // room
+    const [roomList, setRoomList] = useState([])
+    const [roomError, setRoomError] = useState<string>(null)
+    const [roomInputPassword, setRoomInputPassword] = useState<string>(null)
+    // game
+    const [myCurrentGame, setMyCurrentGame] = useState<number>(null)
+    const [gameRoomId, setGameRoomId] = useState<number>(null)
+    const [gameRoomInfo, setGameRoomInfo] = useState<IGameContext['gameRoomInfo']>([])
+    const [gamePlayerInfo, setGamePlayerInfo] = useState<IGameContext['gamePlayerInfo']>([])
+    const [gameStages, setGameStages] = useState<IGameContext['gameStages']>('prepare')
+    const [gameFixedPlayers, setGameFixedPlayers] = useState<number>(null)
+    const [gamePlayerTurns, setGamePlayerTurns] = useState<string[]>([])
+    const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
 
     useEffect(() => {
         // set online players if exist
@@ -26,15 +40,16 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         if(getOnlinePlayers) setOnlinePlayers(JSON.parse(getOnlinePlayers))
     }, [])
 
-    const states: IGameContext = {
-        // board
+    const boardStates = {
         showTileImage: showTileImage,
         setShowTileImage: setShowTileImage,
-        showNotif: showNotif,
-        setShowNotif: setShowNotif,
+        showGameNotif: showGameNotif,
+        setShowGameNotif: setShowGameNotif,
         rollNumber: rollNumber,
         setRollNumber: setRollNumber,
-        // side buttons
+    }
+    
+    const sideButtonStates = {
         gameSideButton: gameSideButton,
         setGameSideButton: setGameSideButton,
         openPlayerSetting: openPlayerSetting,
@@ -43,13 +58,47 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         setDisplaySettingItem: setDisplaySettingItem,
         showGameHistory: showGameHistory,
         setShowGameHistory: setShowGameHistory,
-        // player
+    }
+
+    const playerStates = {
         myPlayerInfo: myPlayerInfo,
         setMyPlayerInfo: setMyPlayerInfo,
         otherPlayerInfo: otherPlayerInfo,
         setOtherPlayerInfo: setOtherPlayerInfo,
         onlinePlayers: onlinePlayers,
         setOnlinePlayers: setOnlinePlayers,
+        spectator: spectator,
+        setSpectator: setSpectator,
+    }
+
+    const roomStates = {
+        roomList, setRoomList,
+        roomError, setRoomError,
+        roomInputPassword, setRoomInputPassword,
+    }
+
+    const gameStates = {
+        myCurrentGame, setMyCurrentGame,
+        gameRoomId, setGameRoomId,
+        gameRoomInfo, setGameRoomInfo,
+        gamePlayerInfo, setGamePlayerInfo,
+        gameStages, setGameStages,
+        gameFixedPlayers, setGameFixedPlayers,
+        gamePlayerTurns, setGamePlayerTurns,
+        gameHistory, setGameHistory
+    }
+
+    const states: IGameContext = {
+        // board
+        ...boardStates,
+        // side buttons
+        ...sideButtonStates,
+        // player
+        ...playerStates,
+        // room
+        ...roomStates,
+        // game
+        ...gameStates
     }
 
     return (

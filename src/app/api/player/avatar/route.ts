@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import PlayerController from "../PlayerController";
 import { IResponse } from "../../../../helper/types";
 import { cookies } from "next/headers";
+import Controller from "../../Controller";
 
 export async function PUT(req: NextRequest) {
     // api action
@@ -9,20 +10,12 @@ export async function PUT(req: NextRequest) {
     // client payload
     const payload = await req.json()
     // check authorization
-    const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
-    if(!accessToken) {
-        // check refresh token
-        const refreshToken = cookies().get('refreshToken')?.value
-        // access & refresh token empty
-        if(!refreshToken) 
-            return NextResponse.json<IResponse>({
-                status: 403,
-                message: 'forbidden',
-                data: []
-            }, {status: 403})
-    }
+    const controller = new Controller()
+    const isAuth = controller.checkAuthorization(req)
+    // token empty
+    if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
-    payload.token = accessToken
+    payload.token = isAuth.data[0].accessToken
     // process
     const playerController = new PlayerController()
     const result = await playerController.avatarUpload(action, payload)

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const loginController = new LoginController()
     const result = accessToken 
                 ? await loginController.autoLogin('user auto login')
-                : await loginController.login('user login', payload, req)
+                : await loginController.login('user login', payload)
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

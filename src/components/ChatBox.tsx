@@ -1,10 +1,10 @@
 import { FormEvent, useEffect } from "react"
 import { useGame } from "../context/GameContext"
 import { useMisc } from "../context/MiscContext"
-import { cE, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
+import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
 import { IChat, IMiscContext, IResponse } from "../helper/types"
 
-export default function ChatBox({ page }: {page: 'room'|'game'}) {
+export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
     const miscState = useMisc()
     const gameState = useGame()
 
@@ -21,16 +21,21 @@ export default function ChatBox({ page }: {page: 'room'|'game'}) {
                 <ChatContainer />
             </div>
             // game room
-            : <div id="chat_container" className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
+            : <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
             absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
-            text-left [writing-mode:horizontal-tb] p-1 overflow-y-scroll overflow-x-hidden
+            text-left [writing-mode:horizontal-tb] p-1 
             bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
-                <ChatContainer />
-                {/* chat input */}
-                <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" onSubmit={ev => ev.preventDefault()}>
+                <div id="chat_container" className="overflow-y-scroll h-[calc(100%-1.5rem)] lg:h-[calc(100%-3rem)]">
+                    <ChatContainer />
+                </div>
+                {/* chat form */}
+                <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
+                onSubmit={ev => sendChat(ev, miscState, id)}>
+                    {/* input chat */}
                     <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
                     <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                     placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
+                    {/* submit chat */}
                     <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                         <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                     </button>
@@ -66,16 +71,20 @@ function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}
     )
 }
 
-export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext) {
+export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, id?: number) {
     ev.preventDefault()
 
     const messageInput = qS('#message_text') as HTMLInputElement
+    // set manual time
+    const date = new Date()
+    const getHours = date.getHours().toString().length == 1 ? `0${date.getHours()}` : date.getHours()
+    const getMinutes = date.getMinutes().toString().length == 1 ? `0${date.getMinutes()}` : date.getMinutes()
     // input value container
     const inputValues: IChat = {
-        channel: 'monopoli-roomlist',
+        channel: id ? `monopoli-gameroom-${id}` : 'monopoli-roomlist',
         display_name: null,
         message_text: null,
-        message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
+        message_time: `${getHours}:${getMinutes}`
     }
     // get input elements
     const formInputs = ev.currentTarget.elements

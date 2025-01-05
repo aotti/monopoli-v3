@@ -1,5 +1,5 @@
 import { PointerEvent } from "react";
-import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, IPlayer, IResponse, ITranslate, IVerifyTokenOnly, IVerifyTokenPayload, VerifyTokenReturn, VerifyTokenType } from "./types";
+import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, InputIDType, IPlayer, IResponse, ITranslate, IVerifyTokenOnly, IVerifyTokenPayload, VerifyTokenReturn, VerifyTokenType } from "./types";
 import translateUI_data from '../config/translate-ui.json'
 import { createHash } from "crypto";
 import { JWTPayload, jwtVerify } from "jose";
@@ -56,83 +56,8 @@ export function catchError<T=any>(promise: Promise<T>): Promise<[undefined, T] |
         })
 }
 
-type InputType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'|'channel'|'message_text'|'message_time'
-export function setInputValue(input: InputType, element: HTMLInputElement) {
+export function setInputValue(input: InputIDType, element: HTMLInputElement) {
     return element.id == input && filterInput(element.id, element.value)
-}
-
-export function filterInput(input: InputType, value: string) {
-    // username = 4~10 | password = 8~16 | display_name = 4~12
-    switch(input) {
-        // filter uuid
-        case 'uuid': 
-            const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-            return value.match(uuidv4_regex)
-        // letter & number
-        case 'username': 
-            return value.match(/^[a-zA-Z0-9]{4,10}$/)
-        // letter, number, whitespace, symbol (.,#-+@) 
-        case 'password': 
-        case 'confirm_password':
-            return value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/)
-        // letter, number, whitespace
-        case 'display_name': 
-            return value.match(/^[a-zA-Z0-9\s]{4,12}$/)
-        // must have monopoli-profiles url
-        case 'avatar': 
-            return value.match(/monopoli-profiles/)
-        // websocket message channel
-        case 'channel': 
-            return value.match(/monopoli-roomlist|monopoli-gameroom-\d{1,3}$/)
-        // message text can have letter, number, whitespace, symbol (.,#-+@)
-        case 'message_text': 
-            return value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/)
-        // time of chat
-        case 'message_time': 
-            return value.match(/^[\d{2}:\d{2}]{4,5}$/)
-    }
-}
-
-/**
- * @returns encrypted text
- */
-export function sha256(text: string) {
-    const hash = createHash('sha256').update(text).digest('hex')
-    return hash
-}
-
-export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
-export function fetcherOptions(args: FetchOptionsType) {
-    const { method, credentials } = args
-    // get access token
-    const accessToken = localStorage.getItem('accessToken')
-    // headers
-    const headers = credentials 
-                    // auth
-                    ? method == 'GET'
-                        // GET will only have authorization
-                        ? { 'authorization': `Bearer ${accessToken}` }
-                        // POST, PUT, DELETE with auth
-                        : { 'content-type': 'application/json',
-                            'authorization': `Bearer ${accessToken}` }
-                    // POST, PUT, DELETE register/login
-                    : { 'content-type': 'application/json' }
-    switch(method) {
-        case 'GET': 
-            if(credentials) 
-                return { method: method, headers: headers }
-            // public
-            return { method: method }
-        case 'POST': return { method: method, headers: headers, body: args.body }
-        case 'PUT': return { method: method, headers: headers, body: args.body }
-        case 'DELETE': return { method: method, headers: headers, body: args.body }
-    }
-}
-
-export function fetcher(endpoint: string, options: RequestInit) {
-    const host = `${window.location.origin}/api`
-    const url = host + endpoint
-    return fetch(url, options)
 }
 
 export function errorLoginRegister(input: string, language: ITranslate['lang']) {
@@ -149,8 +74,83 @@ export function errorLoginRegister(input: string, language: ITranslate['lang']) 
     }
 }
 
-/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
-/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+export function errorCreateRoom(input: string, language: ITranslate['lang']) {
+    switch(input) {
+        case 'room_name':
+            return translateUI({lang: language, text: `name: length must be 4 to 12 | only letter, number and spaces allowed`})
+        case 'room_password':
+            return `${input}: ${translateUI({lang: language, text: 'length must be 3 to 8 | only letter, number, spaces and symbols .,#-+@ allowed'})}`
+        case 'room_id':
+        case 'select_mode':
+        case 'select_board':
+        case 'select_dice':
+        case 'select_money_start':
+        case 'select_money_lose':
+        case 'select_curse':
+        case 'select_max_player':
+        case 'select_character':
+            return `${input}: ${translateUI({lang: language, text: 'value doesnt match'})}`
+    }
+}
+
+/**
+ * @returns encrypted text
+ */
+export function sha256(text: string) {
+    const hash = createHash('sha256').update(text).digest('hex')
+    return hash
+}
+
+export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
+export function fetcherOptions(args: FetchOptionsType) {
+    const { method, credentials, noCache } = args
+    // get access token
+    const accessToken = localStorage.getItem('accessToken')
+    // headers
+    const headers = credentials 
+                    // auth
+                    ? method == 'GET'
+                        // GET will only have authorization
+                        ? { 'authorization': `Bearer ${accessToken}` }
+                        // POST, PUT, DELETE with auth
+                        : { 'content-type': 'application/json',
+                            'authorization': `Bearer ${accessToken}` }
+                    // POST, PUT, DELETE register/login
+                    : { 'content-type': 'application/json' }
+    // cache
+    const cache = noCache ? { cache: 'no-store' } : null
+    // method
+    switch(method) {
+        case 'GET': 
+            if(credentials) 
+                return { method: method, headers: headers, ...cache }
+            // public
+            return { method: method, ...cache }
+        case 'POST': return { method: method, headers: headers, body: args.body }
+        case 'PUT': return { method: method, headers: headers, body: args.body }
+        case 'DELETE': return { method: method, headers: headers, body: args.body }
+    }
+}
+
+export function fetcher(endpoint: string, options: RequestInit) {
+    const host = `${window.location.origin}/api`
+    const url = host + endpoint
+    return fetch(url, options)
+}
+
+export function resetAllData(gameState: IGameContext) {
+    // remove all local storage
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('onlinePlayers')
+    localStorage.removeItem('playerData')
+    // remove player info
+    gameState.setMyPlayerInfo(null)
+    gameState.setOnlinePlayers([])
+    // remove room list
+    gameState.setRoomList([])
+    // remove game stage
+    gameState.setGameStages('prepare')
+}
 /**
  * @returns [null, data] or [error]
  */
@@ -165,6 +165,96 @@ export async function verifyAccessToken(args: VerifyTokenType) {
     switch(args.action) {
         case 'verify-only': return [null, true]
         case 'verify-payload': return [null, data.payload]
+    }
+}
+
+/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+/* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
+
+export function filterInput(input: InputIDType, value: string) {
+    // username = 4~10 | password = 8~16 | display_name = 4~12
+    switch(input) {
+        // ====== PLAYER TYPE ======
+        // filter uuid
+        case 'uuid': 
+            const uuidv4_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+            return value ? value.match(uuidv4_regex) : null
+        // letter & number
+        case 'username': 
+            return value ? value.match(/^[a-zA-Z0-9]{4,10}$/) : null
+        // letter, number, whitespace, symbol (.,#-+@) 
+        case 'password': 
+        case 'confirm_password':
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/) : null
+        // letter, number, whitespace
+        case 'creator':
+        case 'room_name': // create room 'name'
+        case 'display_name': 
+            return value ? value.match(/^[a-zA-Z0-9\s]{4,12}$/) : null
+        // must have monopoli-profiles url
+        case 'avatar': 
+            return value ? value.match(/monopoli-profiles/) : null
+
+        // ====== CHAT TYPE ======
+        // websocket message channel
+        case 'channel': 
+            return value ? value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/) : null
+        // message text can have letter, number, whitespace, symbol (.,#-+@)
+        case 'message_text': 
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/) : null
+        // time of chat
+        case 'message_time': 
+            return value ? value.match(/^[\d{2}:\d{2}]{4,5}$/) : null
+
+        // ====== CREATE ROOM TYPE ======
+        case 'room_id': 
+            return value ? value.match(/\d+/) : null
+        case 'room_password':
+        case 'confirm_room_password': 
+            const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
+            return itsOptional
+        case 'select_mode':
+            return value ? value.match(/^survive$|^5_laps$|^7_laps$/) : null
+        case 'select_board':
+            return value ? value.match(/^normal$|^delta$|^2_way$/i) : null
+        case 'select_dice':
+            return value ? value.match(/^1$|^2$/) : null
+        case 'money_start':
+        case 'select_money_start':
+            return value ? value.match(/^50000$|^75000$|^100000$/) : null
+        case 'select_money_lose':
+            return value ? value.match(/^25000$|^50000$|^75000$/) : null
+        case 'select_curse':
+            return value ? value.match(/^5$|^10$|^15$/) : null
+        case 'select_max_player':
+            return value ? value.match(/^2$|^3$|^4$/) : null
+        case 'select_character':
+            return value ? value.match(/lvu1slpqdkmigp40.public.blob.vercel-storage.com\/characters/) : null
+        // ====== JOIN ROOM TYPE ======
+        case 'rules': 
+            return value ? value.match(/^board: (normal|delta|2_way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/) : null
+        // ====== ROLL TURN TYPE ======
+        case 'rolled_number': 
+            return value ? value.match(/^[\d]{3}$/) : null
+        // ====== ROLL DICE TYPE ======
+        case 'rolled_dice': 
+            return value ? value.match(/^[\d]{1,2}$/) : null
+        // ====== TURN END TYPE ======
+        case 'pos': 
+            return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null
+        case 'lap': 
+            return value ? value.match(/^[0-9]{1,2}$/) : null
+        case 'history': 
+            return value ? value.match(/^rolled_dice: ([0-9]|1[0-2])$/) : null
+        // ====== SURRENDER TYPE ======
+        case 'money': 
+            return value ? value.match(/\d+/) : null
+        // ====== GAME OVER TYPE ======
+        case 'all_player_stats': 
+            const splitValue = value.split(';')
+            for(let sv of splitValue)
+                if(!sv.match(/\w+,\d+|\w+,-\d+/)) return null
+            return value 
     }
 }
 
@@ -191,6 +281,9 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 delete renewResponse.data[0].token
                 // set my player data
                 gameState.setMyPlayerInfo(renewResponse.data[0].player)
+                // save player data to localStorage to make sure its updated
+                // cuz data from jwt is not (game_played & worst_money)
+                localStorage.setItem('playerData', JSON.stringify(renewResponse.data[0].player))
                 // set online players
                 gameState.setOnlinePlayers(renewResponse.data[0].onlinePlayers)
                 localStorage.setItem('onlinePlayers', JSON.stringify(renewResponse.data[0].onlinePlayers))
@@ -205,13 +298,21 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
     }
     // auto login access token
     else {
-        // set my player info
-        gameState.setMyPlayerInfo({
-            display_name: data.display_name,
-            game_played: data.game_played,
-            worst_money_lost: data.worst_money_lost,
-            avatar: data.avatar
-        })
+        // check local storage
+        // set updated my player info if access token not expired
+        const getPlayerData = localStorage.getItem('playerData')
+        if(getPlayerData) {
+            gameState.setMyPlayerInfo(JSON.parse(getPlayerData))
+        }
+        else {
+            // set my player info
+            gameState.setMyPlayerInfo({
+                display_name: data.display_name,
+                game_played: data.game_played,
+                worst_money_lost: data.worst_money_lost,
+                avatar: data.avatar
+            })
+        }
         // set online players
         gameState.setOnlinePlayers(JSON.parse(onlinePlayers))
         miscState.setIsLoading(false)

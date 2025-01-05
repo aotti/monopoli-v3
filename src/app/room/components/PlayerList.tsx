@@ -56,7 +56,7 @@ async function viewPlayerStats(ev: FormEvent<HTMLFormElement>, gameState: IGameC
         return
     }
     // fetch
-    const viewFetchOptions = fetcherOptions({method: 'GET', credentials: true})
+    const viewFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
     const viewResponse: IResponse = await (await fetcher(`/player/?display_name=${inputValues.display_name}`, viewFetchOptions)).json()
     // response
     switch(viewResponse.status) {

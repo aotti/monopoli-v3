@@ -115,9 +115,9 @@ export class DatabaseQueries {
      * 
      * list of column:
      * - users - id | username | password | created_at | updated_at | deleted_at
-     * - players - uuid | user_id | display_name | game_played | worst_money_lost | avatar | updated_at | deleted_at
-     * - rooms - 
-     * - games - 
+     * - players - id | user_id | display_name | game_played | worst_money_lost | avatar | updated_at | deleted_at
+     * - rooms - id | creator_id | name | password | player_count | rules | status | created_at | updated_at | deleted_at
+     * - games - id | room_id | player_id | character | pos | lap | money | card | city | prison | created_at | updated_at | deleted_at
      */
     columnSelector(type: 'users'|'players'|'rooms'|'games', columns: number) {
         // to save selected column 
@@ -129,16 +129,18 @@ export class DatabaseQueries {
         }
         // for profiles table
         else if(type === 'players') {
-            const pickerList: string[] = ['uuid', 'user_id', 'display_name', 'game_played', 'worst_money_lost', 'avatar', 'created_at', 'updated_at', 'deleted_at']
+            const pickerList: string[] = ['id', 'user_id', 'display_name', 'game_played', 'worst_money_lost', 'avatar', 'created_at', 'updated_at', 'deleted_at']
             selectedColumns.push(columnPicker(pickerList))
         }
         // for messages table
         else if(type === 'rooms') {
-            // null
+            const pickerList: string[] = ['id', 'creator_id(display_name)', 'name', 'password', 'player_count', 'rules', 'status', 'created_at', 'updated_at', 'deleted_at']
+            selectedColumns.push(columnPicker(pickerList))
         }
         // for direct_chats table
         else if(type === 'games') {
-            // null
+            const pickerList: string[] = ['id', 'room_id', 'player_id(display_name)', 'character', 'pos', 'lap', 'money', 'card', 'city', 'prison', 'created_at', 'updated_at', 'deleted_at']
+            selectedColumns.push(columnPicker(pickerList))
         }
         // return selected columns
         return selectedColumns.join(', ')

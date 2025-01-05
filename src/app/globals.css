@@ -57,6 +57,11 @@ img[alt] {
     height: 100%;
 }
 
+.scrollbar-none {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox, Chrome, Safari */
+}
+
 @media screen and (min-width: 1024px) {
     ol > details > li, ol > li {
         @apply pl-6 py-1 ml-2 leading-4

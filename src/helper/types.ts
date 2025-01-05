@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 import translateUI_data from '../config/translate-ui.json'
 import { PostgrestError } from "@supabase/supabase-js";
 import { JWTPayload } from "jose";
-import PubNub from "pubnub";
 
 // translate language
 export interface ITranslate {
@@ -22,6 +21,37 @@ export interface ITooltip {
     arrow: ['top'|'left'|'right'|'bottom', 'start'|'middle'|'end'],
 }
 
+// pubnub message
+export type RoomListListener = {
+    onlinePlayers: string, 
+    roomCreated: ICreateRoom['list'], 
+    roomInfo: IGameRoomInfo,
+    roomsLeft:  ICreateRoom['list'][],
+    joinedPlayers: number,
+    joinedRoomId: number,
+    leavePlayer: string,
+    disabledCharacters: string[],
+    roomGame: number,
+    roomOverId: number,
+}
+
+export type GameRoomListener = {
+    joinPlayer: IGamePlayerInfo,
+    leavePlayer: string,
+    roomsLeft:  ICreateRoom['list'][],
+    readyPlayers: string[],
+    startGame: string,
+    fixedPlayers: number,
+    decidePlayers: Omit<IGamePlay['decide_player'], 'token'|'channel'>[],
+    gameStage: IGameContext['gameStages'],
+    playerTurn: string,
+    playerDice: number,
+    gameHistory: IGameHistory[],
+    playerTurns: string[],
+    surrendPlayer: string,
+    playerTurnEnd: IGamePlayerInfo,
+}
+
 // context
 export interface IMiscProvider {
     accessSecret: string, 
@@ -31,10 +61,14 @@ export interface IMiscProvider {
 type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
 type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
+    screenType: 'landscape'|'portrait',
+    setScreenType: Dispatch<SetStateAction<IMiscContext['screenType']>>,
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
-    showModal: 'login'|'register'|'create room',
+    showModal: 'login'|'register'|'create room'|'join room',
     setShowModal: Dispatch<SetStateAction<IMiscContext['showModal']>>,
+    showJoinModal: string, 
+    setShowJoinModal: Dispatch<SetStateAction<IMiscContext['showJoinModal']>>,
     animation: boolean,
     setAnimation: Dispatch<SetStateAction<boolean>>,
     isChatFocus: 'on'|'off'|'stay',
@@ -49,12 +83,40 @@ export interface IMiscContext {
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
 }
 
+interface IGameRoomInfo {
+    room_id: number,
+    room_name: string,
+    creator: string,
+    mode: string,
+    board: string,
+    dice: number,
+    money_lose: number,
+    curse: number,
+}
+
+interface IGamePlayerInfo {
+    display_name: string,
+    character: string,
+    pos: number,
+    lap: number,
+    money: number,
+    card: string,
+    city: string,
+    prison: boolean,
+}
+
+interface IGameHistory {
+    room_id: number,
+    display_name: string,
+    history: string,
+}
+
 export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
-    showNotif: 'normal'|'with_button',
-    setShowNotif: Dispatch<SetStateAction<IGameContext['showNotif']>>,
+    showGameNotif: 'normal'|'with_button',
+    setShowGameNotif: Dispatch<SetStateAction<IGameContext['showGameNotif']>>,
     rollNumber: 'dice'|'turn',
     setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
     // side buttons
@@ -73,6 +135,32 @@ export interface IGameContext {
     setOtherPlayerInfo: Dispatch<SetStateAction<IPlayer>>,
     onlinePlayers: ILoggedUsers[],
     setOnlinePlayers: Dispatch<SetStateAction<ILoggedUsers[]>>,
+    spectator: boolean,
+    setSpectator: Dispatch<SetStateAction<boolean>>,
+    // room 
+    roomList: ICreateRoom['list'][],
+    setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
+    roomError: string,
+    setRoomError: Dispatch<SetStateAction<string>>,
+    roomInputPassword: string,
+    setRoomInputPassword: Dispatch<SetStateAction<string>>,
+    // game
+    myCurrentGame: number,
+    setMyCurrentGame: Dispatch<SetStateAction<number>>,
+    gameRoomId: number,
+    setGameRoomId: Dispatch<SetStateAction<number>>,
+    gameRoomInfo: IGameRoomInfo[],
+    setGameRoomInfo: Dispatch<SetStateAction<IGameRoomInfo[]>>,
+    gamePlayerInfo: IGamePlayerInfo[],
+    setGamePlayerInfo: Dispatch<SetStateAction<IGamePlayerInfo[]>>,
+    gameStages: 'prepare'|'decide'|'play'|'over',
+    setGameStages: Dispatch<SetStateAction<IGameContext['gameStages']>>,
+    gameFixedPlayers: number,
+    setGameFixedPlayers: Dispatch<SetStateAction<IGameContext['gameFixedPlayers']>>,
+    gamePlayerTurns: string[], 
+    setGamePlayerTurns: Dispatch<SetStateAction<IGameContext['gamePlayerTurns']>>,
+    gameHistory: IGameHistory[], 
+    setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -86,7 +174,7 @@ export type PG_PromiseType<Data> = Promise<{ data: Data[] | null, error: Postgre
  */
 interface IQueryBuilder {
     table: 'users'|'players'|'rooms'|'games';
-    selectColumn?: string | number;
+    selectColumn?: string;
     function?: string;
     function_args?: {[key: string]: string | number | boolean};
     order?: [string, 'asc' | 'desc']
@@ -102,24 +190,28 @@ export interface IQuerySelect extends IQueryBuilder {
 }
 
 export interface IQueryInsert extends IQueryBuilder {
-    get insertColumn(): Partial<IPlayer>
+    get insertColumn(): Partial<IPlayer> | Partial<ICreateRoom['list']>
 }
 
 export interface IQueryUpdate extends IQueryBuilder {
     whereColumn?: string;
     whereValue?: string | number;
-    get updateColumn(): Partial<IPlayer>
+    get updateColumn(): Partial<IPlayer> | Partial<ICreateRoom['list']>
 }
 
 // fetch
+export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'DELETE'}
+
 interface IFetchWithoutBody {
     method: Extract<RequestInitMod['method'], 'GET'>,
-    credentials?: boolean
+    credentials?: boolean,
+    noCache?: boolean,
 }
 interface IFetchWithBody {
     method: Exclude<RequestInitMod['method'], 'GET'>,
-    body?: RequestInitMod['body'],
-    credentials?: boolean
+    body: RequestInitMod['body'],
+    credentials?: boolean,
+    noCache?: boolean,
 }
 interface IFetchOptions {
     without: Omit<IFetchWithoutBody, 'credentials'> & {headers?: RequestInitMod['headers']},
@@ -127,7 +219,6 @@ interface IFetchOptions {
 }
 export type FetchOptionsType = IFetchWithBody | IFetchWithoutBody
 export type FetchOptionsReturnType<T> = ReturnType<() => T extends IFetchWithoutBody ? IFetchOptions['without'] : IFetchOptions['with']>
-export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'DELETE'}
 
 // token
 export type TokenPayloadType = ExcludeOptionalKeys<IUser> | ExcludeOptionalKeys<IPlayer>
@@ -163,9 +254,21 @@ export type VerifyTokenReturn = ReturnType<() => (VerifyTokenType extends IVerif
 // response
 export interface IResponse<T = any> {
     status: number;
-    message: string | object;
+    message: string;
     data: T[];
 }
+
+// input ID
+type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
+type ChatType = 'channel'|'message_text'|'message_time'
+type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
+type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
+type DecideTurnType = 'rolled_number'
+type RollDiceType = 'rolled_dice'
+type TurnEndType = 'pos'|'lap'|'history'
+type SurrenderType = 'money'
+type GameOverType = 'all_player_stats'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType
 
 // user
 export interface ILoggedUsers {
@@ -191,14 +294,125 @@ export interface IPlayer extends ITokenPayload {
     display_name: string,
     game_played: number,
     worst_money_lost: number,
-    avatar: string
+    avatar: string,
 }
 
 export interface IChat extends ITokenPayload {
-    channel: 'monopoli-roomlist',
+    channel: string,
     display_name: string,
     message_text: string,
     message_time: string
+}
+
+// room
+export interface ICreateRoom {
+    input: {
+        room_id?: number,
+        creator: string,
+        room_name: string,
+        room_password: string,
+        select_mode: string,
+        select_board: string,
+        select_dice: string,
+        select_money_start: string,
+        select_money_lose: string,
+        select_curse: string,
+        select_max_player: string,
+        select_character: string,
+        token?: string,
+    },
+    payload: {
+        creator: string,
+        room_name: string,
+        room_password: string,
+        money_start: number,
+        rules: string,
+        character: string,
+    },
+    list: {
+        room_id: number,
+        creator: string,
+        room_name: string,
+        room_password: string,
+        player_count: number,
+        player_max: number,
+        rules: string,
+        status: 'prepare'|'playing',
+        characters: string[],
+    },
+    server: {
+        room_id: number,
+        creator: string,
+        room_name: string,
+        room_password: string,
+        player_count: number,
+        player_max: number,
+        rules: string,
+        status: 'prepare'|'playing',
+        player_list: string,
+        game_played_list: string,
+        worst_money_list: string,
+    }
+}
+
+export interface IShiftRoom {
+    action?: 'room join'|'room leave',
+    room_id: string,
+    room_password: string,
+    confirm_room_password?: string,
+    display_name: string,
+    money_start: string,
+    select_character: string,
+    token?: string,
+}
+
+// game
+export interface IGamePlay {
+    get_players: {
+        token?: string,
+        room_id: number,
+    },
+    ready_player: {
+        token?: string,
+        channel: string,
+        display_name: string,
+    },
+    decide_player: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        rolled_number: string,
+    },
+    roll_dice: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        rolled_dice: string,
+    },
+    surrender: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        money: string,
+    },
+    turn_end: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        pos: string,
+        lap: string,
+        money: string,
+        card: string,
+        city: string,
+        prison: string,
+        history: string,
+    },
+    game_over: {
+        token?: string,
+        room_id: string,
+        room_name: string,
+        all_player_stats: string,
+    }
 }
 
 // helper
