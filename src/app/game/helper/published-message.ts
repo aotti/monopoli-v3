@@ -100,8 +100,23 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // update money & city
             surrendPlayerInfo[findPlayer].money = -999999
             surrendPlayerInfo[findPlayer].city = null
+            // get room info
+            const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
             // check player alive
-            checkAlivePlayers(surrendPlayerInfo, miscState, gameState)
+            const alivePlayers = []
+            for(let spi of surrendPlayerInfo) {
+                // check players money amount
+                if(spi.money > gameState.gameRoomInfo[findRoom].money_lose) 
+                    alivePlayers.push(spi.display_name)
+            }
+            // update my player data only if alive player > 1
+            if(alivePlayers.length > 1) {
+                gameState.setMyPlayerInfo(player => {
+                    const newMyPlayer = {...player}
+                    newMyPlayer.game_played += 1
+                    return newMyPlayer
+                })
+            }
             // return data
             return surrendPlayerInfo
         })
@@ -169,3 +184,4 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
         gameOver(miscState, gameState)
     }
 }
+
