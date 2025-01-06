@@ -5,25 +5,10 @@ import { ILoggedUsers, IPlayer, IResponse, IToken, TokenPayloadType } from "../.
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import PubNub from "pubnub";
-import { createClient } from "redis";
+import { redis } from "../../config/redis";
 
 // redis
-const redisClient = createClient({
-    username: 'default',
-    password: process.env.REDIS_PASS,
-    socket: {
-        host: 'redis-16533.c334.asia-southeast2-1.gce.redns.redis-cloud.com',
-        port: 16533,
-        connectTimeout: 2_000, // 5 seconds
-        timeout: 10_000, // 10 seconds
-    }
-});
-// listener
-redisClient.on('error', err => console.log('Redis Client Error', err));
-// connect to redis
-redisClient.connect()
-.then(res => console.log('redis connected'))
-.catch(err => console.log(err))
+const redisClient = redis()
 
 export default class Controller {
     protected dq = new DatabaseQueries()
@@ -70,8 +55,8 @@ export default class Controller {
      */
     protected async redisGet(key: string) {
         // get existing data
-        const getResult = await redisClient.get(key);
-        return JSON.parse(getResult) as any[] || []
+        const getResult: any = await redisClient.get(key);
+        return getResult as any[] || []
     }
 
     protected async redisReset(key: string) {
