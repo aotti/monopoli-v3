@@ -339,14 +339,20 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        console.log(payload);
+        // check taxes
+        const isTaxes = payload.tax_owner && payload.tax_visitor
         // set payload for db query
         const queryObject: Partial<IQueryUpdate> = {
             table: 'games',
             function: 'mnp_turn_end',
             function_args: {
                 tmp_display_name: payload.display_name,
-                tmp_pos: payload.pos,
-                tmp_lap: payload.lap
+                tmp_pos: +payload.pos,
+                tmp_lap: +payload.lap,
+                tmp_event_money: +payload.event_money,
+                tmp_city: payload.city,
+                tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
             }
         }
         // run query
@@ -355,8 +361,6 @@ export default class GameController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            console.log('turn end',data[0]);
-            
             // modify player turn end data
             const newPlayerTurnEndData: IGameContext['gamePlayerInfo'][0] = {
                 ...data[0],
@@ -389,6 +393,12 @@ export default class GameController extends Controller {
             // publish online players
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,
+                // ### tambah data pajak & uang
+                taxes: isTaxes ? {
+                    owner: payload.tax_owner, 
+                    visitor: payload.tax_visitor, 
+                    money: +payload.event_money
+                } : null,
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory]
             }

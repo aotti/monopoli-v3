@@ -13,6 +13,7 @@ import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
 import GameSounds from "../../components/GameSounds";
+import { getRoomList } from "./helper/functions";
 
 export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
@@ -186,37 +187,4 @@ export default function RoomContent({ pubnubSetting }) {
             <GameSounds />
         </div>
     )
-}
-
-async function getRoomList(gameState: IGameContext) {
-    // result message
-    const resultMessage = qS('#result_message')
-    // fetch
-    const getRoomFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
-    const getRoomResponse: IResponse = await (await fetcher('/room', getRoomFetchOptions)).json()
-    // response
-    switch(getRoomResponse.status) {
-        case 200: 
-            // save access token
-            if(getRoomResponse.data[0].token) {
-                localStorage.setItem('accessToken', getRoomResponse.data[0].token)
-                delete getRoomResponse.data[0].token
-            }
-            // get rooms data
-            const rooms = getRoomResponse.data[0].roomList as ICreateRoom['list'][]
-            // set room list
-            for(let room of rooms) {
-                gameState.setRoomList(data => [...data, room].filter((obj1, i, arr) => 
-                    arr.findLastIndex(obj2 => obj2.room_name == obj1.room_name) === i
-                ))
-            }
-            // set my current game
-            gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
-            // set game room info
-            gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
-            return
-        default: 
-            resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
-            return
-    }
 }

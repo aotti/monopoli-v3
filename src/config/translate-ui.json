@@ -216,6 +216,9 @@
         "__GAMEPLAY TRANSLATE__": "__GAMEPLAY TRANSLATE__",
         "Preparation": "Persiapan",
         "if all players are ready, room creator have to click the \"start\" button": "kalo semua pemain sudah siap, pembuat ruangan harus klik tombol \"mulai\"",
-        "click roll turn": "klik putar angka"
+        "click roll turn": "klik putar angka",
+        "Do you wanna buy xxx city for xxx?": "Apakah anda mau beli kota xxx seharga xxx?",
+        "Do you wanna upgrade xxx city for xxx?": "Apakah anda mau meningkatkan kota xxx seharga xxx?",
+        "xxx paid taxes of xxx": "xxx membayar pajak sebesar xxx"
     }
 }

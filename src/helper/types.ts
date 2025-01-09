@@ -50,6 +50,11 @@ export type GameRoomListener = {
     playerTurns: string[],
     surrendPlayer: string,
     playerTurnEnd: IGamePlayerInfo,
+    taxes: {
+        owner: string,
+        visitor: string,
+        money: number
+    },
 }
 
 // context
@@ -115,7 +120,7 @@ export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
-    showGameNotif: 'normal'|'with_button',
+    showGameNotif: 'normal'|'with_button-2'|'with_button-3'|'with_button-parking',
     setShowGameNotif: Dispatch<SetStateAction<IGameContext['showGameNotif']>>,
     rollNumber: 'dice'|'turn',
     setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
@@ -265,7 +270,7 @@ type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mo
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'
-type TurnEndType = 'pos'|'lap'|'history'
+type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType
@@ -401,11 +406,13 @@ export interface IGamePlay {
         display_name: string,
         pos: string,
         lap: string,
-        money: string,
+        event_money: string,
         card: string,
         city: string,
         prison: string,
         history: string,
+        tax_visitor: string,
+        tax_owner: string,
     },
     game_over: {
         token?: string,
@@ -414,6 +421,32 @@ export interface IGamePlay {
         all_player_stats: string,
     }
 }
+
+// stop by event
+interface IEventBuyCity_Yes {
+    event: 'buy_city'
+    status: true,
+    display_name: string,
+    city: string,
+    property: string,
+    money: number,
+}
+interface IEventBuyCity_No {
+    event: 'buy_city'
+    status: false,
+    money: number,
+}
+
+type IEventBuyCity = IEventBuyCity_Yes | IEventBuyCity_No
+
+interface IEventPayTax {
+    event: 'pay_tax',
+    owner: string,
+    visitor: string,
+    money: number,
+}
+
+export type EventDataType = IEventBuyCity | IEventPayTax
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

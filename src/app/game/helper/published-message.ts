@@ -1,6 +1,6 @@
 import PubNub from "pubnub"
-import { GameRoomListener, IChat, IGameContext, IMiscContext, IResponse } from "../../../helper/types"
-import { fetcher, fetcherOptions, qS, translateUI } from "../../../helper/helper"
+import { GameRoomListener, IChat, IGameContext, IMiscContext } from "../../../helper/types"
+import { qS, translateUI } from "../../../helper/helper"
 import { gameOver, playerMoving } from "./game-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
@@ -49,6 +49,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         notifMessage.textContent = 'this room has been deleted, redirect to room list'
         // redirect to room list
         setTimeout(() => {
+            // set notif to null
+            gameState.setShowGameNotif(null)
             const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
             gotoRoom.click()
         }, 2000)
@@ -131,6 +133,15 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // find turn end player
             const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurnEnd.display_name)
             newPlayerInfo[findPlayer] = getMessage.playerTurnEnd
+            // if theres taxes
+            if(getMessage.taxes) {
+                // find tax player & reduce money
+                const findVisitor = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.visitor)
+                newPlayerInfo[findVisitor].money -= getMessage.taxes.money
+                // add owner money
+                const findOwner = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.owner)
+                newPlayerInfo[findOwner].money += getMessage.taxes.money
+            }
             // check player alive
             checkAlivePlayers(newPlayerInfo, miscState, gameState)
             // return data
@@ -177,6 +188,8 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
         notifTitle.textContent = `Game Over`
         notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
         setTimeout(() => {
+            // set notif to null
+            gameState.setShowGameNotif(null)
             const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
             gotoRoom ? gotoRoom.click() : null
         }, 15_000)

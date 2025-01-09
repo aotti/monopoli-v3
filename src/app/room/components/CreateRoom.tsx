@@ -1,10 +1,9 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useMisc } from "../../../context/MiscContext";
-import { applyTooltipEvent, errorCreateRoom, fetcher, fetcherOptions, moneyFormat, qS, questionMark, setInputValue, translateUI } from "../../../helper/helper";
-import Link from "next/link";
-import { ICreateRoom, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
+import { applyTooltipEvent, moneyFormat, qS, questionMark, translateUI } from "../../../helper/helper";
 import { useGame } from "../../../context/GameContext";
 import SelectCharacter from "./SelectCharacter";
+import { createRoom } from "../helper/functions";
 
 export default function CreateRoom() {
     const miscState = useMisc()
@@ -181,109 +180,5 @@ function displaySelectedRange(ev: ChangeEvent<HTMLInputElement>) {
     }
     else if(elementId == 'select_curse') {
         qS('#selected_curse').textContent = +element.value > 5 ? `(5~${element.value}%)` : `(${element.value}%)`
-    }
-}
-
-async function createRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext, setCreateRoomPage) {
-    ev.preventDefault()
-    // result message
-    const resultMessage = qS('#result_message')
-    resultMessage.className = 'mx-auto text-center text-2xs lg:text-[12px]'
-    resultMessage.textContent = ''
-    // submit button
-    const createButton = qS('#create_room') as HTMLInputElement
-    // input value container
-    const inputValues: ICreateRoom['input'] = {
-        creator: gameState.myPlayerInfo.display_name,
-        room_name: null,
-        room_password: null,
-        select_mode: null,
-        select_board: null,
-        select_dice: null,
-        select_money_start: null,
-        select_money_lose: null,
-        select_curse: null,
-        select_max_player: null,
-        select_character: null
-    }
-    // get input elements
-    const formInputs = ev.currentTarget.elements
-    for(let i=0; i<formInputs.length; i++) {
-        const input = formInputs.item(i) as HTMLInputElement
-        if(input.nodeName.match(/INPUT|SELECT/) && input.type != 'radio') {
-            // filter inputs
-            if(setInputValue('room_name', input)) {
-                // check room list 
-                if(gameState.roomList.length > 0) {
-                    const roomName = input.value.trim().toLowerCase()
-                    const isRoomNameExist = gameState.roomList.map(v => v.room_name).indexOf(roomName)
-                    // room name exist
-                    if(isRoomNameExist !== -1) {
-                        resultMessage.classList.add('text-red-300')
-                        resultMessage.textContent = translateUI({lang: miscState.language, text: 'name: room name already exist'})
-                        return
-                    }
-                }
-                inputValues.room_name = input.value.trim().toLowerCase()
-            }
-            else if(setInputValue('room_password', input)) inputValues.room_password = input.value == '' ? null : input.value.trim()
-            else if(setInputValue('select_mode', input)) inputValues.select_mode = input.value.trim().toLowerCase()
-            else if(setInputValue('select_board', input)) inputValues.select_board = input.value.trim().toLowerCase()
-            else if(setInputValue('select_dice', input)) inputValues.select_dice = `${input.value}`
-            else if(setInputValue('select_money_start', input)) inputValues.select_money_start = `${input.value}`
-            else if(setInputValue('select_money_lose', input)) inputValues.select_money_lose = `${input.value}`
-            else if(setInputValue('select_curse', input)) inputValues.select_curse = `${input.value}`
-            else if(setInputValue('select_max_player', input)) inputValues.select_max_player = `${input.value}`
-            // dont lowercase link
-            else if(setInputValue('select_character', input)) inputValues.select_character = input.value.trim()
-            // error
-            else {
-                resultMessage.classList.add('text-red-300')
-                resultMessage.textContent = errorCreateRoom(input.id, miscState.language)
-                return
-            }
-        }
-    }
-    // submit button loading
-    const tempButtonText = createButton.textContent
-    createButton.textContent = 'Loading'
-    createButton.disabled = true
-    // fetch
-    const createRoomFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
-    const createRoomResponse: IResponse = await (await fetcher('/room', createRoomFetchOptions)).json()
-    // response
-    switch(createRoomResponse.status) {
-        case 200: 
-            // save access token
-            if(createRoomResponse.data[0].token) {
-                localStorage.setItem('accessToken', createRoomResponse.data[0].token)
-                delete createRoomResponse.data[0].token
-            }
-            // set create room page
-            setCreateRoomPage(1)
-            // set my current game
-            gameState.setMyCurrentGame(createRoomResponse.data[0].currentGame)
-            // hide the modal & tutorial
-            miscState.setShowModal(null)
-            miscState.setShowTutorial(null)
-            // submit button normal
-            createButton.textContent = tempButtonText
-            createButton.removeAttribute('disabled')
-            return
-        default: 
-            // submit button normal
-            createButton.textContent = tempButtonText
-            createButton.removeAttribute('disabled')
-            // special for room name error
-            if(typeof createRoomResponse.message == 'string' && createRoomResponse.message.match('name:')) {
-                resultMessage.classList.add('text-red-300')
-                resultMessage.textContent = translateUI({lang: miscState.language, text: createRoomResponse.message as any})
-                return
-            }
-            // result message
-            const translateError = translateUI({lang: miscState.language, text: createRoomResponse.message as any})
-            resultMessage.classList.add('text-red-300')
-            resultMessage.textContent = `❌ ${createRoomResponse.status}: ${translateError || createRoomResponse.message}`
-            return
     }
 }

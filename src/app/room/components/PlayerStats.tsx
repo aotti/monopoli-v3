@@ -1,10 +1,10 @@
 import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { useMisc } from "../../../context/MiscContext";
-import { fetcher, fetcherOptions, moneyFormat, qS, resetAllData, translateUI } from "../../../helper/helper";
-import { IGameContext, ILoggedUsers, IMiscContext, IPlayer, IResponse } from "../../../helper/types";
+import { moneyFormat, qS, translateUI } from "../../../helper/helper";
+import { ILoggedUsers, IPlayer } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
-import { FormEvent } from "react";
 import Link from "next/link";
+import { avatarUpdate, userLogout } from "../helper/functions";
 
 export default function PlayerStats({ playerData, onlinePlayers }: {playerData: IPlayer, onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
@@ -74,90 +74,4 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
             </div>
         </>
     )
-}
-
-/**
- * @param display_name player in game name
- * @param publicId avatar pathname
- * @description update player avatar
- */
-async function avatarUpdate(display_name: string, avatar_url: string, gameState: IGameContext) {
-    const avatarImg = qS('#avatar') as HTMLImageElement
-    const uploadButton = qS('#upload_avatar') as HTMLInputElement
-    // input value container
-    const inputValues = {
-        display_name: display_name,
-        avatar: avatar_url
-    }
-    // disable upload button
-    uploadButton.disabled = true
-    // fetch
-    const avatarFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
-    const avatarResponse: IResponse = await (await fetcher('/player/avatar', avatarFetchOptions)).json()
-    // response
-    switch(avatarResponse.status) {
-        case 200: 
-            // save access token
-            if(avatarResponse.data[0].token) {
-                localStorage.setItem('accessToken', avatarResponse.data[0].token)
-                delete avatarResponse.data[0].token
-            }
-            // set my player data
-            gameState.setMyPlayerInfo(info => {
-                const newAvatar: IPlayer = {
-                    ...info,
-                    avatar: avatarResponse.data[0].avatar,
-                }
-                return newAvatar
-            })
-            // submit button normal
-            uploadButton.removeAttribute('disabled')
-            return
-        default: 
-            // submit button normal
-            uploadButton.removeAttribute('disabled')
-            // result message
-            avatarImg.alt = `${avatarResponse.status}: ${avatarResponse.message}`
-            return
-    }
-}
-
-async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
-    ev.preventDefault()
-
-    // home button
-    const gotoHome = qS('#gotoHome') as HTMLAnchorElement
-    // submit button
-    const logoutButton = qS('#logout_button') as HTMLInputElement
-    logoutButton.textContent = '.'
-    let counter = 0
-    const loggingOut = setInterval(() => {
-        if(counter === 3) {
-            logoutButton.textContent = '.'
-            counter = 0
-        }
-        logoutButton.textContent += '.'
-        counter++
-    }, 1000);
-    
-    // fetch
-    const logoutFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify({})})
-    const logoutResponse: IResponse = await (await fetcher('/logout', logoutFetchOptions)).json()
-    // response
-    switch(logoutResponse.status) {
-        case 200: 
-            // stop interval
-            clearInterval(loggingOut)
-            logoutButton.textContent = 'logout'
-            // reset all data
-            resetAllData(gameState)
-            // set modal to null
-            miscState.setShowModal(null)
-            // go to home
-            gotoHome.click()
-            return
-        default: 
-            logoutButton.textContent = `error${logoutResponse.status}`
-            return
-    }
 }
