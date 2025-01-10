@@ -127,6 +127,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.playerTurnEnd) {
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
+        // update city owned list
+        localStorage.setItem('cityOwnedList', JSON.stringify(getMessage.cityOwnedList))
         // update player
         gameState.setGamePlayerInfo(players => {
             const newPlayerInfo = [...players]
@@ -171,6 +173,9 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
     }
     // if only 1 left, game over
     if(alivePlayers.length === 1) {
+        // remove city owned list
+        localStorage.removeItem('cityOwnedList')
+        // set game stage
         gameState.setGameStages('over')
         // show notif
         miscState.setAnimation(true)

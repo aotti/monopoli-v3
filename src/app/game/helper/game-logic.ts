@@ -15,7 +15,9 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory } = getPlayerResponse.data[0]
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory, cityOwnedList } = getPlayerResponse.data[0]
+            // set city owned list
+            localStorage.setItem('cityOwnedList', JSON.stringify(cityOwnedList))
             // set game stage
             gameState.setGameStages(gameStage)
             // set player list
@@ -663,9 +665,6 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                 ofcourseButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
-                    // set city owned
-                    const getCityOwned = localStorage.getItem('cityOwned') || '0'
-                    localStorage.setItem('cityOwned', (+getCityOwned + 1).toString())
                     // update game player info
                     const myCity = gameState.gamePlayerInfo[findPlayer].city
                     gameState.setGamePlayerInfo(players => {

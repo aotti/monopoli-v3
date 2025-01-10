@@ -55,6 +55,7 @@ export type GameRoomListener = {
         visitor: string,
         money: number
     },
+    cityOwnedList: string[],
 }
 
 // context

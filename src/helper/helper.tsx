@@ -143,6 +143,7 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('onlinePlayers')
     localStorage.removeItem('playerData')
+    localStorage.removeItem('cityOwnedList')
     // remove player info
     gameState.setMyPlayerInfo(null)
     gameState.setOnlinePlayers([])
@@ -247,7 +248,7 @@ export function filterInput(input: InputIDType, value: string) {
         case 'history': 
             const [rolledDiceRegex, buyCityRegex, payTaxRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
-                ';buy_city: \\w+ \\W\\w+\\W|;buy_city: none',
+                ';buy_city: \\w+ \\(\\w+\\)|;buy_city: none',
                 ';pay_tax: .* to \\w+'
             ]
             const historyRegex = new RegExp(`^${rolledDiceRegex}$|^${rolledDiceRegex}(${buyCityRegex}|${payTaxRegex})$`)

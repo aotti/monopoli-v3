@@ -69,6 +69,8 @@ export default class GameController extends Controller {
             const getPlayerTurns = await this.redisGet(`playerTurns_${payload.room_id}`)
             // get game history
             const getGameHistory = await this.redisGet(`gameHistory_${payload.room_id}`)
+            // get city owned list
+            const getCityOwnedList = await this.redisGet(`cityOwned_${payload.room_id}`)
             // set result
             const resultData = {
                 gameStage: getGameStage.length > 0 ? getGameStage[0] : null,
@@ -78,6 +80,7 @@ export default class GameController extends Controller {
                 ) : null,
                 playerTurns: getPlayerTurns.length > 0 ? getPlayerTurns : null,
                 gameHistory: getGameHistory,
+                cityOwnedList: getCityOwnedList,
                 getPlayers: extractedData,
                 token: token
             }
@@ -369,6 +372,9 @@ export default class GameController extends Controller {
             // update game history (buy city, get cards, etc)
             const roomId = payload.channel.match(/\d+/)[0]
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            // get city owned list
+            const getCityOwnedList = await this.redisGet(`cityOwned_${roomId}`)
+            let filterCityOwnedList = []
             // fill game history
             const gameHistory: IGameContext['gameHistory'] = []
             // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
@@ -378,7 +384,22 @@ export default class GameController extends Controller {
                     display_name: payload.display_name, 
                     history: ph
                 }
-                // push
+                // check for buy city (land) history
+                if(ph.match(/buy_city: .* \(land\)/)) {
+                    // set city owned counter
+                    let cityOwnedCounter = 1
+                    for(let co of getCityOwnedList) {
+                        const [owner, count] = co.split(',')
+                        // if player owned city, add the counter
+                        if(owner == data[0].display_name) cityOwnedCounter += +count
+                    }
+                    // filter duplicate data (remove data from 1st index)
+                    filterCityOwnedList = [...getCityOwnedList, `${data[0].display_name},${cityOwnedCounter}`]
+                                        .filter((v1, i, arr) => arr.findLastIndex(v2 => v2.split(',')[0] == v1.split(',')[0]) == i)
+                    // set city owned
+                    await this.redisSet(`cityOwned_${roomId}`, filterCityOwnedList)
+                }
+                // push to game history
                 gameHistory.push(tempHistory)
             }
             // save game history to redis
@@ -393,6 +414,7 @@ export default class GameController extends Controller {
             // publish online players
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,
+                cityOwnedList: filterCityOwnedList,
                 // ### tambah data pajak & uang
                 taxes: isTaxes ? {
                     owner: payload.tax_owner, 

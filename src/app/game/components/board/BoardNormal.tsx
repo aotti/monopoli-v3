@@ -104,7 +104,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // price label
     const priceText = `after:block after:content-[attr(data-price)]`
     // match city with player data
-    let getCityData: any[] = null
+    const getCityData = []
     gameState.gamePlayerInfo.map(player => {
         const cityList = player.city?.split(';') || []
         // city name
@@ -114,38 +114,32 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
         if(isCityBought !== -1) {
             // check city property (match the latest prop)
             type CityPropertyType = 'land'|'1house'|'2house'|'2house1hotel'
-            const cityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0] as CityPropertyType
-            switch(cityProperty) {
+            const tempCityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0] as CityPropertyType
+            switch(tempCityProperty) {
                 // [owner, price, property]
                 case 'land': 
                     // set city owner (only after bought land property)
-                    tempCityName += `\n${player.display_name}`
-                    getCityData = [tempCityName, player.display_name, price + (price * .10), '1house', '']
+                    getCityData.push(`${tempCityName}\n${player.display_name}`, player.display_name, price + (price * .10), '1house', '')
                     return
                 case '1house': 
-                    getCityData = [tempCityName, player.display_name, price + (price * .20), '2house', '🏡']
+                    getCityData.push(tempCityName, player.display_name, price + (price * .20), '2house', '🏡')
                     return
                 case '2house': 
-                    getCityData = [tempCityName, player.display_name, price + (price * .30), '2house1hotel', '🏡🏡']
+                    getCityData.push(tempCityName, player.display_name, price + (price * .30), '2house1hotel', '🏡🏡')
                     return
                 case '2house1hotel': 
-                    getCityData = [tempCityName, player.display_name, price + (price * .40), 'realestate', '🏡🏡🏨']
+                    getCityData.push(tempCityName, player.display_name, price + (price * .40), 'realestate', '🏡🏡🏨')
                     return
             }
-        }
-        // city not bought
-        else {
-            getCityData = [tempCityName, null, price, 'land', null]
-            return
         }
     })
     const [cityName, cityOwner, cityPrice, cityProperty, cityIcon] = getCityData as [string, string, number, string, string]
     // city info
-    const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},${cityProperty},${cityPrice}`
+    const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},land,${price}`
     // modify info
     const cityBoughtInfo = cityOwner 
                         ? cityProperty == 'realestate'
-                            ? `<${cityOwner}>;${moneyFormat(cityPrice)};full upgrade` 
+                            ? `<${cityOwner}>;${moneyFormat(cityPrice)};max upgrade` 
                             : `<${cityOwner}>;${moneyFormat(cityPrice)}` 
                         : null
     const translateInfo = translateUI({lang: miscState.language, text: info as any})
@@ -164,9 +158,9 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
-                    <p className={`${cityIcon ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
-                    data-price={moneyFormat(cityPrice)}> 
-                        {cityIcon ? `${cityName}\n${cityIcon}` : cityName} 
+                    <p className={`${cityProperty ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
+                    data-price={moneyFormat(cityPrice || price)}> 
+                        {cityProperty ? `${cityName}\n${cityIcon}` : cityName || name} 
                     </p>
                 </div>
             </div>
@@ -205,8 +199,13 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
 }
 
 function Characters({ playerData }: {playerData: IGameContext['gamePlayerInfo'][0]}) {
-    const getCityOwned = localStorage.getItem('cityOwned') || 0
-    const playerTooltip = `${playerData.display_name};city owned: ${getCityOwned}`
+    const getCityOwnedList = localStorage.getItem('cityOwnedList') || '[]'
+    // match player in city owned list
+    const cityOwned = (JSON.parse(getCityOwnedList) as any[])
+                    .map(v => v.split(',')[0] == playerData.display_name ? v : null)
+                    .filter(i => i)[0]
+    // set player tooltip (display_name & city owned)
+    const playerTooltip = `${playerData.display_name};city owned: ${cityOwned?.split(',')[1] || 0}`
 
     return (
         <div data-tooltip={playerTooltip.replaceAll(';', '\n')} data-player-name={playerData.display_name} 

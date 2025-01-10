@@ -76,6 +76,9 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.roomOverId) {
+        // remove city owned list
+        localStorage.removeItem('cityOwnedList')
+        // update room list
         gameState.setRoomList(rooms => {
             const newRoomList = [...rooms]
             // find room over
