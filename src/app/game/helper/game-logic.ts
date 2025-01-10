@@ -629,7 +629,7 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
         // if city owner not current player
         // === paying taxes ===
         const isCityMine = buyCityOwner != gameState.gamePlayerInfo[findPlayer].display_name
-        if(isCityMine === false) return payingTaxes()
+        if(isCityMine && buyCityProperty != 'land') return payingTaxes()
     
         // if city property is maxed, stop
         if(buyCityProperty == 'realestate') {
@@ -652,7 +652,7 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
             if(buyCityTimer < 0) {
                 clearInterval(buyCityInterval)
                 notifTimer.textContent = ''
-                nopeButton.click()
+                nopeButton ? nopeButton.click() : null
             }
             // prevent other player from doing event
             if(gameState.gamePlayerInfo[findPlayer].display_name == gameState.myPlayerInfo.display_name) {
@@ -663,6 +663,9 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                 ofcourseButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
+                    // set city owned
+                    const getCityOwned = localStorage.getItem('cityOwned') || '0'
+                    localStorage.setItem('cityOwned', (+getCityOwned + 1).toString())
                     // update game player info
                     const myCity = gameState.gamePlayerInfo[findPlayer].city
                     gameState.setGamePlayerInfo(players => {
@@ -710,8 +713,8 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
         }, 1000);
         // set event text for notif
         [eventTitle, eventContent] = [
-            isCityMine ? 'Upgrade City' : 'Buy City', 
-            isCityMine 
+            !isCityMine ? 'Upgrade City' : 'Buy City', 
+            !isCityMine 
                 // upgrade city content
                 ? translateUI({lang: miscState.language, text: 'Do you wanna upgrade xxx city for xxx?'})
                 // buy city content

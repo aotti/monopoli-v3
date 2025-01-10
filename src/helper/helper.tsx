@@ -254,7 +254,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(historyRegex) : null
         case 'money': 
         case 'event_money':
-            return value ? value.match(/^[\d]+/) : null
+            return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
         case 'city': 
             const optionalCity = value === null || typeof value == 'string' ? true : false
             return optionalCity

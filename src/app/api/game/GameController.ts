@@ -339,7 +339,6 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
-        console.log(payload);
         // check taxes
         const isTaxes = payload.tax_owner && payload.tax_visitor
         // set payload for db query
@@ -379,10 +378,11 @@ export default class GameController extends Controller {
                     display_name: payload.display_name, 
                     history: ph
                 }
-                // save game history to redis
+                // push
                 gameHistory.push(tempHistory)
-                await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, tempHistory])
             }
+            // save game history to redis
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
             // push end turn player to playerTurns
             const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
             // remove empty

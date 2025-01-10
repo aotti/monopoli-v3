@@ -97,11 +97,6 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // set curse
     const curse = gameState.gameRoomInfo[getGameRoomInfo]?.curse
     const curseRand = curse > 5 ? `5~${curse}%` : `5%`
-    // modify info
-    const translateInfo = translateUI({lang: miscState.language, text: info as any})
-    const newInfo = name.match('Cursed')
-                    ? `${name};${curseRand};${translateInfo}`
-                    : `${name};${translateInfo}`
     // highlight
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
     // tile info
@@ -117,14 +112,14 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
         // match current city
         const isCityBought = cityList.map(v => v.split('*')[0]).indexOf(name)
         if(isCityBought !== -1) {
-            // set city owner
-            tempCityName += `\n${player.display_name}`
             // check city property (match the latest prop)
             type CityPropertyType = 'land'|'1house'|'2house'|'2house1hotel'
             const cityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0] as CityPropertyType
             switch(cityProperty) {
                 // [owner, price, property]
                 case 'land': 
+                    // set city owner (only after bought land property)
+                    tempCityName += `\n${player.display_name}`
                     getCityData = [tempCityName, player.display_name, price + (price * .10), '1house', '']
                     return
                 case '1house': 
@@ -147,6 +142,16 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const [cityName, cityOwner, cityPrice, cityProperty, cityIcon] = getCityData as [string, string, number, string, string]
     // city info
     const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},${cityProperty},${cityPrice}`
+    // modify info
+    const cityBoughtInfo = cityOwner 
+                        ? cityProperty == 'realestate'
+                            ? `<${cityOwner}>;${moneyFormat(cityPrice)};full upgrade` 
+                            : `<${cityOwner}>;${moneyFormat(cityPrice)}` 
+                        : null
+    const translateInfo = translateUI({lang: miscState.language, text: info as any})
+    const newInfo = name.match('Cursed')
+                    ? `${name};${curseRand};${translateInfo}`
+                    : cityBoughtInfo ? `${name};${cityBoughtInfo}` : `${name};${translateInfo}`
 
     return (
         <div className="relative">
@@ -159,9 +164,9 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
-                    <p className={`${cityIcon == '' ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
+                    <p className={`${cityIcon ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
                     data-price={moneyFormat(cityPrice)}> 
-                        {cityName} 
+                        {cityIcon ? `${cityName}\n${cityIcon}` : cityName} 
                     </p>
                 </div>
             </div>
@@ -200,7 +205,8 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
 }
 
 function Characters({ playerData }: {playerData: IGameContext['gamePlayerInfo'][0]}) {
-    const playerTooltip = `${playerData.display_name};city owned: 0`
+    const getCityOwned = localStorage.getItem('cityOwned') || 0
+    const playerTooltip = `${playerData.display_name};city owned: ${getCityOwned}`
 
     return (
         <div data-tooltip={playerTooltip.replaceAll(';', '\n')} data-player-name={playerData.display_name} 

@@ -131,22 +131,26 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setGamePlayerInfo(players => {
             const newPlayerInfo = [...players]
             // find turn end player
+            // ### when pay tax, visitor money already reduced in db
+            // ### and return as playerTurnEnd, no need to reduce it anymore
             const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurnEnd.display_name)
             newPlayerInfo[findPlayer] = getMessage.playerTurnEnd
             // if theres taxes
             if(getMessage.taxes) {
-                // find tax player & reduce money
-                const findVisitor = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.visitor)
-                newPlayerInfo[findVisitor].money -= getMessage.taxes.money
+                // ### money is in minus state (ex: -5000)
+                // ### for owner use - to reduce (- with - = +)
                 // add owner money
                 const findOwner = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.owner)
-                newPlayerInfo[findOwner].money += getMessage.taxes.money
+                newPlayerInfo[findOwner].money -= getMessage.taxes.money
             }
             // check player alive
             checkAlivePlayers(newPlayerInfo, miscState, gameState)
             // return data
             return newPlayerInfo
         })
+        // turn off notif
+        miscState.setAnimation(false)
+        gameState.setShowGameNotif(null)
         // show notif next player turn
         playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
     }
