@@ -41,12 +41,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     }, [])
 
     const boardStates = {
-        showTileImage: showTileImage,
-        setShowTileImage: setShowTileImage,
-        showGameNotif: showGameNotif,
-        setShowGameNotif: setShowGameNotif,
-        rollNumber: rollNumber,
-        setRollNumber: setRollNumber,
+        showTileImage, setShowTileImage,
+        showGameNotif, setShowGameNotif,
+        rollNumber, setRollNumber,
     }
     
     const sideButtonStates = {

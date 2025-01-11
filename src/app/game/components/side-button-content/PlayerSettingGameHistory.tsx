@@ -17,7 +17,7 @@ export default function PlayerSettingGameHistory() {
         <div className={`absolute -left-2 bottom-8 flex flex-col items-center transition-all ease-in-out duration-500
         w-[14vw] ${gameState.showGameHistory ? 'h-[55vh]' : 'h-[5vh]'} bg-darkblue-1 border-2`}>
             {/* history content */}
-            <div id="history_container" className="flex flex-col gap-2 w-full h-[45vh] overflow-y-scroll scrollbar-none p-1">
+            <div id="history_container" className="flex flex-col gap-2 w-full h-[47vh] overflow-y-scroll scrollbar-none p-1">
                 {gameState.gameHistory.map((v,i) => {
                     const myHistories = v.display_name == gameState.myPlayerInfo.display_name
 

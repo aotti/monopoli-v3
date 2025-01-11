@@ -69,6 +69,8 @@ export default class GameController extends Controller {
             const getPlayerTurns = await this.redisGet(`playerTurns_${payload.room_id}`)
             // get game history
             const getGameHistory = await this.redisGet(`gameHistory_${payload.room_id}`)
+            // get city owned list
+            const getCityOwnedList = await this.redisGet(`cityOwned_${payload.room_id}`)
             // set result
             const resultData = {
                 gameStage: getGameStage.length > 0 ? getGameStage[0] : null,
@@ -78,6 +80,7 @@ export default class GameController extends Controller {
                 ) : null,
                 playerTurns: getPlayerTurns.length > 0 ? getPlayerTurns : null,
                 gameHistory: getGameHistory,
+                cityOwnedList: getCityOwnedList,
                 getPlayers: extractedData,
                 token: token
             }
@@ -339,14 +342,19 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        // check taxes
+        const isTaxes = payload.tax_owner && payload.tax_visitor
         // set payload for db query
         const queryObject: Partial<IQueryUpdate> = {
             table: 'games',
             function: 'mnp_turn_end',
             function_args: {
                 tmp_display_name: payload.display_name,
-                tmp_pos: payload.pos,
-                tmp_lap: payload.lap
+                tmp_pos: +payload.pos,
+                tmp_lap: +payload.lap,
+                tmp_event_money: +payload.event_money,
+                tmp_city: payload.city,
+                tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
             }
         }
         // run query
@@ -355,8 +363,6 @@ export default class GameController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            console.log('turn end',data[0]);
-            
             // modify player turn end data
             const newPlayerTurnEndData: IGameContext['gamePlayerInfo'][0] = {
                 ...data[0],
@@ -366,6 +372,9 @@ export default class GameController extends Controller {
             // update game history (buy city, get cards, etc)
             const roomId = payload.channel.match(/\d+/)[0]
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            // get city owned list
+            const getCityOwnedList = await this.redisGet(`cityOwned_${roomId}`)
+            let filterCityOwnedList = []
             // fill game history
             const gameHistory: IGameContext['gameHistory'] = []
             // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
@@ -375,10 +384,26 @@ export default class GameController extends Controller {
                     display_name: payload.display_name, 
                     history: ph
                 }
-                // save game history to redis
+                // check for buy city (land) history
+                if(ph.match(/buy_city: .* \(land\)/)) {
+                    // set city owned counter
+                    let cityOwnedCounter = 1
+                    for(let co of getCityOwnedList) {
+                        const [owner, count] = co.split(',')
+                        // if player owned city, add the counter
+                        if(owner == data[0].display_name) cityOwnedCounter += +count
+                    }
+                    // filter duplicate data (remove data from 1st index)
+                    filterCityOwnedList = [...getCityOwnedList, `${data[0].display_name},${cityOwnedCounter}`]
+                                        .filter((v1, i, arr) => arr.findLastIndex(v2 => v2.split(',')[0] == v1.split(',')[0]) == i)
+                    // set city owned
+                    await this.redisSet(`cityOwned_${roomId}`, filterCityOwnedList)
+                }
+                // push to game history
                 gameHistory.push(tempHistory)
-                await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, tempHistory])
             }
+            // save game history to redis
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
             // push end turn player to playerTurns
             const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
             // remove empty
@@ -389,6 +414,13 @@ export default class GameController extends Controller {
             // publish online players
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,
+                cityOwnedList: filterCityOwnedList,
+                // ### tambah data pajak & uang
+                taxes: isTaxes ? {
+                    owner: payload.tax_owner, 
+                    visitor: payload.tax_visitor, 
+                    money: +payload.event_money
+                } : null,
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory]
             }

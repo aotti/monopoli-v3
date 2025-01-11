@@ -143,6 +143,7 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('onlinePlayers')
     localStorage.removeItem('playerData')
+    localStorage.removeItem('cityOwnedList')
     // remove player info
     gameState.setMyPlayerInfo(null)
     gameState.setOnlinePlayers([])
@@ -211,8 +212,8 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/\d+/) : null
         case 'room_password':
         case 'confirm_room_password': 
-            const itsOptional = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
-            return itsOptional
+            const optionalPassword = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
+            return optionalPassword
         case 'select_mode':
             return value ? value.match(/^survive$|^5_laps$|^7_laps$/) : null
         case 'select_board':
@@ -245,10 +246,24 @@ export function filterInput(input: InputIDType, value: string) {
         case 'lap': 
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
-            return value ? value.match(/^rolled_dice: ([0-9]|1[0-2])$/) : null
-        // ====== SURRENDER TYPE ======
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex] = [
+                'rolled_dice: ([0-9]|1[0-2])',
+                ';buy_city: \\w+ \\(\\w+\\)|;buy_city: none',
+                ';pay_tax: .* to \\w+'
+            ]
+            const historyRegex = new RegExp(`^${rolledDiceRegex}$|^${rolledDiceRegex}(${buyCityRegex}|${payTaxRegex})$`)
+            return value ? value.match(historyRegex) : null
         case 'money': 
-            return value ? value.match(/\d+/) : null
+        case 'event_money':
+            return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
+        case 'city': 
+            const optionalCity = value === null || typeof value == 'string' ? true : false
+            return optionalCity
+        case 'tax_owner': 
+        case 'tax_visitor': 
+            const optionalTax = value === null || typeof value == 'string' ? true : false
+            return optionalTax
+        // ====== SURRENDER TYPE ======
         // ====== GAME OVER TYPE ======
         case 'all_player_stats': 
             const splitValue = value.split(';')

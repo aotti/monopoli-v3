@@ -1,8 +1,8 @@
-import { FormEvent } from "react";
 import { useMisc } from "../../../context/MiscContext";
-import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper";
-import { IGameContext, ILoggedUsers, IPlayer, IResponse } from "../../../helper/types";
+import { translateUI } from "../../../helper/helper";
+import { ILoggedUsers } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
+import { viewPlayerStats } from "../helper/functions";
 
 export default function PlayerList({ onlinePlayers }: {onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
@@ -21,56 +21,4 @@ export default function PlayerList({ onlinePlayers }: {onlinePlayers: ILoggedUse
             )}
         </div>
     )
-}
-
-async function viewPlayerStats(ev: FormEvent<HTMLFormElement>, gameState: IGameContext) {
-    ev.preventDefault()
-
-    // input element
-    let playerInput: HTMLInputElement
-    // input value container
-    const inputValues: Partial<IPlayer> = {
-        display_name: null
-    }
-    // get input elements
-    const formInputs = ev.currentTarget.elements
-    for(let i=0; i<formInputs.length; i++) {
-        const input = formInputs.item(i) as HTMLInputElement
-        if(input.nodeName == 'INPUT') {
-            // filter inputs
-            if(setInputValue('display_name', input)) {
-                inputValues.display_name = input.value.trim()
-                playerInput = input
-            }
-            // error
-            else {
-                input.value = input.value + '⚠'
-                return
-            }
-        }
-    }
-    // check player name
-    if(gameState.myPlayerInfo.display_name == inputValues.display_name) {
-        // set other player info
-        gameState.setOtherPlayerInfo(null)
-        return
-    }
-    // fetch
-    const viewFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
-    const viewResponse: IResponse = await (await fetcher(`/player/?display_name=${inputValues.display_name}`, viewFetchOptions)).json()
-    // response
-    switch(viewResponse.status) {
-        case 200: 
-            // save access token
-            if(viewResponse.data[0].token) {
-                localStorage.setItem('accessToken', viewResponse.data[0].token)
-                delete viewResponse.data[0].token
-            }
-            // set other player info
-            gameState.setOtherPlayerInfo(viewResponse.data[0].player)
-            return
-        default: 
-            playerInput.value += viewResponse.status
-            return
-    }
 }
