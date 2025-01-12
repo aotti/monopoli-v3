@@ -92,6 +92,7 @@ export default class Controller {
             case 'game roll turn': 
             case 'game roll dice': 
             case 'game surrender': 
+            case 'game sell city': 
             case 'game turn end': 
             case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
         }

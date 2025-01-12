@@ -1,5 +1,6 @@
+import { FormEvent } from "react"
 import { fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
-import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse } from "../../../helper/types"
+import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, UpdateCityListType } from "../../../helper/types"
 
 export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // result message
@@ -669,7 +670,12 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                     const myCity = gameState.gamePlayerInfo[findPlayer].city
                     gameState.setGamePlayerInfo(players => {
                         const buyCityPlayers = [...players]
-                        buyCityPlayers[findPlayer].city = updateCityList(myCity, buyCityName, buyCityProperty)
+                        buyCityPlayers[findPlayer].city = updateCityList({
+                            action: 'buy', 
+                            currentCity: myCity, 
+                            cityName: buyCityName, 
+                            cityProperty: buyCityProperty
+                        })
                         return buyCityPlayers
                     })
                     // turn off notif
@@ -751,25 +757,125 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
     })
 }
 
+export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const sellButton = (ev.nativeEvent as any).submitter as HTMLInputElement
+    // input value container
+    const inputValues = {
+        action: 'game sell city',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        city_left: null,
+        sell_city_name: null,
+        sell_city_price: null
+    }
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName == 'INPUT') {
+            // filter inputs
+            if(setInputValue('sell_city_name', input)) {
+                inputValues.sell_city_name = input.value.trim()
+                // update player city
+                inputValues.city_left = updateCityList({
+                    action: 'sell', 
+                    currentCity: currentCity, 
+                    cityName: inputValues.sell_city_name
+                })
+            }
+            else if(setInputValue('sell_city_price', input)) inputValues.sell_city_price = input.value.trim().toLowerCase()
+            // error
+            else {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                // error message
+                notifTitle.textContent = 'error 400'
+                notifMessage.textContent = `${input.id} doesnt match`
+                return
+            }
+        }
+    }
+    // loading button
+    const tempButtonText = sellButton.textContent
+    sellButton.textContent = 'Loading'
+    sellButton.disabled = true
+    // fetch
+    const sellCityFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
+    const sellCityResponse: IResponse = await (await fetcher('/game', sellCityFetchOptions)).json()
+    // response
+    switch(sellCityResponse.status) {
+        case 200: 
+            // save access token
+            if(sellCityResponse.data[0].token) {
+                localStorage.setItem('accessToken', sellCityResponse.data[0].token)
+                delete sellCityResponse.data[0].token
+            }
+            // submit button normal
+            sellButton.textContent = tempButtonText
+            sellButton.removeAttribute('disabled')
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${sellCityResponse.status}`
+            notifMessage.textContent = `${sellCityResponse.message}`
+            // submit button normal
+            sellButton.textContent = tempButtonText
+            sellButton.removeAttribute('disabled')
+            return
+    }
+}
+
 // ============= MISC FUNCTIONS =============
 // ============= MISC FUNCTIONS =============
 
-function updateCityList(currentCity: string, buyCityName: string, buyCityProperty: string) {
-    // check if player own the city
-    const isCityOwned = currentCity?.match(buyCityName)
-    // city owned
-    if(isCityOwned) {
-        // find city
-        const splitCurrentCity = currentCity.split(';')
-        const findCity = splitCurrentCity.map(v => v.match(buyCityName)).flat().indexOf(buyCityName)
-        // update property
-        splitCurrentCity[findCity] += `,${buyCityProperty}`
-        return splitCurrentCity.join(';')
+function updateCityList(data: UpdateCityListType) {
+    // buy city
+    if(data.action == 'buy') {
+        const {currentCity, cityName, cityProperty} = data
+        // check if player own the city
+        const isCityOwned = currentCity?.match(cityName)
+        // city owned
+        if(isCityOwned) {
+            // find city
+            const splitCurrentCity = currentCity.split(';')
+            const findCity = splitCurrentCity.map(v => v.match(cityName)).flat().indexOf(cityName)
+            // update property
+            splitCurrentCity[findCity] += `,${cityProperty}`
+            return splitCurrentCity.join(';')
+        }
+        // city not owned
+        else {
+            const addNewCity = currentCity ? `${currentCity};${cityName}*${cityProperty}` : `${cityName}*${cityProperty}`
+            return addNewCity
+        }
     }
-    // city not owned
-    else {
-        const addNewCity = currentCity ? `${currentCity};${buyCityName}*${buyCityProperty}` : `${buyCityName}*${buyCityProperty}`
-        return addNewCity
+    // sell city
+    else if(data.action == 'sell') {
+        const {currentCity, cityName} = data
+        // city left container
+        const cityLeft: string[] = []
+        // check if player own the city
+        const isCityOwned = currentCity?.match(cityName)
+        if(isCityOwned) {
+            const splitCurrentCity = currentCity.split(';')
+            for(let scc of splitCurrentCity) {
+                // remove city from list
+                if(!scc.match(cityName)) cityLeft.push(scc)
+            }
+            return cityLeft.length === 0 ? '' : cityLeft.join(';')
+        }
+        else {
+            return null
+        }
     }
 }
 

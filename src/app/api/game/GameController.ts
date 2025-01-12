@@ -90,6 +90,7 @@ export default class GameController extends Controller {
         return result
     }
     
+    // main method
     async readyPlayer(action: string, payload: IGamePlay['ready_player']) {
         let result: IResponse
         
@@ -393,7 +394,7 @@ export default class GameController extends Controller {
                         // if player owned city, add the counter
                         if(owner == data[0].display_name) cityOwnedCounter += +count
                     }
-                    // filter duplicate data (remove data from 1st index)
+                    // add & filter duplicate data (remove data from 1st index)
                     filterCityOwnedList = [...getCityOwnedList, `${data[0].display_name},${cityOwnedCounter}`]
                                         .filter((v1, i, arr) => arr.findLastIndex(v2 => v2.split(',')[0] == v1.split(',')[0]) == i)
                     // set city owned
@@ -430,6 +431,91 @@ export default class GameController extends Controller {
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
+    // event method
+    async sellCity(action: string, payload: IGamePlay['sell_city']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+
+        const roomId = payload.channel.match(/\d+/)[0]
+        // check player turn
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.display_name) 
+            return this.respond(400, 'only allowed on your turn', [])
+        // get city owned list
+        const getCityOwnedList = await this.redisGet(`cityOwned_${roomId}`)
+        if(getCityOwnedList.length === 0) 
+            return this.respond(403, 'you dont have any city', [])
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_sell_city',
+            function_args: {
+                tmp_display_name: payload.display_name,
+                tmp_city: payload.city_left == '' ? null : payload.city_left,
+                tmp_price: +payload.sell_city_price
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            // update city owned
+            let filterCityOwnedList = []
+            for(let col of getCityOwnedList) {
+                const [owner, count] = col.split(',')
+                if(owner == payload.display_name) {
+                    // filter duplicate
+                    filterCityOwnedList = [...getCityOwnedList, `${owner},${+count - 1}`].filter((v1, i, arr) => 
+                                                arr.findLastIndex(v2 => v2.split(',')[0] == v1.split(',')[0]) == i)
+                    // update redis
+                    await this.redisSet(`cityOwned_${roomId}`, filterCityOwnedList)
+                }
+            }
+            // update game history
+            const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            const gameHistory: IGameContext['gameHistory'] = [{
+                display_name: payload.display_name,
+                room_id: +roomId,
+                history: `sell_city: ${payload.sell_city_name}`
+            }]
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
+            // publish data
+            const publishData = {
+                citySeller: payload.display_name,
+                citySold: payload.sell_city_name,
+                cityPrice: +payload.sell_city_price,
+                cityLeft: payload.city_left == '' ? null : payload.city_left,
+                cityOwnedList: filterCityOwnedList,
+                gameHistory: [...getGameHistory, ...gameHistory]
+            }
+            const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // publish to roomlist
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            console.log(isRoomPublished);
+            
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                data: data[0],
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])

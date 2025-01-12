@@ -123,8 +123,32 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return surrendPlayerInfo
         })
     }
+    // sell city (null = sold all city)
+    if(getMessage.cityLeft === null || getMessage.cityLeft.length > 0) {
+        // update game history
+        gameState.setGameHistory(getMessage.gameHistory)
+        // update player city
+        gameState.setGamePlayerInfo(players => {
+            const newPlayerInfo = [...players]
+            // find player who sell city
+            const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.citySeller)
+            // update city
+            newPlayerInfo[findPlayer].city = getMessage.cityLeft
+            newPlayerInfo[findPlayer].money += getMessage.cityPrice
+            // update city owned list
+            localStorage.setItem('cityOwnedList', JSON.stringify(getMessage.cityOwnedList))
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            notifTitle.textContent = translateUI({lang: miscState.language, text: 'Sell City'})
+            notifMessage.textContent = `${getMessage.citySeller} sold ${getMessage.citySold} city`
+            return newPlayerInfo
+        })
+    }
     // end turn
     if(getMessage.playerTurnEnd) {
+        // show notif next player turn
+        playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
         // update city owned list
@@ -153,8 +177,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // turn off notif
         miscState.setAnimation(false)
         gameState.setShowGameNotif(null)
-        // show notif next player turn
-        playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
     }
 }
 
@@ -177,9 +199,6 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
         localStorage.removeItem('cityOwnedList')
         // set game stage
         gameState.setGameStages('over')
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
         // update my player stats
         for(let pd of playersData) {
             if(pd.display_name == gameState.myPlayerInfo.display_name) {
@@ -193,6 +212,9 @@ function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscStat
                 })
             }
         }
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
         // winner message
         notifTitle.textContent = `Game Over`
         notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`

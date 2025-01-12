@@ -255,13 +255,18 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(historyRegex) : null
         case 'money': 
         case 'event_money':
+        case 'sell_city_price':
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
         case 'city': 
-            const optionalCity = value === null || typeof value == 'string' ? true : false
-            return optionalCity
+            const optionalCity_1 = value === null || typeof value == 'string' ? true : false
+            return optionalCity_1
+        case 'sell_city_name':
+        case 'city_left':
+            const optionalCity_2 = value === null || value == '' || value.match(/^[a-zA-Z0-9]+$/) ? true : false
+            return optionalCity_2
         case 'tax_owner': 
         case 'tax_visitor': 
-            const optionalTax = value === null || typeof value == 'string' ? true : false
+            const optionalTax = value === null || value.match(/^[a-zA-Z0-9\s]+$/) ? true : false
             return optionalTax
         // ====== SURRENDER TYPE ======
         // ====== GAME OVER TYPE ======

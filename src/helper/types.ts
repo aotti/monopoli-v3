@@ -56,6 +56,10 @@ export type GameRoomListener = {
         money: number
     },
     cityOwnedList: string[],
+    citySeller: string,
+    citySold: string,
+    cityPrice: number,
+    cityLeft: string,
 }
 
 // context
@@ -274,7 +278,8 @@ type RollDiceType = 'rolled_dice'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType
+type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType
 
 // user
 export interface ILoggedUsers {
@@ -401,6 +406,14 @@ export interface IGamePlay {
         display_name: string,
         money: string,
     },
+    sell_city: {
+        token?: string,
+        channel: string,
+        display_name: string,
+        sell_city_name: string,
+        sell_city_price: string,
+        city_left: string,
+    },
     turn_end: {
         token?: string,
         channel: string,
@@ -446,8 +459,21 @@ interface IEventPayTax {
     visitor: string,
     money: number,
 }
-
 export type EventDataType = IEventBuyCity | IEventPayTax
+
+interface IBuyCity {
+    action: 'buy',
+    currentCity: string, 
+    cityName: string, 
+    cityProperty: string,
+}
+
+interface ISellCity {
+    action: 'sell',
+    currentCity: string, 
+    cityName: string, 
+}
+export type UpdateCityListType = IBuyCity | ISellCity
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:
