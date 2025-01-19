@@ -73,7 +73,7 @@ export default function GameContent({ pubnubSetting }) {
             })
             pubnubClient.removeListener(publishedMessage)
         }
-    }, [gameState.gamePlayerInfo])
+    }, [gameState.gamePlayerInfo, gameState.showGameNotif])
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">

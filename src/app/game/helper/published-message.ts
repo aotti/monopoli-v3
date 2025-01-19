@@ -89,9 +89,16 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // roll dice
     if(getMessage.playerTurn && getMessage.playerDice) {
+        const rollDiceData = {
+            playerTurn: getMessage.playerTurn,
+            playerDice: getMessage.playerDice,
+            playerRNG: getMessage.playerRNG
+        }
+        // save dice for history
+        localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos
         // ### player turn = display_name
-        playerMoving(getMessage.playerTurn, getMessage.playerDice, miscState, gameState)
+        playerMoving(rollDiceData, miscState, gameState)
     }
     // surrender
     if(getMessage.surrendPlayer) {
@@ -111,8 +118,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 if(spi.money > gameState.gameRoomInfo[findRoom].money_lose) 
                     alivePlayers.push(spi.display_name)
             }
-            // update my player data only if alive player > 1
-            if(alivePlayers.length > 1) {
+            // update my player data only if alive player > 2
+            if(alivePlayers.length > 2) {
                 gameState.setMyPlayerInfo(player => {
                     const newMyPlayer = {...player}
                     newMyPlayer.game_played += 1
@@ -124,17 +131,17 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         })
     }
     // sell city (null = sold all city)
-    if(getMessage.cityLeft === null || getMessage.cityLeft.length > 0) {
+    if(getMessage.cityLeft === null || getMessage.cityLeft?.length > 0) {
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
         // update player city
         gameState.setGamePlayerInfo(players => {
-            const newPlayerInfo = [...players]
+            const cityLeftInfo = [...players]
             // find player who sell city
-            const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.citySeller)
+            const findPlayer = cityLeftInfo.map(v => v.display_name).indexOf(getMessage.citySeller)
             // update city
-            newPlayerInfo[findPlayer].city = getMessage.cityLeft
-            newPlayerInfo[findPlayer].money += getMessage.cityPrice
+            cityLeftInfo[findPlayer].city = getMessage.cityLeft
+            cityLeftInfo[findPlayer].money += getMessage.cityPrice
             // update city owned list
             localStorage.setItem('cityOwnedList', JSON.stringify(getMessage.cityOwnedList))
             // show notif
@@ -142,17 +149,22 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             gameState.setShowGameNotif('normal')
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Sell City'})
             notifMessage.textContent = `${getMessage.citySeller} sold ${getMessage.citySold} city`
-            return newPlayerInfo
+            return cityLeftInfo
         })
     }
     // end turn
     if(getMessage.playerTurnEnd) {
         // show notif next player turn
         playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
-        // update game history
-        gameState.setGameHistory(getMessage.gameHistory)
         // update city owned list
         localStorage.setItem('cityOwnedList', JSON.stringify(getMessage.cityOwnedList))
+        // turn off notif for buttons
+        if(gameState.showGameNotif?.match('with_button')) {
+            miscState.setAnimation(false)
+            gameState.setShowGameNotif(null)
+        }
+        // update game history
+        gameState.setGameHistory(getMessage.gameHistory)
         // update player
         gameState.setGamePlayerInfo(players => {
             const newPlayerInfo = [...players]
@@ -162,7 +174,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurnEnd.display_name)
             newPlayerInfo[findPlayer] = getMessage.playerTurnEnd
             // if theres taxes
-            if(getMessage.taxes) {
+            if(getMessage?.taxes) {
                 // ### money is in minus state (ex: -5000)
                 // ### for owner use - to reduce (- with - = +)
                 // add owner money
@@ -174,9 +186,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // return data
             return newPlayerInfo
         })
-        // turn off notif
-        miscState.setAnimation(false)
-        gameState.setShowGameNotif(null)
     }
 }
 

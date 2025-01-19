@@ -31,6 +31,9 @@ export default class Controller {
         // this.redisReset('readyPlayers_33')
         // this.redisReset('decidePlayers_33')
         // this.redisReset('gameHistory_33')
+        // this.redisReset('playerTurns_116')
+        // this.redisSet('playerTurns_116', ['suwanto', 'tester123'])
+        // this.redisSet('playerTurns_116', ['tester123', 'suwanto'])
         // this.redisSet('disabledCharacters_32', [
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
         // ])
@@ -126,7 +129,7 @@ export default class Controller {
         }
         // renew my player
         const renewMyPlayer = await this.logOnlineUsers('renew', logData)
-        if(renewMyPlayer.status === 200 || renewMyPlayer.status === 400) return renewMyPlayer
+        if(renewMyPlayer.status === 200 || renewMyPlayer.status === 403) return renewMyPlayer
         // if data empty, log my player
         const logMyPlayer = await this.logOnlineUsers('log', logData)
         if(logMyPlayer.status === 200) return logMyPlayer
@@ -157,7 +160,7 @@ export default class Controller {
             const isTokenMatch = matchTimeoutToken(isUserExist)
             // for renew, if token match = proceed to renew
             // for log, if token match = dont log player
-            if(isTokenMatch) return this.respond(400, 'account in use', [])
+            if(isTokenMatch) return this.respond(403, 'account in use', [])
             console.log(action, isTokenMatch);
             
             // token expired
@@ -187,14 +190,14 @@ export default class Controller {
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // renew if user still logged
             const renewUser = loggedPlayers.map(user => user.display_name).indexOf(payload.display_name)
-            if(renewUser === -1) return this.respond(403, 'nothing to renew', [])
+            if(renewUser === -1) return this.respond(400, 'nothing to renew', [])
             // match the token
             const isTokenMatch = matchTimeoutToken(renewUser)
             console.log(action, isTokenMatch);
             
             // for renew, if token match = proceed to renew
             // for log, if token match = dont log player
-            if(!isTokenMatch) return this.respond(400, 'account in use', [])
+            if(!isTokenMatch) return this.respond(403, 'account in use', [])
             // update my token
             loggedPlayers[renewUser].timeout_token = timeoutToken
             // update timeout token for identifier

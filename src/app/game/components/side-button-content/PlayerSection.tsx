@@ -9,12 +9,6 @@ import { clickOutsideElement } from "../../../../helper/click-outside"
 export default function PlayerSection() {
     const miscState = useMisc()
     const gameState = useGame()
-    // ### TEMP PLAYER CARDS
-    const tempCards = [
-        '>anti tax;>anti jail',
-        '>nerf gaming dice;>nerf parking;>nerf tax',
-        '>anti tax;>anti jail;>nerf gaming dice;>nerf parking;>nerf tax;>terlele awiwi'
-    ]
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
@@ -42,7 +36,8 @@ export default function PlayerSection() {
                     <div className="flex items-center w-[15vw] bg-darkblue-2">
                         <span className="w-full"> {moneyFormat(player.money)} </span>
                     </div>
-                    <div className="relative flex items-center bg-darkblue-2" data-tooltip={tempCards[0].replaceAll(';', '\n')}>
+                    <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
+                    data-tooltip={player.card?.replaceAll(';', '\n')}>
                         <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
                     </div>
                 </div>)}

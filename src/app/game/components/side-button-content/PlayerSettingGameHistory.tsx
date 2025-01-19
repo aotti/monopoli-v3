@@ -25,7 +25,7 @@ export default function PlayerSettingGameHistory() {
                         v.room_id != gameState.gameRoomId ? null 
                         : <div key={i} className={`${myHistories ? 'bg-primary/30' : ''} border-b-2 border-dashed`}>
                             <p className="text-green-400"> {v.display_name} </p>
-                            <p> {v.history.replace(':', '')} </p>
+                            <p className="lg:text-[10px]"> {v.history.replace(':', '')} </p>
                         </div>
                     )
                 }

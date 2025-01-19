@@ -240,24 +240,33 @@ export function filterInput(input: InputIDType, value: string) {
         // ====== ROLL DICE TYPE ======
         case 'rolled_dice': 
             return value ? value.match(/^[\d]{1,2}$/) : null
+        case 'rng':
+            return value ? value.match(/^[\d]{1,2},[\d]{1,2}$/) : null
         // ====== TURN END TYPE ======
         case 'pos': 
             return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null
         case 'lap': 
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex] = [
+            // set regex
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
-                ';buy_city: \\w+ \\(\\w+\\)|;buy_city: none',
-                ';pay_tax: .* to \\w+'
+                'buy_city: .* \\(\\w+\\)|buy_city: none',
+                'pay_tax: .* to \\w+',
+                'get_card: .* \\(chance\\)|get_card: .* \\(community\\)'
             ]
-            const historyRegex = new RegExp(`^${rolledDiceRegex}$|^${rolledDiceRegex}(${buyCityRegex}|${payTaxRegex})$`)
-            return value ? value.match(historyRegex) : null
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}`, 'g')
+            // set length
+            const historyLength = value ? value.split(';').length : 0
+            // match regex
+            const isValueMatch = value.match(historyRegex) && value.match(historyRegex).length === historyLength
+            return isValueMatch
         case 'money': 
         case 'event_money':
         case 'sell_city_price':
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
         case 'city': 
+        case 'card':
             const optionalCity_1 = value === null || typeof value == 'string' ? true : false
             return optionalCity_1
         case 'sell_city_name':

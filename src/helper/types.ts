@@ -46,6 +46,7 @@ export type GameRoomListener = {
     gameStage: IGameContext['gameStages'],
     playerTurn: string,
     playerDice: number,
+    playerRNG: number,
     gameHistory: IGameHistory[],
     playerTurns: string[],
     surrendPlayer: string,
@@ -125,7 +126,7 @@ export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
-    showGameNotif: 'normal'|'with_button-2'|'with_button-3'|'with_button-parking',
+    showGameNotif: 'normal'|'with_button'|'card'|'card_with_button',
     setShowGameNotif: Dispatch<SetStateAction<IGameContext['showGameNotif']>>,
     rollNumber: 'dice'|'turn',
     setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
@@ -274,8 +275,8 @@ type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
-type RollDiceType = 'rolled_dice'
-type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'
+type RollDiceType = 'rolled_dice'|'rng'
+type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
@@ -399,6 +400,7 @@ export interface IGamePlay {
         channel: string,
         display_name: string,
         rolled_dice: string,
+        rng: string
     },
     surrender: {
         token?: string,
@@ -450,7 +452,6 @@ interface IEventBuyCity_No {
     status: false,
     money: number,
 }
-
 type IEventBuyCity = IEventBuyCity_Yes | IEventBuyCity_No
 
 interface IEventPayTax {
@@ -459,7 +460,16 @@ interface IEventPayTax {
     visitor: string,
     money: number,
 }
-export type EventDataType = IEventBuyCity | IEventPayTax
+
+interface IEventCards {
+    event: 'get_card',
+    type: string,
+    tileName: string,
+    money: number,
+    city?: string,
+    card?: string
+}
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards
 
 interface IBuyCity {
     action: 'buy',
@@ -467,13 +477,24 @@ interface IBuyCity {
     cityName: string, 
     cityProperty: string,
 }
-
 interface ISellCity {
     action: 'sell',
     currentCity: string, 
     cityName: string, 
 }
-export type UpdateCityListType = IBuyCity | ISellCity
+interface IDestroyCity {
+    action: 'destroy',
+    currentCity: string, 
+    rng: number,
+}
+export type UpdateCityListType = IBuyCity | ISellCity | IDestroyCity
+
+interface ISpecialCard {
+    action: 'add',
+    currentSpecialCard: string,
+    specialCard: string, 
+}
+export type UpdateSpecialCardListType = ISpecialCard
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

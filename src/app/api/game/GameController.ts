@@ -262,6 +262,7 @@ export default class GameController extends Controller {
         const publishData = {
             playerTurn: payload.display_name,
             playerDice: +payload.rolled_dice,
+            playerRNG: payload.rng.split(',') // send back as array
         }
         const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isGamePublished);
@@ -356,6 +357,7 @@ export default class GameController extends Controller {
                 tmp_event_money: +payload.event_money,
                 tmp_city: payload.city,
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
+                tmp_card: payload.card
             }
         }
         // run query
@@ -375,7 +377,7 @@ export default class GameController extends Controller {
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
             // get city owned list
             const getCityOwnedList = await this.redisGet(`cityOwned_${roomId}`)
-            let filterCityOwnedList = []
+            let filterCityOwnedList = getCityOwnedList.length > 0 ? getCityOwnedList : []
             // fill game history
             const gameHistory: IGameContext['gameHistory'] = []
             // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
