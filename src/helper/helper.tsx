@@ -267,6 +267,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
         case 'city': 
         case 'card':
+        case 'take_money':
             const optionalCity_1 = value === null || typeof value == 'string' ? true : false
             return optionalCity_1
         case 'sell_city_name':
