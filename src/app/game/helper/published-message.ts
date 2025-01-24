@@ -1,7 +1,7 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
-import { gameOver, playerMoving } from "./game-logic"
+import { checkAlivePlayers, gameOver, playerMoving } from "./game-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -181,6 +181,13 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 const findOwner = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.owner)
                 newPlayerInfo[findOwner].money -= getMessage.taxes.money
             }
+            if(getMessage?.takeMoney) {
+                // update other player money
+                for(let other of getMessage.takeMoney.from) {
+                    const findOther = newPlayerInfo.map(v => v.display_name).indexOf(other)
+                    newPlayerInfo[findOther].money -= getMessage.takeMoney.money
+                }
+            }
             // check player alive
             checkAlivePlayers(newPlayerInfo, miscState, gameState)
             // return data
@@ -188,53 +195,3 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         })
     }
 }
-
-function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
-    // notif
-    const notifTitle = qS('#result_notif_title')
-    const notifMessage = qS('#result_notif_message')
-    // get room info
-    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-    // get alive players
-    const alivePlayers = []
-    for(let pd of playersData) {
-        // check players money amount
-        if(pd.money > gameState.gameRoomInfo[findRoom].money_lose) 
-            alivePlayers.push(pd.display_name)
-    }
-    // if only 1 left, game over
-    if(alivePlayers.length === 1) {
-        // remove city owned list
-        localStorage.removeItem('cityOwnedList')
-        // set game stage
-        gameState.setGameStages('over')
-        // update my player stats
-        for(let pd of playersData) {
-            if(pd.display_name == gameState.myPlayerInfo.display_name) {
-                gameState.setMyPlayerInfo(player => {
-                    const newMyPlayer = {...player}
-                    newMyPlayer.game_played += 1
-                    newMyPlayer.worst_money_lost = pd.money === -999999 ? newMyPlayer.worst_money_lost : pd.money
-                    // save to local storage
-                    localStorage.setItem('playerData', JSON.stringify(newMyPlayer))
-                    return newMyPlayer
-                })
-            }
-        }
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
-        // winner message
-        notifTitle.textContent = `Game Over`
-        notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
-        setTimeout(() => {
-            // set notif to null
-            gameState.setShowGameNotif(null)
-            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
-            gotoRoom ? gotoRoom.click() : null
-        }, 15_000)
-        // run game over
-        gameOver(miscState, gameState)
-    }
-}
-

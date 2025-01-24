@@ -100,3 +100,12 @@ fix 7 jan 2025
 - ~~fix redis untuk update history game (tampung ke temp array lalu redis.set)~~
 - ~~saat bayar pajak, posisi player tidak terupdate~~
 **note: angka dadu & roll dice jangan lupa balikin semula**
+
+fix bug 11 jan 2025
+- ~~game count saat surrend lalu game over, terhitung 2x~~
+- ~~worst lost saat surrend tidak benar~~ bukan bug, tapi dianggap tidak kalah, jadi data sesuai db
+- ~~dapat uang 25k saat lewat start~~
+- ~~prompt saat surrender~~
+- ~~pulau komodo punya 2 kata, jadi ngebug saat beli~~
+- ~~ada kemungkinan data null saat turn end~~
+- ~~perkecil font size history~~

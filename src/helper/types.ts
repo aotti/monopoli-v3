@@ -61,6 +61,11 @@ export type GameRoomListener = {
     citySold: string,
     cityPrice: number,
     cityLeft: string,
+    takeMoney: {
+        from: string[],
+        to: string,
+        money: number
+    }
 }
 
 // context
@@ -429,6 +434,7 @@ export interface IGamePlay {
         history: string,
         tax_visitor: string,
         tax_owner: string,
+        take_money: string,
     },
     game_over: {
         token?: string,
@@ -444,6 +450,7 @@ interface IEventBuyCity_Yes {
     status: true,
     display_name: string,
     city: string,
+    name: string,
     property: string,
     money: number,
 }
@@ -467,7 +474,8 @@ interface IEventCards {
     tileName: string,
     money: number,
     city?: string,
-    card?: string
+    card?: string,
+    takeMoney?: string,
 }
 export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards
 

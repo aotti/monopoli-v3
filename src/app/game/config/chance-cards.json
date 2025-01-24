@@ -5,7 +5,7 @@
             "chance": [96, 100],
             "data": [
                 {
-                    "description": "Get city upgrade card",
+                    "description": "Home Renovation TV Show gives you upgrade city card",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
                     "effect": "special card_city upgrade"
                 }
@@ -21,7 +21,7 @@
                     "effect": "move place_prison&lose money_90%"
                 },
                 {
-                    "description": "Get anti prison card",
+                    "description": "Your police neighbor gives you an anti jail card as a Christmas present",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
                     "effect": "special card_anti prison"
                 },
@@ -47,19 +47,19 @@
                     "effect": "destroy property_city"
                 },
                 {
-                    "description": "Gilang drops his ichi ocha, you have to take 1 steps back to return it",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
-                    "effect": "move backward_1"
-                },
-                {
                     "description": "Try your luck, go to free parking or prison",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
                     "effect": "random-move place_parking|move place_prison"
                 },
                 {
-                    "description": "Get free parking nerf card",
+                    "description": "Gilang drops his ichi ocha, you have to take 1 steps back to return it",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
-                    "effect": "special card_free parking nerf"
+                    "effect": "move backward_1"
+                },
+                {
+                    "description": "Due to number of vehicles in Indonesia is more than 160 million, players are given nerf parking card so they dont travel often",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "special card_parking nerf"
                 }
             ]
         },
@@ -68,9 +68,9 @@
             "chance": [23, 47],
             "data": [
                 {
-                    "description": "Home renovation, pay 30% of the total money",
+                    "description": "The kind Gilang gives you 5.000",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
-                    "effect": "lose money_30%"
+                    "effect": "get money_5000"
                 },
                 {
                     "description": "You chased by a monitor lizard, take 2 steps back",
@@ -83,14 +83,14 @@
                     "effect": "button-move place_start|take card_community"
                 },
                 {
-                    "description": "Get gaming dice card",
+                    "description": "You found gaming dice card under your PC desk",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
                     "effect": "special card_gaming dice"
                 },
                 {
                     "description": "Upgrade 1 owned city (random)",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
-                    "effect": "upgrade_city property"
+                    "effect": "upgrade city_city property"
                 }
             ]
         },
@@ -99,9 +99,9 @@
             "chance": [48, 95],
             "data": [
                 {
-                    "description": "You stumbled, take 1 step forward",
+                    "description": "You stumbled, take 2 step forward",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
-                    "effect": "move forward_1"
+                    "effect": "move forward_2"
                 },
                 {
                     "description": "You find 30.000 in your pocket",
@@ -109,9 +109,9 @@
                     "effect": "get money_30000"
                 },
                 {
-                    "description": "You find 50.000 on the road, take the money or take 2 steps forward",
+                    "description": "You find 20.000 on the road, take the money or take 1 steps forward (choose)",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
-                    "effect": "random-get money_50000|move forward_2"
+                    "effect": "button-get money_20000|move forward_1"
                 }
             ]
         }

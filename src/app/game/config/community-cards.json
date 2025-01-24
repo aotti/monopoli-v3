@@ -1,97 +1,119 @@
 {
-    "S_RANK": [
+    "cards": [
         {
-            "description": "Get city upgrade card",
-            "effect": ["special card_city upgrade"],
-            "chance": [96, 100]
-        }
-    ],
-    "A_RANK": [
-        {
-            "description": "Monthly salary has been paid, you get 160.000",
-            "effect": ["get money_160000"],
-            "chance": [0, 7]
+            "category": "S_RANK",
+            "chance": [96, 100],
+            "data": [
+                {
+                    "description": "Home Renovation TV Show gives you upgrade city card",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "special card_city upgrade"
+                }
+            ]
         },
         {
-            "description": "Pay electricity & water bills 100.000",
-            "effect": ["lose money_100000"],
-            "chance": [0, 7]
+            "category": "A_RANK",
+            "chance": [0, 7],
+            "data": [
+                {
+                    "description": "Your catfish business is successful, profits increased by 50%. Then, Gilang stops by to buy catfish for 80.000",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "get money_80000&more money_50%"
+                },
+                {
+                    "description": "Pay electricity & water bills 100.000",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "lose money_100000"
+                },
+                {
+                    "description": "Sell 1 owned city (random)",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "random-sell_city"
+                }
+            ]
         },
         {
-            "description": "Sell 1 owned city (random)",
-            "effect": ["sell_city"],
-            "chance": [0, 7]
-        }
-    ],
-    "B_RANK": [
-        {
-            "description": "Debt collectors come to your house, you pay 60.000 debt",
-            "effect": ["lose money_60000"],
-            "chance": [8, 22]
+            "category": "B_RANK",
+            "chance": [8, 22],
+            "data": [
+                {
+                    "description": "You take 1 step back when being chased by debt collectors, then get caught and pay 30%",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "lose money_60000&move backward_1"
+                },
+                {
+                    "description": "Pay the hospital 50.000",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "lose money_50000"
+                },
+                {
+                    "description": "Home renovation, pay 30% of the total money",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "lose money_30%"
+                },
+                {
+                    "description": "Go to your own city (choice)",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "button-move place_my city"
+                },
+                {
+                    "description": "After being friends with Gilang for a long time, he gave you an anti tax card for fun",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "special card_anti tax"
+                }
+            ]
         },
         {
-            "description": "Pay the hospital 50.000",
-            "effect": ["lose money_50000"],
-            "chance": [8, 22]
+            "category": "C_RANK",
+            "chance": [23, 47],
+            "data": [
+                {
+                    "description": "Gilang the hacker hacks your bank account and loses 20.000",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "lose money_20000"
+                },
+                {
+                    "description": "Due to the small amount of aid, you only get a fortune block card",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "special card_fortune block"
+                },
+                {
+                    "description": "Your car is broken, pay 35.000 repair costs",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "lose money_35000"
+                },
+                {
+                    "description": "You pick up the tax nerf card that Gilang dropped",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "special card_tax nerf"
+                },
+                {
+                    "description": "You get 20.000 times the number on the selected coin",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "button-get money_20000"
+                }
+            ]
         },
         {
-            "description": "The kind Gilang gives you 5.000",
-            "effect": ["get money_5000"],
-            "chance": [8, 22]
-        },
-        {
-            "description": "Go to your own city (choice)",
-            "effect": ["move to_my city"],
-            "chance": [8, 22]
-        },
-        {
-            "description": "Get anti tax card",
-            "effect": ["special card_anti tax"],
-            "chance": [8, 22]
-        }
-    ],
-    "C_RANK": [
-        {
-            "description": "Gilang the hacker hacks your bank account and loses 20.000",
-            "effect": ["lose money_20000"],
-            "chance": [23, 47]
-        },
-        {
-            "description": "Get fortune block card, when you pass the start, you only get 5.000",
-            "effect": ["special card_fortune block"],
-            "chance": [23, 47]
-        },
-        {
-            "description": "Your car is broken, pay 35.000 repair costs",
-            "effect": ["lose money_35000"],
-            "chance": [23, 47]
-        },
-        {
-            "description": "Tax nerf card 35%",
-            "effect": ["special card_tax nerf"],
-            "chance": [23, 47]
-        },
-        {
-            "description": "You get 20.000 times the number on the selected coin",
-            "effect": ["coin toss_20000"],
-            "chance": [23, 47]
-        }
-    ],
-    "D_RANK": [
-        {
-            "description": "Gift from the bank, you get 40.000",
-            "effect": ["get money_40000"],
-            "chance": [48, 95]
-        },
-        {
-            "description": "Your birthday, get 15.000 from each player",
-            "effect": ["take money_15000"],
-            "chance": [48, 95]
-        },
-        {
-            "description": "You get an inheritance of 65.000",
-            "effect": ["get money_65000"],
-            "chance": [48, 95]
+            "category": "D_RANK",
+            "chance": [48, 95],
+            "data": [
+                {
+                    "description": "Gift from the bank, you get 40.000",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "get money_40000"
+                },
+                {
+                    "description": "Your birthday, get 15.000 from each player",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "take money_15000"
+                },
+                {
+                    "description": "You get an inheritance of 65.000",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "effect": "get money_65000"
+                }
+            ]
         }
     ]
 }

@@ -134,17 +134,17 @@
         },
         { 
             "square": 9, 
-            "type": "other",
-            "name": "Chance Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
-        },
-        { 
-            "square": 8, 
             "type": "city",
             "name": "Cursed-1", 
             "price": 20000,
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Lawang_Sewu_100-OgKDUcfqHVUE1cmvSilsFZvU1DzRlX.png",
             "info": "<Lawang Sewu>\nlose money every visit"
+        },
+        { 
+            "square": 8, 
+            "type": "other",
+            "name": "Chance Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
         },
         { 
             "square": 7, 

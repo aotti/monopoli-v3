@@ -346,6 +346,18 @@ export default class GameController extends Controller {
         const {token, onlinePlayersData} = filtering.data[0]
         // check taxes
         const isTaxes = payload.tax_owner && payload.tax_visitor
+        const taxes = isTaxes ? {
+            owner: payload.tax_owner, 
+            visitor: payload.tax_visitor, 
+            money: +payload.event_money
+        } : null
+        // transfer money
+        const isTakeMoney = payload.take_money ? payload.take_money.split(';') : null
+        const takeMoney = isTakeMoney ? {
+            from: isTakeMoney[1].split(',').filter(v => v != payload.display_name),
+            to: payload.display_name,
+            money: +isTakeMoney[0]
+        } : null
         // set payload for db query
         const queryObject: Partial<IQueryUpdate> = {
             table: 'games',
@@ -357,7 +369,8 @@ export default class GameController extends Controller {
                 tmp_event_money: +payload.event_money,
                 tmp_city: payload.city,
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
-                tmp_card: payload.card
+                tmp_card: payload.card,
+                tmp_take_money: payload.take_money,
             }
         }
         // run query
@@ -418,12 +431,8 @@ export default class GameController extends Controller {
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,
                 cityOwnedList: filterCityOwnedList,
-                // ### tambah data pajak & uang
-                taxes: isTaxes ? {
-                    owner: payload.tax_owner, 
-                    visitor: payload.tax_visitor, 
-                    money: +payload.event_money
-                } : null,
+                taxes: taxes,
+                takeMoney: takeMoney,
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory]
             }

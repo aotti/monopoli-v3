@@ -1,8 +1,21 @@
 import { FormEvent } from "react"
-import { fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
+import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
 import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
 import chance_cards_list from "../config/chance-cards.json"
+import community_cards_list from "../config/community-cards.json"
 
+/*
+    TABLE OF CONTENTS
+    - GAME PREPARE
+    - GAME PLAYING
+    - GAME TILE EVENT
+        # CITY EVENT
+        # CARD EVENT
+        # SPECIAL CARD EVENT
+*/
+
+// ========== GAME PREPARE ==========
+// ========== GAME PREPARE ==========
 export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -211,6 +224,8 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
     }
 }
 
+// ========== GAME PLAYING ==========
+// ========== GAME PLAYING ==========
 export async function startGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -326,7 +341,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
         rolled_dice: null,
-        rng: [5, 40].toString() // Math.floor(Math.random() * 101).toString()
+        rng: [55, 40].toString() // Math.floor(Math.random() * 101).toString()
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {
@@ -427,6 +442,55 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
     }
 }
 
+export function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
+    // notif
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // get room info
+    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+    // get alive players
+    const alivePlayers = []
+    for(let pd of playersData) {
+        // check players money amount
+        if(pd.money > gameState.gameRoomInfo[findRoom].money_lose) 
+            alivePlayers.push(pd.display_name)
+    }
+    // if only 1 left, game over
+    if(alivePlayers.length === 1) {
+        // remove city owned list
+        localStorage.removeItem('cityOwnedList')
+        // set game stage
+        gameState.setGameStages('over')
+        // update my player stats
+        for(let pd of playersData) {
+            if(pd.display_name == gameState.myPlayerInfo.display_name) {
+                gameState.setMyPlayerInfo(player => {
+                    const newMyPlayer = {...player}
+                    newMyPlayer.game_played += 1
+                    newMyPlayer.worst_money_lost = pd.money === -999999 ? newMyPlayer.worst_money_lost : pd.money
+                    // save to local storage
+                    localStorage.setItem('playerData', JSON.stringify(newMyPlayer))
+                    return newMyPlayer
+                })
+            }
+        }
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        // winner message
+        notifTitle.textContent = `Game Over`
+        notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
+        setTimeout(() => {
+            // set notif to null
+            gameState.setShowGameNotif(null)
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom ? gotoRoom.click() : null
+        }, 15_000)
+        // run game over
+        gameOver(miscState, gameState)
+    }
+}
+
 /**
  * @param playerDice dice result number
  */
@@ -492,7 +556,7 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                         return newPosInfo
                     })
                     // update laps for moving player
-                    if(tempStep === playerPaths.length) {
+                    if(tempStep === 1) {
                         numberLaps += 1
                         throughStart = true
                         gameState.setGamePlayerInfo(players => {
@@ -508,8 +572,8 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
         function stopByEvent() {
             return new Promise((resolve: (value: EventDataType)=>void ) => {
                 // match tile info
-                // ### EVENT LIST COMPLETE: city, tax
-                // ### EVENT LIST NOT COMPLETE: special, curse, community card, chance card, prison, free park, buff, debuff
+                // ### EVENT LIST COMPLETE: city, tax, chance card
+                // ### EVENT LIST NOT COMPLETE: special, curse, community card, prison, free park, buff, debuff
                 switch(tileInfo) {
                     case 'city': 
                         stopByCity(findPlayer, tileElement, miscState, gameState)
@@ -517,9 +581,15 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                         .catch(err => console.log(err))
                         break
                     case 'chance': 
-                        stopByChanceCard(findPlayer, playerRNG, miscState, gameState)
+                        stopByCards('chance', findPlayer, playerRNG, miscState, gameState)
                         // only match type "move" if the card is a single effect
-                        .then(eventData => (eventData as any).type.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
+                        .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
+                    case 'community': 
+                        stopByCards('community', findPlayer, playerRNG, miscState, gameState)
+                        // only match type "move" if the card is a single effect
+                        .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
                         .catch(err => console.log(err))
                         break
                     default: 
@@ -555,7 +625,9 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                 city: (eventData as any)?.city || gameState.gamePlayerInfo[findPlayer].city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
-                card: (eventData as any)?.card || gameState.gamePlayerInfo[findPlayer].card
+                card: (eventData as any)?.card || gameState.gamePlayerInfo[findPlayer].card,
+                // taking money from players
+                take_money: (eventData as any)?.takeMoney || null,
             }
             // remove sub data
             localStorage.removeItem('subPlayerDice')
@@ -583,6 +655,35 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
             }
         }
     })
+}
+
+function setEventHistory(rolled_dice: string, eventData: EventDataType) {
+    // check sub event
+    const subEventData = localStorage.getItem('subEventData')
+    // history container
+    const historyArray = subEventData ? [rolled_dice, subEventData] : [rolled_dice]
+    // check event data
+    switch(eventData?.event) {
+        case 'buy_city': 
+            // check status
+            if(eventData.status) {
+                // buying city
+                historyArray.push(`${eventData.event}: ${eventData.name} (${eventData.property})`)
+            }
+            else {
+                // not buy || property max
+                historyArray.push(`${eventData.event}: none`)
+            }
+            return historyArray.join(';')
+        case 'pay_tax': 
+            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
+            return historyArray.join(';')
+        case 'get_card': 
+            historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName})`)
+            return historyArray.join(';')
+        default: 
+            return historyArray.join(';')
+    }
 }
 
 export async function gameOver(miscState: IMiscContext, gameState: IGameContext) {
@@ -632,9 +733,12 @@ export async function gameOver(miscState: IMiscContext, gameState: IGameContext)
     }
 }
 
-// ============= EVENT FUNCTIONS =============
-// ============= EVENT FUNCTIONS =============
 
+// ========== GAME TILE EVENT ==========
+// ========== GAME TILE EVENT ==========
+
+// ========== # CITY EVENT ==========
+// ========== # CITY EVENT ==========
 function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
     return new Promise((resolve: (value: EventDataType)=>void) => {
         // result message
@@ -660,14 +764,14 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
         }
         // show notif (must be on top the buttons to prevent undefined)
         miscState.setAnimation(true)
-        gameState.setShowGameNotif(`with_button-${2}` as any)
+        gameState.setShowGameNotif(`with_button-2` as any)
         // set timer
         let buyCityTimer = 6
         const buyCityInterval = setInterval(() => {
             notifTimer.textContent = `${buyCityTimer}`
             buyCityTimer--
             // event buttons (2 buttons)
-            const [nopeButton, ofcourseButton] = [qS('[data-id=notif_button_0]'), qS('data-id=notif_button_1')] as HTMLInputElement[]
+            const [nopeButton, ofcourseButton] = [qS('[data-id=notif_button_0]'), qS('[data-id=notif_button_1]')] as HTMLInputElement[]
             // if timer run out, auto cancel
             if(buyCityTimer < 0) {
                 clearInterval(buyCityInterval)
@@ -676,49 +780,61 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                 return
             }
             // prevent other player from doing event
-            if(gameState.gamePlayerInfo[findPlayer].display_name == gameState.myPlayerInfo.display_name) {
+            if(ofcourseButton && gameState.gamePlayerInfo[findPlayer].display_name == gameState.myPlayerInfo.display_name) {
                 // show buttons
-                ofcourseButton?.classList.remove('hidden')
-                nopeButton?.classList.remove('hidden')
+                ofcourseButton.classList.remove('hidden')
                 // modify button 
-                ofcourseButton ? ofcourseButton.textContent = 'Of course' : null
-                nopeButton ? nopeButton.textContent = 'Nope' : null
-                ofcourseButton?.classList.add('text-green-300')
-                nopeButton?.classList.add('text-red-300')
-                // choice click event
+                ofcourseButton.textContent = 'Of course'
+                ofcourseButton.classList.add('text-green-300')
+                // click event
                 ofcourseButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
-                    // update game player info
-                    const myCity = gameState.gamePlayerInfo[findPlayer].city
-                    gameState.setGamePlayerInfo(players => {
-                        const buyCityPlayers = [...players]
-                        buyCityPlayers[findPlayer].city = updateCityList({
-                            action: 'buy', 
-                            currentCity: myCity, 
-                            cityName: buyCityName, 
-                            cityProperty: buyCityProperty
-                        })
-                        return buyCityPlayers
-                    })
                     // turn off notif
                     miscState.setAnimation(false)
                     gameState.setShowGameNotif(null)
                     // hide buttons
                     ofcourseButton.classList.add('hidden')
                     nopeButton.classList.add('hidden')
+                    // is money enough
+                    const isMoneyEnough = gameState.gamePlayerInfo[findPlayer].money > +buyCityPrice
+                    if(!isMoneyEnough) {
+                        // set event data (for history)
+                        const eventData: EventDataType = {
+                            event: 'buy_city',
+                            status: false,
+                            money: 0
+                        }
+                        // return event data
+                        return resolve(eventData)
+                    }
+                    // update game player info
+                    const myCity = gameState.gamePlayerInfo[findPlayer].city
+                    const buyingCity = updateCityList({
+                        action: 'buy', 
+                        currentCity: myCity, 
+                        cityName: buyCityName, 
+                        cityProperty: buyCityProperty
+                    })
                     // set event data (for history)
                     const eventData: EventDataType = {
                         event: 'buy_city',
                         status: true,
                         display_name: gameState.gamePlayerInfo[findPlayer].display_name,
-                        city: buyCityName,
+                        city: buyingCity,
+                        name: buyCityName,
                         property: buyCityProperty == '2house1hotel' ? '1hotel' : buyCityProperty,
                         money: -buyCityPrice
                     }
                     // return event data
                     return resolve(eventData)
                 }
+                // show buttons
+                nopeButton.classList.remove('hidden')
+                // modify button 
+                nopeButton.textContent = 'Nope'
+                nopeButton.classList.add('text-red-300')
+                // click event
                 nopeButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
@@ -857,40 +973,6 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
     }
 }
 
-function stopByChanceCard(findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
-    return new Promise(async (resolve: (value: EventDataType)=>void) => {
-        // result message
-        const notifTitle = qS('#result_notif_title')
-        const notifMessage = qS('#result_notif_message')
-        const notifImage = qS('#card_image') as HTMLImageElement
-        // chance cards data
-        const chanceCardsList = chance_cards_list.cards
-        // loop cards
-        for(let cards of chanceCardsList) {
-            const [minRange, maxRange] = cards.chance
-            // match rng
-            if(+rng[0] >= minRange && +rng[0] <= maxRange) {
-                console.log(cards);
-                // notif content
-                // ### BELUM ADA CARD BORDER RANK
-                notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
-                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[1].description as any})
-                notifImage.src = cards.data[1].img
-                // run card effect
-                const cardData = {
-                    tileName: 'chance',
-                    rank: cards.category,
-                    effectData: cards.data[1].effect
-                }
-                return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
-            }
-        }
-    })
-}
-
-// ============= MISC FUNCTIONS =============
-// ============= MISC FUNCTIONS =============
-
 function updateCityList(data: UpdateCityListType) {
     // buy city
     if(data.action == 'buy') {
@@ -957,48 +1039,38 @@ function updateCityList(data: UpdateCityListType) {
     }
 }
 
-function updateSpecialCardList(data: UpdateSpecialCardListType) {
-    if(data.action == 'add') {
-        const {currentSpecialCard, specialCard} = data
-        // check if card exist
-        const isSpecialCardOwned = currentSpecialCard.match(specialCard)
-        // dont have yet, then add
-        if(!isSpecialCardOwned) {
-            const splitCurrentSpecialCard = currentSpecialCard.split(';')
-            splitCurrentSpecialCard.push(specialCard)
-            return splitCurrentSpecialCard.filter(i => i).join(';')
+// ========== # CARD EVENT ==========
+// ========== # CARD EVENT ==========
+function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // result message
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        const notifImage = qS('#card_image') as HTMLImageElement
+        // cards data
+        const cardsList = card == 'chance' ? chance_cards_list.cards : community_cards_list.cards
+        // loop cards
+        for(let cards of cardsList) {
+            const [minRange, maxRange] = cards.chance
+            // match rng
+            if(+rng[0] >= minRange && +rng[0] <= maxRange) {
+                console.log(cards);
+                const cardRNG = +rng[0] % cards.data.length
+                // notif content
+                // ### BELUM ADA CARD BORDER RANK
+                notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
+                notifImage.src = cards.data[cardRNG].img
+                // run card effect
+                const cardData = {
+                    tileName: card,
+                    rank: cards.category,
+                    effectData: cards.data[cardRNG].effect
+                }
+                return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
+            }
         }
-        return currentSpecialCard
-    }
-}
-
-function setEventHistory(rolled_dice: string, eventData: EventDataType) {
-    // check sub event
-    const subEventData = localStorage.getItem('subEventData')
-    // history container
-    const historyArray = subEventData ? [rolled_dice, subEventData] : [rolled_dice]
-    // check event data
-    switch(eventData?.event) {
-        case 'buy_city': 
-            // check status
-            if(eventData.status) {
-                // buying city
-                historyArray.push(`${eventData.event}: ${eventData.city} (${eventData.property})`)
-            }
-            else {
-                // not buy || property max
-                historyArray.push(`${eventData.event}: none`)
-            }
-            return historyArray.join(';')
-        case 'pay_tax': 
-            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
-            return historyArray.join(';')
-        case 'get_card': 
-            historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName})`)
-            return historyArray.join(';')
-        default: 
-            return historyArray.join(';')
-    }
+    })
 }
 
 async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
@@ -1007,54 +1079,70 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
     // ### rank will be used for rarity border
     const {tileName, rank, effectData} = cardData
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
-    // check if card need buttons
-    const hasButton = effectData.split('-')[0] == 'button'
-    // card need buttons
-    if(hasButton) {
-
+    // check card separator
+    const isMultipleEffects = effectData.split('&')
+    const isOptionalEffects = effectData.split('|')
+    // card has multiple effects
+    if(isMultipleEffects.length === 2) {
+        // combine container
+        const eventDataCombined: EventDataType = {
+            event: 'get_card',
+            type: '',
+            tileName: tileName,
+            money: 0
+        }
+        // run the effect
+        for(let i in isMultipleEffects) {
+            const [type, effect] = isMultipleEffects[i].split('_')
+            const eventData = await executeEffect(type, effect, null, 'AND')
+            // set event data
+            eventDataCombined.money += eventData.money
+            eventDataCombined.type += i == '0' ? type : `,${type}`
+        }
+        return eventDataCombined
     }
-    // no buttons
+    // card has optional effect
+    else if(isOptionalEffects.length === 2) {
+        // show notif with button
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif(`card_with_button-2` as any)
+        // get effect prefix
+        const getPrefix = effectData.split('-')
+        // player choose the optional effect
+        if(getPrefix[0] == 'button') {
+            // get optional effect
+            const getOptionalEffect = getPrefix[1].split('|')
+            const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+            const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+            // run effect
+            const eventData = await executeOptionalCard(6, optionalTypes, optionalEffects)
+            return eventData
+        }
+        // system choose the optional effect
+        else if(getPrefix[0] == 'random') {
+            // get optional effect
+            const getOptionalEffect = getPrefix[1].split('|')
+            const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+            const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+            // run effect
+            const eventData = await executeOptionalCard(2, optionalTypes, optionalEffects)
+            return eventData
+        }
+    }
+    // only 1 effect
     else {
-        const isMultipleEffects = effectData.split('&')
-        const isOptionalEffects = effectData.split('|')
-        // card has multiple effects
-        if(isMultipleEffects.length === 2) {
-            // combine container
-            const eventDataCombined: EventDataType = {
-                event: 'get_card',
-                type: '',
-                tileName: tileName,
-                money: 0
-            }
-            // run the effect
-            for(let i in isMultipleEffects) {
-                const [type, effect] = isMultipleEffects[i].split('_')
-                const eventData = await executeEffect(type, effect, null, 'AND')
-                // set event data
-                eventDataCombined.money += eventData.money
-                eventDataCombined.type += i == '0' ? type : `,${type}`
-            }
-            return eventDataCombined
+        // check if the event is random (choices but system pick)
+        const isRandom = effectData.split('-')
+        if(isRandom[0] == 'random') {
+            // get type & effect
+            const [type, effect] = isRandom[1].split('_')
+            const eventData = await executeEffect(type, effect, isRandom[0])
+            return eventData
         }
-        // card will choose 1 of the effects
-        else if(isOptionalEffects.length === 2) {
-
-        }
-        // only 1 effect
         else {
-            // check if the event is random (choices but system pick)
-            const isRandom = effectData.split('-')
-            if(isRandom[0] == 'random') {
-                // get type & effect
-                const [type, effect] = isRandom[1].split('_')
-                const eventData = await executeEffect(type, effect, isRandom[0])
-                return eventData
-            }
-            else {
-                const [type, effect] = effectData.split('_')
-                const eventData = await executeEffect(type, effect)
-                return eventData
-            }
+            const [type, effect] = effectData.split('_')
+            const eventData = await executeEffect(type, effect)
+            return eventData
         }
     }
 
@@ -1063,21 +1151,102 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
      * @returns 
      */
     function executeEffect(type: string, effect: string, prefix?: string, separator?: 'OR'|'AND') {
-        // ### TAMBAH PROMISE DI DALEM executeEffect
-        // ### TAMBAH PROMISE DI DALEM executeEffect
         return new Promise((resolve: (value: EventDataType)=>void) => {
             // ### effect list
-            // ### get money, lose money, move forward, move backward, move to, 
+            // ### get money, more money, lose money, move forward, move backward, move place, 
             // ### special card, destroy, take card, upgrade
             if(type == 'get money') {
+                // get money choice
+                if(prefix == 'button') {
+                    // show notif
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif('card_with_button-3' as any)
+                    // card interval
+                    let getMoneyTimer = 6
+                    const getMoneyInterval = setInterval(() => {
+                        notifTimer.textContent = `${getMoneyTimer}`
+                        getMoneyTimer--
+                        // buttons
+                        const coinButtons = [
+                            qS(`[data-id=notif_button_0]`),
+                            qS(`[data-id=notif_button_1]`),
+                            qS(`[data-id=notif_button_2]`)
+                        ] as HTMLInputElement[]
+                        // choose random
+                        if(getMoneyTimer < 0) {
+                            clearInterval(getMoneyInterval)
+                            notifTimer.textContent = ``
+                            // hide all buttons
+                            for(let coin of coinButtons) coin.classList.add('hidden')
+                            // return event data
+                            return resolve({
+                                event: 'get_card',
+                                type: type,
+                                tileName: tileName,
+                                money: +effect * +coinButtons[0].dataset.prize
+                            })
+                        }
+                        if(coinButtons[0] && playerTurnData.display_name == gameState.gamePlayerInfo[findPlayer].display_name) {
+                            for(let i=0; i<coinButtons.length; i++) {
+                                // show button
+                                coinButtons[i].classList.remove('hidden')
+                                // modify button
+                                coinButtons[i].textContent = '???'
+                                coinButtons[i].dataset.prize = `${i}`
+                                coinButtons[i].classList.add('!w-20', 'h-20', 'border', 'rounded-full')
+                                // click event
+                                coinButtons[i].onclick = () => {
+                                    clearInterval(getMoneyInterval)
+                                    notifTimer.textContent = ``
+                                    // hide all buttons
+                                    for(let coin of coinButtons) coin.classList.add('hidden')
+                                    // return event data
+                                    return resolve({
+                                        event: 'get_card',
+                                        type: type,
+                                        tileName: tileName,
+                                        money: +effect * +coinButtons[i].dataset.prize
+                                    })
+                                }
+                            }
+                        }
+                    }, 1000);
+                }
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
+                // check for more money
+                const getMoreMoney = localStorage.getItem('moreMoney')
+                // get money + more money
+                if(getMoreMoney) {
+                    const moreMoney = (playerTurnData.money + +effect) * +getMoreMoney
+                    return resolve({
+                        event: 'get_card',
+                        type: type,
+                        tileName: tileName,
+                        money: playerTurnData.money + moreMoney
+                    })
+                }
+                // normal get money
                 resolve({
                     event: 'get_card',
                     type: type,
                     tileName: tileName,
                     money: +effect
+                })
+            }
+            else if(type == 'more money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // set more money to local storage
+                const isPercent = effect.match('%') ? +effect / 100 : +effect
+                localStorage.setItem('moreMoney', `${isPercent}`)
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: 0
                 })
             }
             else if(type == 'lose money') {
@@ -1101,11 +1270,25 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                     }
                 ) 
             }
+            else if(type == 'take money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // get all players except current player
+                const otherPlayerNames = gameState.gamePlayerInfo.map(v => v.display_name).join(',')
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: +effect,
+                    takeMoney: `${+effect};${otherPlayerNames}`
+                })
+            }
             else if(type == 'move forward' || type == 'move backward') {
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
-                // set additional event data for history (only for moving cards)
+                // set additional event data for history (only for moving cards, upgrade, take card)
                 if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
                 // set dice number
@@ -1126,26 +1309,42 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                 })
             }
             else if(type == 'move place') {
-                // set additional event data for history (only for moving cards, not multiple effect)
+                // set additional event data for history (only for moving cards, upgrade, take card)
                 if(separator != 'AND' && playerTurnData.display_name == gameState.myPlayerInfo.display_name)
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
                 // get tile data (tile number)
-                const getTileList = getMovePlaceTiles(effect)
+                const getTileList = getMovePlaceTiles(effect, separator)
+                // if tile data empty, just resolve
+                if(getTileList.length === 0) {
+                    return setTimeout(() => {
+                        notifTimer.textContent = 'nowhere to go'
+                        resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: 0
+                        })
+                    }, 1000);
+                }
                 // set timer
-                let movePlaceTimer = prefix == 'button' ? 6 : 2
+                let movePlaceTimer = prefix == 'button' 
+                                    ? separator == 'OR' 
+                                        ? 1 // optional effect \w button (instant)
+                                        : 6 // 1 effect \w button prefix
+                                    : 2 // random prefix
                 let chosenButton: HTMLElement = null
                 const movePlaceInterval = setInterval(() => {
                     // no need timer for multiple effect card
-                    notifTimer.textContent = separator != 'AND' ? `${movePlaceTimer}` : ''
+                    notifTimer.textContent = !separator ? `${movePlaceTimer}` : ''
                     movePlaceTimer--
                     // if timer run out, auto cancel
                     if(movePlaceTimer < 0) {
                         clearInterval(movePlaceInterval)
                         notifTimer.textContent = ''
                         // set choosen button
-                        chosenButton.classList.add('bg-green-300')
+                        if(!separator) chosenButton.classList.add('bg-green-600')
                         // set player dice
-                        const chosenSquare = +chosenButton.textContent
+                        const chosenSquare = +chosenButton.dataset.destination
                         const setChosenDice = playerTurnData.pos > chosenSquare 
                                             ? (24 + chosenSquare) - playerTurnData.pos
                                             : chosenSquare - playerTurnData.pos
@@ -1169,19 +1368,87 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                     if(checkNotifButton) {
                         // buttons created, then modify buttons
                         const notifButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
-                        for(let i=0; i<notifButtons.length; i++) {
-                            const button = notifButtons[i]
-                            if(separator != 'AND') {
-                                button.classList.remove('hidden')
-                                button.classList.add('border')
-                            }
-                            button.textContent = getTileList[i]
-                        }
                         // set chosen button
                         const chosenIndex = +rng[0] % notifButtons.length
-                        chosenButton = notifButtons[chosenIndex]
+                        // separator null means only card \w 1 effect can modify the button
+                        // destination random / choice
+                        if(!separator) {
+                            for(let i=0; i<notifButtons.length; i++) {
+                                const button = notifButtons[i]
+                                button.classList.remove('hidden')
+                                button.classList.add('border')
+                                button.textContent = getTileList[i]
+                                button.dataset.destination = getTileList[i]
+                                // set event click for prefix button + 1 effect
+                                if(prefix == 'button') {
+                                    button.onclick = () => {
+                                        clearInterval(movePlaceInterval)
+                                        notifTimer.textContent = ''
+                                        // set player dice
+                                        const chosenSquare = +button.dataset.destination
+                                        const setChosenDice = playerTurnData.pos > chosenSquare 
+                                                            ? (24 + chosenSquare) - playerTurnData.pos
+                                                            : chosenSquare - playerTurnData.pos
+                                        const rollDiceData = {
+                                            playerTurn: playerTurnData.display_name,
+                                            playerDice: setChosenDice,
+                                            playerRNG: rng
+                                        }
+                                        // move to chosen place
+                                        playerMoving(rollDiceData, miscState, gameState)
+                                        // return event data
+                                        resolve({
+                                            event: 'get_card',
+                                            type: type,
+                                            tileName: tileName,
+                                            money: 0
+                                        })
+                                    }
+                                }
+                            }
+                            chosenButton = notifButtons[chosenIndex]
+                        }
+                        // destination already set, so it only has 1 array element
+                        else {
+                            notifButtons[chosenIndex].dataset.destination = getTileList[0]
+                            chosenButton = notifButtons[chosenIndex]
+                        }
                     }
                 }, 1000)
+            }
+            else if(type == 'upgrade city') {
+                // set additional event data for history (only for moving cards, upgrade, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                notifTimer.textContent = 'getting city data..'
+                // get player city list
+                setTimeout(async () => {
+                    const playerCityList = playerTurnData.city?.split(';')
+                    if(playerCityList) {
+                        notifTimer.textContent = ''
+                        // filter fully upgrade city
+                        const filteredCityList = playerCityList.filter(v => !v.match(/2house1hotel/))
+                        // set upgrade params
+                        const upgradeRNG = +rng[0] % filteredCityList.length
+                        const upgradeCityName = filteredCityList[upgradeRNG].split('*')[0]
+                        const upgradeCityElement = qS(`[data-city-info^='${upgradeCityName}']`) as HTMLElement
+                        // upgrade city
+                        const [error, eventData] = await catchError(stopByCity(findPlayer, upgradeCityElement, miscState, gameState))
+                        if(error) console.log(error)
+                        return resolve(eventData)
+                    }
+                    // show notif have no city
+                    notifTimer.textContent = 'smh my head, homeless'
+                    resolve({
+                        event: 'get_card',
+                        type: type,
+                        tileName: tileName,
+                        money: 0,
+                        city: null
+                    })
+                }, 2000)
             }
             else if(type == 'destroy property') {
                 // destroy city property
@@ -1207,6 +1474,22 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                     city: isDestroyed || null
                 })
             }
+            else if(type == 'take card') {
+                // set additional event data for history (only for moving cards, upgrade, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                notifTimer.textContent = `getting ${effect} card..`
+                // run card
+                setTimeout(async () => {
+                    notifTimer.textContent = ''
+                    const [error, eventData] = await catchError(stopByCards(effect as any, findPlayer, [rng[1], rng[1]], miscState, gameState))
+                    if(error) console.log(error)
+                    return resolve(eventData)
+                }, 2000);
+            }
             else if(type == 'special card') {
                 // show notif
                 miscState.setAnimation(true)
@@ -1228,16 +1511,103 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
         })
     }
 
-    function getMovePlaceTiles(destination: string) {
+    /**
+     * @param timer prefix random = 2 | button = 6
+     * @param types card types
+     * @param effects card effects
+     * @returns 
+     */
+    function executeOptionalCard(timer: number, types: string[], effects: string[]) {
+        return new Promise((resolve: (value: EventDataType)=>void) => {
+            const [leftType, rightType] = types
+            const [leftEffect, rightEffect] = effects
+            // event interval
+            let optionalButtonTimer = timer
+            const optionalButtonInterval = setInterval(async () => {
+                notifTimer.textContent = `${optionalButtonTimer}`
+                optionalButtonTimer--
+                // optional buttons
+                const [leftButton, rightButton] = [qS(`[data-id=notif_button_0]`), qS(`[data-id=notif_button_1]`)] as HTMLInputElement[]
+                // auto click on timer off
+                if(optionalButtonTimer < 0) {
+                    clearInterval(optionalButtonInterval)
+                    notifTimer.textContent = ''
+                    // disable button
+                    leftButton.disabled = true
+                    rightButton.disabled = true
+                    // run event, check prefix (random = 2 | button = 6)
+                    if(timer == 2) {
+                        // rng % 2 buttons
+                        const optionalButtons = [
+                            {button: leftButton, type: leftType, effect: leftEffect},
+                            {button: rightButton, type: rightType, effect: rightEffect},
+                        ]
+                        const optionalRNG = +rng[0] % optionalButtons.length
+                        // modify button
+                        optionalButtons[optionalRNG].button.classList.add('text-green-300')
+                        // run effect
+                        return resolve(await executeEffect(
+                            optionalButtons[optionalRNG].type, 
+                            optionalButtons[optionalRNG].effect, 
+                            'button', 'OR'
+                        ))
+                    }
+                    // modify button
+                    leftButton.classList.add('text-green-300')
+                    // run effect
+                    return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
+                }
+                if(rightButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+                    // show buttons
+                    leftButton.classList.remove('hidden')
+                    // modify button 
+                    timer == 2 ? leftButton.disabled = true : null
+                    leftButton.textContent = leftEffect.match(/\d{4}/) ? moneyFormat(+leftEffect) : leftEffect
+                    // click event
+                    leftButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
+                    }
+                    // show buttons
+                    rightButton.classList.remove('hidden')
+                    // modify button 
+                    timer == 2 ? rightButton.disabled = true : null
+                    rightButton.textContent = rightEffect.match(/\d{4}/) ? moneyFormat(+rightEffect) : rightEffect
+                    // click event
+                    rightButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(rightType, rightEffect, 'button', 'OR'))
+                    }
+                }
+            }, 1000)
+        })
+    }
+
+    /**
+     * @param prefix could be 'button'|'random'
+     */
+    function getMovePlaceTiles(destination: string, separator: 'OR'|'AND') {
         // get city tiles
-        if(destination == 'other city') {
+        if(destination == 'other city' || destination == 'my city') {
             const boughtCityList = qSA('[data-city-info]') as NodeListOf<HTMLElement>
             const filteredBoughtCityList = []
             // loop city list
             for(let city of boughtCityList) {
                 const [cityName, cityProperty, cityPrice, cityOwner] = city.dataset.cityInfo.split(',')
                 // ### cityOwner != null
-                if(cityOwner && cityOwner != playerTurnData.display_name)
+                if(destination == 'other city' && cityOwner && cityOwner != playerTurnData.display_name)
+                    filteredBoughtCityList.push(city.dataset.playerPath)
+                else if(destination == 'my city' && cityOwner && cityOwner == playerTurnData.display_name)
                     filteredBoughtCityList.push(city.dataset.playerPath)
             }
             // show notif with buttons
@@ -1251,10 +1621,29 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
             const destinedCity = qS(`[data-tile-info=${destination}]`) as HTMLElement
             const destinedCitySquare = [destinedCity.dataset.playerPath]
             // show notif with buttons
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif(`card_with_button-${destinedCitySquare.length}` as any)
+            if(separator != 'OR') {
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif(`card_with_button-${destinedCitySquare.length}` as any)
+            }
             // return data
             return destinedCitySquare
         }
+    }
+}
+
+// ========== # SPECIAL CARD EVENT ==========
+// ========== # SPECIAL CARD EVENT ==========
+function updateSpecialCardList(data: UpdateSpecialCardListType) {
+    if(data.action == 'add') {
+        const {currentSpecialCard, specialCard} = data
+        // check if card exist
+        const isSpecialCardOwned = currentSpecialCard.match(specialCard)
+        // dont have yet, then add
+        if(!isSpecialCardOwned) {
+            const splitCurrentSpecialCard = currentSpecialCard.split(';')
+            splitCurrentSpecialCard.push(specialCard)
+            return splitCurrentSpecialCard.filter(i => i).join(';')
+        }
+        return currentSpecialCard
     }
 }
