@@ -241,7 +241,7 @@ export function filterInput(input: InputIDType, value: string) {
         case 'rolled_dice': 
             return value ? value.match(/^[\d]{1,2}$/) : null
         case 'rng':
-            return value ? value.match(/^[\d]{1,2},[\d]{1,2}$/) : null
+            return value ? value.match(/^[\d]{1,2},[\d]{1,2}$|^100,[\d]{1,2}$|^[\d]{1,2},100$/) : null
         // ====== TURN END TYPE ======
         case 'pos': 
             return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null
@@ -272,7 +272,7 @@ export function filterInput(input: InputIDType, value: string) {
             return optionalCity_1
         case 'sell_city_name':
         case 'city_left':
-            const optionalCity_2 = value === null || value == '' || value.match(/^[a-zA-Z0-9]+$/) ? true : false
+            const optionalCity_2 = value === null || value == '' || value.match(/^[a-zA-Z0-9\-*,;]+$/) ? true : false
             return optionalCity_2
         case 'tax_owner': 
         case 'tax_visitor': 

@@ -341,7 +341,11 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
         rolled_dice: null,
-        rng: [55, 40].toString() // Math.floor(Math.random() * 101).toString()
+        // Math.floor(Math.random() * 101).toString()
+        rng: [
+            Math.floor(Math.random() * 101), 
+            Math.floor(Math.random() * 101)
+        ].toString() 
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {
@@ -1028,8 +1032,6 @@ function updateCityList(data: UpdateCityListType) {
                 // set property left
                 const [cityName, cityProperties] = isPropertyExist[destroyRNG].split('*')
                 const propertyLeft = cityProperties.split(',').filter(v => v != destroyedProperty).join(',')
-                // set destroyed city name to local storage
-                localStorage.setItem('destroyedCity', cityName)
                 // merge destroyed city
                 return [...splitCurrentCity.filter(v => !v.match(cityName)), `${cityName}*${propertyLeft}`].join(';')
             }

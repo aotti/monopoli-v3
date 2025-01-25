@@ -24,7 +24,7 @@ export default function PlayerSection() {
                 {/* title */}
                 <span> {translateUI({lang: miscState.language, text: 'players'})} </span>
                 {/* setting */}
-                {gameState.spectator ? null : <PlayerSettingButton />}
+                <PlayerSettingButton />
             </div>
             {/* player list */}
             <div className="flex flex-col gap-1">
@@ -68,45 +68,83 @@ function PlayerSettingButton() {
             absolute right-4 flex flex-col gap-2 
             text-2xs lg:text-xs text-left
             bg-darkblue-3 border-8bit-modal w-max p-1`}>
-                {/* auto roll dice */}
-                <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
-                    <label htmlFor="auto_roll_dice" className="w-full"> 
-                        {translateUI({lang: miscState.language, text: 'Auto roll dice'})} 
-                    </label>
-                    <input type="checkbox" id="auto_roll_dice" onClick={() => console.log('auto_roll')} />
-                </div>
-                {/* sell city */}
-                <div className="flex items-center p-1 hover:bg-darkblue-2">
-                    <input type="button" id="sell_city" onClick={() => {
-                        gameState.setDisplaySettingItem('sell_city')
-                        gameState.setOpenPlayerSetting(false)
-                    }} />
-                    <label htmlFor="sell_city" className="w-full"> 
-                        {translateUI({lang: miscState.language, text: 'Sell City'})} 
-                    </label>
-                </div>
-                {/* history */}
-                <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
-                    <label htmlFor="game_history" className="w-full">
-                        {translateUI({lang: miscState.language, text: 'Game History'})}
-                    </label>
-                    <input type="checkbox" id="game_history" onChange={ev => {
-                        ev.currentTarget.checked
-                            ? gameState.setDisplaySettingItem('game_history')
-                            : gameState.setDisplaySettingItem(null)
-                    }} />
-                </div>
-                {/* attack */}
-                <div className="flex items-center p-1 hover:bg-darkblue-2">
-                    <input type="button" id="attack_city" onClick={() => {
-                        gameState.setDisplaySettingItem('attack_city')
-                        gameState.setOpenPlayerSetting(false)
-                    }} />
-                    <label htmlFor="attack_city" className="w-full">
-                        {translateUI({lang: miscState.language, text: 'Attack City'})}
-                    </label>
-                </div>
+                {!gameState.spectator
+                    // button for players
+                    ? <>
+                        <AutoRollDiceOption />
+                        <SellCityOption />
+                        <AttackCityOption />
+                        <GameHistoryOption />
+                    </>
+                    // button for spectator
+                    : <GameHistoryOption />
+                }
             </div>
+        </div>
+    )
+}
+
+function AutoRollDiceOption() {
+    const miscState = useMisc()
+
+    return (
+        <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
+            <label htmlFor="auto_roll_dice" className="w-full"> 
+                {translateUI({lang: miscState.language, text: 'Auto roll dice'})} 
+            </label>
+            <input type="checkbox" id="auto_roll_dice" onClick={() => console.log('auto_roll')} />
+        </div>
+    )
+}
+
+function SellCityOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="flex items-center p-1 hover:bg-darkblue-2">
+            <input type="button" id="sell_city" onClick={() => {
+                gameState.setDisplaySettingItem('sell_city')
+                gameState.setOpenPlayerSetting(false)
+            }} />
+            <label htmlFor="sell_city" className="w-full"> 
+                {translateUI({lang: miscState.language, text: 'Sell City'})} 
+            </label>
+        </div>
+    )
+}
+
+function AttackCityOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="flex items-center p-1 hover:bg-darkblue-2">
+            <input type="button" id="attack_city" onClick={() => {
+                gameState.setDisplaySettingItem('attack_city')
+                gameState.setOpenPlayerSetting(false)
+            }} />
+            <label htmlFor="attack_city" className="w-full">
+                {translateUI({lang: miscState.language, text: 'Attack City'})}
+            </label>
+        </div>
+    )
+}
+
+function GameHistoryOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
+            <label htmlFor="game_history" className="w-full">
+                {translateUI({lang: miscState.language, text: 'Game History'})}
+            </label>
+            <input type="checkbox" id="game_history" onChange={ev => {
+                ev.currentTarget.checked
+                    ? gameState.setDisplaySettingItem('game_history')
+                    : gameState.setDisplaySettingItem(null)
+            }} />
         </div>
     )
 }

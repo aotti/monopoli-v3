@@ -154,16 +154,6 @@ export default class Controller {
         }
         // logging users
         if(action == 'log') {
-            // check if user exist
-            const isUserExist = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
-            // match the token
-            const isTokenMatch = matchTimeoutToken(isUserExist)
-            // for renew, if token match = proceed to renew
-            // for log, if token match = dont log player
-            if(isTokenMatch) return this.respond(403, 'account in use', [])
-            console.log(action, isTokenMatch);
-            
-            // token expired
             // create token for timeout
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // log the player
@@ -179,18 +169,18 @@ export default class Controller {
                 httpOnly: true,
                 sameSite: 'strict',
             })
+            const filteredLoggedPlayers = loggedPlayers.filter((v1, i, arr) => arr.findLastIndex(v2 => v2.display_name == v1.display_name) === i)
             // save to redis
-            await this.redisSet('loggedPlayers', loggedPlayers)
+            await this.redisSet('loggedPlayers', filteredLoggedPlayers)
             // response
-            return this.respond(200, 'user logged', loggedPlayers)
+            return this.respond(200, 'user logged', filteredLoggedPlayers)
         }
         // renew user timeout token
         else if(action == 'renew') {
-            // create token for timeout
-            const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // renew if user still logged
-            const renewUser = loggedPlayers.map(user => user.display_name).indexOf(payload.display_name)
-            if(renewUser === -1) return this.respond(400, 'nothing to renew', [])
+            // status 400 used for proceed to 'log' action 
+            const renewUser = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
+            if(renewUser === -1) return this.respond(400, 'no access', [])
             // match the token
             const isTokenMatch = matchTimeoutToken(renewUser)
             console.log(action, isTokenMatch);
@@ -198,6 +188,8 @@ export default class Controller {
             // for renew, if token match = proceed to renew
             // for log, if token match = dont log player
             if(!isTokenMatch) return this.respond(403, 'account in use', [])
+            // create token for timeout
+            const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // update my token
             loggedPlayers[renewUser].timeout_token = timeoutToken
             // update timeout token for identifier
@@ -214,7 +206,7 @@ export default class Controller {
         }
         // remove user
         else if(action == 'out') {
-            loggedPlayers = loggedPlayers.filter(p => p.display_name != payload.display_name)
+            loggedPlayers = loggedPlayers.filter(v => v.display_name != payload.display_name)
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response
