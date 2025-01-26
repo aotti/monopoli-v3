@@ -199,6 +199,8 @@ export default class Controller {
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // update my token
             loggedPlayers[renewUser].timeout_token = timeoutToken
+            // update timeout token to redis
+            await this.redisSet(`timeoutToken_${getTimeoutTokenId}`, [timeoutToken])
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response
