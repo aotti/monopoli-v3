@@ -343,7 +343,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            5, 
+            Math.floor(Math.random() * 101), 
             Math.floor(Math.random() * 101)
         ].toString() 
     }
@@ -1061,13 +1061,13 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
                 notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
-                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[0].description as any})
-                notifImage.src = cards.data[0].img
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
+                notifImage.src = cards.data[cardRNG].img
                 // run card effect
                 const cardData = {
                     tileName: card,
                     rank: cards.category,
-                    effectData: cards.data[0].effect
+                    effectData: cards.data[cardRNG].effect
                 }
                 return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
             }
