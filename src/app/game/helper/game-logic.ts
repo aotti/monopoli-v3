@@ -343,7 +343,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            5, 
             Math.floor(Math.random() * 101)
         ].toString() 
     }
@@ -622,7 +622,7 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                 pos: nextPos.toString(),
                 lap: numberLaps.toString(),
                 // money from event that occured
-                event_money: throughStart ? (eventMoney + 25000).toString() : eventMoney.toString(),
+                event_money: throughStart ? Math.round(eventMoney + 25000).toString() : Math.round(eventMoney).toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
                 history: setEventHistory(`rolled_dice: ${subPlayerDice || playerDice}`, eventData),
                 // nullable data: city, card, taxes
@@ -1061,13 +1061,13 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
                 notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
-                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
-                notifImage.src = cards.data[cardRNG].img
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[0].description as any})
+                notifImage.src = cards.data[0].img
                 // run card effect
                 const cardData = {
                     tileName: card,
                     rank: cards.category,
-                    effectData: cards.data[cardRNG].effect
+                    effectData: cards.data[0].effect
                 }
                 return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
             }
@@ -1075,78 +1075,81 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
     })
 }
 
-async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
     // notif timer
     const notifTimer = qS('#result_notif_timer')
     // ### rank will be used for rarity border
     const {tileName, rank, effectData} = cardData
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
-    // check card separator
-    const isMultipleEffects = effectData.split('&')
-    const isOptionalEffects = effectData.split('|')
-    // card has multiple effects
-    if(isMultipleEffects.length === 2) {
-        // combine container
-        const eventDataCombined: EventDataType = {
-            event: 'get_card',
-            type: '',
-            tileName: tileName,
-            money: 0
+
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // check card separator
+        const isMultipleEffects = effectData.split('&')
+        const isOptionalEffects = effectData.split('|')
+        // card has multiple effects
+        if(isMultipleEffects.length === 2) {
+            // combine container
+            const eventDataCombined: EventDataType = {
+                event: 'get_card',
+                type: '',
+                tileName: tileName,
+                money: 0
+            }
+            // run the effect
+            for(let i in isMultipleEffects) {
+                const [type, effect] = isMultipleEffects[i].split('_')
+                const eventData = await executeEffect(type, effect, null, 'AND')
+                // set event data
+                eventDataCombined.money += eventData.money
+                eventDataCombined.type += i == '0' ? type : `,${type}`
+            }
+            resolve(eventDataCombined)
         }
-        // run the effect
-        for(let i in isMultipleEffects) {
-            const [type, effect] = isMultipleEffects[i].split('_')
-            const eventData = await executeEffect(type, effect, null, 'AND')
-            // set event data
-            eventDataCombined.money += eventData.money
-            eventDataCombined.type += i == '0' ? type : `,${type}`
+        // card has optional effect
+        else if(isOptionalEffects.length === 2) {
+            // show notif with button
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif(`card_with_button-2` as any)
+            // get effect prefix
+            const getPrefix = effectData.split('-')
+            // player choose the optional effect
+            if(getPrefix[0] == 'button') {
+                // get optional effect
+                const getOptionalEffect = getPrefix[1].split('|')
+                const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+                const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+                // run effect
+                const eventData = await executeOptionalCard(6, optionalTypes, optionalEffects)
+                resolve(eventData)
+            }
+            // system choose the optional effect
+            else if(getPrefix[0] == 'random') {
+                // get optional effect
+                const getOptionalEffect = getPrefix[1].split('|')
+                const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+                const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+                // run effect
+                const eventData = await executeOptionalCard(2, optionalTypes, optionalEffects)
+                resolve(eventData)
+            }
         }
-        return eventDataCombined
-    }
-    // card has optional effect
-    else if(isOptionalEffects.length === 2) {
-        // show notif with button
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif(`card_with_button-2` as any)
-        // get effect prefix
-        const getPrefix = effectData.split('-')
-        // player choose the optional effect
-        if(getPrefix[0] == 'button') {
-            // get optional effect
-            const getOptionalEffect = getPrefix[1].split('|')
-            const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
-            const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
-            // run effect
-            const eventData = await executeOptionalCard(6, optionalTypes, optionalEffects)
-            return eventData
-        }
-        // system choose the optional effect
-        else if(getPrefix[0] == 'random') {
-            // get optional effect
-            const getOptionalEffect = getPrefix[1].split('|')
-            const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
-            const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
-            // run effect
-            const eventData = await executeOptionalCard(2, optionalTypes, optionalEffects)
-            return eventData
-        }
-    }
-    // only 1 effect
-    else {
-        // check if the event is random (choices but system pick)
-        const isRandom = effectData.split('-')
-        if(isRandom[0] == 'random') {
-            // get type & effect
-            const [type, effect] = isRandom[1].split('_')
-            const eventData = await executeEffect(type, effect, isRandom[0])
-            return eventData
-        }
+        // only 1 effect
         else {
-            const [type, effect] = effectData.split('_')
-            const eventData = await executeEffect(type, effect)
-            return eventData
+            // check if the event is random (choices but system pick)
+            const getPrefix = effectData.split('-')
+            if(getPrefix[0] == 'random' || getPrefix[0] == 'button') {
+                // get type & effect
+                const [type, effect] = getPrefix[1].split('_')
+                const eventData = await executeEffect(type, effect, getPrefix[0])
+                resolve(eventData)
+            }
+            else {
+                const [type, effect] = effectData.split('_')
+                const eventData = await executeEffect(type, effect)
+                resolve(eventData)
+            }
         }
-    }
+    })
 
     /**
      * @param prefix could be 'button'|'random'
@@ -1156,7 +1159,7 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
         return new Promise((resolve: (value: EventDataType)=>void) => {
             // ### effect list
             // ### get money, more money, lose money, move forward, move backward, move place, 
-            // ### special card, destroy, take card, upgrade
+            // ### special card, destroy, take card, upgrade, sell city
             if(type == 'get money') {
                 // get money choice
                 if(prefix == 'button') {
@@ -1372,7 +1375,7 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                         const notifButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
                         // set chosen button
                         const chosenIndex = +rng[0] % notifButtons.length
-                        // separator null means only card \w 1 effect can modify the button
+                        // separator null means only card \w single effect can modify the button
                         // destination random / choice
                         if(!separator) {
                             for(let i=0; i<notifButtons.length; i++) {
@@ -1381,7 +1384,7 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                                 button.classList.add('border')
                                 button.textContent = getTileList[i]
                                 button.dataset.destination = getTileList[i]
-                                // set event click for prefix button + 1 effect
+                                // set event click for prefix button + single effect
                                 if(prefix == 'button') {
                                     button.onclick = () => {
                                         clearInterval(movePlaceInterval)
@@ -1406,6 +1409,7 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                                             money: 0
                                         })
                                     }
+                                    break
                                 }
                             }
                             chosenButton = notifButtons[chosenIndex]
@@ -1451,6 +1455,60 @@ async function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', stri
                         city: null
                     })
                 }, 2000)
+            }
+            else if(type == 'sell city') {
+                // set additional event data for history (only for moving cards, upgrade/sell city, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                // notif message
+                notifTimer.textContent = 'getting city data..'
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // get owned city
+                const getOwnedCity = playerTurnData.city ? playerTurnData.city.split(';') : null
+                if(!getOwnedCity) {
+                    setTimeout(() => {
+                        // notif message
+                        notifTimer.textContent = 'can you buy a city pls?'
+                        return resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: 0
+                        })
+                    }, 2000);
+                }
+                // sell city interval
+                let sellCityTimer = 2
+                let chosenSellCity = null
+                const sellCityInterval = setInterval(() => {
+                    notifTimer.textContent = `${sellCityTimer}`
+                    sellCityTimer--
+                    if(sellCityTimer < 0) {
+                        clearInterval(sellCityInterval)
+                        notifTimer.textContent = `${chosenSellCity} city sold`
+                        // selling city
+                        const cityLeft = updateCityList({
+                            action: 'sell', 
+                            currentCity: playerTurnData.city,
+                            cityName: chosenSellCity
+                        })
+                        const getCityInfo = (qS(`[data-city-info^=${chosenSellCity}]`) as HTMLElement).dataset.cityInfo.split(',')
+                        const [cityName, cityProperty, cityPrice, cityOwner] = getCityInfo
+                        // return event data
+                        resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: +cityPrice,
+                            city: cityLeft
+                        })
+                    }
+                    // sell city rng
+                    const sellCityRNG = +rng[0] % getOwnedCity.length
+                    chosenSellCity = getOwnedCity[sellCityRNG].split('*')[0]
+                }, 1000);
             }
             else if(type == 'destroy property') {
                 // destroy city property

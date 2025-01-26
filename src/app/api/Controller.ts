@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import PubNub from "pubnub";
 import { redis } from "../../config/redis";
+import { randomBytes } from "crypto";
 
 // redis
 const redisClient = redis()
@@ -31,9 +32,9 @@ export default class Controller {
         // this.redisReset('readyPlayers_33')
         // this.redisReset('decidePlayers_33')
         // this.redisReset('gameHistory_33')
-        // this.redisReset('playerTurns_116')
-        // this.redisSet('playerTurns_116', ['suwanto', 'tester123'])
-        // this.redisSet('playerTurns_116', ['tester123', 'suwanto'])
+        // this.redisReset('playerTurns_127')
+        // this.redisSet('playerTurns_127', ['suwanto', 'gandesblood'])
+        // this.redisSet('playerTurns_127', ['gandesblood', 'suwanto'])
         // this.redisSet('disabledCharacters_32', [
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
         // ])
@@ -156,19 +157,22 @@ export default class Controller {
         if(action == 'log') {
             // create token for timeout
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
+            const timeoutTokenId = randomBytes(8).toString('hex')
             // log the player
             loggedPlayers.push({
                 display_name: payload.display_name,
                 status: payload.status,
                 timeout_token: timeoutToken
             })
-            // save timeout token for identifier
-            cookies().set('timeoutToken', timeoutToken, { 
+            // save timeout token identifier
+            cookies().set('timeoutTokenId', timeoutTokenId, { 
                 path: '/',
                 maxAge: 604800 * 2, // 1 week * 2
                 httpOnly: true,
                 sameSite: 'strict',
             })
+            // save timeout token to redis
+            await this.redisSet(`timeoutToken_${timeoutTokenId}`, [timeoutToken])
             const filteredLoggedPlayers = loggedPlayers.filter((v1, i, arr) => arr.findLastIndex(v2 => v2.display_name == v1.display_name) === i)
             // save to redis
             await this.redisSet('loggedPlayers', filteredLoggedPlayers)
@@ -181,8 +185,11 @@ export default class Controller {
             // status 400 used for proceed to 'log' action 
             const renewUser = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
             if(renewUser === -1) return this.respond(400, 'no access', [])
+            // get timeout token identifier
+            const getTimeoutTokenId = cookies().get('timeoutTokenId')?.value || null
+            const getTimeoutToken = await this.redisGet(`timeoutToken_${getTimeoutTokenId}`)
             // match the token
-            const isTokenMatch = matchTimeoutToken(renewUser)
+            const isTokenMatch = matchTimeoutToken(getTimeoutToken, renewUser)
             console.log(action, isTokenMatch);
             
             // for renew, if token match = proceed to renew
@@ -192,13 +199,6 @@ export default class Controller {
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // update my token
             loggedPlayers[renewUser].timeout_token = timeoutToken
-            // update timeout token for identifier
-            cookies().set('timeoutToken', timeoutToken, { 
-                path: '/',
-                maxAge: 604800 * 2, // 1 week * 2
-                httpOnly: true,
-                sameSite: 'strict',
-            })
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response
@@ -216,9 +216,8 @@ export default class Controller {
         /**
          * @description match timeout token as identifier for user
          */
-        function matchTimeoutToken(index: number) {
-            const getTimeoutToken = cookies().get('timeoutToken')?.value
-            if(getTimeoutToken && getTimeoutToken == loggedPlayers[index]?.timeout_token)
+        function matchTimeoutToken(getTimeoutToken: string[], index: number) {
+            if(getTimeoutToken[0] && getTimeoutToken[0] == loggedPlayers[index]?.timeout_token)
                 return true
             return false
         }

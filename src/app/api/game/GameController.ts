@@ -422,11 +422,20 @@ export default class GameController extends Controller {
             await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
             // push end turn player to playerTurns
             const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
-            // remove empty
-            getPlayerTurns.splice(0, 1)
-            // push player
-            getPlayerTurns.push(payload.display_name)
-            await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
+            // check if turn end player is playing in this game
+            const getDecidePlayers = await this.redisGet(`decidePlayers_${roomId}`)
+            const isTurnEndPlayerInGame = getDecidePlayers.map(v => v.display_name).indexOf(payload.display_name)
+            if(isTurnEndPlayerInGame !== -1) {
+                // player is playing in this game
+                // now check if it exist in player turns (walking player should not exist)
+                if(getPlayerTurns.indexOf(payload.display_name) === -1) {
+                    // player doesnt exist, now modify player turns
+                    getPlayerTurns.splice(0, 1)
+                    // push player
+                    getPlayerTurns.push(payload.display_name)
+                    await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
+                }
+            }
             // publish online players
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,

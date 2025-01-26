@@ -94,7 +94,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             playerDice: getMessage.playerDice,
             playerRNG: getMessage.playerRNG
         }
-        // save dice for history
+        // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos
         // ### player turn = display_name
