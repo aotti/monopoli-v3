@@ -560,7 +560,7 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                         return newPosInfo
                     })
                     // update laps for moving player
-                    if(tempStep === 1) {
+                    if(fixedNextStep === 1) {
                         numberLaps += 1
                         throughStart = true
                         gameState.setGamePlayerInfo(players => {
@@ -794,15 +794,13 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                 ofcourseButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
-                    // turn off notif
-                    miscState.setAnimation(false)
-                    gameState.setShowGameNotif(null)
                     // hide buttons
                     ofcourseButton.classList.add('hidden')
                     nopeButton.classList.add('hidden')
                     // is money enough
                     const isMoneyEnough = gameState.gamePlayerInfo[findPlayer].money > +buyCityPrice
                     if(!isMoneyEnough) {
+                        notifTimer.textContent = 'smh my head, you poor'
                         // set event data (for history)
                         const eventData: EventDataType = {
                             event: 'buy_city',
@@ -812,6 +810,9 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                         // return event data
                         return resolve(eventData)
                     }
+                    // turn off notif
+                    miscState.setAnimation(false)
+                    gameState.setShowGameNotif(null)
                     // update game player info
                     const myCity = gameState.gamePlayerInfo[findPlayer].city
                     const buyingCity = updateCityList({
