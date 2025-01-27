@@ -206,6 +206,7 @@ export async function avatarUpdate(display_name: string, avatar_url: string, gam
     }
     // disable upload button
     uploadButton.disabled = true
+    avatarImg.alt = 'Loading..'
     // fetch
     const avatarFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
     const avatarResponse: IResponse = await (await fetcher('/player/avatar', avatarFetchOptions)).json()
@@ -217,6 +218,7 @@ export async function avatarUpdate(display_name: string, avatar_url: string, gam
                 localStorage.setItem('accessToken', avatarResponse.data[0].token)
                 delete avatarResponse.data[0].token
             }
+            avatarImg.alt = 'avatar'
             // set my player data
             gameState.setMyPlayerInfo(info => {
                 const newAvatar: IPlayer = {

@@ -21,36 +21,43 @@ export default function GameNotif() {
         ${gameState.showGameNotif ? 'flex' : 'hidden'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p id="result_notif_title" className="border-b-2 p-1"></p>
-            <p id="result_notif_message"></p>
-            <p id="result_notif_timer"></p>
-            {gameState.showGameNotif?.match('with_button') ? <GameNotifWithButtons /> : null}
+            <div className="flex items-center justify-around">
+                <GameNotifWithImage />
+                <div className="w-[50vw] lg:w-[35vw]">
+                    <p id="result_notif_message"></p>
+                    <p id="result_notif_timer"></p>
+                    {gameState.showGameNotif?.match('with_button') ? <GameNotifWithButtons /> : null}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function GameNotifWithImage() {
+    const gameState = useGame()
+    const showImage = gameState.showGameNotif?.match('card') ? 'block' : 'hidden'
+
+    return (
+        <div className={`${showImage} lg:w-44 lg:h-40`}>
+            <img id="card_image" src="" alt="card-image" draggable={false} />
         </div>
     )
 }
 
 function GameNotifWithButtons() {
-    const miscState = useMisc()
     const gameState = useGame()
     // set button number
     const getButtonInfo = gameState.showGameNotif.split('-')[1]
-    const countNotifButtons = getButtonInfo.match(/\d/) ? [...new Array(+getButtonInfo).keys()] : [...new Array(24).keys()]
-    // button text
-    const choiceButtonText = ['Nope', 'Of course']
-    const choiceButtonColor = ['text-red-300', 'text-green-300']
-    const choiceButtonId = ['nope_button', 'ofcourse_button']
+    const countNotifButtons = [...new Array(+getButtonInfo).keys()]
+    const setJustifyAlign = +getButtonInfo === 2 ? 'justify-between' : 'justify-around'
 
     return (
-        <div className="flex gap-2 justify-between my-2 mx-6">
-            {countNotifButtons.map(v => {
-                const colorClass = countNotifButtons.length == 2 ? choiceButtonColor[v] : ''
-                const buttonId = countNotifButtons.length == 2 ? choiceButtonId[v] : null
-                
-                return (
-                    <button key={v} type="button" id={buttonId} className={`${colorClass} hidden px-1 active:opacity-75`}>
-                        {countNotifButtons.length === 2 ? choiceButtonText[v] : v+1}
-                    </button>
-                )
-            })}
+        <div className={`flex flex-wrap gap-2 ${setJustifyAlign} my-2 mx-6`}>
+            {countNotifButtons.map(v => 
+                <button key={v} type="button" data-id={`notif_button_${v}`} className="hidden p-1 min-w-10 active:opacity-75">
+                    {v+1}
+                </button>
+            )}
         </div>
     )
 }

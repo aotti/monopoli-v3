@@ -1,6 +1,6 @@
 import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { useMisc } from "../../../context/MiscContext";
-import { moneyFormat, qS, translateUI } from "../../../helper/helper";
+import { moneyFormat, translateUI } from "../../../helper/helper";
 import { ILoggedUsers, IPlayer } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
 import Link from "next/link";

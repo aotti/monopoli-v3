@@ -6,10 +6,9 @@ import { IChat, IMiscContext, IResponse } from "../helper/types"
 
 export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
     const miscState = useMisc()
-    const gameState = useGame()
 
-    // scroll to bottom
     useEffect(() => {
+        // scroll to bottom
         const chatContainer = qS('#chat_container')
         if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
     }, [miscState.messageItems])
@@ -17,30 +16,53 @@ export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}
     return (
         page == 'room'
             // room list
-            ? <div id="chat_container" className="h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2">
+            ? <ChatRoomList />
+            // game room
+            : <ChatGameRoom id={id} />
+    )
+}
+
+function ChatRoomList() {
+    return (
+        <div id="chat_container" className="h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2">
+            <ChatContainer />
+        </div>
+    )
+}
+
+function ChatGameRoom({ id }) {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    useEffect(() => {
+        if(gameState.gameSideButton == 'chat') {
+            // auto focus
+            const chatInput = qS('#message_text') as HTMLInputElement
+            chatInput.focus()
+        }
+    }, [gameState.gameSideButton])
+
+    return (
+        <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
+        absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
+        text-left [writing-mode:horizontal-tb] p-1 
+        bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
+            <div id="chat_container" className="overflow-y-scroll h-[calc(100%-1.5rem)] lg:h-[calc(100%-3rem)]">
                 <ChatContainer />
             </div>
-            // game room
-            : <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
-            absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
-            text-left [writing-mode:horizontal-tb] p-1 
-            bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
-                <div id="chat_container" className="overflow-y-scroll h-[calc(100%-1.5rem)] lg:h-[calc(100%-3rem)]">
-                    <ChatContainer />
-                </div>
-                {/* chat form */}
-                <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
-                onSubmit={ev => sendChat(ev, miscState, id)}>
-                    {/* input chat */}
-                    <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
-                    <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
-                    placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
-                    {/* submit chat */}
-                    <button type="submit" className="w-6 lg:w-10 active:opacity-50">
-                        <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
-                    </button>
-                </form>
-            </div>
+            {/* chat form */}
+            <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
+            onSubmit={ev => sendChat(ev, miscState, id)}>
+                {/* input chat */}
+                <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
+                <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
+                placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
+                {/* submit chat */}
+                <button type="submit" className="w-6 lg:w-10 active:opacity-50">
+                    <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
+                </button>
+            </form>
+        </div>
     )
 }
 

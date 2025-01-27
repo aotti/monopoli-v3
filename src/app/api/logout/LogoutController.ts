@@ -35,8 +35,10 @@ export default class LogoutController extends Controller {
         console.log(isPublished);
         
         if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-        // set player secret to empty
-        cookies().set('timeoutToken', '', {
+        // set timeout token id to empty
+        const getTimeoutTokenId = cookies().get('timeoutTokenId')?.value
+        await this.redisReset(`timeoutToken_${getTimeoutTokenId}`)
+        cookies().set('timeoutTokenId', '', {
             path: '/',
             maxAge: 0, // expire & remove in 0 seconds
             httpOnly: true,

@@ -82,3 +82,30 @@ fix 29 des 2024
 > > ~~saat roll dice, ubah playerTurns jadi empty~~
 > > ~~saat end turn, splice empty dan push playerTurns~~
 - ~~tambah sound step~~
+
+fix 5 jan 2025
+- ~~pake redis dari upstash~~
+- ~~update env vercel untuk redis upstash~~
+- ~~refactor functions di room & game~~
+
+fix 7 jan 2025
+- ~~query param reset=true saat login bisa membuat error~~
+- ubah logic untuk account in use
+- ~~game history hanya terhitung 1 setelah beli kota~~
+- ~~owned city (tooltip) di karakter blm dihitung~~
+- ~~update tooltip kota yg sudah terbeli~~
+- ~~turn off notif setelah turn end~~
+- ~~icon kota tidak muncul~~
+- ~~uang kurang 2x lipat karna returned data dari db + dikurang lagi saat client~~
+- ~~fix redis untuk update history game (tampung ke temp array lalu redis.set)~~
+- ~~saat bayar pajak, posisi player tidak terupdate~~
+**note: angka dadu & roll dice jangan lupa balikin semula**
+
+fix bug 11 jan 2025
+- ~~game count saat surrend lalu game over, terhitung 2x~~
+- ~~worst lost saat surrend tidak benar~~ bukan bug, tapi dianggap tidak kalah, jadi data sesuai db
+- ~~dapat uang 25k saat lewat start~~
+- ~~prompt saat surrender~~
+- ~~pulau komodo punya 2 kata, jadi ngebug saat beli~~
+- ~~ada kemungkinan data null saat turn end~~
+- ~~perkecil font size history~~

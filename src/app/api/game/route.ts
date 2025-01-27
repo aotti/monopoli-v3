@@ -40,20 +40,12 @@ export async function POST(req: NextRequest) {
     // process
     let result: IResponse = null
     switch(action) {
-        case 'game ready player': 
-            result = await gameController.readyPlayer(action, payload)
-            break
-        case 'game start': 
-            result = await gameController.startGame(action, payload)
-            break
-        case 'game roll turn': 
-            result = await gameController.decideTurn(action, payload)
-            break
-        case 'game roll dice': 
-            result = await gameController.rollDice(action, payload)
-            break
-        default: 
-            result = {status: 404, message: 'request failed', data: []}
+        case 'game ready player': result = await gameController.readyPlayer(action, payload); break
+        case 'game start': result = await gameController.startGame(action, payload); break
+        case 'game roll turn': result = await gameController.decideTurn(action, payload); break
+        case 'game roll dice': result = await gameController.rollDice(action, payload); break
+        // error
+        default: result = {status: 404, message: 'request failed', data: []}
     }
     // return data to client
     return NextResponse.json(result, {status: result.status})
@@ -78,6 +70,8 @@ export async function PUT(req: NextRequest) {
         case 'game turn end': result = await gameController.turnEnd(action, payload); break
         case 'game surrender': result = await gameController.surrender(action, payload); break
         case 'game over': result = await roomController.softDelete(action, payload); break
+        case 'game sell city': result = await gameController.sellCity(action, payload); break
+        // error
         default: result = {status: 404, message: 'request failed', data: []}
     }
     // return data to client

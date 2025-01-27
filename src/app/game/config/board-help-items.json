@@ -7,51 +7,51 @@
         ],
         "25%": [
             "Gilang the hacker hacks your bank account and loses 20.000",
-            "Fortune block card, when you pass the start, you only get 5.000",
+            "Due to the small amount of aid, you only get a fortune block card",
             "Your car is broken, pay 35.000 repair costs",
-            "Tax nerf card 35%",
+            "You pick up the tax nerf card that Gilang dropped",
             "You get 20.000 times the number on the selected coin"
         ],
         "15%": [
-            "Debt collectors come to your house, you pay 60.000 debt",
+            "You take 1 step back when being chased by debt collectors, then get caught and pay 30%",
             "Pay the hospital 50.000",
-            "The kind Gilang gives you 5.000",
-            "Select the city you want to go to",
-            "Anti tax card"
+            "Home renovation, pay 30% of the total money",
+            "Go to your own city (choice)",
+            "After being friends with Gilang for a long time, he gave you an anti tax card for fun"
         ],
         "8%": [
-            "Monthly salary has been paid, you get 160.000",
+            "Your catfish business is successful, profits increased by 50%. Then, Gilang stops by to buy catfish for 80.000",
             "Pay electricity & water bills 100.000",
             "Sell 1 owned city (random)"
         ],
-        "5%": ["City upgrade card"]
+        "5%": ["Home Renovation TV Show gives you upgrade city card"]
     },
     "chance_card": {
         ">25%": [
-            "You stumbled, take 1 step forward",
-            "You find 50.000 on the road, take the money or take 2 steps forward",
+            "You stumbled, take 2 step forward",
+            "You find 20.000 on the road, take the money or take 1 steps forward (choose)",
             "You find 30.000 in your pocket"
         ],
         "25%": [
-            "Home renovation, pay 30% of the total money",
+            "The kind Gilang gives you 5.000",
             "You chased by a monitor lizard, take 2 steps back",
             "Go forward to the start or take a general fund card",
-            "Gaming dice card, get 10.000 multiplied by the rolled dice number",
+            "You found gaming dice card under your PC desk",
             "Upgrade 1 owned city (random)"
         ],
         "15%": [
-            "Head to someone else's city",
-            "Gilang drops his ichi ocha, you have to take 3 steps back to return it",
+            "Head to someone else's city (random)",
+            "Gilang drops his ichi ocha, you have to take 1 steps back to return it",
             "Try your luck, go to free parking or go to jail",
-            "Free parking nerf card",
-            "Earthquake, 1 building collapses #sadge"
+            "Due to number of vehicles in Indonesia is >160 million, players are given nerf parking card so they dont travel often",
+            "Earthquake, 1 building collapse #sadge"
         ],
         "8%": [
             "You are caught red-handed in corruption, go to jail & fined 90% of the total money",
-            "Anti jail card",
+            "Your police neighbor gives you an anti jail card as a Christmas present",
             "You get a surprise money of 200.000"
         ],
-        "5%": ["City upgrade card"]
+        "5%": ["Home Renovation TV Show gives you upgrade city card"]
     },
     "special_card": {
         "reminder": [

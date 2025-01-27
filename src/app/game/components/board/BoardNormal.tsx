@@ -100,7 +100,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // highlight
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
     // tile info
-    const tileInfo = name.match(/special/i) ? 'special' : name.match(/cursed/i) ? 'cursed' : 'city'
+    const tileInfo = setTileInfo(name)
     // price label
     const priceText = `after:block after:content-[attr(data-price)]`
     // match city with player data
@@ -177,10 +177,12 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const translateInfo = translateUI({lang: miscState.language, text: info as any})
     // highlight
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
+    // tile info
+    const tileInfo = setTileInfo(name)
 
     return (
         <div className="relative">
-            <div className="absolute z-10" data-player-path={square}>
+            <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == square ? <Characters key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={info ? translateInfo : null} className="relative flex flex-col">
@@ -213,4 +215,17 @@ function Characters({ playerData }: {playerData: IGameContext['gamePlayerInfo'][
             <img src={playerData.character} alt={playerData.display_name} />
         </div>
     )
+}
+
+function setTileInfo(tileName: string) {
+    if(tileName.match(/special/i)) return 'special'
+    else if(tileName.match(/cursed/i)) return 'cursed'
+    else if(tileName.match(/chance/i)) return 'chance'
+    else if(tileName.match(/community/i)) return 'community'
+    else if(tileName.match(/arrested/i)) return 'prison'
+    else if(tileName.match(/parking/i)) return 'parking'
+    else if(tileName.match(/debuff/i)) return 'debuff'
+    else if(tileName.match(/buff/i)) return 'buff'
+    else if(tileName.match(/start/i)) return 'start'
+    else return 'city'
 }

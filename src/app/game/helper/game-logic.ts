@@ -1,6 +1,21 @@
-import { fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
-import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse } from "../../../helper/types"
+import { FormEvent } from "react"
+import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
+import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
+import chance_cards_list from "../config/chance-cards.json"
+import community_cards_list from "../config/community-cards.json"
 
+/*
+    TABLE OF CONTENTS
+    - GAME PREPARE
+    - GAME PLAYING
+    - GAME TILE EVENT
+        # CITY EVENT
+        # CARD EVENT
+        # SPECIAL CARD EVENT
+*/
+
+// ========== GAME PREPARE ==========
+// ========== GAME PREPARE ==========
 export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -209,6 +224,8 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
     }
 }
 
+// ========== GAME PLAYING ==========
+// ========== GAME PLAYING ==========
 export async function startGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -323,7 +340,12 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         action: 'game roll dice',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
-        rolled_dice: null
+        rolled_dice: null,
+        // Math.floor(Math.random() * 101).toString()
+        rng: [
+            Math.floor(Math.random() * 101), 
+            Math.floor(Math.random() * 101)
+        ].toString() 
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {
@@ -384,6 +406,8 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
         display_name: gameState.myPlayerInfo.display_name,
         money: '-999999'
     }
+    // surrender prompt
+    if(!confirm(`Are you sure wanna surrend?`)) return
     // loading button
     const tempButtonText = surrenderButton.textContent
     surrenderButton.textContent = 'Loading'
@@ -422,10 +446,60 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
     }
 }
 
+export function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
+    // notif
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // get room info
+    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+    // get alive players
+    const alivePlayers = []
+    for(let pd of playersData) {
+        // check players money amount
+        if(pd.money > gameState.gameRoomInfo[findRoom].money_lose) 
+            alivePlayers.push(pd.display_name)
+    }
+    // if only 1 left, game over
+    if(alivePlayers.length === 1) {
+        // remove city owned list
+        localStorage.removeItem('cityOwnedList')
+        // set game stage
+        gameState.setGameStages('over')
+        // update my player stats
+        for(let pd of playersData) {
+            if(pd.display_name == gameState.myPlayerInfo.display_name) {
+                gameState.setMyPlayerInfo(player => {
+                    const newMyPlayer = {...player}
+                    newMyPlayer.game_played += 1
+                    newMyPlayer.worst_money_lost = pd.money === -999999 ? newMyPlayer.worst_money_lost : pd.money
+                    // save to local storage
+                    localStorage.setItem('playerData', JSON.stringify(newMyPlayer))
+                    return newMyPlayer
+                })
+            }
+        }
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        // winner message
+        notifTitle.textContent = `Game Over`
+        notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
+        setTimeout(() => {
+            // set notif to null
+            gameState.setShowGameNotif(null)
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom ? gotoRoom.click() : null
+        }, 15_000)
+        // run game over
+        gameOver(miscState, gameState)
+    }
+}
+
 /**
- * @param numberTarget dice result number
+ * @param playerDice dice result number
  */
-export function playerMoving(playerTurn: string, numberTarget: number, miscState: IMiscContext, gameState: IGameContext) {
+export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameState: IGameContext) {
+    const {playerTurn, playerDice, playerRNG} = rollDiceData as {playerTurn: string, playerDice: number, playerRNG: string[]}
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -445,22 +519,22 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
         let [tileInfo, tileElement]: [string, HTMLElement] = [null, null]
         // moving params
         let numberStep = 0
-        let numberLaps = gameState.gamePlayerInfo[findPlayer].lap
+        let [numberLaps, throughStart] = [gameState.gamePlayerInfo[findPlayer].lap, false]
         const currentPos = gameState.gamePlayerInfo[findPlayer].pos
-        const nextPos = (currentPos + numberTarget) === playerPaths.length 
+        const nextPos = (currentPos + playerDice) === playerPaths.length 
                         ? playerPaths.length 
-                        : (currentPos + numberTarget) % playerPaths.length
+                        : (currentPos + playerDice) % playerPaths.length
         // move function
         const stepInterval = setInterval(() => moving(), 750);
 
         async function moving() {
             // count step
             ++numberStep
-            // step sounds
-            if(numberStep % 2 === 1 && numberStep <= numberTarget) soundFootstep1.play()
-            else if(numberStep % 2 === 0 && numberStep <= numberTarget) soundFootstep2.play()
-            // stop moving
-            if(numberStep > numberTarget) {
+            // step sounds (math.abs to prevent move backward bug)
+            if(numberStep % 2 === 1 && numberStep <= Math.abs(playerDice)) soundFootstep1.play()
+            else if(numberStep % 2 === 0 && numberStep <= Math.abs(playerDice)) soundFootstep2.play()
+            // stop moving (math.abs to prevent move backward bug)
+            if(numberStep > Math.abs(playerDice)) {
                 clearInterval(stepInterval)
                 // turn off roll dice
                 gameState.setRollNumber(null)
@@ -473,7 +547,8 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
             // moving
             playerPaths.forEach(path => {
                 // prevent tile number == 0
-                const tempStep = currentPos + numberStep
+                // check player dice to decide step forward / backward
+                const tempStep = playerDice < 0 ? currentPos - numberStep : currentPos + numberStep
                 const fixedNextStep = tempStep === playerPaths.length ? playerPaths.length : (tempStep % playerPaths.length)
                 // match paths & move
                 if(+path.dataset.playerPath === fixedNextStep) {
@@ -485,8 +560,9 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
                         return newPosInfo
                     })
                     // update laps for moving player
-                    if(tempStep === playerPaths.length) {
+                    if(fixedNextStep === 1) {
                         numberLaps += 1
+                        throughStart = true
                         gameState.setGamePlayerInfo(players => {
                             const newLapInfo = [...players]
                             newLapInfo[findPlayer].lap = numberLaps
@@ -500,12 +576,24 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
         function stopByEvent() {
             return new Promise((resolve: (value: EventDataType)=>void ) => {
                 // match tile info
-                // ### EVENT LIST COMPLETE: city, tax
-                // ### EVENT LIST NOT COMPLETE: special, curse, community card, chance card, prison, free park, buff, debuff
+                // ### EVENT LIST COMPLETE: city, tax, chance card
+                // ### EVENT LIST NOT COMPLETE: special, curse, community card, prison, free park, buff, debuff
                 switch(tileInfo) {
                     case 'city': 
                         stopByCity(findPlayer, tileElement, miscState, gameState)
                         .then(eventData => resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
+                    case 'chance': 
+                        stopByCards('chance', findPlayer, playerRNG, miscState, gameState)
+                        // only match type "move" if the card is a single effect
+                        .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
+                    case 'community': 
+                        stopByCards('community', findPlayer, playerRNG, miscState, gameState)
+                        // only match type "move" if the card is a single effect
+                        .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
                         .catch(err => console.log(err))
                         break
                     default: 
@@ -519,10 +607,13 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
             playerTurnNotif.textContent = `${playerTurn} turn ending..`
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
+            // check sub player dice
+            const subPlayerDice = localStorage.getItem('subPlayerDice')
             // get tax data
             const taxData = eventData?.event == 'pay_tax' 
                             ? {owner: eventData.owner, visitor: eventData.visitor} 
                             : null
+            const eventMoney = eventData?.money || 0
             // input values container
             const inputValues: IGamePlay['turn_end'] | {action: string} = {
                 action: 'game turn end',
@@ -531,14 +622,20 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
                 pos: nextPos.toString(),
                 lap: numberLaps.toString(),
                 // money from event that occured
-                event_money: eventData?.money.toString() || '0',
+                event_money: throughStart ? Math.round(eventMoney + 25000).toString() : Math.round(eventMoney).toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
-                history: setEventHistory(`rolled_dice: ${numberTarget}`, eventData),
+                history: setEventHistory(`rolled_dice: ${subPlayerDice || playerDice}`, eventData),
                 // nullable data: city, card, taxes
-                city: gameState.gamePlayerInfo[findPlayer].city,
+                city: (eventData as any)?.city || gameState.gamePlayerInfo[findPlayer].city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
+                card: (eventData as any)?.card || gameState.gamePlayerInfo[findPlayer].card,
+                // taking money from players
+                take_money: (eventData as any)?.takeMoney || null,
             }
+            // remove sub data
+            localStorage.removeItem('subPlayerDice')
+            localStorage.removeItem('subEventData')
             // fetch
             const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
             const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
@@ -562,6 +659,35 @@ export function playerMoving(playerTurn: string, numberTarget: number, miscState
             }
         }
     })
+}
+
+function setEventHistory(rolled_dice: string, eventData: EventDataType) {
+    // check sub event
+    const subEventData = localStorage.getItem('subEventData')
+    // history container
+    const historyArray = subEventData ? [rolled_dice, subEventData] : [rolled_dice]
+    // check event data
+    switch(eventData?.event) {
+        case 'buy_city': 
+            // check status
+            if(eventData.status) {
+                // buying city
+                historyArray.push(`${eventData.event}: ${eventData.name} (${eventData.property})`)
+            }
+            else {
+                // not buy || property max
+                historyArray.push(`${eventData.event}: none`)
+            }
+            return historyArray.join(';')
+        case 'pay_tax': 
+            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
+            return historyArray.join(';')
+        case 'get_card': 
+            historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName})`)
+            return historyArray.join(';')
+        default: 
+            return historyArray.join(';')
+    }
 }
 
 export async function gameOver(miscState: IMiscContext, gameState: IGameContext) {
@@ -611,9 +737,12 @@ export async function gameOver(miscState: IMiscContext, gameState: IGameContext)
     }
 }
 
-// ============= EVENT FUNCTIONS =============
-// ============= EVENT FUNCTIONS =============
 
+// ========== GAME TILE EVENT ==========
+// ========== GAME TILE EVENT ==========
+
+// ========== # CITY EVENT ==========
+// ========== # CITY EVENT ==========
 function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
     return new Promise((resolve: (value: EventDataType)=>void) => {
         // result message
@@ -624,14 +753,11 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
         let [eventTitle, eventContent]: [string, string] = [null, null]
         // get city info
         const getCityInfo = tileElement.dataset.cityInfo.split(',')
-        let [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = [null, null, null, null] as string[];
-        // set city info
-        if(getCityInfo.length === 4) [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
-        else if(getCityInfo.length === 3) [buyCityName, buyCityProperty, buyCityPrice] = getCityInfo
+        const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo as string[];
         // if city owner not current player
         // === paying taxes ===
         const isCityMine = buyCityOwner != gameState.gamePlayerInfo[findPlayer].display_name
-        if(isCityMine && buyCityProperty != 'land') return payingTaxes()
+        if(isCityMine && buyCityProperty != 'land') return resolve(payingTaxes())
     
         // if city property is maxed, stop
         if(buyCityProperty == 'realestate') {
@@ -642,54 +768,78 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
         }
         // show notif (must be on top the buttons to prevent undefined)
         miscState.setAnimation(true)
-        gameState.setShowGameNotif('with_button-2')
+        gameState.setShowGameNotif(`with_button-2` as any)
         // set timer
-        let buyCityTimer = 5
+        let buyCityTimer = 6
         const buyCityInterval = setInterval(() => {
             notifTimer.textContent = `${buyCityTimer}`
             buyCityTimer--
             // event buttons (2 buttons)
-            const [nopeButton, ofcourseButton] = [qS('#nope_button'), qS('#ofcourse_button')] as HTMLInputElement[]
+            const [nopeButton, ofcourseButton] = [qS('[data-id=notif_button_0]'), qS('[data-id=notif_button_1]')] as HTMLInputElement[]
             // if timer run out, auto cancel
             if(buyCityTimer < 0) {
                 clearInterval(buyCityInterval)
                 notifTimer.textContent = ''
                 nopeButton ? nopeButton.click() : null
+                return
             }
             // prevent other player from doing event
-            if(gameState.gamePlayerInfo[findPlayer].display_name == gameState.myPlayerInfo.display_name) {
+            if(ofcourseButton && gameState.gamePlayerInfo[findPlayer].display_name == gameState.myPlayerInfo.display_name) {
                 // show buttons
-                ofcourseButton?.classList.remove('hidden')
-                nopeButton?.classList.remove('hidden')
-                // choice click event
+                ofcourseButton.classList.remove('hidden')
+                // modify button 
+                ofcourseButton.textContent = 'Of course'
+                ofcourseButton.classList.add('text-green-300')
+                // click event
                 ofcourseButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
-                    // update game player info
-                    const myCity = gameState.gamePlayerInfo[findPlayer].city
-                    gameState.setGamePlayerInfo(players => {
-                        const buyCityPlayers = [...players]
-                        buyCityPlayers[findPlayer].city = updateCityList(myCity, buyCityName, buyCityProperty)
-                        return buyCityPlayers
-                    })
-                    // turn off notif
-                    miscState.setAnimation(false)
-                    gameState.setShowGameNotif(null)
                     // hide buttons
                     ofcourseButton.classList.add('hidden')
                     nopeButton.classList.add('hidden')
-                    // set event data
+                    // is money enough
+                    const isMoneyEnough = gameState.gamePlayerInfo[findPlayer].money > +buyCityPrice
+                    if(!isMoneyEnough) {
+                        notifTimer.textContent = 'smh my head, you poor'
+                        // set event data (for history)
+                        const eventData: EventDataType = {
+                            event: 'buy_city',
+                            status: false,
+                            money: 0
+                        }
+                        // return event data
+                        return resolve(eventData)
+                    }
+                    // turn off notif
+                    miscState.setAnimation(false)
+                    gameState.setShowGameNotif(null)
+                    // update game player info
+                    const myCity = gameState.gamePlayerInfo[findPlayer].city
+                    const buyingCity = updateCityList({
+                        action: 'buy', 
+                        currentCity: myCity, 
+                        cityName: buyCityName, 
+                        cityProperty: buyCityProperty
+                    })
+                    // set event data (for history)
                     const eventData: EventDataType = {
                         event: 'buy_city',
                         status: true,
                         display_name: gameState.gamePlayerInfo[findPlayer].display_name,
-                        city: buyCityName,
+                        city: buyingCity,
+                        name: buyCityName,
                         property: buyCityProperty == '2house1hotel' ? '1hotel' : buyCityProperty,
                         money: -buyCityPrice
                     }
                     // return event data
                     return resolve(eventData)
                 }
+                // show buttons
+                nopeButton.classList.remove('hidden')
+                // modify button 
+                nopeButton.textContent = 'Nope'
+                nopeButton.classList.add('text-red-300')
+                // click event
                 nopeButton.onclick = () => {
                     clearInterval(buyCityInterval)
                     notifTimer.textContent = ''
@@ -699,7 +849,7 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                     // hide buttons
                     ofcourseButton.classList.add('hidden')
                     nopeButton.classList.add('hidden')
-                    // set event data
+                    // set event data (for history)
                     const eventData: EventDataType = {
                         event: 'buy_city',
                         status: false,
@@ -738,7 +888,7 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
             notifMessage.textContent = eventContent
                                     .replace('xxx', gameState.gamePlayerInfo[findPlayer].display_name) // player name
                                     .replace('xxx', moneyFormat(+buyCityPrice)) // city price
-            // set event data
+            // set event data (for history)
             const eventData: EventDataType = {
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
@@ -746,52 +896,815 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                 money: -buyCityPrice
             }
             // return event history
-            return resolve(eventData)
+            return eventData
         }
     })
 }
 
-// ============= MISC FUNCTIONS =============
-// ============= MISC FUNCTIONS =============
-
-function updateCityList(currentCity: string, buyCityName: string, buyCityProperty: string) {
-    // check if player own the city
-    const isCityOwned = currentCity?.match(buyCityName)
-    // city owned
-    if(isCityOwned) {
-        // find city
-        const splitCurrentCity = currentCity.split(';')
-        const findCity = splitCurrentCity.map(v => v.match(buyCityName)).flat().indexOf(buyCityName)
-        // update property
-        splitCurrentCity[findCity] += `,${buyCityProperty}`
-        return splitCurrentCity.join(';')
+export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const sellButton = (ev.nativeEvent as any).submitter as HTMLInputElement
+    // input value container
+    const inputValues = {
+        action: 'game sell city',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        city_left: null,
+        sell_city_name: null,
+        sell_city_price: null
     }
-    // city not owned
-    else {
-        const addNewCity = currentCity ? `${currentCity};${buyCityName}*${buyCityProperty}` : `${buyCityName}*${buyCityProperty}`
-        return addNewCity
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName == 'INPUT') {
+            // filter inputs
+            if(setInputValue('sell_city_name', input)) {
+                inputValues.sell_city_name = input.value.trim()
+                // update player city
+                inputValues.city_left = updateCityList({
+                    action: 'sell', 
+                    currentCity: currentCity, 
+                    cityName: inputValues.sell_city_name
+                })
+            }
+            else if(setInputValue('sell_city_price', input)) inputValues.sell_city_price = input.value.trim().toLowerCase()
+            // error
+            else {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                // error message
+                notifTitle.textContent = 'error 400'
+                notifMessage.textContent = `${input.id} doesnt match`
+                return
+            }
+        }
+    }
+    // loading button
+    const tempButtonText = sellButton.textContent
+    sellButton.textContent = 'Loading'
+    sellButton.disabled = true
+    // fetch
+    const sellCityFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
+    const sellCityResponse: IResponse = await (await fetcher('/game', sellCityFetchOptions)).json()
+    // response
+    switch(sellCityResponse.status) {
+        case 200: 
+            // save access token
+            if(sellCityResponse.data[0].token) {
+                localStorage.setItem('accessToken', sellCityResponse.data[0].token)
+                delete sellCityResponse.data[0].token
+            }
+            // submit button normal
+            sellButton.textContent = tempButtonText
+            sellButton.removeAttribute('disabled')
+            return
+        default: 
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${sellCityResponse.status}`
+            notifMessage.textContent = `${sellCityResponse.message}`
+            // submit button normal
+            sellButton.textContent = tempButtonText
+            sellButton.removeAttribute('disabled')
+            return
     }
 }
 
-function setEventHistory(rolled_dice: string, eventData: EventDataType) {
-    const historyArray = [rolled_dice]
-    // check event data
-    switch(eventData?.event) {
-        case 'buy_city': 
-            // check status
-            if(eventData.status) {
-                // buying city
-                historyArray.push(`${eventData.event}: ${eventData.city} (${eventData.property})`)
+function updateCityList(data: UpdateCityListType) {
+    // buy city
+    if(data.action == 'buy') {
+        const {currentCity, cityName, cityProperty} = data
+        // check if player own the city
+        const isCityOwned = currentCity?.match(cityName)
+        // city owned
+        if(isCityOwned) {
+            // find city
+            const splitCurrentCity = currentCity.split(';')
+            const findCity = splitCurrentCity.map(v => v.match(cityName)).flat().indexOf(cityName)
+            // update property
+            splitCurrentCity[findCity] += `,${cityProperty}`
+            return splitCurrentCity.join(';')
+        }
+        // city not owned
+        else {
+            const addNewCity = currentCity ? `${currentCity};${cityName}*${cityProperty}` : `${cityName}*${cityProperty}`
+            return addNewCity
+        }
+    }
+    // sell city
+    else if(data.action == 'sell') {
+        const {currentCity, cityName} = data
+        // city left container
+        const cityLeft: string[] = []
+        // check if player own the city
+        const isCityOwned = currentCity?.match(cityName)
+        if(isCityOwned) {
+            const splitCurrentCity = currentCity.split(';')
+            for(let scc of splitCurrentCity) {
+                // remove city from list
+                if(!scc.match(cityName)) cityLeft.push(scc)
+            }
+            return cityLeft.length === 0 ? '' : cityLeft.join(';')
+        }
+        else {
+            return null
+        }
+    }
+    // destroy
+    else if(data.action == 'destroy') {
+        const {currentCity, rng} = data
+        // find city with building, then destroy
+        const splitCurrentCity = currentCity?.split(';')
+        if(splitCurrentCity) {
+            // check property
+            const isPropertyExist = splitCurrentCity.map(v => v.match(/2house1hotel$|2house$|1house$/) ? v : null).filter(i => i)
+            if(isPropertyExist.length > 0) {
+                const destroyRNG = rng % isPropertyExist.length
+                // destroy property
+                const destroyedProperty = isPropertyExist[destroyRNG].match(/2house1hotel$|2house$|1house$/)[0]
+                // set property left
+                const [cityName, cityProperties] = isPropertyExist[destroyRNG].split('*')
+                const propertyLeft = cityProperties.split(',').filter(v => v != destroyedProperty).join(',')
+                // merge destroyed city
+                return [...splitCurrentCity.filter(v => !v.match(cityName)), `${cityName}*${propertyLeft}`].join(';')
+            }
+        }
+        // if theres no city / houses, return current city
+        return null
+    }
+}
+
+// ========== # CARD EVENT ==========
+// ========== # CARD EVENT ==========
+function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // result message
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        const notifImage = qS('#card_image') as HTMLImageElement
+        // cards data
+        const cardsList = card == 'chance' ? chance_cards_list.cards : community_cards_list.cards
+        // loop cards
+        for(let cards of cardsList) {
+            const [minRange, maxRange] = cards.chance
+            // match rng
+            if(+rng[0] >= minRange && +rng[0] <= maxRange) {
+                console.log(cards);
+                const cardRNG = +rng[0] % cards.data.length
+                // notif content
+                // ### BELUM ADA CARD BORDER RANK
+                notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
+                notifImage.src = cards.data[cardRNG].img
+                // run card effect
+                const cardData = {
+                    tileName: card,
+                    rank: cards.category,
+                    effectData: cards.data[cardRNG].effect
+                }
+                return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
+            }
+        }
+    })
+}
+
+function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+    // notif timer
+    const notifTimer = qS('#result_notif_timer')
+    // ### rank will be used for rarity border
+    const {tileName, rank, effectData} = cardData
+    const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // check card separator
+        const isMultipleEffects = effectData.split('&')
+        const isOptionalEffects = effectData.split('|')
+        // card has multiple effects
+        if(isMultipleEffects.length === 2) {
+            // combine container
+            const eventDataCombined: EventDataType = {
+                event: 'get_card',
+                type: '',
+                tileName: tileName,
+                money: 0
+            }
+            // run the effect
+            for(let i in isMultipleEffects) {
+                const [type, effect] = isMultipleEffects[i].split('_')
+                const eventData = await executeEffect(type, effect, null, 'AND')
+                // set event data
+                eventDataCombined.money += eventData.money
+                eventDataCombined.type += i == '0' ? type : `,${type}`
+            }
+            resolve(eventDataCombined)
+        }
+        // card has optional effect
+        else if(isOptionalEffects.length === 2) {
+            // show notif with button
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif(`card_with_button-2` as any)
+            // get effect prefix
+            const getPrefix = effectData.split('-')
+            // player choose the optional effect
+            if(getPrefix[0] == 'button') {
+                // get optional effect
+                const getOptionalEffect = getPrefix[1].split('|')
+                const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+                const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+                // run effect
+                const eventData = await executeOptionalCard(6, optionalTypes, optionalEffects)
+                resolve(eventData)
+            }
+            // system choose the optional effect
+            else if(getPrefix[0] == 'random') {
+                // get optional effect
+                const getOptionalEffect = getPrefix[1].split('|')
+                const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+                const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+                // run effect
+                const eventData = await executeOptionalCard(2, optionalTypes, optionalEffects)
+                resolve(eventData)
+            }
+        }
+        // only 1 effect
+        else {
+            // check if the event is random (choices but system pick)
+            const getPrefix = effectData.split('-')
+            if(getPrefix[0] == 'random' || getPrefix[0] == 'button') {
+                // get type & effect
+                const [type, effect] = getPrefix[1].split('_')
+                const eventData = await executeEffect(type, effect, getPrefix[0])
+                resolve(eventData)
             }
             else {
-                // not buy || property max
-                historyArray.push(`${eventData.event}: none`)
+                const [type, effect] = effectData.split('_')
+                const eventData = await executeEffect(type, effect)
+                resolve(eventData)
             }
-            return historyArray.join(';')
-        case 'pay_tax': 
-            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
-            return historyArray.join(';')
-        default: 
-            return historyArray.join(';')
+        }
+    })
+
+    /**
+     * @param prefix could be 'button'|'random'
+     * @returns 
+     */
+    function executeEffect(type: string, effect: string, prefix?: string, separator?: 'OR'|'AND') {
+        return new Promise((resolve: (value: EventDataType)=>void) => {
+            // ### effect list
+            // ### get money, more money, lose money, move forward, move backward, move place, 
+            // ### special card, destroy, take card, upgrade, sell city
+            if(type == 'get money') {
+                // get money choice
+                if(prefix == 'button') {
+                    // show notif
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif('card_with_button-3' as any)
+                    // card interval
+                    let getMoneyTimer = 6
+                    const getMoneyInterval = setInterval(() => {
+                        notifTimer.textContent = `${getMoneyTimer}`
+                        getMoneyTimer--
+                        // buttons
+                        const coinButtons = [
+                            qS(`[data-id=notif_button_0]`),
+                            qS(`[data-id=notif_button_1]`),
+                            qS(`[data-id=notif_button_2]`)
+                        ] as HTMLInputElement[]
+                        // choose random
+                        if(getMoneyTimer < 0) {
+                            clearInterval(getMoneyInterval)
+                            notifTimer.textContent = ``
+                            // hide all buttons
+                            for(let coin of coinButtons) coin.classList.add('hidden')
+                            // return event data
+                            return resolve({
+                                event: 'get_card',
+                                type: type,
+                                tileName: tileName,
+                                money: +effect * +coinButtons[0].dataset.prize
+                            })
+                        }
+                        if(coinButtons[0] && playerTurnData.display_name == gameState.gamePlayerInfo[findPlayer].display_name) {
+                            for(let i=0; i<coinButtons.length; i++) {
+                                // show button
+                                coinButtons[i].classList.remove('hidden')
+                                // modify button
+                                coinButtons[i].textContent = '???'
+                                coinButtons[i].dataset.prize = `${i}`
+                                coinButtons[i].classList.add('!w-20', 'h-20', 'border', 'rounded-full')
+                                // click event
+                                coinButtons[i].onclick = () => {
+                                    clearInterval(getMoneyInterval)
+                                    notifTimer.textContent = ``
+                                    // hide all buttons
+                                    for(let coin of coinButtons) coin.classList.add('hidden')
+                                    // return event data
+                                    return resolve({
+                                        event: 'get_card',
+                                        type: type,
+                                        tileName: tileName,
+                                        money: +effect * +coinButtons[i].dataset.prize
+                                    })
+                                }
+                            }
+                        }
+                    }, 1000);
+                }
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // check for more money
+                const getMoreMoney = localStorage.getItem('moreMoney')
+                // get money + more money
+                if(getMoreMoney) {
+                    const moreMoney = (playerTurnData.money + +effect) * +getMoreMoney
+                    return resolve({
+                        event: 'get_card',
+                        type: type,
+                        tileName: tileName,
+                        money: playerTurnData.money + moreMoney
+                    })
+                }
+                // normal get money
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: +effect
+                })
+            }
+            else if(type == 'more money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // set more money to local storage
+                const isPercent = effect.match('%') ? +effect / 100 : +effect
+                localStorage.setItem('moreMoney', `${isPercent}`)
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: 0
+                })
+            }
+            else if(type == 'lose money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // check percent
+                const isEffectPercent = effect.match('%')
+                resolve(isEffectPercent
+                    ? {
+                        event: 'get_card',
+                        type: type,
+                        tileName: tileName,
+                        money: -(playerTurnData.money * +effect.split('%')[0] / 100)
+                    } 
+                    : {
+                        event: 'get_card',
+                        type: type,
+                        tileName: tileName,
+                        money: -effect.split('%')[0]
+                    }
+                ) 
+            }
+            else if(type == 'take money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // get all players except current player
+                const otherPlayerNames = gameState.gamePlayerInfo.map(v => v.display_name).join(',')
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: +effect,
+                    takeMoney: `${+effect};${otherPlayerNames}`
+                })
+            }
+            else if(type == 'move forward' || type == 'move backward') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // set additional event data for history (only for moving cards, upgrade, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                // set dice number
+                const diceNumber = type == 'move forward' ? +effect : -effect
+                const rollDiceData = {
+                    playerTurn: playerTurnData.display_name,
+                    playerDice: diceNumber,
+                    playerRNG: rng
+                }
+                // move player
+                playerMoving(rollDiceData, miscState, gameState)
+                // return event data
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: 0
+                })
+            }
+            else if(type == 'move place') {
+                // set additional event data for history (only for moving cards, upgrade, take card)
+                if(separator != 'AND' && playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                // get tile data (tile number)
+                const getTileList = getMovePlaceTiles(effect, separator)
+                // if tile data empty, just resolve
+                if(getTileList.length === 0) {
+                    return setTimeout(() => {
+                        notifTimer.textContent = 'nowhere to go'
+                        resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: 0
+                        })
+                    }, 1000);
+                }
+                // set timer
+                let movePlaceTimer = prefix == 'button' 
+                                    ? separator == 'OR' 
+                                        ? 1 // optional effect \w button (instant)
+                                        : 6 // 1 effect \w button prefix
+                                    : 2 // random prefix
+                let chosenButton: HTMLElement = null
+                const movePlaceInterval = setInterval(() => {
+                    // no need timer for multiple effect card
+                    notifTimer.textContent = !separator ? `${movePlaceTimer}` : ''
+                    movePlaceTimer--
+                    // if timer run out, auto cancel
+                    if(movePlaceTimer < 0) {
+                        clearInterval(movePlaceInterval)
+                        notifTimer.textContent = ''
+                        // set choosen button
+                        if(!separator) chosenButton.classList.add('bg-green-600')
+                        // set player dice
+                        const chosenSquare = +chosenButton.dataset.destination
+                        const setChosenDice = playerTurnData.pos > chosenSquare 
+                                            ? (24 + chosenSquare) - playerTurnData.pos
+                                            : chosenSquare - playerTurnData.pos
+                        const rollDiceData = {
+                            playerTurn: playerTurnData.display_name,
+                            playerDice: setChosenDice,
+                            playerRNG: rng
+                        }
+                        // move to chosen place
+                        playerMoving(rollDiceData, miscState, gameState)
+                        // return event data
+                        resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: 0
+                        })
+                    }
+                    // check if button created
+                    const checkNotifButton = qS('[data-id=notif_button_0]')
+                    if(checkNotifButton) {
+                        // buttons created, then modify buttons
+                        const notifButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
+                        // set chosen button
+                        const chosenIndex = +rng[0] % notifButtons.length
+                        // separator null means only card \w single effect can modify the button
+                        // destination random / choice
+                        if(!separator) {
+                            for(let i=0; i<notifButtons.length; i++) {
+                                const button = notifButtons[i]
+                                button.classList.remove('hidden')
+                                button.classList.add('border')
+                                button.textContent = getTileList[i]
+                                button.dataset.destination = getTileList[i]
+                                // set event click for prefix button + single effect
+                                if(prefix == 'button') {
+                                    button.onclick = () => {
+                                        clearInterval(movePlaceInterval)
+                                        notifTimer.textContent = ''
+                                        // set player dice
+                                        const chosenSquare = +button.dataset.destination
+                                        const setChosenDice = playerTurnData.pos > chosenSquare 
+                                                            ? (24 + chosenSquare) - playerTurnData.pos
+                                                            : chosenSquare - playerTurnData.pos
+                                        const rollDiceData = {
+                                            playerTurn: playerTurnData.display_name,
+                                            playerDice: setChosenDice,
+                                            playerRNG: rng
+                                        }
+                                        // move to chosen place
+                                        playerMoving(rollDiceData, miscState, gameState)
+                                        // return event data
+                                        resolve({
+                                            event: 'get_card',
+                                            type: type,
+                                            tileName: tileName,
+                                            money: 0
+                                        })
+                                    }
+                                    break
+                                }
+                            }
+                            chosenButton = notifButtons[chosenIndex]
+                        }
+                        // destination already set, so it only has 1 array element
+                        else {
+                            notifButtons[chosenIndex].dataset.destination = getTileList[0]
+                            chosenButton = notifButtons[chosenIndex]
+                        }
+                    }
+                }, 1000)
+            }
+            else if(type == 'upgrade city') {
+                // set additional event data for history (only for moving cards, upgrade, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                notifTimer.textContent = 'getting city data..'
+                // get player city list
+                setTimeout(async () => {
+                    const playerCityList = playerTurnData.city?.split(';')
+                    if(playerCityList) {
+                        notifTimer.textContent = ''
+                        // filter fully upgrade city
+                        const filteredCityList = playerCityList.filter(v => !v.match(/2house1hotel/))
+                        // set upgrade params
+                        const upgradeRNG = +rng[0] % filteredCityList.length
+                        const upgradeCityName = filteredCityList[upgradeRNG].split('*')[0]
+                        const upgradeCityElement = qS(`[data-city-info^='${upgradeCityName}']`) as HTMLElement
+                        // upgrade city
+                        const [error, eventData] = await catchError(stopByCity(findPlayer, upgradeCityElement, miscState, gameState))
+                        if(error) console.log(error)
+                        return resolve(eventData)
+                    }
+                    // show notif have no city
+                    notifTimer.textContent = 'smh my head, homeless'
+                    resolve({
+                        event: 'get_card',
+                        type: type,
+                        tileName: tileName,
+                        money: 0,
+                        city: null
+                    })
+                }, 2000)
+            }
+            else if(type == 'sell city') {
+                // set additional event data for history (only for moving cards, upgrade/sell city, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                // notif message
+                notifTimer.textContent = 'getting city data..'
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // get owned city
+                const getOwnedCity = playerTurnData.city ? playerTurnData.city.split(';') : null
+                if(!getOwnedCity) {
+                    setTimeout(() => {
+                        // notif message
+                        notifTimer.textContent = 'can you buy a city pls?'
+                        return resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: 0
+                        })
+                    }, 2000);
+                }
+                // sell city interval
+                let sellCityTimer = 2
+                let chosenSellCity = null
+                const sellCityInterval = setInterval(() => {
+                    notifTimer.textContent = `${sellCityTimer}`
+                    sellCityTimer--
+                    if(sellCityTimer < 0) {
+                        clearInterval(sellCityInterval)
+                        notifTimer.textContent = `${chosenSellCity} city sold`
+                        // selling city
+                        const cityLeft = updateCityList({
+                            action: 'sell', 
+                            currentCity: playerTurnData.city,
+                            cityName: chosenSellCity
+                        })
+                        const getCityInfo = (qS(`[data-city-info^=${chosenSellCity}]`) as HTMLElement).dataset.cityInfo.split(',')
+                        const [cityName, cityProperty, cityPrice, cityOwner] = getCityInfo
+                        // return event data
+                        resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: +cityPrice,
+                            city: cityLeft
+                        })
+                    }
+                    // sell city rng
+                    const sellCityRNG = +rng[0] % getOwnedCity.length
+                    chosenSellCity = getOwnedCity[sellCityRNG].split('*')[0]
+                }, 1000);
+            }
+            else if(type == 'destroy property') {
+                // destroy city property
+                const isDestroyed = updateCityList({
+                    action: 'destroy', 
+                    currentCity: playerTurnData.city,
+                    rng: +rng[1]
+                })
+                // get destroyed city
+                const getDestroyedCity = isDestroyed ? isDestroyed.split(';') : null
+                const destroyedCity = getDestroyedCity ? getDestroyedCity[getDestroyedCity.length-1].split('*')[0] : null
+                // use notif timer as addition message
+                notifTimer.textContent = destroyedCity ? `"${destroyedCity} city collapse"` : '"go get a house, homeless"'
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // return event data
+                resolve({
+                    event: 'get_card',
+                    tileName: tileName,
+                    type: type,
+                    money: 0,
+                    city: isDestroyed || null
+                })
+            }
+            else if(type == 'take card') {
+                // set additional event data for history (only for moving cards, upgrade, take card)
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                notifTimer.textContent = `getting ${effect} card..`
+                // run card
+                setTimeout(async () => {
+                    notifTimer.textContent = ''
+                    const [error, eventData] = await catchError(stopByCards(effect as any, findPlayer, [rng[1], rng[1]], miscState, gameState))
+                    if(error) console.log(error)
+                    return resolve(eventData)
+                }, 2000);
+            }
+            else if(type == 'special card') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('card')
+                // add special card
+                const isSpecialCardAdded = updateSpecialCardList({
+                    action: 'add',
+                    currentSpecialCard: playerTurnData.card || '',
+                    specialCard: effect
+                })
+                resolve({
+                    event: 'get_card',
+                    type: type,
+                    tileName: tileName,
+                    money: 0,
+                    card: isSpecialCardAdded || null
+                })
+            }
+        })
+    }
+
+    /**
+     * @param timer prefix random = 2 | button = 6
+     * @param types card types
+     * @param effects card effects
+     * @returns 
+     */
+    function executeOptionalCard(timer: number, types: string[], effects: string[]) {
+        return new Promise((resolve: (value: EventDataType)=>void) => {
+            const [leftType, rightType] = types
+            const [leftEffect, rightEffect] = effects
+            // event interval
+            let optionalButtonTimer = timer
+            const optionalButtonInterval = setInterval(async () => {
+                notifTimer.textContent = `${optionalButtonTimer}`
+                optionalButtonTimer--
+                // optional buttons
+                const [leftButton, rightButton] = [qS(`[data-id=notif_button_0]`), qS(`[data-id=notif_button_1]`)] as HTMLInputElement[]
+                // auto click on timer off
+                if(optionalButtonTimer < 0) {
+                    clearInterval(optionalButtonInterval)
+                    notifTimer.textContent = ''
+                    // disable button
+                    leftButton.disabled = true
+                    rightButton.disabled = true
+                    // run event, check prefix (random = 2 | button = 6)
+                    if(timer == 2) {
+                        // rng % 2 buttons
+                        const optionalButtons = [
+                            {button: leftButton, type: leftType, effect: leftEffect},
+                            {button: rightButton, type: rightType, effect: rightEffect},
+                        ]
+                        const optionalRNG = +rng[0] % optionalButtons.length
+                        // modify button
+                        optionalButtons[optionalRNG].button.classList.add('text-green-300')
+                        // run effect
+                        return resolve(await executeEffect(
+                            optionalButtons[optionalRNG].type, 
+                            optionalButtons[optionalRNG].effect, 
+                            'button', 'OR'
+                        ))
+                    }
+                    // modify button
+                    leftButton.classList.add('text-green-300')
+                    // run effect
+                    return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
+                }
+                if(rightButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+                    // show buttons
+                    leftButton.classList.remove('hidden')
+                    // modify button 
+                    timer == 2 ? leftButton.disabled = true : null
+                    leftButton.textContent = leftEffect.match(/\d{4}/) ? moneyFormat(+leftEffect) : leftEffect
+                    // click event
+                    leftButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
+                    }
+                    // show buttons
+                    rightButton.classList.remove('hidden')
+                    // modify button 
+                    timer == 2 ? rightButton.disabled = true : null
+                    rightButton.textContent = rightEffect.match(/\d{4}/) ? moneyFormat(+rightEffect) : rightEffect
+                    // click event
+                    rightButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(rightType, rightEffect, 'button', 'OR'))
+                    }
+                }
+            }, 1000)
+        })
+    }
+
+    /**
+     * @param prefix could be 'button'|'random'
+     */
+    function getMovePlaceTiles(destination: string, separator: 'OR'|'AND') {
+        // get city tiles
+        if(destination == 'other city' || destination == 'my city') {
+            const boughtCityList = qSA('[data-city-info]') as NodeListOf<HTMLElement>
+            const filteredBoughtCityList = []
+            // loop city list
+            for(let city of boughtCityList) {
+                const [cityName, cityProperty, cityPrice, cityOwner] = city.dataset.cityInfo.split(',')
+                // ### cityOwner != null
+                if(destination == 'other city' && cityOwner && cityOwner != playerTurnData.display_name)
+                    filteredBoughtCityList.push(city.dataset.playerPath)
+                else if(destination == 'my city' && cityOwner && cityOwner == playerTurnData.display_name)
+                    filteredBoughtCityList.push(city.dataset.playerPath)
+            }
+            // show notif with buttons
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif(`card_with_button-${filteredBoughtCityList.length}` as any)
+            // return data
+            return filteredBoughtCityList
+        }
+        // get misc tiles
+        else {
+            const destinedCity = qS(`[data-tile-info=${destination}]`) as HTMLElement
+            const destinedCitySquare = [destinedCity.dataset.playerPath]
+            // show notif with buttons
+            if(separator != 'OR') {
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif(`card_with_button-${destinedCitySquare.length}` as any)
+            }
+            // return data
+            return destinedCitySquare
+        }
+    }
+}
+
+// ========== # SPECIAL CARD EVENT ==========
+// ========== # SPECIAL CARD EVENT ==========
+function updateSpecialCardList(data: UpdateSpecialCardListType) {
+    if(data.action == 'add') {
+        const {currentSpecialCard, specialCard} = data
+        // check if card exist
+        const isSpecialCardOwned = currentSpecialCard.match(specialCard)
+        // dont have yet, then add
+        if(!isSpecialCardOwned) {
+            const splitCurrentSpecialCard = currentSpecialCard.split(';')
+            splitCurrentSpecialCard.push(specialCard)
+            return splitCurrentSpecialCard.filter(i => i).join(';')
+        }
+        return currentSpecialCard
     }
 }
