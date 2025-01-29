@@ -179,13 +179,24 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
     // tile info
     const tileInfo = setTileInfo(name)
+    // prison info
+    const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+    const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
+    const findPlayer = gameState.gamePlayerInfo?.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    const prisonNumber = gameState.gamePlayerInfo[findPlayer]?.prison
+    const isPrisonNumber = typeof prisonNumber == 'number'
+                        ? prisonNumber : '?'
+    // modify info
+    const newInfo = name.match(/arrested/i)
+                    ? translateInfo.replace('xxx', `${isPrisonNumber}`).replace('xxx', `${prisonAccumulateLimit}`)
+                    : translateInfo
 
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == square ? <Characters key={i} playerData={player}/> : null)}
             </div>
-            <div data-tooltip={info ? translateInfo : null} className="relative flex flex-col">
+            <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
                 <img src={img} alt={name} className={`w-[7.5vw] h-[23vh]`} loading="lazy" draggable={false} />
                 {/* tile label */}

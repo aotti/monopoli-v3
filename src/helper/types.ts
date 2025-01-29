@@ -118,7 +118,7 @@ interface IGamePlayerInfo {
     money: number,
     card: string,
     city: string,
-    prison: boolean,
+    prison: number,
 }
 
 interface IGameHistory {
@@ -281,7 +281,7 @@ type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mo
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'|'rng'
-type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'
+type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
@@ -384,6 +384,12 @@ export interface IShiftRoom {
 }
 
 // game
+export interface IRollDiceData {
+    playerTurn: string, 
+    playerDice: number, 
+    playerRNG: string[]
+}
+
 export interface IGamePlay {
     get_players: {
         token?: string,
@@ -477,7 +483,12 @@ interface IEventCards {
     card?: string,
     takeMoney?: string,
 }
-export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards
+
+interface IEventPrison {
+    event: 'get_arrested',
+    money: number,
+}
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison
 
 interface IBuyCity {
     action: 'buy',
