@@ -46,7 +46,7 @@ export type GameRoomListener = {
     gameStage: IGameContext['gameStages'],
     playerTurn: string,
     playerDice: number,
-    playerRNG: number,
+    playerRNG: string[],
     gameHistory: IGameHistory[],
     playerTurns: string[],
     surrendPlayer: string,
