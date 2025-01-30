@@ -140,13 +140,21 @@ const startAnimation = (number: number[], miscState: IMiscContext, gameState: IG
     const totalHeight = number.length * totalDuplicates * defaultSize;
     
     // Animate each one of the slots
+    const soundRollNumber = qS('#sound_roll_number') as HTMLAudioElement
+    soundRollNumber.volume = .25
+    soundRollNumber.play()
     const items = document.getElementsByClassName('slot-machine__prizes');
     Array.prototype.forEach.call(items, (slot, s) => {
         slot.animate([
             { transform: "translateY(0)" }, // from
             { transform: `translateY(-${totalHeight}px)` } // to
         ], {
-            duration: 1000 + (s * 500),
+            // roll dice = 1.5 sec | roll turn = 2 sec
+            duration: gameState.rollNumber == 'dice' 
+                    ? items.length === 1
+                        ? 2000 // single dice
+                        : 1000 + (++s * 500) // double dice
+                    : 1000 + (s * 500),
             fill: "forwards",
             easing: 'ease-in-out'
         });

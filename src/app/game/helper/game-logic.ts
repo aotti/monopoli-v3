@@ -11,6 +11,7 @@ import community_cards_list from "../config/community-cards.json"
     - GAME TILE EVENT
         # CITY EVENT
         # CARD EVENT
+        # PRISON EVENT
         # SPECIAL CARD EVENT
 */
 
@@ -1286,7 +1287,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                             money: playerTurnData.money + moreMoney
                         })
                     }
-                    // normal get money
+                    // return event data
                     resolve({
                         event: 'get_card',
                         type: type,
