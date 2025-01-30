@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useGame } from "../../../../context/GameContext";
 import { IGameContext, IMiscContext } from "../../../../helper/types";
-import { qS, qSA, translateUI } from "../../../../helper/helper";
+import { qS, qSA, shuffle, translateUI } from "../../../../helper/helper";
 import { useMisc } from "../../../../context/MiscContext";
 
 export default function RollNumber({ roomId }: {roomId: number}) {
@@ -82,20 +82,6 @@ function RollTurn() {
     )
 }
 
-function shuffle(array: any[]) {
-    let currentIndex = array.length,  
-        randomIndex;
-  
-    while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-  
-        [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex], array[currentIndex]];
-    }
-    return array;
-}
-
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -128,7 +114,7 @@ const buildItemLists = (number: number[]) => {
         })
     
         // Get a random item from the prizes array
-        const resultItem = getRandomInt(0, number.length-1);
+        const resultItem = getRandomInt(2, 2);
         // Adds the result to the last row
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')
@@ -154,13 +140,21 @@ const startAnimation = (number: number[], miscState: IMiscContext, gameState: IG
     const totalHeight = number.length * totalDuplicates * defaultSize;
     
     // Animate each one of the slots
+    const soundRollNumber = qS('#sound_roll_number') as HTMLAudioElement
+    soundRollNumber.volume = .25
+    soundRollNumber.play()
     const items = document.getElementsByClassName('slot-machine__prizes');
     Array.prototype.forEach.call(items, (slot, s) => {
         slot.animate([
             { transform: "translateY(0)" }, // from
             { transform: `translateY(-${totalHeight}px)` } // to
         ], {
-            duration: 1000 + (s * 500),
+            // roll dice = 1.5 sec | roll turn = 2 sec
+            duration: gameState.rollNumber == 'dice' 
+                    ? items.length === 1
+                        ? 2000 // single dice
+                        : 1000 + (++s * 500) // double dice
+                    : 1000 + (s * 500),
             fill: "forwards",
             easing: 'ease-in-out'
         });

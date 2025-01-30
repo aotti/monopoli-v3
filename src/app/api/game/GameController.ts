@@ -371,6 +371,7 @@ export default class GameController extends Controller {
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
                 tmp_card: payload.card,
                 tmp_take_money: payload.take_money,
+                tmp_prison: payload.prison,
             }
         }
         // run query

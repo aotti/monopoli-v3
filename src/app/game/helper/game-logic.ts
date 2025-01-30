@@ -1,6 +1,6 @@
 import { FormEvent } from "react"
-import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
-import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
+import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, shuffle, translateUI } from "../../../helper/helper"
+import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
 import chance_cards_list from "../config/chance-cards.json"
 import community_cards_list from "../config/community-cards.json"
 
@@ -11,6 +11,7 @@ import community_cards_list from "../config/community-cards.json"
     - GAME TILE EVENT
         # CITY EVENT
         # CARD EVENT
+        # PRISON EVENT
         # SPECIAL CARD EVENT
 */
 
@@ -343,7 +344,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            40, 
             Math.floor(Math.random() * 101)
         ].toString() 
     }
@@ -498,8 +499,8 @@ export function checkAlivePlayers(playersData: IGameContext['gamePlayerInfo'], m
 /**
  * @param playerDice dice result number
  */
-export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameState: IGameContext) {
-    const {playerTurn, playerDice, playerRNG} = rollDiceData as {playerTurn: string, playerDice: number, playerRNG: string[]}
+export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContext, gameState: IGameContext) {
+    const {playerTurn, playerDice, playerRNG} = rollDiceData
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -513,6 +514,8 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
     // match player name
     playerNames.forEach(player => {
         if(player.dataset.playerName != playerTurn) return
+        // find current room info
+        const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
         // find current player
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(playerTurn)
         // get tile element for stop by event
@@ -525,7 +528,19 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                         ? playerPaths.length 
                         : (currentPos + playerDice) % playerPaths.length
         // move function
-        const stepInterval = setInterval(() => moving(), 750);
+        const stepInterval = setInterval(() => {
+            // check if player is arrested / get debuff (skip turn)
+            const prisonNumber = gameState.gamePlayerInfo[findPlayer].prison
+            if(prisonNumber !== -1) {
+                clearInterval(stepInterval)
+                // turn off roll dice
+                gameState.setRollNumber(null)
+                // end turn
+                return turnEnd(null)
+            }
+            // player can move
+            moving()
+        }, 500);
 
         async function moving() {
             // count step
@@ -596,6 +611,11 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                         .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
                         .catch(err => console.log(err))
                         break
+                    case 'prison': 
+                        stopByPrison(findPlayer, miscState, gameState)
+                        .then(eventData => resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
                     default: 
                         resolve(null)
                         break
@@ -614,12 +634,27 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                             ? {owner: eventData.owner, visitor: eventData.visitor} 
                             : null
             const eventMoney = eventData?.money || 0
+            // get prison accumulate number
+            const prisonNumber = gameState.gamePlayerInfo[findPlayer].prison
+            // check if player is just step on prison / already arrested
+            const isFirstArrested = eventData?.event == 'get_arrested'
+            const isArrested = prisonNumber < 0 ? null : prisonNumber
+            // accumulate dice number
+            const prisonAccumulate = isFirstArrested ? 0 : 
+                                    typeof isArrested == 'number' && isArrested > -1 
+                                        ? (isArrested + playerDice) 
+                                        : -1
+            // check if accumulate dice is enough
+            // 1 dice = 6, 2 dice = 12
+            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
+            const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // input values container
             const inputValues: IGamePlay['turn_end'] | {action: string} = {
                 action: 'game turn end',
                 channel: `monopoli-gameroom-${gameState.gameRoomId}`,
                 display_name: gameState.gamePlayerInfo[findPlayer].display_name,
-                pos: nextPos.toString(),
+                // arrested (-1) = stay current pos
+                pos: prisonNumber === -1 ? nextPos.toString() : currentPos.toString(),
                 lap: numberLaps.toString(),
                 // money from event that occured
                 event_money: throughStart ? Math.round(eventMoney + 25000).toString() : Math.round(eventMoney).toString(),
@@ -632,6 +667,8 @@ export function playerMoving(rollDiceData: any, miscState: IMiscContext, gameSta
                 card: (eventData as any)?.card || gameState.gamePlayerInfo[findPlayer].card,
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
+                // prison accumulate
+                prison: isPrisonAccumulatePass.toString()
             }
             // remove sub data
             localStorage.removeItem('subPlayerDice')
@@ -684,6 +721,9 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
             return historyArray.join(';')
         case 'get_card': 
             historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName})`)
+            return historyArray.join(';')
+        case 'get_arrested': 
+            historyArray.push(`${eventData.event}: lemao 😂`)
             return historyArray.join(';')
         default: 
             return historyArray.join(';')
@@ -775,7 +815,10 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
             notifTimer.textContent = `${buyCityTimer}`
             buyCityTimer--
             // event buttons (2 buttons)
-            const [nopeButton, ofcourseButton] = [qS('[data-id=notif_button_0]'), qS('[data-id=notif_button_1]')] as HTMLInputElement[]
+            const [nopeButton, ofcourseButton] = [
+                qS('[data-id=notif_button_0]'), 
+                qS('[data-id=notif_button_1]')
+            ] as HTMLInputElement[]
             // if timer run out, auto cancel
             if(buyCityTimer < 0) {
                 clearInterval(buyCityInterval)
@@ -1062,13 +1105,13 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
                 notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
-                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
-                notifImage.src = cards.data[cardRNG].img
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[4].description as any})
+                notifImage.src = cards.data[4].img
                 // run card effect
                 const cardData = {
                     tileName: card,
                     rank: cards.category,
-                    effectData: cards.data[cardRNG].effect
+                    effectData: cards.data[4].effect
                 }
                 return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
             }
@@ -1166,7 +1209,9 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 if(prefix == 'button') {
                     // show notif
                     miscState.setAnimation(true)
-                    gameState.setShowGameNotif('card_with_button-3' as any)
+                    gameState.setShowGameNotif(`card_with_button-3` as any)
+                    // coin rng
+                    const coinPrizes = shuffle([1, 2, 3])
                     // card interval
                     let getMoneyTimer = 6
                     const getMoneyInterval = setInterval(() => {
@@ -1182,64 +1227,74 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         if(getMoneyTimer < 0) {
                             clearInterval(getMoneyInterval)
                             notifTimer.textContent = ``
-                            // hide all buttons
-                            for(let coin of coinButtons) coin.classList.add('hidden')
-                            // return event data
-                            return resolve({
-                                event: 'get_card',
-                                type: type,
-                                tileName: tileName,
-                                money: +effect * +coinButtons[0].dataset.prize
-                            })
+                            // show number on selected coin
+                            coinButtons[0] ? coinButtons[0].textContent = `${coinPrizes[0]}` : null
+                            // set timeout to hide all buttons
+                            return setTimeout(() => {
+                                for(let coin of coinButtons) coin ? coin.classList.add('hidden') : null
+                                // return event data
+                                resolve({
+                                    event: 'get_card',
+                                    type: type,
+                                    tileName: tileName,
+                                    money: +effect * coinPrizes[0]
+                                })
+                            }, 1500);
                         }
-                        if(coinButtons[0] && playerTurnData.display_name == gameState.gamePlayerInfo[findPlayer].display_name) {
+                        if(coinButtons[0] && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
                             for(let i=0; i<coinButtons.length; i++) {
                                 // show button
                                 coinButtons[i].classList.remove('hidden')
                                 // modify button
                                 coinButtons[i].textContent = '???'
-                                coinButtons[i].dataset.prize = `${i}`
-                                coinButtons[i].classList.add('!w-20', 'h-20', 'border', 'rounded-full')
+                                coinButtons[i].classList.add('!w-12', 'h-12', 'lg:!w-20', 'lg:h-20', 'border', 'rounded-full')
                                 // click event
                                 coinButtons[i].onclick = () => {
                                     clearInterval(getMoneyInterval)
                                     notifTimer.textContent = ``
-                                    // hide all buttons
-                                    for(let coin of coinButtons) coin.classList.add('hidden')
-                                    // return event data
-                                    return resolve({
-                                        event: 'get_card',
-                                        type: type,
-                                        tileName: tileName,
-                                        money: +effect * +coinButtons[i].dataset.prize
-                                    })
+                                    // show number on selected coin
+                                    coinButtons[i].textContent = `${coinPrizes[i]}`
+                                    // set timeout to hide all buttons
+                                    setTimeout(() => {
+                                        for(let coin of coinButtons) coin.classList.add('hidden')
+                                        // return event data
+                                        resolve({
+                                            event: 'get_card',
+                                            type: type,
+                                            tileName: tileName,
+                                            money: +effect * coinPrizes[i]
+                                        })
+                                    }, 1500);
                                 }
                             }
                         }
                     }, 1000);
                 }
-                // show notif
-                miscState.setAnimation(true)
-                gameState.setShowGameNotif('card')
-                // check for more money
-                const getMoreMoney = localStorage.getItem('moreMoney')
-                // get money + more money
-                if(getMoreMoney) {
-                    const moreMoney = (playerTurnData.money + +effect) * +getMoreMoney
-                    return resolve({
+                // normal get money
+                else {
+                    // show notif
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif('card')
+                    // check for more money
+                    const getMoreMoney = localStorage.getItem('moreMoney')
+                    // get money + more money
+                    if(getMoreMoney) {
+                        const moreMoney = (playerTurnData.money + +effect) * +getMoreMoney
+                        return resolve({
+                            event: 'get_card',
+                            type: type,
+                            tileName: tileName,
+                            money: playerTurnData.money + moreMoney
+                        })
+                    }
+                    // return event data
+                    resolve({
                         event: 'get_card',
                         type: type,
                         tileName: tileName,
-                        money: playerTurnData.money + moreMoney
+                        money: +effect
                     })
                 }
-                // normal get money
-                resolve({
-                    event: 'get_card',
-                    type: type,
-                    tileName: tileName,
-                    money: +effect
-                })
             }
             else if(type == 'more money') {
                 // show notif
@@ -1424,16 +1479,18 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 }, 1000)
             }
             else if(type == 'upgrade city') {
-                // set additional event data for history (only for moving cards, upgrade, take card)
-                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
                 notifTimer.textContent = 'getting city data..'
                 // get player city list
                 setTimeout(async () => {
                     const playerCityList = playerTurnData.city?.split(';')
+                    // player has city
                     if(playerCityList) {
+                        // set additional event data for history (only for moving cards, upgrade, take card)
+                        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                            localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                        // hide timer
                         notifTimer.textContent = ''
                         // filter fully upgrade city
                         const filteredCityList = playerCityList.filter(v => !v.match(/2house1hotel/))
@@ -1690,6 +1747,30 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
             return destinedCitySquare
         }
     }
+}
+
+// ========== # PRISON EVENT ==========
+// ========== # PRISON EVENT ==========
+function stopByPrison(findPlayer: number, miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise((resolve: (value: EventDataType)=>void) => {
+        // result message
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        // prison info
+        const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+        const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
+        // notif message
+        notifTitle.textContent = 'Prison'
+        notifMessage.textContent = `${gameState.gamePlayerInfo[findPlayer].display_name} get arrested for being silly. accumulate > ${prisonAccumulateLimit} dice number to be free.`
+        // show notif 
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        // return event data
+        resolve({
+            event: 'get_arrested',
+            money: 0,
+        })
+    })
 }
 
 // ========== # SPECIAL CARD EVENT ==========

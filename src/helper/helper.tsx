@@ -169,6 +169,20 @@ export async function verifyAccessToken(args: VerifyTokenType) {
     }
 }
 
+export function shuffle(array: any[]) {
+    let currentIndex = array.length,  
+        randomIndex;
+  
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+  
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
 
@@ -249,14 +263,17 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             // set regex
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex] = [
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
-                'get_card: .* \\(chance\\)|get_card: .* \\(community\\)'
+                'get_card: .* \\(chance\\)|get_card: .* \\(community\\)',
+                'get_arrested: lemao 😂'
             ]
-            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}`, 'g')
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}`, 'g')
             // set length
+            // used to verify the regex, if client send 2 history 
+            // but only match 1, something is wrong 
             const historyLength = value ? value.split(';').length : 0
             // match regex
             const isValueMatch = value.match(historyRegex) && value.match(historyRegex).length === historyLength
@@ -278,6 +295,8 @@ export function filterInput(input: InputIDType, value: string) {
         case 'tax_visitor': 
             const optionalTax = value === null || value.match(/^[a-zA-Z0-9\s]+$/) ? true : false
             return optionalTax
+        case 'prison': 
+            return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
         // ====== SURRENDER TYPE ======
         // ====== GAME OVER TYPE ======
         case 'all_player_stats': 
