@@ -834,7 +834,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
         // === paying taxes ===
         const isCityNotMine = buyCityOwner != gameState.gamePlayerInfo[findPlayer].display_name
         if(isCityNotMine && buyCityProperty != 'land') 
-            return resolve(payingTaxes(findPlayer, getCityInfo, miscState, gameState))
+            return resolve(payingTaxes())
     
         // if you own the city and its special & bought, get money
         if(tileInfo == 'special' && buyCityProperty == '1house') {
@@ -968,36 +968,31 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 }
             }
         }, 1000);
-    })
-}
 
-function payingTaxes(findPlayer: number, cityData: string[], miscState: IMiscContext, gameState: IGameContext) {
-    // result message
-    const notifTitle = qS('#result_notif_title')
-    const notifMessage = qS('#result_notif_message')
-    // city data
-    const [buyCityPrice, buyCityOwner] = cityData
-    // set event text for notif
-    let [eventTitle, eventContent] = [
-        'Paying Taxes', 
-        translateUI({lang: miscState.language, text: `xxx paid taxes of xxx`})
-    ]
-    // show notif (tax)
-    miscState.setAnimation(true)
-    gameState.setShowGameNotif('normal')
-    notifTitle.textContent = eventTitle
-    notifMessage.textContent = eventContent
-                            .replace('xxx', gameState.gamePlayerInfo[findPlayer].display_name) // player name
-                            .replace('xxx', moneyFormat(+buyCityPrice)) // city price
-    // set event data (for history)
-    const eventData: EventDataType = {
-        event: 'pay_tax', 
-        owner: buyCityOwner, 
-        visitor: gameState.gamePlayerInfo[findPlayer].display_name,
-        money: -buyCityPrice
-    }
-    // return event history
-    return eventData
+        function payingTaxes() {
+            // set event text for notif
+            [eventTitle, eventContent] = [
+                'Paying Taxes', 
+                translateUI({lang: miscState.language, text: `xxx paid taxes of xxx`})
+            ]
+            // show notif (tax)
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            notifTitle.textContent = eventTitle
+            notifMessage.textContent = eventContent
+                                    .replace('xxx', gameState.gamePlayerInfo[findPlayer].display_name) // player name
+                                    .replace('xxx', moneyFormat(+buyCityPrice)) // city price
+            // set event data (for history)
+            const eventData: EventDataType = {
+                event: 'pay_tax', 
+                owner: buyCityOwner, 
+                visitor: gameState.gamePlayerInfo[findPlayer].display_name,
+                money: -buyCityPrice
+            }
+            // return event history
+            return eventData
+        }
+    })
 }
 
 // ========== > SELL CITY ==========
