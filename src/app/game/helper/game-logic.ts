@@ -9,9 +9,14 @@ import community_cards_list from "../config/community-cards.json"
     - GAME PREPARE
     - GAME PLAYING
     - GAME TILE EVENT
-        # CITY EVENT
+        # NORMAL CITY EVENT
+        # SPECIAL CITY EVENT
+            > SELL CITY
+            > UPDATE CITY
         # CARD EVENT
         # PRISON EVENT
+        # PARKING EVENT
+        # CURSED CITY EVENT
         # SPECIAL CARD EVENT
 */
 
@@ -344,7 +349,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            40, 
+            Math.floor(Math.random() * 101), 
             Math.floor(Math.random() * 101)
         ].toString() 
     }
@@ -365,6 +370,8 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
             }
         }
     }
+    // set state to disable "back to room & surrender" buttons
+    miscState.setDisableButtons('gameroom')
     // fetch
     const rollDiceFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
     const rollDiceResponse: IResponse = await (await fetcher('/game', rollDiceFetchOptions)).json()
@@ -595,7 +602,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // ### EVENT LIST NOT COMPLETE: special, curse, community card, prison, free park, buff, debuff
                 switch(tileInfo) {
                     case 'city': 
-                        stopByCity(findPlayer, tileElement, miscState, gameState)
+                    case 'special':
+                        stopByCity(tileInfo, findPlayer, tileElement, miscState, gameState)
                         .then(eventData => resolve(eventData))
                         .catch(err => console.log(err))
                         break
@@ -613,6 +621,16 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         break
                     case 'prison': 
                         stopByPrison(findPlayer, miscState, gameState)
+                        .then(eventData => resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
+                    case 'parking': 
+                        stopByParking(findPlayer, playerRNG, miscState, gameState)
+                        .then(eventData => resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
+                    case 'cursed': 
+                        stopByCursedCity(tileElement, miscState, gameState)
                         .then(eventData => resolve(eventData))
                         .catch(err => console.log(err))
                         break
@@ -673,6 +691,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // remove sub data
             localStorage.removeItem('subPlayerDice')
             localStorage.removeItem('subEventData')
+            localStorage.removeItem('parkingEventData')
             // fetch
             const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
             const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
@@ -684,6 +703,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
                         delete playerTurnEndResponse.data[0].token
                     }
+                    // reset disable buttons
+                    miscState.setDisableButtons(null)
                     return
                 default: 
                     // show notif
@@ -701,8 +722,17 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
 function setEventHistory(rolled_dice: string, eventData: EventDataType) {
     // check sub event
     const subEventData = localStorage.getItem('subEventData')
+    // check parking event
+    const parkingEventData = localStorage.getItem('parkingEventData')
     // history container
-    const historyArray = subEventData ? [rolled_dice, subEventData] : [rolled_dice]
+    const historyArray = subEventData 
+                        ? parkingEventData 
+                            // parking + sub event
+                            ? [rolled_dice, parkingEventData, subEventData] 
+                            // sub event
+                            : [rolled_dice, subEventData] 
+                        // no other event
+                        : [rolled_dice]
     // check event data
     switch(eventData?.event) {
         case 'buy_city': 
@@ -724,6 +754,12 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
             return historyArray.join(';')
         case 'get_arrested': 
             historyArray.push(`${eventData.event}: lemao 😂`)
+            return historyArray.join(';')
+        case 'cursed': 
+            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} 💀`)
+            return historyArray.join(';')
+        case 'special_city': 
+            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} 💸`)
             return historyArray.join(';')
         default: 
             return historyArray.join(';')
@@ -781,31 +817,60 @@ export async function gameOver(miscState: IMiscContext, gameState: IGameContext)
 // ========== GAME TILE EVENT ==========
 // ========== GAME TILE EVENT ==========
 
-// ========== # CITY EVENT ==========
-// ========== # CITY EVENT ==========
-function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
+// ========== # NORMAL CITY EVENT ==========
+// ========== # NORMAL CITY EVENT ==========
+// ========== # SPECIAL CITY EVENT ==========
+// ========== # SPECIAL CITY EVENT ==========
+function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
     return new Promise((resolve: (value: EventDataType)=>void) => {
         // result message
         const notifTitle = qS('#result_notif_title')
         const notifMessage = qS('#result_notif_message')
         const notifTimer = qS('#result_notif_timer')
-        // event text container
-        let [eventTitle, eventContent]: [string, string] = [null, null]
         // get city info
         const getCityInfo = tileElement.dataset.cityInfo.split(',')
-        const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo as string[];
+        const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
         // if city owner not current player
         // === paying taxes ===
-        const isCityMine = buyCityOwner != gameState.gamePlayerInfo[findPlayer].display_name
-        if(isCityMine && buyCityProperty != 'land') return resolve(payingTaxes())
+        const isCityNotMine = buyCityOwner != gameState.gamePlayerInfo[findPlayer].display_name
+        if(isCityNotMine && buyCityProperty != 'land') 
+            return resolve(payingTaxes(findPlayer, getCityInfo, miscState, gameState))
     
-        // if city property is maxed, stop
-        if(buyCityProperty == 'realestate') {
-            return {
-                event: 'buy_city',
-                status: false
-            } as EventDataType
+        // if you own the city and its special & bought, get money
+        if(tileInfo == 'special' && buyCityProperty == '1house') {
+            // notif message
+            notifTitle.textContent = 'Special City'
+            notifMessage.textContent = `You get ${moneyFormat(+buyCityPrice)} when visiting your grandma`
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            return resolve({
+                event: 'special_city',
+                money: +buyCityPrice
+            })
         }
+        // if you own the city and its property is maxed, stop
+        if(tileInfo == 'city' && buyCityProperty == 'realestate') {
+            return resolve({
+                event: 'buy_city',
+                status: false,
+                money: 0
+            })
+        }
+        // set event text for notif
+        let [eventTitle, eventContent] = [
+            !isCityNotMine ? 'Upgrade City' : 'Buy City', 
+            !isCityNotMine 
+                // upgrade city content
+                ? translateUI({lang: miscState.language, text: 'Do you wanna upgrade xxx city for xxx?'})
+                // buy city content
+                : translateUI({lang: miscState.language, text: `Do you wanna buy xxx city for xxx?`})
+        ]
+        // notif (buy)
+        notifTitle.textContent = eventTitle
+        notifMessage.textContent = eventContent
+                                .replace('xxx', buyCityName) // city name
+                                .replace('xxx', moneyFormat(+buyCityPrice)) // price
         // show notif (must be on top the buttons to prevent undefined)
         miscState.setAnimation(true)
         gameState.setShowGameNotif(`with_button-2` as any)
@@ -903,47 +968,40 @@ function stopByCity(findPlayer: number, tileElement: HTMLElement, miscState: IMi
                 }
             }
         }, 1000);
-        // set event text for notif
-        [eventTitle, eventContent] = [
-            !isCityMine ? 'Upgrade City' : 'Buy City', 
-            !isCityMine 
-                // upgrade city content
-                ? translateUI({lang: miscState.language, text: 'Do you wanna upgrade xxx city for xxx?'})
-                // buy city content
-                : translateUI({lang: miscState.language, text: `Do you wanna buy xxx city for xxx?`})
-        ]
-        // notif (buy)
-        notifTitle.textContent = eventTitle
-        notifMessage.textContent = eventContent
-                                .replace('xxx', buyCityName) // city name
-                                .replace('xxx', moneyFormat(+buyCityPrice)) // price
-    
-        function payingTaxes() {
-            // set event text for notif
-            [eventTitle, eventContent] = [
-                'Paying Taxes', 
-                translateUI({lang: miscState.language, text: `xxx paid taxes of xxx`})
-            ]
-            // show notif (tax)
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('normal')
-            notifTitle.textContent = eventTitle
-            notifMessage.textContent = eventContent
-                                    .replace('xxx', gameState.gamePlayerInfo[findPlayer].display_name) // player name
-                                    .replace('xxx', moneyFormat(+buyCityPrice)) // city price
-            // set event data (for history)
-            const eventData: EventDataType = {
-                event: 'pay_tax', 
-                owner: buyCityOwner, 
-                visitor: gameState.gamePlayerInfo[findPlayer].display_name,
-                money: -buyCityPrice
-            }
-            // return event history
-            return eventData
-        }
     })
 }
 
+function payingTaxes(findPlayer: number, cityData: string[], miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // city data
+    const [buyCityPrice, buyCityOwner] = cityData
+    // set event text for notif
+    let [eventTitle, eventContent] = [
+        'Paying Taxes', 
+        translateUI({lang: miscState.language, text: `xxx paid taxes of xxx`})
+    ]
+    // show notif (tax)
+    miscState.setAnimation(true)
+    gameState.setShowGameNotif('normal')
+    notifTitle.textContent = eventTitle
+    notifMessage.textContent = eventContent
+                            .replace('xxx', gameState.gamePlayerInfo[findPlayer].display_name) // player name
+                            .replace('xxx', moneyFormat(+buyCityPrice)) // city price
+    // set event data (for history)
+    const eventData: EventDataType = {
+        event: 'pay_tax', 
+        owner: buyCityOwner, 
+        visitor: gameState.gamePlayerInfo[findPlayer].display_name,
+        money: -buyCityPrice
+    }
+    // return event history
+    return eventData
+}
+
+// ========== > SELL CITY ==========
+// ========== > SELL CITY ==========
 export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     // result message
@@ -1021,6 +1079,8 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
     }
 }
 
+// ========== > UPDATE CITY ==========
+// ========== > UPDATE CITY ==========
 function updateCityList(data: UpdateCityListType) {
     // buy city
     if(data.action == 'buy') {
@@ -1100,18 +1160,17 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
             const [minRange, maxRange] = cards.chance
             // match rng
             if(+rng[0] >= minRange && +rng[0] <= maxRange) {
-                console.log(cards);
                 const cardRNG = +rng[0] % cards.data.length
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
                 notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
-                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[4].description as any})
-                notifImage.src = cards.data[4].img
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
+                notifImage.src = cards.data[cardRNG].img
                 // run card effect
                 const cardData = {
                     tileName: card,
                     rank: cards.category,
-                    effectData: cards.data[4].effect
+                    effectData: cards.data[cardRNG].effect
                 }
                 return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
             }
@@ -1488,6 +1547,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     // player has city
                     if(playerCityList) {
                         // set additional event data for history (only for moving cards, upgrade, take card)
+                        // only add sub event data if player have any city
                         if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
                             localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
                         // hide timer
@@ -1499,7 +1559,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         const upgradeCityName = filteredCityList[upgradeRNG].split('*')[0]
                         const upgradeCityElement = qS(`[data-city-info^='${upgradeCityName}']`) as HTMLElement
                         // upgrade city
-                        const [error, eventData] = await catchError(stopByCity(findPlayer, upgradeCityElement, miscState, gameState))
+                        const [error, eventData] = await catchError(stopByCity('city', findPlayer, upgradeCityElement, miscState, gameState))
                         if(error) console.log(error)
                         return resolve(eventData)
                     }
@@ -1769,6 +1829,105 @@ function stopByPrison(findPlayer: number, miscState: IMiscContext, gameState: IG
         resolve({
             event: 'get_arrested',
             money: 0,
+        })
+    })
+}
+
+// ========== # PARKING EVENT ==========
+// ========== # PARKING EVENT ==========
+function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise((resolve: (value: EventDataType)=>void) => {
+        // get current player
+        const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+        // result message
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        const notifTimer = qS('#result_notif_timer')
+        // notif message
+        notifTitle.textContent = 'Free Parking'
+        notifMessage.textContent = 'select tile number'
+        // show notif 
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('with_button-24' as any)
+        // parking interval
+        let parkingTimer = 10
+        const parkingInterval = setInterval(() => {
+            notifTimer.textContent = `${parkingTimer}`
+            parkingTimer--
+            // dont move if not click
+            if(parkingTimer < 0) {
+                clearInterval(parkingInterval)
+                notifTimer.textContent = ''
+                return resolve({
+                    event: 'parking',
+                    destination: 22, // parking tile
+                    money: 0
+                })
+            }
+            // check button exist
+            const parkingButton = qS(`[data-id=notif_button_0]`)
+            if(parkingButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+                // modify button
+                const parkingButtons = qSA(`[data-id^=notif_button]`) as NodeListOf<HTMLInputElement>
+                for(let i=0; i<parkingButtons.length; i++) {
+                    // skip prison (tile 10, i 9) & parking (tile 22, i 21) 
+                    if(i === 9 || i === 21) continue
+
+                    const pb = parkingButtons[i]
+                    pb.classList.remove('hidden')
+                    pb.classList.add('border')
+                    pb.textContent = `${i+1}`
+                    pb.dataset.destination = `${i+1}`
+                    // click event
+                    pb.onclick = () => {
+                        clearInterval(parkingInterval)
+                        // set moving parameter
+                        const chosenSquare = +pb.dataset.destination
+                        const setChosenDice = playerTurnData.pos > chosenSquare 
+                                            ? (24 + chosenSquare) - playerTurnData.pos
+                                            : chosenSquare - playerTurnData.pos
+                        const rollDiceData: IRollDiceData = {
+                            playerTurn: playerTurnData.display_name,
+                            playerDice: setChosenDice,
+                            playerRNG: rng
+                        }
+                        // reset modify buttons
+                        for(let tpb of parkingButtons) {
+                            tpb.classList.add('hidden')
+                            tpb.classList.remove('border')
+                        }
+                        // set additional event data for history (only for moving cards, upgrade, take card)
+                        // only add sub event if player click the button
+                        localStorage.setItem('parkingEventData', `parking: tile ${chosenSquare} 😎`)
+                        // update notif
+                        notifTimer.textContent = `going to tile ${chosenSquare}`
+                        return playerMoving(rollDiceData, miscState, gameState)
+                    }
+                }
+            }
+        }, 1000);
+    })
+}
+
+// ========== # CURSED CITY EVENT ==========
+// ========== # CURSED CITY EVENT ==========
+function stopByCursedCity(tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise((resolve: (value: EventDataType)=>void) => {
+        const getCityInfo = tileElement.dataset.cityInfo.split(',')
+        const [cityName, cityProperty, cityPrice, cityOwner] = getCityInfo as string[];
+        // result message
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        // notif message
+        notifTitle.textContent = 'Cursed City'
+        notifMessage.textContent = `The city curse you for ${moneyFormat(+cityPrice)}`
+        // show notif 
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        // return event data
+        resolve({
+            event: 'cursed',
+            money: -cityPrice
         })
     })
 }

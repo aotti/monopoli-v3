@@ -282,8 +282,6 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
 export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // submit buttons
     const joinButton = qS(`#join_button_${roomId}`) as HTMLButtonElement
-    const spectateButton = qS(`#spectate_button_${roomId}`) as HTMLButtonElement
-    const deleteButton = qS(`#delete_button_${roomId}`) as HTMLButtonElement
     // result message
     const resultMessage: Element = qS(`#result_room_${roomId}`)
     // input value container
@@ -341,9 +339,8 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
     const tempButtonText = joinButton.textContent
     joinButton.textContent = 'Loading'
     joinButton.disabled = true
-    // disable other buttons
-    spectateButton ? spectateButton.disabled = true : null
-    deleteButton ? deleteButton.disabled = true : null
+    // disable all buttons
+    miscState.setDisableButtons('roomlist')
     // fetch
     const joinRoomFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
     const joinRoomResponse: IResponse = await (await fetcher('/room', joinRoomFetchOptions)).json()
@@ -355,6 +352,8 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
                 localStorage.setItem('accessToken', joinRoomResponse.data[0].token)
                 delete joinRoomResponse.data[0].token
             }
+            // reset disable buttons
+            miscState.setDisableButtons(null)
             // set joined room
             gameState.setMyCurrentGame(roomId)
             // get room info
@@ -385,8 +384,6 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
             // enable submit buttons
             joinButton.textContent = tempButtonText
             joinButton.removeAttribute('disabled')
-            spectateButton ? spectateButton.removeAttribute('disabled') : null
-            deleteButton ? deleteButton.removeAttribute('disabled') : null
             return
         default: 
             // error message
@@ -397,38 +394,26 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
             // enable submit buttons
             joinButton.textContent = tempButtonText
             joinButton.removeAttribute('disabled')
-            spectateButton ? spectateButton.removeAttribute('disabled') : null
-            deleteButton ? deleteButton.removeAttribute('disabled') : null
             // set join button type back to BUTTON
             joinButton.type = 'button'
             return
     }
 }
 
-export function spectateRoom(roomId: number, gameState: IGameContext) {
-    // submit buttons
-    const joinButton = qS(`#join_button_${roomId}`) as HTMLButtonElement
-    const spectateButton = qS(`#spectate_button_${roomId}`) as HTMLButtonElement
-    const deleteButton = qS(`#delete_button_${roomId}`) as HTMLButtonElement
-    // disable buttons
-    spectateButton.disabled = true
-    joinButton ? joinButton.disabled = true : null
-    deleteButton ? deleteButton.disabled = true : null
+export function spectateRoom(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
+    // disable all buttons
+    miscState.setDisableButtons('roomlist')
     // set player as spectator
     gameState.setSpectator(true)
     // move to game room
     const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
     link.click()
-    // enable buttons
-    joinButton.removeAttribute('disabled')
-    spectateButton ? spectateButton.removeAttribute('disabled') : null
-    deleteButton ? deleteButton.removeAttribute('disabled') : null
+    // reset disable buttons
+    setTimeout(() => miscState.setDisableButtons(null), 1000)
 }
 
-export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId: number, gameState: IGameContext) {
+export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // submit buttons
-    const joinButton = qS(`#join_button_${roomId}`) as HTMLButtonElement
-    const spectateButton = qS(`#spectate_button_${roomId}`) as HTMLButtonElement
     const deleteButton = qS(`#delete_button_${roomId}`) as HTMLButtonElement
     // input value container
     const inputValues = {
@@ -462,9 +447,8 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
     const tempButtonText = deleteButton.textContent
     deleteButton.textContent = 'Loading'
     deleteButton.disabled = true
-    // disable other buttons
-    spectateButton ? spectateButton.disabled = true : null
-    joinButton ? joinButton.disabled = true : null
+    // disable all buttons
+    miscState.setDisableButtons('roomlist')
     // fetch
     const deleteRoomFetchOptions = fetcherOptions({method: 'DELETE', credentials: true, body: JSON.stringify(inputValues)})
     const deleteRoomResponse: IResponse = await (await fetcher('/room', deleteRoomFetchOptions)).json()
@@ -476,19 +460,17 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
                 localStorage.setItem('accessToken', deleteRoomResponse.data[0].token)
                 delete deleteRoomResponse.data[0].token
             }
+            // reset disable buttons
+            miscState.setDisableButtons(null)
             // enable submit buttons
             deleteButton.textContent = tempButtonText
             deleteButton.removeAttribute('disabled')
-            spectateButton ? spectateButton.removeAttribute('disabled') : null
-            joinButton ? joinButton.removeAttribute('disabled') : null
             return
         default: 
             deleteButton.classList.add('text-red-600')
             deleteButton.textContent = `err${deleteRoomResponse.status}`
             // enable submit buttons
             deleteButton.removeAttribute('disabled')
-            spectateButton ? spectateButton.removeAttribute('disabled') : null
-            joinButton ? joinButton.removeAttribute('disabled') : null
             return
     }
 }

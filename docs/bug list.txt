@@ -109,3 +109,23 @@ fix bug 11 jan 2025
 - ~~pulau komodo punya 2 kata, jadi ngebug saat beli~~
 - ~~ada kemungkinan data null saat turn end~~
 - ~~perkecil font size history~~
+
+fix bug 20 jan 2025
+- ~~tambah sound roll dice + roll turn~~
+- ~~ubah text alt jadi **loading **saat aplod gambar~~
+- ~~jika dapat kartu optional, jangan ubah textContent button,~~
+~~tambah attr **data-destination** (move place) untuk simpan angka tujuan~~
+- ~~lap update di petak 24, bukan 1 :peb:~~
+- ~~rapihkan function di **game logic**~~
+- ~~tidak boleh beli rumah jika uang kurang~~
+- ~~filter (sell city) city_left kemungkinan error~~
+- ~~function db mnp_turnend bug **string to arr(unknown)**~~
+- ~~kartu penjara & 90% denda ngebug pos~~
+- ~~kartu ulang taun 15k gk work~~
+- ~~kartu jual kota error kalo kota kosong~~
+- ~~kartu denda 90% + penjara membuat **player turns** error~~
+- ~~uang tidak bertambah saat lewat start~~
+- ~~kartu coin toss ngebug~~
+
+fix penting 10juta%%%
+- ~~ubah logika account in use~~

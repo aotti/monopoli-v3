@@ -8,21 +8,31 @@ const MiscContext = createContext<IMiscContext>(null)
 
 export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
     const [screenType, setScreenType] = useState<'landscape'|'portrait'>(null)
-    const [language, setLanguage] = useState<ITranslate['lang']>('english')
+    const [language, setLanguage] = useState<ITranslate['lang']>(() => {
+        if(typeof window == 'undefined') return 'english'
+        const storedLanguage = localStorage.getItem('language') as ITranslate['lang']
+        return storedLanguage || 'english'
+    })
     const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
     const [showJoinModal, setShowJoinModal] = useState<string>(null)
     const [animation, setAnimation] = useState<boolean>(true)
+    // used to make chat box stay open (room list)
     const [isChatFocus, setIsChatFocus] = useState<IMiscContext['isChatFocus']>('on')
     const [showTutorial, setShowTutorial] = useState<IMiscContext['showTutorial']>(null)
+    // access token secret
     const [secret, setSecret] = useState<string>(accessSecret)
     const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [disableButtons, setDisableButtons] = useState<'roomlist'|'gameroom'>(null)
     // message items
-    const systemMessage: Omit<IChat, 'channel'|'token'> = {
-        display_name: 'system',
-        message_text: 'only player in this room can see the chat',
-        message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
-    }
-    const [messageItems, setMessageItems] = useState<Omit<IChat, 'channel'|'token'>[]>([])
+    const [messageItems, setMessageItems] = useState<Omit<IChat, 'channel'|'token'>[]>(() => {
+        const systemMessage: Omit<IChat, 'channel'|'token'> = {
+            display_name: 'system',
+            message_text: 'only player in this room can see the chat',
+            message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
+        }
+        systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
+        return [systemMessage]
+    })
 
     useEffect(() => {
         const displayOrientation = () => {
@@ -48,15 +58,7 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
             }
             catch (e) { console.log(e.message) }
         }
-        // get language setting
-        const storedLanguage = localStorage.getItem('language') as ITranslate['lang']
-        setLanguage(storedLanguage)
-        // system message
-        if(language == storedLanguage) {
-            systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
-            setMessageItems(data => [...data, systemMessage])
-        }
-    }, [language])
+    }, [])
 
     const states: IMiscContext = {
         language, setLanguage,
@@ -69,6 +71,7 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
         messageItems, setMessageItems,
         screenType, setScreenType,
         showJoinModal, setShowJoinModal,
+        disableButtons, setDisableButtons
     }
 
     return (

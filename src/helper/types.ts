@@ -97,6 +97,8 @@ export interface IMiscContext {
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     messageItems: Omit<IChat, 'channel'|'token'>[],
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
+    disableButtons: 'roomlist'|'gameroom',
+    setDisableButtons: Dispatch<SetStateAction<'roomlist'|'gameroom'>>,
 }
 
 interface IGameRoomInfo {
@@ -465,6 +467,14 @@ interface IEventBuyCity_No {
     status: false,
     money: number,
 }
+export interface IBuyCityButtonEvent {
+    buyCityInterval: NodeJS.Timeout, 
+    findPlayer: number, 
+    buyButtons: HTMLInputElement[],
+    buyCityData: string[], 
+    miscState: IMiscContext, 
+    gameState: IGameContext
+}
 type IEventBuyCity = IEventBuyCity_Yes | IEventBuyCity_No
 
 interface IEventPayTax {
@@ -488,7 +498,23 @@ interface IEventPrison {
     event: 'get_arrested',
     money: number,
 }
-export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison
+
+interface IEventParking {
+    event: 'parking',
+    destination: number,
+    money: number,
+}
+
+interface IEventCursed {
+    event: 'cursed',
+    money: number,
+}
+
+interface IEventSpecial {
+    event: 'special_city',
+    money: number,
+}
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial
 
 interface IBuyCity {
     action: 'buy',

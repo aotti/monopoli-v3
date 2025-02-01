@@ -85,7 +85,9 @@ function RollTurnButtons() {
                 </button>
             </div>
             <div>
-                <button type="submit" id="surrender_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> 
+                <button type="submit" id="surrender_button" className={`min-w-20 bg-primary border-8bit-primary active:opacity-75
+                ${miscState.disableButtons == 'gameroom' ? 'saturate-0' : ''}`}
+                disabled={miscState.disableButtons == 'gameroom' ? true : false}> 
                     {translateUI({lang: miscState.language, text: 'surrender'})} 
                 </button>
             </div>

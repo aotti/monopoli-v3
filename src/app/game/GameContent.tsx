@@ -45,7 +45,8 @@ export default function GameContent({ pubnubSetting }) {
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
-
+        // reset disable buttons
+        miscState.setDisableButtons(null)
         // get player list
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
         getPlayerInfo(gameroomParam, miscState, gameState)
@@ -81,8 +82,10 @@ export default function GameContent({ pubnubSetting }) {
             {/* tutorial: relative z-10 */}
             <div className={`${miscState.showTutorial == 'tutorial_gameroom_3' ? 'relative z-10' : ''}
             flex flex-col gap-2 lg:gap-6 mt-6 mx-2 w-24 lg:w-36 h-[calc(100%-5rem)]`}>
-                <Link href={'/room'} className={`flex items-center justify-center text-center w-20 h-10 lg:w-24 bg-primary
-                border-8bit-primary text-2xs lg:text-xs active:opacity-75 ${miscState.language == 'indonesia' ? 'py-1' : ''}`} 
+                <Link className={`flex items-center justify-center text-center w-20 h-10 lg:w-24 bg-primary 
+                border-8bit-primary text-2xs lg:text-xs active:opacity-75
+                ${miscState.disableButtons == 'gameroom' ? 'saturate-0' : ''} ${miscState.language == 'indonesia' ? 'py-1' : ''}`} 
+                id="back_to_room" href={miscState.disableButtons == 'gameroom' ? '#' : '/room'} 
                 onClick={spectatorLeave} draggable={false}>
                     <span data-tooltip={'back to room, not leave game'} className="relative"> 
                         {translateUI({lang: miscState.language, text: 'Back to room'})} 
