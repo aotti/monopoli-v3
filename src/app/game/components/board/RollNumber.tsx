@@ -114,7 +114,7 @@ const buildItemLists = (number: number[]) => {
         })
     
         // Get a random item from the prizes array
-        const resultItem = getRandomInt(0, number.length-1);
+        const resultItem = getRandomInt(2, 2);
         // Adds the result to the last row
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')

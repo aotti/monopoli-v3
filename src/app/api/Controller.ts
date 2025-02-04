@@ -6,7 +6,6 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import PubNub from "pubnub";
 import { redis } from "../../config/redis";
-import { randomBytes } from "crypto";
 
 // redis
 const redisClient = redis()
@@ -123,20 +122,23 @@ export default class Controller {
         }
     }
 
-    protected async getOnlinePlayers(data: IPlayer) {
-        const logData: Omit<ILoggedUsers, 'timeout_token'> = {
+    protected async getOnlinePlayers(data: IPlayer, userAgent: string) {
+        const logData: Partial<ILoggedUsers> = {
             display_name: data.display_name,
-            status: 'online'
+            status: 'online',
+            user_agent: userAgent
         }
         // renew my player
         const renewMyPlayer = await this.logOnlineUsers('renew', logData)
-        if(renewMyPlayer.status === 200 || renewMyPlayer.status === 403) return renewMyPlayer
+        if(renewMyPlayer.status === 200 || renewMyPlayer.status === 400 || renewMyPlayer.status === 403) 
+            return renewMyPlayer
         // if data empty, log my player
         const logMyPlayer = await this.logOnlineUsers('log', logData)
-        if(logMyPlayer.status === 200) return logMyPlayer
+        if(logMyPlayer.status === 200 || logMyPlayer.status === 400 || logMyPlayer.status === 403) 
+            return logMyPlayer
     }
 
-    protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Omit<ILoggedUsers, 'timeout_token'>) {
+    protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Partial<ILoggedUsers>) {
         const getLoggedPlayers = await this.redisGet('loggedPlayers')
         let loggedPlayers: ILoggedUsers[] = getLoggedPlayers.length > 0 ? getLoggedPlayers : []
         // check players token each request
@@ -152,27 +154,33 @@ export default class Controller {
                 // filter expired players
                 if(error) loggedPlayers = loggedPlayers.filter(v => v.timeout_token != token)
             }
+            // check for account in use
+            // match the user agent
+            console.log(action, 'checking account in use');
+            const findUser = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
+            const isUserAgentMatch = matchUserAgent(payload.user_agent, findUser)
+            if(findUser !== -1 && !isUserAgentMatch) {
+                // if user wanna logout
+                if(action == 'out') return this.respond(400, 'status must be online', [])
+                // other action
+                return this.respond(403, 'account in use', [])
+            }
         }
         // logging users
         if(action == 'log') {
             // create token for timeout
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
-            const timeoutTokenId = randomBytes(8).toString('hex')
             // log the player
+            // used for client side afk player
             loggedPlayers.push({
                 display_name: payload.display_name,
                 status: payload.status,
-                timeout_token: timeoutToken
+                timeout_token: timeoutToken,
+                user_agent: payload.user_agent
             })
-            // save timeout token identifier
-            cookies().set('timeoutTokenId', timeoutTokenId, { 
-                path: '/',
-                maxAge: 604800 * 2, // 1 week * 2
-                httpOnly: true,
-                sameSite: 'strict',
-            })
-            // save timeout token to redis
-            await this.redisSet(`timeoutToken_${timeoutTokenId}`, [timeoutToken])
+            // save user agent to redis
+            // used for check account in use
+            await this.redisSet(`userAgent_${payload.display_name}`, [payload.user_agent])
             const filteredLoggedPlayers = loggedPlayers.filter((v1, i, arr) => arr.findLastIndex(v2 => v2.display_name == v1.display_name) === i)
             // save to redis
             await this.redisSet('loggedPlayers', filteredLoggedPlayers)
@@ -184,23 +192,11 @@ export default class Controller {
             // renew if user still logged
             // status 400 used for proceed to 'log' action 
             const renewUser = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
-            if(renewUser === -1) return this.respond(400, 'no access', [])
-            // get timeout token identifier
-            const getTimeoutTokenId = cookies().get('timeoutTokenId')?.value || null
-            const getTimeoutToken = await this.redisGet(`timeoutToken_${getTimeoutTokenId}`)
-            // match the token
-            const isTokenMatch = matchTimeoutToken(getTimeoutToken, renewUser)
-            console.log(action, isTokenMatch);
-            
-            // for renew, if token match = proceed to renew
-            // for log, if token match = dont log player
-            if(!isTokenMatch) return this.respond(403, 'account in use', [])
+            if(renewUser === -1) return this.respond(401, 'no access', [])
             // create token for timeout
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
             // update my token
             loggedPlayers[renewUser].timeout_token = timeoutToken
-            // update timeout token to redis
-            await this.redisSet(`timeoutToken_${getTimeoutTokenId}`, [timeoutToken])
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response
@@ -218,8 +214,8 @@ export default class Controller {
         /**
          * @description match timeout token as identifier for user
          */
-        function matchTimeoutToken(getTimeoutToken: string[], index: number) {
-            if(getTimeoutToken[0] && getTimeoutToken[0] == loggedPlayers[index]?.timeout_token)
+        function matchUserAgent(userAgent: string, index: number) {
+            if(userAgent && userAgent == loggedPlayers[index]?.user_agent)
                 return true
             return false
         }

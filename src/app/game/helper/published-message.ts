@@ -1,7 +1,7 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
-import { checkAlivePlayers, gameOver, playerMoving } from "./game-logic"
+import { checkGameProgress, playerMoving } from "./game-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -189,7 +189,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 }
             }
             // check player alive
-            checkAlivePlayers(newPlayerInfo, miscState, gameState)
+            checkGameProgress(newPlayerInfo, miscState, gameState)
             // return data
             return newPlayerInfo
         })

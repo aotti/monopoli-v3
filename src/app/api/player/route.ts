@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 import { IPlayer } from "../../../helper/types";
 import PlayerController from "./PlayerController";
 import Controller from "../Controller";
@@ -17,6 +17,8 @@ export async function GET(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent
+    payload.user_agent = userAgent(req).ua
     // process
     const playerController = new PlayerController()
     const result = await playerController.viewPlayer(action, payload as IPlayer)

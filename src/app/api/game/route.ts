@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 import Controller from "../Controller";
 import GameController from "./GameController";
 import { IResponse } from "../../../helper/types";
@@ -18,9 +18,11 @@ export async function GET(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent to payload
+    payload.user_agent = userAgent(req).ua
     // process
     const gameController = new GameController()
-    const result = await gameController.getPlayers(action, payload as any)
+    const result = await gameController.getPlayers(action, payload)
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }
@@ -34,6 +36,8 @@ export async function POST(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent to payload
+    payload.user_agent = userAgent(req).ua
     // get action
     const action = payload.action
     delete payload.action
@@ -61,6 +65,8 @@ export async function PUT(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent to payload
+    payload.user_agent = userAgent(req).ua
     // get action
     const action = payload.action
     delete payload.action

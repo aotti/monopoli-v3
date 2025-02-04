@@ -272,6 +272,7 @@ export function filterInput(input: InputIDType, value: string) {
                 'parking: tile \\d+ 😎',
                 'cursed: .* 💀',
                 'special_city: .* 💸',
+                'special_card: .*',
             ]
             const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}`, 'g')
             // set length
@@ -300,13 +301,15 @@ export function filterInput(input: InputIDType, value: string) {
             return optionalTax
         case 'prison': 
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
-        // ====== SURRENDER TYPE ======
         // ====== GAME OVER TYPE ======
         case 'all_player_stats': 
             const splitValue = value.split(';')
             for(let sv of splitValue)
                 if(!sv.match(/\w+,\d+|\w+,-\d+/)) return null
             return value 
+        // ====== MISC TYPE ======
+        case 'user_agent': 
+            return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null
     }
 }
 
