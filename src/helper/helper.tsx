@@ -263,7 +263,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             // set regex
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex] = [
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
@@ -274,7 +274,7 @@ export function filterInput(input: InputIDType, value: string) {
                 'special_city: .* 💸',
                 'special_card: .*',
             ]
-            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}`, 'g')
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}`, 'g')
             // set length
             // used to verify the regex, if client send 2 history 
             // but only match 1, something is wrong 

@@ -2047,9 +2047,9 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = 5000
-                return [specialCard[0], newMoney]
+                return resolve([specialCard[0], newMoney])
             }
-            return [null, null]
+            return resolve([null, null])
         }
         else return resolve([null, null])
     })
