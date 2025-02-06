@@ -33,6 +33,7 @@ export type RoomListListener = {
     disabledCharacters: string[],
     roomGame: number,
     roomOverId: number,
+    gameOverPlayers: {player: string, worst_money: number}[],
 }
 
 export type GameRoomListener = {
@@ -51,6 +52,7 @@ export type GameRoomListener = {
     playerTurns: string[],
     surrendPlayer: string,
     playerTurnEnd: IGamePlayerInfo,
+    gameOverPlayers: {player: string, worst_money: number}[],
     taxes: {
         owner: string,
         visitor: string,
@@ -529,13 +531,16 @@ export type UpdateCityListType = IBuyCity | ISellCity | IDestroyCity
 
 interface ISpecialCardCity {
     type: 'city',
-    price: number
+    price: number,
+}
+interface ISpecialCardStart {
+    type: 'start',
 }
 interface ISpecialCardPrison {
     type: 'prison',
     test: string,
 }
-export type SpecialCardEventType = ISpecialCardCity | ISpecialCardPrison
+export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison
 
 interface ISpecialCardAdd {
     action: 'add',

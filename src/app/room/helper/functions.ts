@@ -386,6 +386,8 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
             joinButton.removeAttribute('disabled')
             return
         default: 
+            // reset disable buttons
+            miscState.setDisableButtons(null)
             // error message
             gameState.setRoomError(inputValues.room_id)
             setTimeout(() => gameState.setRoomError(null), 3000);
@@ -409,7 +411,7 @@ export function spectateRoom(roomId: number, miscState: IMiscContext, gameState:
     const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
     link.click()
     // reset disable buttons
-    setTimeout(() => miscState.setDisableButtons(null), 1000)
+    setTimeout(() => miscState.setDisableButtons(null), 1500)
 }
 
 export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
@@ -467,6 +469,8 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
             deleteButton.removeAttribute('disabled')
             return
         default: 
+            // reset disable buttons
+            miscState.setDisableButtons(null)
             deleteButton.classList.add('text-red-600')
             deleteButton.textContent = `err${deleteRoomResponse.status}`
             // enable submit buttons

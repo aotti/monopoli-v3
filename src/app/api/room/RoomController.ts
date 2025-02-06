@@ -546,16 +546,30 @@ export default class RoomController extends Controller {
         }
         else {
             await this.deleteRoomData(payload)
+            const gameOverPlayers = payload.all_player_stats.split(';').map(v => {
+                const splitStats = v.split(',')
+                const [player, worst_money] = [splitStats[0], +splitStats[1]]
+                return {player, worst_money}
+            })
             // publish realtime data
+            // ### KIRIM DATA KE GAME ROOM & ROOM LIST UNTUK APDET WORST MONEY LOSE
+            // ### KIRIM DATA KE GAME ROOM & ROOM LIST UNTUK APDET WORST MONEY LOSE
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 roomOverId: data[0].room_id,
+                gameOverPlayers,
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
             const isPublished = await this.pubnubPublish(roomlistChannel, publishData)
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // gameroom publish
+            const gameroomChannel = `monopoli-gameroom-${data[0].room_id}`
+            const isGamePublished = await this.pubnubPublish(gameroomChannel, {gameOverPlayers})
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 data: data,

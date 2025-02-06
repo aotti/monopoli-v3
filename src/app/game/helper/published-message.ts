@@ -194,4 +194,20 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return newPlayerInfo
         })
     }
+    // game over
+    if(getMessage.gameOverPlayers) {
+        // update worst money
+        gameState.setMyPlayerInfo(player => {
+            const newPlayerInfo = {...player}
+            getMessage.gameOverPlayers.forEach(v => {
+                if(newPlayerInfo.display_name == v.player) {
+                    newPlayerInfo.worst_money_lost = v.worst_money === -999999 
+                                                    ? newPlayerInfo.worst_money_lost 
+                                                    : v.worst_money
+                    newPlayerInfo.game_played += 1
+                }
+            })
+            return newPlayerInfo
+        })
+    }
 }
