@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { applyTooltipEvent, fetcher, fetcherOptions, qS, translateUI } from "../../helper/helper"
+import { applyTooltipEvent, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -38,6 +38,8 @@ export default function GameContent({ pubnubSetting }) {
         miscState.setShowTutorial(null)
         // set notif to null
         gameState.setShowGameNotif(null)
+        // remove city owned list
+        setTimeout(() => localStorage.removeItem('cityOwnedList'), 1000)
     }
 
     // pubnub

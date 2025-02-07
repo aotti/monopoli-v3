@@ -685,11 +685,12 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // get prison accumulate number
             const prisonNumber = playerTurnData.prison
             // check if player is just step on prison / already arrested
-            const isFirstArrested = eventData?.event == 'get_arrested'
+            const isFirstArrested = (eventData as any)?.accumulate === 0
             const isArrested = prisonNumber < 0 ? null : prisonNumber
             // accumulate dice number
-            const prisonAccumulate = isFirstArrested ? 0 : 
-                                    typeof isArrested == 'number' && isArrested > -1 
+            const prisonAccumulate = isFirstArrested 
+                                    ? 0 
+                                    : typeof isArrested == 'number' && isArrested > -1 
                                         ? (isArrested + playerDice) 
                                         : -1
             // check if accumulate dice is enough
@@ -1853,24 +1854,28 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
 // ========== # PRISON EVENT ==========
 // ========== # PRISON EVENT ==========
 function stopByPrison(findPlayer: number, miscState: IMiscContext, gameState: IGameContext) {
-    return new Promise((resolve: (value: EventDataType)=>void) => {
-        // result message
-        const notifTitle = qS('#result_notif_title')
-        const notifMessage = qS('#result_notif_message')
-        // prison info
-        const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-        const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
-        // notif message
-        notifTitle.textContent = 'Prison'
-        notifMessage.textContent = `${gameState.gamePlayerInfo[findPlayer].display_name} get arrested for being silly. accumulate > ${prisonAccumulateLimit} dice number to be free.`
-        // show notif 
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+        // check for anti prison special card
+        const [specialCard, specialEffect] = await useSpecialCard({type: 'prison'}, findPlayer, miscState, gameState)
+        const isSpecialCardUsed = specialCard ? updateSpecialCardList({
+            action: 'used', 
+            currentSpecialCard: playerTurnData.card, 
+            specialCard: specialCard
+        }) : null
         // return event data
-        resolve({
-            event: 'get_arrested',
-            money: 0,
-        })
+        isSpecialCardUsed
+            ? resolve({
+                event: 'get_arrested',
+                accumulate: -1,
+                money: 0,
+                card: isSpecialCardUsed,
+            })
+            : resolve({
+                event: 'get_arrested',
+                accumulate: 0,
+                money: 0,
+            })
     })
 }
 
@@ -2026,12 +2031,12 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                 if(sc == 'nerf tax') {
                     setSpecialCardHistory(sc)
                     const newPrice = price - (price * .35)
-                    return resolve(await specialCardConfirmation({sc, newPrice, eventContent}))
+                    return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
                 else if(sc == 'anti tax') {
                     setSpecialCardHistory(sc)
                     const newPrice = 0
-                    return resolve(await specialCardConfirmation({sc, newPrice, eventContent}))
+                    return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
             }
         }
@@ -2051,15 +2056,49 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             }
             return resolve([null, null])
         }
+        else if(data.type == 'prison') {
+            // prison info
+            const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
+            const [eventTitle, eventContent] = [
+                'Prison',
+                `${gameState.gamePlayerInfo[findPlayer].display_name} get arrested for being silly. accumulate > ${prisonAccumulateLimit} dice number to be free.`
+            ]
+            // notif message
+            notifTitle.textContent = eventTitle
+            notifMessage.textContent = eventContent
+            // show notif 
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // split card
+            const splitSpecialCard = playerTurnData.card?.split(';')
+            // no card, show normal notif
+            if(!splitSpecialCard) {
+                // show notif (tax)
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                return resolve([null, null])
+            }
+            // show notif (tax)
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('with_button-2' as any)
+            // get card
+            const specialCard = splitSpecialCard.map(v => v.match(/anti prison/i)).flat().filter(i=>i)
+            if(specialCard[0]) {
+                setSpecialCardHistory(specialCard[0])
+                return resolve(await specialCardConfirmation({sc: specialCard[0], newValue: 'free', eventContent}))
+            }
+            return resolve([null, null])
+        }
         else return resolve([null, null])
     })
 
     // confirmation function
     interface ISpecialCardConfirm {
-        sc: string, newPrice: number, eventContent: string
+        sc: string, newValue: string|number, eventContent: string
     }
     function specialCardConfirmation(data: ISpecialCardConfirm) {
-        const {sc, newPrice, eventContent} = data
+        const {sc, newValue, eventContent} = data
         
         return new Promise((resolve: (value: [string, string|number])=>void) => {
             let specialCardTimer = 6
@@ -2096,11 +2135,9 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                         nopeButton.classList.add('hidden')
                         ofcourseButton.classList.add('hidden')
                         // modify tax price
-                        notifMessage.textContent = eventContent
-                                                .replace('xxx', playerTurnData.display_name) // player name
-                                                .replace('xxx', moneyFormat(newPrice)) // city price
+                        notifMessage.textContent = setSpecialCardContent(newValue, eventContent)
                         // return data
-                        return resolve([sc, newPrice])
+                        return resolve([sc, newValue])
                     }
                     // show buttons
                     nopeButton.classList.remove('hidden')
@@ -2120,6 +2157,17 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                 }
             }, 1000);
         })
+    }
+
+    function setSpecialCardContent(newValue: string|number, eventContent: string) {
+        switch(true) {
+            case typeof newValue == 'number':
+                return eventContent
+                .replace('xxx', playerTurnData.display_name) // player name
+                .replace('xxx', moneyFormat(newValue)) // city price
+            case typeof newValue == 'string':
+                return eventContent
+        }
     }
 
     function setSpecialCardHistory(specialCard: string) {

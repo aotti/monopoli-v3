@@ -196,18 +196,16 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
-        // update worst money
-        gameState.setMyPlayerInfo(player => {
-            const newPlayerInfo = {...player}
-            getMessage.gameOverPlayers.forEach(v => {
-                if(newPlayerInfo.display_name == v.player) {
-                    newPlayerInfo.worst_money_lost = v.worst_money === -999999 
-                                                    ? newPlayerInfo.worst_money_lost 
-                                                    : v.worst_money
-                    newPlayerInfo.game_played += 1
-                }
-            })
-            return newPlayerInfo
+        // set local storage for temp syncronize data
+        getMessage.gameOverPlayers.forEach(v => {
+            if(v.player == gameState.myPlayerInfo.display_name) {
+                // set temp player info
+                const newPlayerInfo = gameState.myPlayerInfo
+                newPlayerInfo.game_played += 1
+                newPlayerInfo.worst_money_lost = v.worst_money
+                // save to local storage
+                localStorage.setItem('playerData', JSON.stringify(newPlayerInfo))
+            }
         })
     }
 }

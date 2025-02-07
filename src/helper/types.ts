@@ -491,7 +491,9 @@ interface IEventCards {
 
 interface IEventPrison {
     event: 'get_arrested',
+    accumulate: number,
     money: number,
+    card?: string,
 }
 
 interface IEventParking {
@@ -538,7 +540,6 @@ interface ISpecialCardStart {
 }
 interface ISpecialCardPrison {
     type: 'prison',
-    test: string,
 }
 export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison
 

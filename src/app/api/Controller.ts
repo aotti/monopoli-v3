@@ -106,7 +106,7 @@ export default class Controller {
         function loopKeyValue(): [boolean, string] {
             for(let [key, value] of Object.entries(payload)) {
                 // skip filter password 
-                if(key == 'password' || key == 'token') continue
+                if(key == 'token') continue
                 else if(!filterInput(key as any, value)) 
                     return [false, `${key} doesnt match!`]
             }
