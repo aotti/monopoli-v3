@@ -541,7 +541,11 @@ interface ISpecialCardStart {
 interface ISpecialCardPrison {
     type: 'prison',
 }
-export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison
+interface ISpecialCardDice {
+    type: 'dice',
+    diceNumber: number,
+}
+export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice
 
 interface ISpecialCardAdd {
     action: 'add',

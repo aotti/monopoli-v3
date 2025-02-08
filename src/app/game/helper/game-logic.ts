@@ -549,14 +549,14 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         let [tileInfo, tileElement]: [string, HTMLElement] = [null, null]
         // moving params
         let numberStep = 0
-        let [numberLaps, throughStart] = [playerTurnData.lap, {card: '', money: 0}]
+        let [numberLaps, throughStart] = [playerTurnData.lap, 0]
         const currentPos = playerTurnData.pos
         const nextPos = (currentPos + playerDice) === playerPaths.length 
                         ? playerPaths.length 
                         : (currentPos + playerDice) % playerPaths.length
         const prisonNumber = playerTurnData.prison
-        console.log({prisonNumber});
-        
+        // special card container
+        const specialCardCollection = {cards: [], effects: []}
         // move function
         const stepInterval = setInterval(() => {
             // check if player is arrested / get debuff (skip turn)
@@ -582,6 +582,12 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 clearInterval(stepInterval)
                 // turn off roll dice
                 gameState.setRollNumber(null)
+                // check special card (gaming dice)
+                const [specialCard, specialEffect] = await useSpecialCard(
+                    {type: 'dice', diceNumber: playerDice}, findPlayer, miscState, gameState
+                )
+                specialCardCollection.cards.push(specialCard)
+                specialCardCollection.effects.push(specialEffect)
                 // stop by event
                 stopByEvent()
                 // ====== ONLY MOVING PLAYER WILL FETCH ======
@@ -606,20 +612,19 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     // update laps for moving player
                     if(fixedNextStep === 1) {
                         numberLaps += 1
-                        const isSpecialCardUsed = await useSpecialCard({type: 'start'}, findPlayer, miscState, gameState)
-                        throughStart = isSpecialCardUsed[0] ? {
-                            card: updateSpecialCardList({
-                                action: 'used', 
-                                currentSpecialCard: playerTurnData.card, 
-                                specialCard: isSpecialCardUsed[0]
-                            }), 
-                            money: isSpecialCardUsed[1] as number
-                        } : {card: null, money: 25_000}
+                        // update laps
                         gameState.setGamePlayerInfo(players => {
                             const newLapInfo = [...players]
                             newLapInfo[findPlayer].lap = numberLaps
                             return newLapInfo
                         })
+                        // check special card
+                        const [specialCard, specialEffect] = await useSpecialCard(
+                            {type: 'start'}, findPlayer, miscState, gameState
+                        )
+                        specialCardCollection.cards.push(specialCard)
+                        specialCardCollection.effects.push(0)
+                        throughStart = +specialEffect || 25_000
                     }
                 }
             })
@@ -681,7 +686,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const taxData = eventData?.event == 'pay_tax' 
                             ? {owner: eventData.owner, visitor: eventData.visitor} 
                             : null
-            const eventMoney = eventData?.money || 0
+            const specialCardMoney = specialCardCollection.effects.filter(v => typeof v == 'number')
+                                    .reduce((accumulate, current) => accumulate + current, 0)
+            const eventMoney = throughStart 
+                            ? Math.round(eventData.money + specialCardMoney + throughStart) 
+                            : Math.round(eventData.money + specialCardMoney)
             // get prison accumulate number
             const prisonNumber = playerTurnData.prison
             // check if player is just step on prison / already arrested
@@ -697,25 +706,27 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // 1 dice = 6, 2 dice = 12
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
+            // update special card list
+            const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // input values container
             const inputValues: IGamePlay['turn_end'] | {action: string} = {
                 action: 'game turn end',
                 channel: `monopoli-gameroom-${gameState.gameRoomId}`,
                 display_name: playerTurnData.display_name,
-                // arrested (-1) = stay current pos
+                // arrested (0) = stay current pos
                 pos: prisonNumber === -1 ? nextPos.toString() : currentPos.toString(),
                 lap: numberLaps.toString(),
                 // money from event that occured
-                event_money: throughStart.money ? Math.round(eventMoney + throughStart.money).toString() : Math.round(eventMoney).toString(),
+                event_money: eventMoney.toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
                 history: setEventHistory(`rolled_dice: ${subPlayerDice || playerDice}`, eventData),
-                // nullable data: city, card, taxes
+                // nullable data: city, card, taxes, take money
                 city: (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
                 card: (eventData as any)?.card || playerTurnData.card,
                 // taking money from players
-                take_money: (eventData as any)?.takeMoney || throughStart.card || null,
+                take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate
                 prison: isPrisonAccumulatePass.toString()
             }
@@ -1011,18 +1022,13 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
             const [specialCard, specialEffect] = await useSpecialCard(
                 {type: 'city', price: +buyCityPrice}, findPlayer, miscState, gameState
             ) as [string, number];
-            const isSpecialCardUsed = specialCard ? updateSpecialCardList({
-                action: 'used', 
-                currentSpecialCard: playerTurnData.card, 
-                specialCard: specialCard
-            }) : null
             // set event data (for history)
             const eventData: EventDataType = {
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
                 visitor: playerTurnData.display_name,
                 money: -specialEffect || -buyCityPrice,
-                card: isSpecialCardUsed
+                card: specialCard
             }
             // return event history
             return eventData
@@ -1711,18 +1717,12 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
-                // add special card
-                const isSpecialCardAdded = updateSpecialCardList({
-                    action: 'add',
-                    currentSpecialCard: playerTurnData.card || '',
-                    specialCard: effect
-                })
                 resolve({
                     event: 'get_card',
                     type: type,
                     tileName: tileName,
                     money: 0,
-                    card: isSpecialCardAdded || null
+                    card: `add-${effect}`
                 })
             }
         })
@@ -1855,27 +1855,15 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
 // ========== # PRISON EVENT ==========
 function stopByPrison(findPlayer: number, miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
-        const playerTurnData = gameState.gamePlayerInfo[findPlayer]
         // check for anti prison special card
         const [specialCard, specialEffect] = await useSpecialCard({type: 'prison'}, findPlayer, miscState, gameState)
-        const isSpecialCardUsed = specialCard ? updateSpecialCardList({
-            action: 'used', 
-            currentSpecialCard: playerTurnData.card, 
-            specialCard: specialCard
-        }) : null
         // return event data
-        isSpecialCardUsed
-            ? resolve({
-                event: 'get_arrested',
-                accumulate: -1,
-                money: 0,
-                card: isSpecialCardUsed,
-            })
-            : resolve({
-                event: 'get_arrested',
-                accumulate: 0,
-                money: 0,
-            })
+        return resolve({
+            event: 'get_arrested',
+            accumulate: specialEffect ? -1 : 0,
+            money: 0,
+            card: specialCard,
+        })
     })
 }
 
@@ -2052,7 +2040,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = 5000
-                return resolve([specialCard[0], newMoney])
+                return resolve([`used-${specialCard[0]}`, newMoney])
             }
             return resolve([null, null])
         }
@@ -2087,6 +2075,23 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 return resolve(await specialCardConfirmation({sc: specialCard[0], newValue: 'free', eventContent}))
+            }
+            return resolve([null, null])
+        }
+        else if(data.type == 'dice') {
+            const {diceNumber} = data
+            // split card
+            const splitSpecialCard = playerTurnData.card?.split(';')
+            // no card
+            if(!splitSpecialCard) {
+                return resolve([null, null])
+            }
+            // get card
+            const specialCard = splitSpecialCard.map(v => v.match(/gaming dice/i)).flat().filter(i=>i)
+            if(specialCard[0]) {
+                setSpecialCardHistory(specialCard[0])
+                const newMoney = diceNumber * 10_000
+                return resolve([`used-${specialCard[0]}`, newMoney])
             }
             return resolve([null, null])
         }
@@ -2137,7 +2142,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                         // modify tax price
                         notifMessage.textContent = setSpecialCardContent(newValue, eventContent)
                         // return data
-                        return resolve([sc, newValue])
+                        return resolve([`used-${sc}`, newValue])
                     }
                     // show buttons
                     nopeButton.classList.remove('hidden')
@@ -2178,23 +2183,28 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
 
 // ========== > UPDATE SPECIAL CARD ==========
 // ========== > UPDATE SPECIAL CARD ==========
-function updateSpecialCardList(data: UpdateSpecialCardListType) {
-    if(data.action == 'add') {
-        const {currentSpecialCard, specialCard} = data
-        // check if card exist
-        const isSpecialCardOwned = currentSpecialCard.match(specialCard)
-        // dont have yet, then add
-        if(!isSpecialCardOwned) {
-            const splitCurrentSpecialCard = currentSpecialCard.split(';')
-            splitCurrentSpecialCard.push(specialCard)
-            return splitCurrentSpecialCard.filter(i => i).join(';')
+function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
+    const tempSpecialCardArray = currentSpecialCard?.split(';') || []
+    for(let cd of cardData) {
+        // card null
+        if(!cd) continue
+        // card exist
+        const [action, specialCard] = cd.split('-')
+        if(action == 'add') {
+            // check if player already have the card
+            const isSpecialCardOwned = tempSpecialCardArray.indexOf(specialCard)
+            // dont have yet, then add
+            if(isSpecialCardOwned === -1) {
+                const splitCurrentSpecialCard = currentSpecialCard.split(';')
+                splitCurrentSpecialCard.push(specialCard)
+                tempSpecialCardArray.push(...splitCurrentSpecialCard.filter(i => i))
+            }
         }
-        return currentSpecialCard
+        else if(action == 'used') {
+            // remove the card
+            const filteredSpecialCard = tempSpecialCardArray.filter(v => v != specialCard)
+            tempSpecialCardArray.push(...filteredSpecialCard)
+        }
     }
-    else if(data.action == 'used') {
-        const {currentSpecialCard, specialCard} = data
-        // filter the card
-        const filteredSpecialCard = currentSpecialCard.split(';').filter(v => v != specialCard)
-        return filteredSpecialCard.length === 0 ? null : filteredSpecialCard.join(';')
-    }
+    return tempSpecialCardArray.join(';')
 }
