@@ -523,7 +523,7 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
  * @param playerDice dice result number
  */
 export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContext, gameState: IGameContext) {
-    const {playerTurn, playerDice, playerRNG} = rollDiceData
+    const {playerTurn, playerDice, playerRNG, playerSpecialCard} = rollDiceData
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -556,7 +556,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         : (currentPos + playerDice) % playerPaths.length
         const prisonNumber = playerTurnData.prison
         // special card container
-        const specialCardCollection = {cards: [], effects: []}
+        // player special card = nerf parking card (nullable)
+        const specialCardCollection = {cards: [playerSpecialCard], effects: []}
         // move function
         const stepInterval = setInterval(() => {
             // check if player is arrested / get debuff (skip turn)
@@ -686,8 +687,12 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const taxData = eventData?.event == 'pay_tax' 
                             ? {owner: eventData.owner, visitor: eventData.visitor} 
                             : null
+            // get special card event data
+            if((eventData as any)?.card) specialCardCollection.cards.push((eventData as any)?.card)
+            // accumulate special card effects (only money)
             const specialCardMoney = specialCardCollection.effects.filter(v => typeof v == 'number')
                                     .reduce((accumulate, current) => accumulate + current, 0)
+            // set event money
             const eventMoney = throughStart 
                             ? Math.round(eventData.money + specialCardMoney + throughStart) 
                             : Math.round(eventData.money + specialCardMoney)
@@ -724,7 +729,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 city: (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
-                card: (eventData as any)?.card || playerTurnData.card,
+                card: isSpecialCardUsed || playerTurnData.card,
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate
@@ -856,7 +861,6 @@ export async function gameOver(winPlayer: string, miscState: IMiscContext, gameS
             return
     }
 }
-
 
 // ========== GAME TILE EVENT ==========
 // ========== GAME TILE EVENT ==========
@@ -1870,13 +1874,17 @@ function stopByPrison(findPlayer: number, miscState: IMiscContext, gameState: IG
 // ========== # PARKING EVENT ==========
 // ========== # PARKING EVENT ==========
 function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
-    return new Promise((resolve: (value: EventDataType)=>void) => {
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
         // get current player
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
         // result message
         const notifTitle = qS('#result_notif_title')
         const notifMessage = qS('#result_notif_message')
         const notifTimer = qS('#result_notif_timer')
+        // check special card
+        const [specialCard, specialEffect] = await useSpecialCard(
+            {type: 'parking'}, findPlayer, miscState, gameState
+        ) as [string, string]
         // notif message
         notifTitle.textContent = 'Free Parking'
         notifMessage.textContent = 'select tile number'
@@ -1886,7 +1894,7 @@ function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContex
         // parking interval
         let parkingTimer = 10
         const parkingInterval = setInterval(() => {
-            notifTimer.textContent = `${parkingTimer}`
+            notifTimer.textContent = specialCard ? `"nerf parking" ${parkingTimer}` : `${parkingTimer}`
             parkingTimer--
             // dont move if not click
             if(parkingTimer < 0) {
@@ -1898,7 +1906,8 @@ function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContex
                 return resolve({
                     event: 'parking',
                     destination: 22, // parking tile
-                    money: 0
+                    money: 0,
+                    card: specialCard
                 })
             }
             // check button exist
@@ -1908,7 +1917,8 @@ function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContex
                 const parkingButtons = qSA(`[data-id^=notif_button]`) as NodeListOf<HTMLInputElement>
                 for(let i=0; i<parkingButtons.length; i++) {
                     // skip prison (tile 10, i 9) & parking (tile 22, i 21) 
-                    if(i === 9 || i === 21) continue
+                    // skip special effect (nerf tiles)
+                    if(i === 9 || i === 21 || specialEffect?.match(`${i}`)) continue
 
                     const pb = parkingButtons[i]
                     pb.classList.remove('hidden')
@@ -1926,7 +1936,8 @@ function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContex
                         const rollDiceData: IRollDiceData = {
                             playerTurn: playerTurnData.display_name,
                             playerDice: setChosenDice,
-                            playerRNG: rng
+                            playerRNG: rng,
+                            playerSpecialCard: specialCard
                         }
                         // reset modify buttons
                         for(let tpb of parkingButtons) {
@@ -2092,6 +2103,43 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = diceNumber * 10_000
                 return resolve([`used-${specialCard[0]}`, newMoney])
+            }
+            return resolve([null, null])
+        }
+        else if(data.type == 'parking') {
+            // split card
+            const splitSpecialCard = playerTurnData.card?.split(';')
+            // no card
+            if(!splitSpecialCard) {
+                return resolve([null, null])
+            }
+            // get card
+            const specialCard = splitSpecialCard.map(v => v.match(/nerf parking/i)).flat().filter(i=>i)
+            if(specialCard[0]) {
+                setSpecialCardHistory(specialCard[0])
+                // add nerf tiles
+                const nerfTiles = []
+                for(let i=0; i<24; i++) {
+                    const randTile = Math.floor(Math.random() * 24)
+                    // skip prison & parking tile
+                    if(randTile === 9 || randTile === 21) 
+                        nerfTiles.push(randTile+1)
+                    else nerfTiles.push(randTile)
+                }
+                // filter nerf tiles
+                const filteredNerfTiles = nerfTiles.filter((v, i) => nerfTiles.indexOf(v) === i)
+                // if there are still too many nerf tiles, slice the array to 12
+                if(filteredNerfTiles.length > 12) {
+                    return resolve([
+                        `used-${specialCard[0]}`, 
+                        filteredNerfTiles.slice(0, 12).join(',')
+                    ])
+                }
+                // nerf tiles <= 12
+                return resolve([
+                    `used-${specialCard[0]}`, 
+                    filteredNerfTiles.join(',')
+                ])
             }
             return resolve([null, null])
         }

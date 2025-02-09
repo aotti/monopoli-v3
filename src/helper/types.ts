@@ -391,7 +391,8 @@ export interface IShiftRoom extends ITokenPayload {
 export interface IRollDiceData {
     playerTurn: string, 
     playerDice: number, 
-    playerRNG: string[]
+    playerRNG: string[],
+    playerSpecialCard?: string,
 }
 
 export interface IGamePlay {
@@ -500,6 +501,7 @@ interface IEventParking {
     event: 'parking',
     destination: number,
     money: number,
+    card?: string,
 }
 
 interface IEventCursed {
@@ -545,7 +547,10 @@ interface ISpecialCardDice {
     type: 'dice',
     diceNumber: number,
 }
-export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice
+interface ISpecialCardParking {
+    type: 'parking',
+}
+export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice | ISpecialCardParking
 
 interface ISpecialCardAdd {
     action: 'add',
