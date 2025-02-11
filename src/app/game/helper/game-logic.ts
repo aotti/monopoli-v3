@@ -701,6 +701,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const eventMoney = throughStart 
                             ? Math.round(eventData.money + specialCardMoney + throughStart) 
                             : Math.round(eventData.money + specialCardMoney)
+            // update special card list
+            const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // get prison accumulate number
             const prisonNumber = playerTurnData.prison
             // check if player is just step on prison / already arrested
@@ -716,8 +718,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // 1 dice = 6, 2 dice = 12
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
-            // update special card list
-            const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // input values container
             const inputValues: IGamePlay['turn_end'] | {action: string} = {
                 action: 'game turn end',
@@ -2299,11 +2299,7 @@ function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
             // check if player already have the card
             const isSpecialCardOwned = tempSpecialCardArray.indexOf(specialCard)
             // dont have yet, then add
-            if(isSpecialCardOwned === -1) {
-                const splitCurrentSpecialCard = currentSpecialCard.split(';')
-                splitCurrentSpecialCard.push(specialCard)
-                tempSpecialCardArray.push(...splitCurrentSpecialCard.filter(i => i))
-            }
+            if(isSpecialCardOwned === -1) tempSpecialCardArray.push(specialCard)
         }
         else if(action == 'used') {
             // remove the card
