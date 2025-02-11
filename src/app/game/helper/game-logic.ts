@@ -717,11 +717,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // update special card list
-            console.log(specialCardCollection, playerTurnData.card);
-            
             const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
-            console.log({isSpecialCardUsed});
-            
             // input values container
             const inputValues: IGamePlay['turn_end'] | {action: string} = {
                 action: 'game turn end',
