@@ -72,7 +72,7 @@ function PlayerSettingButton() {
                     // button for players
                     ? <>
                         <AutoRollDiceOption />
-                        <SellCityOption />
+                        <SellUpgradeCityOption />
                         <AttackCityOption />
                         <GameHistoryOption />
                     </>
@@ -97,7 +97,7 @@ function AutoRollDiceOption() {
     )
 }
 
-function SellCityOption() {
+function SellUpgradeCityOption() {
     const miscState = useMisc()
     const gameState = useGame()
 
@@ -108,7 +108,7 @@ function SellCityOption() {
                 gameState.setOpenPlayerSetting(false)
             }} />
             <label htmlFor="sell_city" className="w-full"> 
-                {translateUI({lang: miscState.language, text: 'Sell City'})} 
+                {translateUI({lang: miscState.language, text: 'Upgrade/Sell City'})} 
             </label>
         </div>
     )

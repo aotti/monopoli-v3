@@ -1,5 +1,5 @@
 import PubNub from "pubnub"
-import { GameRoomListener, IChat, IGameContext, IMiscContext } from "../../../helper/types"
+import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-logic"
 
@@ -88,11 +88,12 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setGameStages(getMessage.gameStage)
     }
     // roll dice
-    if(getMessage.playerTurn && getMessage.playerDice) {
-        const rollDiceData = {
+    if(getMessage.playerTurn && typeof getMessage.playerDice == 'number') {
+        const rollDiceData: IRollDiceData = {
             playerTurn: getMessage.playerTurn,
             playerDice: getMessage.playerDice,
-            playerRNG: getMessage.playerRNG
+            playerRNG: getMessage.playerRNG,
+            playerSpecialCard: getMessage.playerSpecialCard
         }
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)

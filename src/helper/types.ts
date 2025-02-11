@@ -48,6 +48,7 @@ export type GameRoomListener = {
     playerTurn: string,
     playerDice: number,
     playerRNG: string[],
+    playerSpecialCard: string,
     gameHistory: IGameHistory[],
     playerTurns: string[],
     surrendPlayer: string,
@@ -284,7 +285,7 @@ type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
-type RollDiceType = 'rolled_dice'|'rng'
+type RollDiceType = 'rolled_dice'|'rng'|'special_card'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
@@ -412,7 +413,8 @@ export interface IGamePlay {
         channel: string,
         display_name: string,
         rolled_dice: string,
-        rng: string
+        rng: string,
+        special_card: string,
     } & ITokenPayload,
     surrender: {
         channel: string,
@@ -507,6 +509,7 @@ interface IEventParking {
 interface IEventCursed {
     event: 'cursed',
     money: number,
+    takeMoney?: string,
 }
 
 interface IEventSpecial {
@@ -550,7 +553,11 @@ interface ISpecialCardDice {
 interface ISpecialCardParking {
     type: 'parking',
 }
-export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice | ISpecialCardParking
+interface ISpecialCardCursed {
+    type: 'cursed',
+    price: number,
+}
+export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice | ISpecialCardParking | ISpecialCardCursed
 
 interface ISpecialCardAdd {
     action: 'add',

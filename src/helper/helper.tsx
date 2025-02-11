@@ -256,6 +256,9 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[\d]{1,2}$/) : null
         case 'rng':
             return value ? value.match(/^[\d]{1,2},[\d]{1,2}$|^100,[\d]{1,2}$|^[\d]{1,2},100$/) : null
+        case 'special_card': 
+            const optionalSpecialCard = value === null || value.match(/used\W.*/) ? true : false
+            return optionalSpecialCard
         // ====== TURN END TYPE ======
         case 'pos': 
             return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null

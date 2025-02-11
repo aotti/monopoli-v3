@@ -54,6 +54,11 @@ export default function GameContent({ pubnubSetting }) {
         getPlayerInfo(gameroomParam, miscState, gameState)
 
         gameState.setGameRoomId(gameroomParam)
+        // remove sub event data
+        localStorage.removeItem('subPlayerDice')
+        localStorage.removeItem('subEventData')
+        localStorage.removeItem('parkingEventData')
+        localStorage.removeItem('specialCardUsed')
     }, [])
 
     useEffect(() => {

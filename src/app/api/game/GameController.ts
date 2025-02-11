@@ -262,7 +262,8 @@ export default class GameController extends Controller {
         const publishData = {
             playerTurn: payload.display_name,
             playerDice: +payload.rolled_dice,
-            playerRNG: payload.rng.split(',') // send back as array
+            playerRNG: payload.rng.split(','), // send back as array
+            playerSpecialCard: payload.special_card
         }
         const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isGamePublished);

@@ -13,6 +13,7 @@ import community_cards_list from "../config/community-cards.json"
         # SPECIAL CITY EVENT
             > SELL CITY
             > UPDATE CITY
+            > SPECIAL UPGRADE CITY
         # CARD EVENT
         # PRISON EVENT
         # PARKING EVENT
@@ -336,7 +337,7 @@ export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, t
     }
 }
 
-export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext) {
+export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext, specialCard?: string) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -347,12 +348,13 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         action: 'game roll dice',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
-        rolled_dice: null,
+        rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
             Math.floor(Math.random() * 101), 
             Math.floor(Math.random() * 101)
-        ].toString() 
+        ].toString(),
+        special_card: specialCard ? specialCard : null
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {
@@ -547,6 +549,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
         // get tile element for stop by event
         let [tileInfo, tileElement]: [string, HTMLElement] = [null, null]
+        // set tile info & element if theres special card
+        if(playerSpecialCard && playerTurnData.city) 
+            [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
         // moving params
         let numberStep = 0
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
@@ -666,7 +671,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         .catch(err => console.log(err))
                         break
                     case 'cursed': 
-                        stopByCursedCity(tileElement, miscState, gameState)
+                        stopByCursedCity(findPlayer, tileElement, miscState, gameState)
                         .then(eventData => resolve(eventData))
                         .catch(err => console.log(err))
                         break
@@ -712,7 +717,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // update special card list
+            console.log(specialCardCollection, playerTurnData.card);
+            
             const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
+            console.log({isSpecialCardUsed});
+            
             // input values container
             const inputValues: IGamePlay['turn_end'] | {action: string} = {
                 action: 'game turn end',
@@ -1185,6 +1194,32 @@ function updateCityList(data: UpdateCityListType) {
     }
 }
 
+// ========== > SPECIAL UPGRADE CITY ==========
+// ========== > SPECIAL UPGRADE CITY ==========
+function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number) {
+    // get all owned city
+    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel/))
+    // get city name
+    const upgradeRNG = rng % myCityList.length
+    const upgradeCityName = myCityList[upgradeRNG].split('*')[0]
+    // get city element & tile info
+    const upgradeCityElement = qS(`[data-city-info^='${upgradeCityName}']`) as HTMLElement
+    const upgradeCityTileInfo = upgradeCityElement.dataset.tileInfo
+    // return data
+    return [upgradeCityTileInfo, upgradeCityElement] as [string, HTMLElement]
+}
+
+export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
+    // roll dice button
+    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+    // loading button
+    const tempRollDiceText = rollDiceButton.textContent
+    rollDiceButton.textContent = 'Loading'
+    // set history
+    localStorage.setItem('specialCardUsed', `special_card: upgrade city`)
+    rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
+}
+
 // ========== # CARD EVENT ==========
 // ========== # CARD EVENT ==========
 function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
@@ -1437,7 +1472,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
-                // get all players except current player
+                // get all players 
                 const otherPlayerNames = gameState.gamePlayerInfo.map(v => v.display_name).join(',')
                 resolve({
                     event: 'get_card',
@@ -1959,23 +1994,32 @@ function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContex
 
 // ========== # CURSED CITY EVENT ==========
 // ========== # CURSED CITY EVENT ==========
-function stopByCursedCity(tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
-    return new Promise((resolve: (value: EventDataType)=>void) => {
+function stopByCursedCity(findPlayer: number, tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
         const getCityInfo = tileElement.dataset.cityInfo.split(',')
         const [cityName, cityProperty, cityPrice, cityOwner] = getCityInfo as string[];
         // result message
         const notifTitle = qS('#result_notif_title')
         const notifMessage = qS('#result_notif_message')
+        const notifTimer = qS('#result_notif_timer')
+        // check special card
+        const [specialCard, specialEffect] = await useSpecialCard(
+            {type: 'cursed', price: +cityPrice}, findPlayer, miscState, gameState
+        ) as [string, number]
         // notif message
         notifTitle.textContent = 'Cursed City'
         notifMessage.textContent = `The city curse you for ${moneyFormat(+cityPrice)}`
+        notifTimer.textContent = specialCard ? `"${specialCard}"` : ''
         // show notif 
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
+        // get all players 
+        const otherPlayerNames = gameState.gamePlayerInfo.map(v => v.display_name).join(',')
         // return event data
         resolve({
             event: 'cursed',
-            money: -cityPrice
+            money: specialEffect || -cityPrice,
+            takeMoney: specialEffect ? `${specialEffect};${otherPlayerNames}` : null
         })
     })
 }
@@ -2143,6 +2187,23 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             }
             return resolve([null, null])
         }
+        else if(data.type == 'cursed') {
+            const {price} = data
+            // split card
+            const splitSpecialCard = playerTurnData.card?.split(';')
+            // no card
+            if(!splitSpecialCard) {
+                return resolve([null, null])
+            }
+            // get card
+            const specialCard = splitSpecialCard.map(v => v.match(/curse reverser/i)).flat().filter(i=>i)
+            if(specialCard[0]) {
+                setSpecialCardHistory(specialCard[0])
+                const newMoney = price * .30
+                return resolve([specialCard[0], newMoney])
+            }
+            return resolve([null, null])
+        }
         else return resolve([null, null])
     })
 
@@ -2250,9 +2311,9 @@ function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
         }
         else if(action == 'used') {
             // remove the card
-            const filteredSpecialCard = tempSpecialCardArray.filter(v => v != specialCard)
-            tempSpecialCardArray.push(...filteredSpecialCard)
+            const findSpecialCard = tempSpecialCardArray.indexOf(specialCard)
+            tempSpecialCardArray.splice(findSpecialCard, 1)
         }
     }
-    return tempSpecialCardArray.join(';')
+    return tempSpecialCardArray.length === 0 ? null : tempSpecialCardArray.join(';')
 }

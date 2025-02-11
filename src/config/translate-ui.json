@@ -76,6 +76,16 @@
         "surrender": "menyerah",
         "back to room, not leave game": "balik ke ruang, bukan menyerah",
 
+        "__SIDE BUTTONS & CONTENT__": "__SIDE BUTTONS & CONTENT__",
+        "Auto roll dice": "Dadu otomatis",
+        "Sell City": "Jual Kota",
+        "Upgrade/Sell City": "Renovasi/Jual Kota",
+        "Game History": "Catatan Main",
+        "Attack City": "Serang Kota",
+        "sell": "jual",
+        "Upgrade": "Renovasi",
+        "only player in this room can see the chat": "obrolan ini hanya bisa dilihat pemain yang ada disini",
+
         "__TILES TOOLTIP__": "__TILES TOOLTIP__",
         "get 25k when passing or staying": "dapat 25k saat lewat atau injak",
         "price +10% for each upgrade": "harga +10% setiap peningkatan",
@@ -89,14 +99,6 @@
         "<Jakarta>\nafter buying, get money every visit": "<Jakarta>\nsetelah beli, dapat uang setiap injak",
         "<Yogyakarta>\nafter buying, get money every visit": "<Yogyakarta>\nsetelah beli, dapat uang setiap injak",
         "<Merauke>\nafter buying, get money every visit": "<Merauke>\nsetelah beli, dapat uang setiap injak",
-
-        "__SIDE BUTTONS & CONTENT__": "__SIDE BUTTONS & CONTENT__",
-        "Auto roll dice": "Dadu otomatis",
-        "Sell City": "Jual Kota",
-        "Game History": "Catatan Main",
-        "Attack City": "Serang Kota",
-        "sell": "jual",
-        "only player in this room can see the chat": "obrolan ini hanya bisa dilihat pemain yang ada disini",
 
         "__HELP CONTENT__": "__HELP CONTENT__",
 
