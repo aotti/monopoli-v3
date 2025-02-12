@@ -699,8 +699,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                                     .reduce((accumulate, current) => accumulate + current, 0)
             // set event money
             const eventMoney = throughStart 
-                            ? Math.round(eventData.money + specialCardMoney + throughStart) 
-                            : Math.round(eventData.money + specialCardMoney)
+                            ? Math.round((eventData?.money || 0) + specialCardMoney + throughStart) 
+                            : Math.round((eventData?.money || 0) + specialCardMoney)
             // update special card list
             const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // get prison accumulate number
