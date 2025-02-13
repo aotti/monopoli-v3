@@ -275,7 +275,7 @@ export function filterInput(input: InputIDType, value: string) {
                 'parking: tile \\d+ 😎',
                 'cursed: .* 💀',
                 'special_city: .* 💸',
-                'special_card: .*',
+                'special_card: .* 💳',
             ]
             const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}`, 'g')
             // set length

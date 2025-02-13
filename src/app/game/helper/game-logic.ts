@@ -702,7 +702,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             ? Math.round((eventData?.money || 0) + specialCardMoney + throughStart) 
                             : Math.round((eventData?.money || 0) + specialCardMoney)
             // update special card list
-            const isSpecialCardUsed = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
+            const specialCardLeft = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // get prison accumulate number
             const prisonNumber = playerTurnData.prison
             // check if player is just step on prison / already arrested
@@ -734,7 +734,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 city: (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
-                card: isSpecialCardUsed || playerTurnData.card,
+                card: specialCardLeft,
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate
@@ -1208,11 +1208,14 @@ function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], r
 export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
     // roll dice button
     const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+    // sound effect
+    const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
     // loading button
     const tempRollDiceText = rollDiceButton.textContent
     rollDiceButton.textContent = 'Loading'
     // set history
-    localStorage.setItem('specialCardUsed', `special_card: upgrade city`)
+    localStorage.setItem('specialCardUsed', `special_card: upgrade city 💳`)
+    soundSpecialCard.play()
     rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
 }
 
@@ -2028,6 +2031,8 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
     const notifTimer = qS('#result_notif_timer')
+    // sound effect
+    const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
 
     return new Promise(async (resolve: (value: [string, string|number])=>void) => {
         // city: anti tax, nerf tax
@@ -2280,9 +2285,14 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
         }
     }
 
+    /**
+     * @description set special card to game history & play sound
+     */
     function setSpecialCardHistory(specialCard: string) {
-        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-            localStorage.setItem('specialCardUsed', `special_card: ${specialCard}`)
+        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+            localStorage.setItem('specialCardUsed', `special_card: ${specialCard} 💳`)
+            soundSpecialCard.play()
+        }
     }
 }
 
