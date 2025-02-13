@@ -942,10 +942,10 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
             if(buyCityTimer < 0) {
                 clearInterval(buyCityInterval)
                 notifTimer.textContent = ''
-                // hide notif
+                nopeButton ? nopeButton.click() : null
+                // hide notif after click
                 miscState.setAnimation(false)
                 gameState.setShowGameNotif(null)
-                nopeButton ? nopeButton.click() : null
                 return
             }
             // prevent other player from doing event
@@ -1360,9 +1360,6 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         if(getMoneyTimer < 0) {
                             clearInterval(getMoneyInterval)
                             notifTimer.textContent = ``
-                            // hide notif
-                            miscState.setAnimation(false)
-                            gameState.setShowGameNotif(null)
                             // show number on selected coin
                             coinButtons[0] ? coinButtons[0].textContent = `${coinPrizes[0]}` : null
                             // set timeout to hide all buttons
@@ -1538,9 +1535,6 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     if(movePlaceTimer < 0) {
                         clearInterval(movePlaceInterval)
                         notifTimer.textContent = ''
-                        // hide notif
-                        miscState.setAnimation(false)
-                        gameState.setShowGameNotif(null)
                         // set choosen button
                         if(!separator) chosenButton.classList.add('bg-green-600')
                         // set player dice
@@ -1553,6 +1547,9 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                             playerDice: setChosenDice,
                             playerRNG: rng
                         }
+                        // hide notif after data set
+                        miscState.setAnimation(false)
+                        gameState.setShowGameNotif(null)
                         // move to chosen place
                         playerMoving(rollDiceData, miscState, gameState)
                         // return event data
@@ -1686,9 +1683,6 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     if(sellCityTimer < 0) {
                         clearInterval(sellCityInterval)
                         notifTimer.textContent = `${chosenSellCity} city sold`
-                        // hide notif
-                        miscState.setAnimation(false)
-                        gameState.setShowGameNotif(null)
                         // selling city
                         const cityLeft = updateCityList({
                             action: 'sell', 
@@ -1697,6 +1691,9 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         })
                         const getCityInfo = (qS(`[data-city-info^=${chosenSellCity}]`) as HTMLElement).dataset.cityInfo.split(',')
                         const [cityName, cityProperty, cityPrice, cityOwner] = getCityInfo
+                        // hide notif after data set
+                        miscState.setAnimation(false)
+                        gameState.setShowGameNotif(null)
                         // return event data
                         resolve({
                             event: 'get_card',
@@ -1787,9 +1784,6 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 if(optionalButtonTimer < 0) {
                     clearInterval(optionalButtonInterval)
                     notifTimer.textContent = ''
-                    // hide notif
-                    miscState.setAnimation(false)
-                    gameState.setShowGameNotif(null)
                     // disable button
                     leftButton.disabled = true
                     rightButton.disabled = true
@@ -1818,7 +1812,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 if(rightButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
                     // show buttons
                     leftButton.classList.remove('hidden')
-                    // modify button 
+                    // modify button (timer 2 == random pick)
                     timer == 2 ? leftButton.disabled = true : null
                     leftButton.textContent = leftEffect.match(/\d{4}/) ? moneyFormat(+leftEffect) : leftEffect
                     // click event
@@ -1833,7 +1827,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     }
                     // show buttons
                     rightButton.classList.remove('hidden')
-                    // modify button 
+                    // modify button (timer 2 == random pick)
                     timer == 2 ? rightButton.disabled = true : null
                     rightButton.textContent = rightEffect.match(/\d{4}/) ? moneyFormat(+rightEffect) : rightEffect
                     // click event
@@ -2229,10 +2223,10 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                 if(specialCardTimer < 0) {
                     clearInterval(specialCardInterval)
                     notifTimer.textContent = ''
-                    // hide notif
+                    nopeButton ? nopeButton.click() : null
+                    // hide notif after click
                     miscState.setAnimation(false)
                     gameState.setShowGameNotif(null)
-                    nopeButton ? nopeButton.click() : null
                     return
                 }
                 // choice event
