@@ -351,7 +351,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            15, 
             Math.floor(Math.random() * 101)
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -1172,7 +1172,7 @@ function updateCityList(data: UpdateCityListType) {
         // find city with building, then destroy
         const splitCurrentCity = currentCity?.split(';')
         if(splitCurrentCity) {
-            // check property
+            // check property, if city has any house then destroy
             const isPropertyExist = splitCurrentCity.map(v => v.match(/2house1hotel$|2house$|1house$/) ? v : null).filter(i => i)
             if(isPropertyExist.length > 0) {
                 const destroyRNG = rng % isPropertyExist.length
@@ -1238,13 +1238,13 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
                 notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
-                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
-                notifImage.src = cards.data[cardRNG].img
+                notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[1].description as any})
+                notifImage.src = cards.data[1].img
                 // run card effect
                 const cardData = {
                     tileName: card,
                     rank: cards.category,
-                    effectData: cards.data[cardRNG].effect
+                    effectData: cards.data[1].effect
                 }
                 return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
             }
@@ -1717,12 +1717,29 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 })
                 // get destroyed city
                 const getDestroyedCity = isDestroyed ? isDestroyed.split(';') : null
-                const destroyedCity = getDestroyedCity ? getDestroyedCity[getDestroyedCity.length-1].split('*')[0] : null
+                // index 0 = city | index 1 = property
+                const destroyedCity = getDestroyedCity ? getDestroyedCity[getDestroyedCity.length-1].split('*') : null
                 // use notif timer as addition message
-                notifTimer.textContent = destroyedCity ? `"${destroyedCity} city collapse"` : '"go get a house, homeless"'
+                notifTimer.textContent = destroyedCity ? `"${destroyedCity[0]} city collapse"` : '"go get a house, homeless"'
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
+                // if destroyed, show broken video & sound
+                if(destroyedCity) {
+                    // get destroyed property
+                    // if the last property is 2house, then hotel destroyed
+                    // else is house destroyed
+                    const destroyedProperty = destroyedCity[1].match(/2house1hotel$|2house$|1house$|land$/)[0] == '2house'
+                                            ? 'hotel' : 'house'
+                    const videoCityBroken = qS(`#video_city_broken_${destroyedProperty}_${destroyedCity[0]}`) as HTMLVideoElement
+                    const soundCityBroken = qS('#sound_city_broken') as HTMLAudioElement
+                    videoCityBroken.classList.remove('hidden')
+                    // play
+                    videoCityBroken.play()
+                    soundCityBroken.play()
+                    // hide broken video
+                    setTimeout(() => videoCityBroken.classList.add('hidden'), 2000)
+                }
                 // return event data
                 resolve({
                     event: 'get_card',

@@ -153,6 +153,11 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const newInfo = name.match('Cursed')
                     ? `${name};${curseRand};${translateInfo}`
                     : cityBoughtInfo ? `${name};${cityBoughtInfo}` : `${name};${translateInfo}`
+    // tile broken & destroy
+    const tileBroken = {
+        house: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_House_100-aO1wZX4zHUd83tK6b1uVbxSsi1sDeE.mp4',
+        hotel: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_Hotel_100-h4YRBkWKUrluT7d17MhkXjDeFiBZBl.mp4',
+    }
 
     return (
         <div className="relative">
@@ -160,6 +165,9 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == square ? <Characters key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
+                {/* tile broken */}
+                <video id={`video_city_broken_house_${cityName || name}`} src={tileBroken.house} className="absolute hidden" />
+                <video id={`video_city_broken_hotel_${cityName || name}`} src={tileBroken.hotel} className="absolute hidden" />
                 {/* tile image */}
                 <img src={img} alt={name} className={`w-[7.5vw] h-[23vh]`} loading="lazy" draggable={false} />
                 {/* tile label */}

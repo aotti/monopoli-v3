@@ -10,14 +10,14 @@ export default function PlayerSettingSellCity() {
     const mySellCityList: string[] = []
     let tempCityInfo: string = null
     // special card container
-    let upgradeCityCard: boolean = null
+    const upgradeCityCard = []
     // get city owned list
     gameState.gamePlayerInfo.map(v => {
         if(v.display_name == gameState.myPlayerInfo.display_name) {
             // set my city list
             tempCityInfo = v.city
             // set my special cards
-            upgradeCityCard = v.card?.match(/upgrade city/i) ? true : false
+            upgradeCityCard.push(v.card?.match(/upgrade city/i))
             // loop city
             const dataCityInfo = qSA(`[data-city-info]`) as NodeListOf<HTMLElement>
             for(let dci of dataCityInfo) {
@@ -27,6 +27,7 @@ export default function PlayerSettingSellCity() {
             }
         }
     })
+    const isUpgradeCityCardExist = upgradeCityCard.flat().filter(i=>i).length === 1
 
     return (
         <div className={`${gameState.displaySettingItem == 'sell_city' ? 'block' : 'hidden'}
@@ -58,8 +59,8 @@ export default function PlayerSettingSellCity() {
                 </div>
                 {/* upgrade & close button */}
                 <div className="flex justify-around w-[calc(100%-.5rem)] p-1 border-t-2">
-                    <button type="button" className={`${upgradeCityCard ? '' : 'text-black'} active:opacity-75`} disabled={upgradeCityCard ? false : true}
-                    onClick={() => handleUpgradeCity(miscState, gameState)}>
+                    <button type="button" className={`${isUpgradeCityCardExist ? '' : 'text-black'} active:opacity-75`}
+                    onClick={() => handleUpgradeCity(miscState, gameState)} disabled={isUpgradeCityCardExist ? false : true}>
                         {translateUI({lang: miscState.language, text: 'Upgrade'})}
                     </button>
                     <button type="button" className="active:opacity-75" 
