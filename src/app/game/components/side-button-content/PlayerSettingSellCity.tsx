@@ -17,7 +17,7 @@ export default function PlayerSettingSellCity() {
             // set my city list
             tempCityInfo = v.city
             // set my special cards
-            upgradeCityCard.push(v.card?.match(/upgrade city/i))
+            upgradeCityCard.push(v.card?.match(/city upgrade/i))
             // loop city
             const dataCityInfo = qSA(`[data-city-info]`) as NodeListOf<HTMLElement>
             for(let dci of dataCityInfo) {
