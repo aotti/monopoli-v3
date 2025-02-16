@@ -1,4 +1,4 @@
-import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256, translateUI } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper"
 import { useMisc } from "../../../context/MiscContext"
 import { FormEvent, useEffect, useRef } from "react";
 import { IUser, IResponse, IMiscContext } from "../../../helper/types";
@@ -77,8 +77,8 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
         if(input.nodeName == 'INPUT') {
             // filter inputs
             if(setInputValue('username', input)) inputValues.username = input.value.trim().toLowerCase()
-            else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
-            else if(setInputValue('confirm_password', input)) inputValues.confirm_password = sha256(input.value.trim())
+            else if(setInputValue('password', input)) inputValues.password = input.value.trim()
+            else if(setInputValue('confirm_password', input)) inputValues.confirm_password = input.value.trim()
             else if(setInputValue('display_name', input)) inputValues.display_name = input.value.trim().toLowerCase()
             // error
             else {

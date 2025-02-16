@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 import PlayerController from "../PlayerController";
 import { IResponse } from "../../../../helper/types";
 import { cookies } from "next/headers";
@@ -16,6 +16,8 @@ export async function PUT(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent
+    payload.user_agent = userAgent(req).ua
     // process
     const playerController = new PlayerController()
     const result = await playerController.avatarUpload(action, payload)

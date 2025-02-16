@@ -5,7 +5,7 @@ import { jwtVerify } from "jose";
 
 export default class LogoutController extends Controller {
 
-    async logout(action: string) {
+    async logout(action: string, payload: {user_agent: string}) {
         console.log(action);
         
         let result: IResponse
@@ -23,27 +23,18 @@ export default class LogoutController extends Controller {
         // remove player from log
         const logData: Partial<ILoggedUsers> = {
             display_name: verify.payload.display_name,
-            status: 'online'
+            status: 'online',
+            user_agent: payload.user_agent
         }
-        const onlinePlayers = await this.logOnlineUsers('out', logData as ILoggedUsers)
+        const onlinePlayers = await this.logOnlineUsers('out', logData)
         if(onlinePlayers.status !== 200) return onlinePlayers
-        console.log('logout', onlinePlayers);
-        
         // publish online players
         const onlineplayer_channel = 'monopoli-onlineplayer'
         const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
         console.log(isPublished);
         
         if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-        // set timeout token id to empty
-        const getTimeoutTokenId = cookies().get('timeoutTokenId')?.value
-        await this.redisReset(`timeoutToken_${getTimeoutTokenId}`)
-        cookies().set('timeoutTokenId', '', {
-            path: '/',
-            maxAge: 0, // expire & remove in 0 seconds
-            httpOnly: true,
-            sameSite: 'strict',
-        })
+        // remove cookies
         cookies().set('joinedRoom', '', {
             path: '/',
             maxAge: 0, // expire & remove in 0 seconds

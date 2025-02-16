@@ -97,6 +97,13 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // set curse
     const curse = gameState.gameRoomInfo[getGameRoomInfo]?.curse
     const curseRand = curse > 5 ? `5~${curse}%` : `5%`
+    const curseRNG = Math.floor(Math.random() * (curse+1 - 5)) + 5
+    const cursedLaps = gameState.gamePlayerInfo.map(v => 
+        v.display_name == gameState.myPlayerInfo.display_name ? v.lap : null
+    ).filter(i=>i)[0] || 0
+    const cursedCityPrice = name.match(/cursed/i) 
+                        ? price + (price * gameState.gamePlayerInfo.length * cursedLaps * curseRNG/100) 
+                        : 0
     // highlight
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
     // tile info
@@ -135,7 +142,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     })
     const [cityName, cityOwner, cityPrice, cityProperty, cityIcon] = getCityData as [string, string, number, string, string]
     // city info
-    const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},land,${price}`
+    const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},land,${cursedCityPrice || price}`
     // modify info
     const cityBoughtInfo = cityOwner 
                         ? cityProperty == 'realestate'
@@ -146,6 +153,11 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const newInfo = name.match('Cursed')
                     ? `${name};${curseRand};${translateInfo}`
                     : cityBoughtInfo ? `${name};${cityBoughtInfo}` : `${name};${translateInfo}`
+    // tile broken & destroy
+    const tileBroken = {
+        house: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_House_100-aO1wZX4zHUd83tK6b1uVbxSsi1sDeE.mp4',
+        hotel: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_Hotel_100-h4YRBkWKUrluT7d17MhkXjDeFiBZBl.mp4',
+    }
 
     return (
         <div className="relative">
@@ -153,13 +165,16 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == square ? <Characters key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
+                {/* tile broken */}
+                <video id={`video_city_broken_house_${cityName || name}`} src={tileBroken.house} className="absolute hidden" />
+                <video id={`video_city_broken_hotel_${cityName || name}`} src={tileBroken.hotel} className="absolute hidden" />
                 {/* tile image */}
                 <img src={img} alt={name} className={`w-[7.5vw] h-[23vh]`} loading="lazy" draggable={false} />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
                     <p className={`${cityProperty ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
-                    data-price={moneyFormat(cityPrice || price)}> 
+                    data-price={moneyFormat(cityPrice || (cursedCityPrice || price))}> 
                         {cityProperty ? `${cityName}\n${cityIcon}` : cityName || name} 
                     </p>
                 </div>

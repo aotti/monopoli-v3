@@ -125,10 +125,10 @@ function JoinRoomButton(
 
     return (
         gameState.myCurrentGame == roomId
-        ? <Link href={{ pathname: '/game', query:{id: roomId} }} className="w-16 lg:w-24 text-2xs lg:text-xs text-center bg-success border-8bit-success active:opacity-75">
+        ? <Link href={miscState.disableButtons == 'roomlist' ? '#' : { pathname: '/game', query:{id: roomId} }} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs text-center bg-success border-8bit-success active:opacity-75`}>
             {translateUI({lang: miscState.language, text: 'Join'})}
         </Link>
-        : <button type="button" id={`join_button_${roomId}`} className={`w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75 ${lockIcon}`} onClick={joinHandler}>
+        : <button type="button" id={`join_button_${roomId}`} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0':''} w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75 ${lockIcon}`} onClick={joinHandler} disabled={miscState.disableButtons == 'roomlist' ? true : false}>
             {translateUI({lang: miscState.language, text: 'Join'})}
         </button>
     )
@@ -142,8 +142,7 @@ function SpectateRoomButton({roomId, roomCreator}: {roomId: number, roomCreator:
         // only show for rooms that not mine
         gameState.myPlayerInfo.display_name == roomCreator
             ? null
-            : <button type="submit" id={`spectate_button_${roomId}`} disabled={gameState.myCurrentGame === roomId ? true : false}
-            className={`w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75 
+            : <button type="submit" id={`spectate_button_${roomId}`} disabled={gameState.myCurrentGame === roomId ? true : miscState.disableButtons == 'roomlist' ? true : false} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75 
             ${gameState.myCurrentGame === roomId ? 'saturate-0' : ''}`}>
                 {translateUI({lang: miscState.language, text: 'Spectate'})}
             </button>
@@ -157,7 +156,7 @@ function DeleteRoomButton({roomId, roomCreator}: {roomId: number, roomCreator: s
     return (
         // only show for my room
         gameState.myPlayerInfo.display_name == roomCreator
-            ? <button type="submit" id={`delete_button_${roomId}`} className="w-16 lg:w-24 text-2xs lg:text-xs bg-darkblue-1 border-8bit-text active:opacity-75">
+            ? <button type="submit" id={`delete_button_${roomId}`} disabled={miscState.disableButtons == 'roomlist' ? true : false} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs bg-darkblue-1 border-8bit-text active:opacity-75`}>
                 {translateUI({lang: miscState.language, text: 'Delete'})}
             </button>
             : null
@@ -242,8 +241,8 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, miscS
         // join room function
         case `join_button_${roomId}`: joinRoom(formInputs, roomId, miscState, gameState); break
         // spectate room function
-        case `spectate_button_${roomId}`: spectateRoom(roomId, gameState); break
+        case `spectate_button_${roomId}`: spectateRoom(roomId, miscState, gameState); break
         // delete room function
-        case `delete_button_${roomId}`: deleteRoom(formInputs, roomId, gameState); break
+        case `delete_button_${roomId}`: deleteRoom(formInputs, roomId, miscState, gameState); break
     }
 }

@@ -10,7 +10,7 @@ export default class GameController extends Controller {
         // token payload data
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
@@ -262,7 +262,8 @@ export default class GameController extends Controller {
         const publishData = {
             playerTurn: payload.display_name,
             playerDice: +payload.rolled_dice,
-            playerRNG: payload.rng.split(',') // send back as array
+            playerRNG: payload.rng.split(','), // send back as array
+            playerSpecialCard: payload.special_card
         }
         const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
         console.log(isGamePublished);

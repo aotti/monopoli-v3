@@ -1,5 +1,5 @@
 import { useMisc } from "../../../context/MiscContext"
-import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256 } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue } from "../../../helper/helper"
 import { FormEvent, useEffect, useRef } from "react"
 import { IGameContext, IMiscContext, IResponse, IUser } from "../../../helper/types"
 import { useGame } from "../../../context/GameContext"
@@ -67,7 +67,7 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
         if(input.nodeName == 'INPUT') {
             // filter inputs
             if(setInputValue('username', input)) inputValues.username = input.value.trim().toLowerCase()
-            else if(setInputValue('password', input)) inputValues.password = sha256(input.value.trim())
+            else if(setInputValue('password', input)) inputValues.password = input.value.trim()
             // error
             else {
                 resultMessage.classList.add('text-red-300')

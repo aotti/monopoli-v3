@@ -256,6 +256,9 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[\d]{1,2}$/) : null
         case 'rng':
             return value ? value.match(/^[\d]{1,2},[\d]{1,2}$|^100,[\d]{1,2}$|^[\d]{1,2},100$/) : null
+        case 'special_card': 
+            const optionalSpecialCard = value === null || value.match(/used\W.*/) ? true : false
+            return optionalSpecialCard
         // ====== TURN END TYPE ======
         case 'pos': 
             return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null
@@ -263,14 +266,18 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             // set regex
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex] = [
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
                 'get_card: .* \\(chance\\)|get_card: .* \\(community\\)',
-                'get_arrested: lemao 😂'
+                'get_arrested: lemao 😂',
+                'parking: tile \\d+ 😎',
+                'cursed: .* 💀',
+                'special_city: .* 💸',
+                'special_card: .* 💳',
             ]
-            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}`, 'g')
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}`, 'g')
             // set length
             // used to verify the regex, if client send 2 history 
             // but only match 1, something is wrong 
@@ -297,13 +304,15 @@ export function filterInput(input: InputIDType, value: string) {
             return optionalTax
         case 'prison': 
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
-        // ====== SURRENDER TYPE ======
         // ====== GAME OVER TYPE ======
         case 'all_player_stats': 
             const splitValue = value.split(';')
             for(let sv of splitValue)
                 if(!sv.match(/\w+,\d+|\w+,-\d+/)) return null
             return value 
+        // ====== MISC TYPE ======
+        case 'user_agent': 
+            return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null
     }
 }
 

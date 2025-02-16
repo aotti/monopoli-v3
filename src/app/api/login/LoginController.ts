@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
 import { IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
 import Controller from "../Controller";
+import { sha256 } from "../../../helper/helper";
 
 export default class LoginController extends Controller {
 
-    async login(action: string, payload: Pick<IUser, 'username'|'password'>) {
+    async login(action: string, payload: Pick<IUser, 'username'|'password'> & {user_agent: string}) {
         let result: IResponse
 
         // filter payload
@@ -16,7 +17,7 @@ export default class LoginController extends Controller {
             function: 'mnp_login',
             function_args: { 
                 tmp_username: payload.username,
-                tmp_password: payload.password
+                tmp_password: sha256(payload.password)
             }
         }
         // run query
@@ -29,7 +30,7 @@ export default class LoginController extends Controller {
         }
         else if(data) {
             // log user
-            const onlinePlayers = await this.getOnlinePlayers(data[0])
+            const onlinePlayers = await this.getOnlinePlayers(data[0], payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
@@ -60,7 +61,7 @@ export default class LoginController extends Controller {
         return result
     }
 
-    async autoLogin(action: string) {
+    async autoLogin(action: string, payload: {user_agent: string}) {
         let result: IResponse
 
         // get refresh token
@@ -92,7 +93,7 @@ export default class LoginController extends Controller {
                 worst_money_lost: data[0].worst_money_lost
             }
             // renew/log online player
-            const onlinePlayers = await this.getOnlinePlayers(renewData)
+            const onlinePlayers = await this.getOnlinePlayers(renewData, payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'

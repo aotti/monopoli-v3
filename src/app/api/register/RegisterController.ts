@@ -1,3 +1,4 @@
+import { sha256 } from "../../../helper/helper";
 import { IQueryInsert, IUser, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 
@@ -15,7 +16,7 @@ export default class RegisterController extends Controller {
             function: 'mnp_register',
             function_args: {
                 tmp_username: payload.username,
-                tmp_password: payload.password,
+                tmp_password: sha256(payload.password),
                 tmp_display_name: payload.display_name
             }
         }

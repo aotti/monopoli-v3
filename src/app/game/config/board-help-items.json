@@ -59,17 +59,17 @@
             "Cannot have 2 same card, if you get 2x anti tax card it'll only count as 1"
         ],
         "page 1": [
-            "Anti Jail = when you step on jail tile, you can avoid imprisoned effect",
+            "Anti Prison = when you step on prison tile, you can avoid imprisoned effect",
             "Anti Tax = avoid paying tax on stepping someone's city",
             "Nerf Tax = pay tax 35% less",
             "Gaming Dice = get money 10k * dice number",
-            "Nerf Gaming Dice = get money 5k * dice number"
+            "Nerf Parking = your tile selection on stepping free parking is 40% less"
         ],
         "page 2": [
-            "Sad Gaming Dice = loss money 5k * dice number",
-            "Nerf Parking = your tile selection on stepping free parking is 40% less",
             "Fortune Block = when passing start line, only get 5k",
-            "City Upgrade = can upgrade your city without getting there, but random"
+            "City Upgrade = can upgrade your city without getting there, but random",
+            "The Striker = can attack other player city (coming soon)",
+            "Curse Reverser = make cursed city effect to be reversed, everyone lose money (30% price) except card owner"
         ]
     },
     "area_items": {

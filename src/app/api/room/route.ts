@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 import RoomController from "./RoomController";
 import Controller from "../Controller";
 import { IResponse } from "../../../helper/types";
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
-    const payload = { token: isAuth.data[0].accessToken }
+    const payload = {token: isAuth.data[0].accessToken}
     // process
     const roomController = new RoomController()
     const result = await roomController.getRooms(action, payload as any)
@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent
+    payload.user_agent = userAgent(req).ua
     // process
     const roomController = new RoomController()
     const result = await roomController.create(action, payload)
@@ -49,6 +51,8 @@ export async function PUT(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent
+    payload.user_agent = userAgent(req).ua
     // get action
     const action = payload.action
     delete payload.action
@@ -56,9 +60,7 @@ export async function PUT(req: NextRequest) {
     const roomController = new RoomController()
     const result = action == 'room join' 
                 ? await roomController.joinRoom(action, payload)
-                : action == 'room over'
-                    ? await roomController.softDelete(action, payload)
-                    : {status: 404, message: 'request failed', data: []} as IResponse
+                : {status: 404, message: 'request failed', data: []} as IResponse
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }
@@ -73,6 +75,8 @@ export async function DELETE(req: NextRequest) {
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
+    // add user agent
+    payload.user_agent = userAgent(req).ua
     // get action
     const action = payload.action
     delete payload.action

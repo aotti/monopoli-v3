@@ -88,5 +88,18 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
             newRoomList.splice(findRoom, 1)
             return newRoomList
         })
+        // update worst money
+        gameState.setMyPlayerInfo(player => {
+            const newPlayerInfo = {...player}
+            getMessage.gameOverPlayers.forEach(v => {
+                if(newPlayerInfo.display_name == v.player) {
+                    newPlayerInfo.worst_money_lost = v.worst_money === -999999 
+                                                    ? newPlayerInfo.worst_money_lost 
+                                                    : v.worst_money
+                    newPlayerInfo.game_played += 1
+                }
+            })
+            return newPlayerInfo
+        })
     }
 }

@@ -13,7 +13,7 @@ export default class PlayerController extends Controller {
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
@@ -58,7 +58,7 @@ export default class PlayerController extends Controller {
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
@@ -107,7 +107,7 @@ export default class PlayerController extends Controller {
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)

@@ -33,6 +33,7 @@ export type RoomListListener = {
     disabledCharacters: string[],
     roomGame: number,
     roomOverId: number,
+    gameOverPlayers: {player: string, worst_money: number}[],
 }
 
 export type GameRoomListener = {
@@ -47,10 +48,12 @@ export type GameRoomListener = {
     playerTurn: string,
     playerDice: number,
     playerRNG: string[],
+    playerSpecialCard: string,
     gameHistory: IGameHistory[],
     playerTurns: string[],
     surrendPlayer: string,
     playerTurnEnd: IGamePlayerInfo,
+    gameOverPlayers: {player: string, worst_money: number}[],
     taxes: {
         owner: string,
         visitor: string,
@@ -97,6 +100,8 @@ export interface IMiscContext {
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     messageItems: Omit<IChat, 'channel'|'token'>[],
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
+    disableButtons: 'roomlist'|'gameroom',
+    setDisableButtons: Dispatch<SetStateAction<'roomlist'|'gameroom'>>,
 }
 
 interface IGameRoomInfo {
@@ -280,18 +285,19 @@ type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
-type RollDiceType = 'rolled_dice'|'rng'
+type RollDiceType = 'rolled_dice'|'rng'|'special_card'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|'user_agent'
 
 // user
 export interface ILoggedUsers {
     display_name: string,
     status: 'online'|'playing'
     timeout_token: string,
+    user_agent: string,
 }
 
 export interface IUser {
@@ -305,6 +311,7 @@ export interface IUser {
 // player
 interface ITokenPayload {
     token?: string
+    user_agent?: string
 }
 
 export interface IPlayer extends ITokenPayload {
@@ -336,8 +343,7 @@ export interface ICreateRoom {
         select_curse: string,
         select_max_player: string,
         select_character: string,
-        token?: string,
-    },
+    } & ITokenPayload,
     payload: {
         creator: string,
         room_name: string,
@@ -372,7 +378,7 @@ export interface ICreateRoom {
     }
 }
 
-export interface IShiftRoom {
+export interface IShiftRoom extends ITokenPayload {
     action?: 'room join'|'room leave',
     room_id: string,
     room_password: string,
@@ -380,55 +386,49 @@ export interface IShiftRoom {
     display_name: string,
     money_start: string,
     select_character: string,
-    token?: string,
 }
 
 // game
 export interface IRollDiceData {
     playerTurn: string, 
     playerDice: number, 
-    playerRNG: string[]
+    playerRNG: string[],
+    playerSpecialCard?: string,
 }
 
 export interface IGamePlay {
     get_players: {
-        token?: string,
         room_id: number,
-    },
+    } & ITokenPayload,
     ready_player: {
-        token?: string,
         channel: string,
         display_name: string,
-    },
+    } & ITokenPayload,
     decide_player: {
-        token?: string,
         channel: string,
         display_name: string,
         rolled_number: string,
-    },
+    } & ITokenPayload,
     roll_dice: {
-        token?: string,
         channel: string,
         display_name: string,
         rolled_dice: string,
-        rng: string
-    },
+        rng: string,
+        special_card: string,
+    } & ITokenPayload,
     surrender: {
-        token?: string,
         channel: string,
         display_name: string,
         money: string,
-    },
+    } & ITokenPayload,
     sell_city: {
-        token?: string,
         channel: string,
         display_name: string,
         sell_city_name: string,
         sell_city_price: string,
         city_left: string,
-    },
+    } & ITokenPayload,
     turn_end: {
-        token?: string,
         channel: string,
         display_name: string,
         pos: string,
@@ -441,13 +441,12 @@ export interface IGamePlay {
         tax_visitor: string,
         tax_owner: string,
         take_money: string,
-    },
+    } & ITokenPayload,
     game_over: {
-        token?: string,
         room_id: string,
         room_name: string,
         all_player_stats: string,
-    }
+    } & ITokenPayload,
 }
 
 // stop by event
@@ -465,6 +464,14 @@ interface IEventBuyCity_No {
     status: false,
     money: number,
 }
+export interface IBuyCityButtonEvent {
+    buyCityInterval: NodeJS.Timeout, 
+    findPlayer: number, 
+    buyButtons: HTMLInputElement[],
+    buyCityData: string[], 
+    miscState: IMiscContext, 
+    gameState: IGameContext
+}
 type IEventBuyCity = IEventBuyCity_Yes | IEventBuyCity_No
 
 interface IEventPayTax {
@@ -472,6 +479,7 @@ interface IEventPayTax {
     owner: string,
     visitor: string,
     money: number,
+    card: string,
 }
 
 interface IEventCards {
@@ -486,9 +494,29 @@ interface IEventCards {
 
 interface IEventPrison {
     event: 'get_arrested',
+    accumulate: number,
+    money: number,
+    card?: string,
+}
+
+interface IEventParking {
+    event: 'parking',
+    destination: number,
+    money: number,
+    card?: string,
+}
+
+interface IEventCursed {
+    event: 'cursed',
+    money: number,
+    takeMoney?: string,
+}
+
+interface IEventSpecial {
+    event: 'special_city',
     money: number,
 }
-export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial
 
 interface IBuyCity {
     action: 'buy',
@@ -508,12 +536,40 @@ interface IDestroyCity {
 }
 export type UpdateCityListType = IBuyCity | ISellCity | IDestroyCity
 
-interface ISpecialCard {
+interface ISpecialCardCity {
+    type: 'city',
+    price: number,
+}
+interface ISpecialCardStart {
+    type: 'start',
+}
+interface ISpecialCardPrison {
+    type: 'prison',
+}
+interface ISpecialCardDice {
+    type: 'dice',
+    diceNumber: number,
+}
+interface ISpecialCardParking {
+    type: 'parking',
+}
+interface ISpecialCardCursed {
+    type: 'cursed',
+    price: number,
+}
+export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice | ISpecialCardParking | ISpecialCardCursed
+
+interface ISpecialCardAdd {
     action: 'add',
     currentSpecialCard: string,
     specialCard: string, 
 }
-export type UpdateSpecialCardListType = ISpecialCard
+interface ISpecialCardUsed {
+    action: 'used',
+    currentSpecialCard: string,
+    specialCard: string, 
+}
+export type UpdateSpecialCardListType = ISpecialCardAdd | ISpecialCardUsed
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

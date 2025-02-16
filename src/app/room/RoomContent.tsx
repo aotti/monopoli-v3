@@ -1,5 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, fetcher, fetcherOptions, qS, translateUI, verifyAccessToken } from "../../helper/helper";
+import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
@@ -8,7 +8,6 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { ICreateRoom, IGameContext, IResponse } from "../../helper/types";
 import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
@@ -104,9 +103,8 @@ export default function RoomContent({ pubnubSetting }) {
                             : <PlayerList onlinePlayers={gameState.onlinePlayers} />
                         }
                         {/* chat form */}
-                        <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState)}>
+                        <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState, gameState)}>
                             {/* inputs */}
-                            <input type="hidden" id="display_name" value={gameState.myPlayerInfo?.display_name} />
                             <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
                             onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />

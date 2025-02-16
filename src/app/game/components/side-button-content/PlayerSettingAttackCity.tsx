@@ -17,7 +17,7 @@ export default function PlayerSettingAttackCity() {
                     <span> coming not soon 😂 </span>
                 </div>
                 {/* close button */}
-                <div className="w-[calc(100%-.5rem)] p-1 border-t-2">
+                <div className="w-[calc(100%-.5rem)] p-1 border-t-2 active:opacity-75">
                     <button type="button" onClick={() => gameState.setDisplaySettingItem(null)}> Close </button>
                 </div>
             </div>
