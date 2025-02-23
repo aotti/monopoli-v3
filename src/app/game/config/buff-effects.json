@@ -1,0 +1,49 @@
+{
+    "buff": [
+        {
+            "chance": [0, 8],
+            "data": [
+                {
+                    "description": "Get curse reverser card",
+                    "effect": "special card_curse reverser"
+                }
+            ]
+        },
+        {
+            "chance": [9, 20],
+            "data": [
+                {
+                    "description": "Go to free parking",
+                    "effect": "move place_parking"
+                }
+            ]
+        },
+        {
+            "chance": [21, 40],
+            "data": [
+                {
+                    "description": "Reduce buy/upgrade city price by 30%",
+                    "effect": "reduce price_30%"
+                }
+            ]
+        },
+        {
+            "chance": [41, 65],
+            "data": [
+                {
+                    "description": "Select card rarity",
+                    "effect": "pick rarity_cards"
+                }
+            ]
+        },
+        {
+            "chance": [66, 100],
+            "data": [
+                {
+                    "description": "Get money 7k x laps",
+                    "effect": "get money_7000"
+                }
+            ]
+        }
+    ]
+}

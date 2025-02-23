@@ -1,0 +1,49 @@
+{
+    "debuff": [
+        {
+            "chance": [0, 7],
+            "data": [
+                {
+                    "description": "Go to next Debuff Area",
+                    "effect": "move place_debuff"
+                }
+            ]
+        },
+        {
+            "chance": [8, 15],
+            "data": [
+                {
+                    "description": "Tax multiply by 30%",
+                    "effect": "tax more_30%"
+                }
+            ]
+        },
+        {
+            "chance": [16, 25],
+            "data": [
+                {
+                    "description": "Go to cursed city/prison",
+                    "effect": "random-move place_cursed|move place_prison"
+                }
+            ]
+        },
+        {
+            "chance": [26, 40],
+            "data": [
+                {
+                    "description": "Skip 1 turn",
+                    "effect": "skip turn_1"
+                }
+            ]
+        },
+        {
+            "chance": [41, 65],
+            "data": [
+                {
+                    "description": "Lose money 5k x laps",
+                    "effect": "lose money_5000"
+                }
+            ]
+        }
+    ]
+}

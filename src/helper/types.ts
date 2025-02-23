@@ -59,7 +59,6 @@ export type GameRoomListener = {
         visitor: string,
         money: number
     },
-    cityOwnedList: string[],
     citySeller: string,
     citySold: string,
     cityPrice: number,
@@ -124,6 +123,8 @@ interface IGamePlayerInfo {
     card: string,
     city: string,
     prison: number,
+    buff: string,
+    debuff: string,
 }
 
 interface IGameHistory {
@@ -286,7 +287,7 @@ type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mo
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'|'rng'|'special_card'
-type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'
+type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'|'buff'|'debuff'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
@@ -437,6 +438,8 @@ export interface IGamePlay {
         card: string,
         city: string,
         prison: string,
+        buff: string,
+        debuff: string,
         history: string,
         tax_visitor: string,
         tax_owner: string,
@@ -479,7 +482,8 @@ interface IEventPayTax {
     owner: string,
     visitor: string,
     money: number,
-    card: string,
+    card?: string,
+    debuff?: string,
 }
 
 interface IEventCards {
@@ -516,7 +520,25 @@ interface IEventSpecial {
     event: 'special_city',
     money: number,
 }
-export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial
+
+interface IEventBuff {
+    event: 'get_buff',
+    type: string,
+    tileName: string,
+    money: number,
+    card?: string,
+    buff?: string,
+}
+
+interface IEventDebuff {
+    event: 'get_debuff',
+    type: string,
+    tileName: string,
+    money: number,
+    card?: string,
+    debuff?: string,
+}
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff
 
 interface IBuyCity {
     action: 'buy',
@@ -539,6 +561,7 @@ export type UpdateCityListType = IBuyCity | ISellCity | IDestroyCity
 interface ISpecialCardCity {
     type: 'city',
     price: number,
+    debuff: string,
 }
 interface ISpecialCardStart {
     type: 'start',
@@ -570,6 +593,26 @@ interface ISpecialCardUsed {
     specialCard: string, 
 }
 export type UpdateSpecialCardListType = ISpecialCardAdd | ISpecialCardUsed
+
+interface IBuffDebuffReducePrice {
+    type: 'buff',
+    effect: 'reduce price',
+    price: number,
+}
+interface IBuffDebuffPickRarity {
+    type: 'buff',
+    effect: 'pick rarity',
+}
+interface IBuffDebuffSkipTurn {
+    type: 'debuff',
+    effect: 'skip turn',
+}
+interface IBuffDebuffTaxMore {
+    type: 'debuff',
+    effect: 'tax more',
+    price: number,
+}
+export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

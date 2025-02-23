@@ -28,19 +28,28 @@ export default function PlayerSection() {
             </div>
             {/* player list */}
             <div className="flex flex-col gap-1">
-                {gameState.gamePlayerInfo.map((player, i) => 
-                <div key={i} className="flex items-stretch text-center gap-1">
-                    <div className="flex items-center w-[17vw] bg-darkblue-2">
-                        <span className="w-full"> {player.display_name} </span>
-                    </div>
-                    <div className="flex items-center w-[15vw] bg-darkblue-2">
-                        <span className="w-full"> {moneyFormat(player.money)} </span>
-                    </div>
-                    <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
-                    data-tooltip={player.card?.replaceAll(';', '\n')}>
-                        <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
-                    </div>
-                </div>)}
+                {gameState.gamePlayerInfo.map((player, i) => {
+                    // buff/debuff text
+                    const buffText = player.buff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
+                    const debuffText = player.debuff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
+                    // buff/debuff tooltip
+                    const buffDebuffTooltip = `buff:\n${buffText}\ndebuff:\n${debuffText}`
+
+                    return (
+                        <div key={i} className="flex items-stretch text-center gap-1">
+                            <div className="flex items-center w-[17vw] bg-darkblue-2">
+                                <span className="relative w-full" data-tooltip={buffDebuffTooltip}> {player.display_name} </span>
+                            </div>
+                            <div className="flex items-center w-[15vw] bg-darkblue-2">
+                                <span className="w-full"> {moneyFormat(player.money)} </span>
+                            </div>
+                            <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
+                            data-tooltip={player.card?.replaceAll(';', '\n')}>
+                                <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
+                            </div>
+                        </div>
+                    )
+                })}
             </div>
             {/* sell city box */}
             <PlayerSettingSellCity />
@@ -51,7 +60,6 @@ export default function PlayerSection() {
 }
 
 function PlayerSettingButton() {
-    const miscState = useMisc()
     const gameState = useGame()
     // click outside element
     const playerSettingRef = useRef()

@@ -74,17 +74,17 @@
     },
     "area_items": {
         "buff 100%": [
-            "[40%] Get money 5k x laps",
-            "[20%] Get anti jail card",
-            "[15%] Get nerf gaming dice card",
-            "[15%] Get nerf tax card",
-            "[10%] Get city upgrade card"
+            "[35%] Get money 7k x laps",
+            "[25%] Select card rarity",
+            "[20%] Reduce buy/upgrade city price by 30%",
+            "[12%] Go to free parking",
+            "[8%] Get curse reverser card"
         ],
-        "debuff 60%": [
-            "[20%] Take 1 step backward",
-            "[15%] Take 2 step forward",
-            "[10%] Get sad gaming dice card",
-            "[8%] Get nerf parking card",
+        "debuff 65%": [
+            "[25%] Lose money 5k x laps",
+            "[15%] Skip 1 turn",
+            "[10%] Go to cursed city/prison",
+            "[8%] Tax multiply by 30%",
             "[7%] Go to next Debuff Area"
         ]
     }

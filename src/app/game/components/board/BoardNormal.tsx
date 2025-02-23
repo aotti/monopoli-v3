@@ -227,13 +227,17 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
 }
 
 function Characters({ playerData }: {playerData: IGameContext['gamePlayerInfo'][0]}) {
-    const getCityOwnedList = localStorage.getItem('cityOwnedList') || '[]'
     // match player in city owned list
-    const cityOwned = (JSON.parse(getCityOwnedList) as any[])
-                    .map(v => v.split(',')[0] == playerData.display_name ? v : null)
-                    .filter(i => i)[0]
+    const cityOwned = playerData.city?.split(';').length || 0
+    const cityOwnedTooltip = `city owned: ${cityOwned}`
+    // get buff data
+    const buffList = playerData.buff?.split(';').length || 0
+    const buffTooltip = `buff: ${buffList}`
+    // get debuff data
+    const debuffList = playerData.debuff?.split(';').length || 0
+    const debuffTooltip = `debuff: ${debuffList}`
     // set player tooltip (display_name & city owned)
-    const playerTooltip = `${playerData.display_name};city owned: ${cityOwned?.split(',')[1] || 0}`
+    const playerTooltip = `${playerData.display_name};${cityOwnedTooltip};${buffTooltip};${debuffTooltip}`
 
     return (
         <div data-tooltip={playerTooltip.replaceAll(';', '\n')} data-player-name={playerData.display_name} 

@@ -1,8 +1,10 @@
 import { FormEvent } from "react"
 import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, shuffle, translateUI } from "../../../helper/helper"
-import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData, SpecialCardEventType, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
+import { BuffDebuffEventType, EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData, SpecialCardEventType, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
 import chance_cards_list from "../config/chance-cards.json"
 import community_cards_list from "../config/community-cards.json"
+import debuff_effects_list from "../config/debuff-effects.json"
+import buff_effects_list from "../config/buff-effects.json"
 
 /*
     TABLE OF CONTENTS
@@ -20,6 +22,8 @@ import community_cards_list from "../config/community-cards.json"
         # CURSED CITY EVENT
         # SPECIAL CARD EVENT
             > UPDATE SPECIAL CARD
+        # BUFF/DEBUFF EVENT
+            > UPDATE BUFF/DEBUFF LIST
 */
 
 // ========== GAME PREPARE ==========
@@ -563,10 +567,18 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // special card container
         // player special card = nerf parking card (nullable)
         const specialCardCollection = {cards: [playerSpecialCard], effects: []}
+        // buff/debuff container
+        const buffCollection = []
+        const debuffCollection = []
         // move function
-        const stepInterval = setInterval(() => {
+        const stepInterval = setInterval(async () => {
+            // check debuff
+            const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+                {type: 'debuff', effect: 'skip turn'}, findPlayer, miscState, gameState
+            )
+            buffCollection.push(buffDebuff)
             // check if player is arrested / get debuff (skip turn)
-            if(prisonNumber !== -1) {
+            if(prisonNumber !== -1 || buffDebuffEffect) {
                 clearInterval(stepInterval)
                 // turn off roll dice
                 gameState.setRollNumber(null)
@@ -675,6 +687,16 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         .then(eventData => resolve(eventData))
                         .catch(err => console.log(err))
                         break
+                    case 'buff': 
+                        stopByBuffDebuff('buff', findPlayer, playerRNG, miscState, gameState)
+                        .then(eventData => resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
+                    case 'debuff': 
+                        stopByBuffDebuff('debuff', findPlayer, playerRNG, miscState, gameState)
+                        .then(eventData => resolve(eventData))
+                        .catch(err => console.log(err))
+                        break
                     default: 
                         resolve(null)
                         break
@@ -703,6 +725,12 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             : Math.round((eventData?.money || 0) + specialCardMoney)
             // update special card list
             const specialCardLeft = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
+            // get buff/debuff event data
+            if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
+            if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
+            // update buff/debuff list
+            const buffLeft = updateBuffDebuffList(buffCollection, playerTurnData.buff)
+            const debuffLeft = updateBuffDebuffList(debuffCollection, playerTurnData.debuff)
             // get prison accumulate number
             const prisonNumber = playerTurnData.prison
             // check if player is just step on prison / already arrested
@@ -730,11 +758,13 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 event_money: eventMoney.toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
                 history: setEventHistory(`rolled_dice: ${subPlayerDice || playerDice}`, eventData),
-                // nullable data: city, card, taxes, take money
+                // nullable data: city, card, taxes, take money, buff, debuff
                 city: (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
                 card: specialCardLeft,
+                buff: buffLeft,
+                debuff: debuffLeft,
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate
@@ -745,6 +775,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             localStorage.removeItem('subEventData')
             localStorage.removeItem('parkingEventData')
             localStorage.removeItem('specialCardUsed')
+            localStorage.removeItem('buffDebuffUsed')
             // fetch
             const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
             const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
@@ -779,8 +810,10 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
     const parkingEventData = localStorage.getItem('parkingEventData')
     // check special card used
     const specialCardUsed = localStorage.getItem('specialCardUsed')
+    // check special card used
+    const buffDebuffUsed = localStorage.getItem('buffDebuffUsed')
     // history container
-    const historyArray = [rolled_dice, specialCardUsed, parkingEventData, subEventData].filter(i=>i)
+    const historyArray = [rolled_dice, specialCardUsed, parkingEventData, buffDebuffUsed, subEventData].filter(i=>i)
     // check event data
     switch(eventData?.event) {
         case 'buy_city': 
@@ -808,6 +841,10 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
             return historyArray.join(';')
         case 'special_city': 
             historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} 💸`)
+            return historyArray.join(';')
+        case 'get_buff': 
+        case 'get_debuff':
+            historyArray.push(`${eventData.event}: ${eventData.type} 🙏`)
             return historyArray.join(';')
         default: 
             return historyArray.join(';')
@@ -890,7 +927,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
         if(isCityNotMine && buyCityProperty != 'land') 
             return resolve(await payingTaxes())
     
-        // if you own the city and its special & bought, get money
+        // if you own the city and its special, get money
         if(tileInfo == 'special' && buyCityProperty == '1house') {
             // notif message
             notifTitle.textContent = 'Special City'
@@ -911,6 +948,13 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 money: 0
             })
         }
+        // check buff 
+        const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+            {type: 'buff', effect: 'reduce price', price: +buyCityPrice},
+            findPlayer, miscState, gameState
+        ) as [string, number];
+        // set buy city price
+        const buyCityPriceFixed = buffDebuff ? +buyCityPrice - buffDebuffEffect : +buyCityPrice
         // set event text for notif
         let [eventTitle, eventContent] = [
             !isCityNotMine ? 'Upgrade City' : 'Buy City', 
@@ -924,14 +968,14 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
         notifTitle.textContent = eventTitle
         notifMessage.textContent = eventContent
                                 .replace('xxx', buyCityName) // city name
-                                .replace('xxx', moneyFormat(+buyCityPrice)) // price
+                                .replace('xxx', moneyFormat(buyCityPriceFixed)) // price
         // show notif (must be on top the buttons to prevent undefined)
         miscState.setAnimation(true)
         gameState.setShowGameNotif(`with_button-2` as any)
         // set timer
         let buyCityTimer = 6
         const buyCityInterval = setInterval(() => {
-            notifTimer.textContent = `${buyCityTimer}`
+            notifTimer.textContent = buffDebuff ? `"buff reduce price" ${buyCityTimer}` :`${buyCityTimer}`
             buyCityTimer--
             // event buttons (2 buttons)
             const [nopeButton, ofcourseButton] = [
@@ -963,7 +1007,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                     ofcourseButton.classList.add('hidden')
                     nopeButton.classList.add('hidden')
                     // is money enough
-                    const isMoneyEnough = playerTurnData.money > +buyCityPrice
+                    const isMoneyEnough = playerTurnData.money > buyCityPriceFixed
                     if(!isMoneyEnough) {
                         notifTimer.textContent = 'smh my head, you poor'
                         // set event data (for history)
@@ -994,7 +1038,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                         city: buyingCity,
                         name: buyCityName,
                         property: buyCityProperty == '2house1hotel' ? '1hotel' : buyCityProperty,
-                        money: -buyCityPrice
+                        money: -buyCityPriceFixed
                     }
                     // return event data
                     return resolve(eventData)
@@ -1027,17 +1071,26 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
         }, 1000);
 
         async function payingTaxes() {
+            // check debuff
+            const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+                {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
+                findPlayer, miscState, gameState
+            ) as [string, number];
             // check if special card exist
             const [specialCard, specialEffect] = await useSpecialCard(
-                {type: 'city', price: +buyCityPrice}, findPlayer, miscState, gameState
+                {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
             ) as [string, number];
+            // set tax price
+            const taxPrice = specialCard == 'anti tax' ? 0 
+                            : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
             // set event data (for history)
             const eventData: EventDataType = {
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
                 visitor: playerTurnData.display_name,
-                money: -specialEffect || -buyCityPrice,
-                card: specialCard
+                money: taxPrice,
+                card: specialCard,
+                debuff: buffDebuff
             }
             // return event history
             return eventData
@@ -1230,16 +1283,26 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
         const notifImage = qS('#card_image') as HTMLImageElement
         // cards data
         const cardsList = card == 'chance' ? chance_cards_list.cards : community_cards_list.cards
+        // check buff
+        const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+            {type: 'buff', effect: 'pick rarity'}, findPlayer, miscState, gameState
+        ) as [string, number];
         // loop cards
         for(let cards of cardsList) {
             const [minRange, maxRange] = cards.chance
+            const pickRarityRNG = buffDebuff 
+                                ? buffDebuffEffect >= minRange && buffDebuffEffect <= maxRange
+                                : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
-            if(+rng[0] >= minRange && +rng[0] <= maxRange) {
+            if(pickRarityRNG) {
                 const cardRNG = +rng[0] % cards.data.length
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
-                notifTitle.textContent = translateUI({lang: miscState.language, text: 'Chance Card'})
+                notifTitle.textContent = card == 'chance' 
+                                        ? translateUI({lang: miscState.language, text: 'Chance Card'})
+                                        : translateUI({lang: miscState.language, text: 'Community Card'})
                 notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
+                                        + buffDebuff ? `\n"buff pick rarity"` : ''
                 notifImage.src = cards.data[cardRNG].img
                 // run card effect
                 const cardData = {
@@ -1247,7 +1310,12 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                     rank: cards.category,
                     effectData: cards.data[cardRNG].effect
                 }
-                return resolve(await cardEffects(cardData, findPlayer, rng, miscState, gameState))
+                // get event data
+                const eventData = await cardEffects(cardData, findPlayer, rng, miscState, gameState)
+                // add buff/debuff to event data
+                if(buffDebuff) (eventData as any).buff = buffDebuff
+                // resolve event data
+                return resolve(eventData)
             }
         }
     })
@@ -1258,6 +1326,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
     const notifTimer = qS('#result_notif_timer')
     // ### rank will be used for rarity border
     const {tileName, rank, effectData} = cardData
+    // current player data (walking)
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
 
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
@@ -1290,22 +1359,18 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
             gameState.setShowGameNotif(`card_with_button-2` as any)
             // get effect prefix
             const getPrefix = effectData.split('-')
+            // get optional effect
+            const getOptionalEffect = getPrefix[1].split('|')
+            const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+            const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
             // player choose the optional effect
             if(getPrefix[0] == 'button') {
-                // get optional effect
-                const getOptionalEffect = getPrefix[1].split('|')
-                const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
-                const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
                 // run effect
                 const eventData = await executeOptionalCard(6, optionalTypes, optionalEffects)
                 resolve(eventData)
             }
             // system choose the optional effect
             else if(getPrefix[0] == 'random') {
-                // get optional effect
-                const getOptionalEffect = getPrefix[1].split('|')
-                const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
-                const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
                 // run effect
                 const eventData = await executeOptionalCard(2, optionalTypes, optionalEffects)
                 resolve(eventData)
@@ -1328,6 +1393,88 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
             }
         }
     })
+
+    /**
+     * @param timer prefix random = 2 | button = 6
+     * @param types card types
+     * @param effects card effects
+     * @returns 
+     */
+    function executeOptionalCard(timer: number, types: string[], effects: string[]) {
+        return new Promise((resolve: (value: EventDataType)=>void) => {
+            const [leftType, rightType] = types
+            const [leftEffect, rightEffect] = effects
+            // event interval
+            let optionalButtonTimer = timer
+            const optionalButtonInterval = setInterval(async () => {
+                notifTimer.textContent = `${optionalButtonTimer}`
+                optionalButtonTimer--
+                // optional buttons
+                const [leftButton, rightButton] = [qS(`[data-id=notif_button_0]`), qS(`[data-id=notif_button_1]`)] as HTMLInputElement[]
+                // auto click on timer off
+                if(optionalButtonTimer < 0) {
+                    clearInterval(optionalButtonInterval)
+                    notifTimer.textContent = ''
+                    // disable button
+                    leftButton.disabled = true
+                    rightButton.disabled = true
+                    // run event, check prefix (random = 2 | button = 6)
+                    if(timer == 2) {
+                        // rng % 2 buttons
+                        const optionalButtons = [
+                            {button: leftButton, type: leftType, effect: leftEffect},
+                            {button: rightButton, type: rightType, effect: rightEffect},
+                        ]
+                        const optionalRNG = +rng[0] % optionalButtons.length
+                        // modify button
+                        optionalButtons[optionalRNG].button.classList.add('text-green-300')
+                        // run effect
+                        return resolve(await executeEffect(
+                            optionalButtons[optionalRNG].type, 
+                            optionalButtons[optionalRNG].effect, 
+                            'button', 'OR'
+                        ))
+                    }
+                    // modify button
+                    leftButton.classList.add('text-green-300')
+                    // run effect
+                    return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
+                }
+                if(rightButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+                    // show buttons
+                    leftButton.classList.remove('hidden')
+                    // modify button (timer 2 == random pick)
+                    timer == 2 ? leftButton.disabled = true : null
+                    leftButton.textContent = leftEffect.match(/\d{4}/) ? moneyFormat(+leftEffect) : leftEffect
+                    // click event
+                    leftButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
+                    }
+                    // show buttons
+                    rightButton.classList.remove('hidden')
+                    // modify button (timer 2 == random pick)
+                    timer == 2 ? rightButton.disabled = true : null
+                    rightButton.textContent = rightEffect.match(/\d{4}/) ? moneyFormat(+rightEffect) : rightEffect
+                    // click event
+                    rightButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(rightType, rightEffect, 'button', 'OR'))
+                    }
+                }
+            }, 1000)
+        })
+    }
 
     /**
      * @param prefix could be 'button'|'random'
@@ -1504,7 +1651,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 })
             }
             else if(type == 'move place') {
-                // set additional event data for history (only for moving cards, upgrade, take card)
+                // set additional event data for history (only for moving cards, upgrade, take card, optional effect)
                 if(separator != 'AND' && playerTurnData.display_name == gameState.myPlayerInfo.display_name)
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
                 // get tile data (tile number)
@@ -1524,7 +1671,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 // set timer
                 let movePlaceTimer = prefix == 'button' 
                                     ? separator == 'OR' 
-                                        ? 1 // optional effect \w button (instant)
+                                        ? 1 // optional effect \w button (already timer in optional function)
                                         : 6 // 1 effect \w button prefix
                                     : 2 // random prefix
                 let chosenButton: HTMLElement = null
@@ -1532,11 +1679,11 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     // no need timer for multiple effect card
                     notifTimer.textContent = !separator ? `${movePlaceTimer}` : ''
                     movePlaceTimer--
-                    // if timer run out, auto cancel
+                    // if timer run out, system pick
                     if(movePlaceTimer < 0) {
                         clearInterval(movePlaceInterval)
                         notifTimer.textContent = ''
-                        // set choosen button
+                        // highlight choosen button (only single effect)
                         if(!separator) chosenButton.classList.add('bg-green-600')
                         // set player dice
                         const chosenSquare = +chosenButton.dataset.destination
@@ -1553,29 +1700,23 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         gameState.setShowGameNotif(null)
                         // move to chosen place
                         playerMoving(rollDiceData, miscState, gameState)
-                        // return event data
-                        resolve({
-                            event: 'get_card',
-                            type: type,
-                            tileName: tileName,
-                            money: 0
-                        })
                     }
                     // check if button created
-                    const checkNotifButton = qS('[data-id=notif_button_0]')
-                    if(checkNotifButton) {
+                    const movePlaceButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
+                    if(movePlaceButtons[0]) {
                         // buttons created, then modify buttons
-                        const notifButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
                         // set chosen button
-                        const chosenIndex = +rng[0] % notifButtons.length
+                        const chosenIndex = +rng[0] % movePlaceButtons.length
                         // separator null means only card \w single effect can modify the button
                         // destination random / choice
                         if(!separator) {
-                            for(let i=0; i<notifButtons.length; i++) {
-                                const button = notifButtons[i]
+                            for(let i=0; i<movePlaceButtons.length; i++) {
+                                const button = movePlaceButtons[i]
                                 button.classList.remove('hidden')
                                 button.classList.add('border')
+                                // tile name
                                 button.textContent = getTileList[i]
+                                // tile number
                                 button.dataset.destination = getTileList[i]
                                 // set event click for prefix button + single effect
                                 if(prefix == 'button') {
@@ -1594,23 +1735,16 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                                         }
                                         // move to chosen place
                                         playerMoving(rollDiceData, miscState, gameState)
-                                        // return event data
-                                        resolve({
-                                            event: 'get_card',
-                                            type: type,
-                                            tileName: tileName,
-                                            money: 0
-                                        })
                                     }
-                                    break
                                 }
                             }
-                            chosenButton = notifButtons[chosenIndex]
+                            chosenButton = movePlaceButtons[chosenIndex]
                         }
                         // destination already set, so it only has 1 array element
                         else {
-                            notifButtons[chosenIndex].dataset.destination = getTileList[0]
-                            chosenButton = notifButtons[chosenIndex]
+                            // set tile number
+                            movePlaceButtons[chosenIndex].dataset.destination = getTileList[0]
+                            chosenButton = movePlaceButtons[chosenIndex]
                         }
                     }
                 }, 1000)
@@ -1781,91 +1915,6 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
         })
     }
 
-    /**
-     * @param timer prefix random = 2 | button = 6
-     * @param types card types
-     * @param effects card effects
-     * @returns 
-     */
-    function executeOptionalCard(timer: number, types: string[], effects: string[]) {
-        return new Promise((resolve: (value: EventDataType)=>void) => {
-            const [leftType, rightType] = types
-            const [leftEffect, rightEffect] = effects
-            // event interval
-            let optionalButtonTimer = timer
-            const optionalButtonInterval = setInterval(async () => {
-                notifTimer.textContent = `${optionalButtonTimer}`
-                optionalButtonTimer--
-                // optional buttons
-                const [leftButton, rightButton] = [qS(`[data-id=notif_button_0]`), qS(`[data-id=notif_button_1]`)] as HTMLInputElement[]
-                // auto click on timer off
-                if(optionalButtonTimer < 0) {
-                    clearInterval(optionalButtonInterval)
-                    notifTimer.textContent = ''
-                    // disable button
-                    leftButton.disabled = true
-                    rightButton.disabled = true
-                    // run event, check prefix (random = 2 | button = 6)
-                    if(timer == 2) {
-                        // rng % 2 buttons
-                        const optionalButtons = [
-                            {button: leftButton, type: leftType, effect: leftEffect},
-                            {button: rightButton, type: rightType, effect: rightEffect},
-                        ]
-                        const optionalRNG = +rng[0] % optionalButtons.length
-                        // modify button
-                        optionalButtons[optionalRNG].button.classList.add('text-green-300')
-                        // run effect
-                        return resolve(await executeEffect(
-                            optionalButtons[optionalRNG].type, 
-                            optionalButtons[optionalRNG].effect, 
-                            'button', 'OR'
-                        ))
-                    }
-                    // modify button
-                    leftButton.classList.add('text-green-300')
-                    // run effect
-                    return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
-                }
-                if(rightButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
-                    // show buttons
-                    leftButton.classList.remove('hidden')
-                    // modify button (timer 2 == random pick)
-                    timer == 2 ? leftButton.disabled = true : null
-                    leftButton.textContent = leftEffect.match(/\d{4}/) ? moneyFormat(+leftEffect) : leftEffect
-                    // click event
-                    leftButton.onclick = async () => {
-                        clearInterval(optionalButtonInterval)
-                        notifTimer.textContent = ''
-                        // hide button
-                        timer == 2 ? null : leftButton.classList.add('hidden')
-                        timer == 2 ? null : rightButton.classList.add('hidden')
-                        // run effect
-                        return resolve(await executeEffect(leftType, leftEffect, 'button', 'OR'))
-                    }
-                    // show buttons
-                    rightButton.classList.remove('hidden')
-                    // modify button (timer 2 == random pick)
-                    timer == 2 ? rightButton.disabled = true : null
-                    rightButton.textContent = rightEffect.match(/\d{4}/) ? moneyFormat(+rightEffect) : rightEffect
-                    // click event
-                    rightButton.onclick = async () => {
-                        clearInterval(optionalButtonInterval)
-                        notifTimer.textContent = ''
-                        // hide button
-                        timer == 2 ? null : leftButton.classList.add('hidden')
-                        timer == 2 ? null : rightButton.classList.add('hidden')
-                        // run effect
-                        return resolve(await executeEffect(rightType, rightEffect, 'button', 'OR'))
-                    }
-                }
-            }, 1000)
-        })
-    }
-
-    /**
-     * @param prefix could be 'button'|'random'
-     */
     function getMovePlaceTiles(destination: string, separator: 'OR'|'AND') {
         // get city tiles
         if(destination == 'other city' || destination == 'my city') {
@@ -1890,7 +1939,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
         else {
             const destinedCity = qS(`[data-tile-info=${destination}]`) as HTMLElement
             const destinedCitySquare = [destinedCity.dataset.playerPath]
-            // show notif with buttons
+            // show notif with buttons (single effect)
             if(separator != 'OR') {
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif(`card_with_button-${destinedCitySquare.length}` as any)
@@ -2057,7 +2106,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
         // ==============
         // card exist
         if(data.type == 'city') {
-            const {price} = data;
+            const {price, debuff} = data;
             // set event text for notif
             const [eventTitle, eventContent] = [
                 'Paying Taxes', 
@@ -2067,6 +2116,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             notifMessage.textContent = eventContent
                                     .replace('xxx', playerTurnData.display_name) // player name
                                     .replace('xxx', moneyFormat(price)) // city price
+                                    + debuff ? `\n"debuff tax more"` : ''
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // no card, show normal notif
@@ -2085,12 +2135,10 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             for(let sc of specialCard) {
                 // player has card
                 if(sc == 'nerf tax') {
-                    setSpecialCardHistory(sc)
-                    const newPrice = price - (price * .35)
+                    const newPrice = price * .35
                     return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
                 else if(sc == 'anti tax') {
-                    setSpecialCardHistory(sc)
                     const newPrice = 0
                     return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
@@ -2123,14 +2171,11 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // notif message
             notifTitle.textContent = eventTitle
             notifMessage.textContent = eventContent
-            // show notif 
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('normal')
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // no card, show normal notif
             if(!splitSpecialCard) {
-                // show notif (tax)
+                // show notif 
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('normal')
                 return resolve([null, null])
@@ -2141,7 +2186,6 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // get card
             const specialCard = splitSpecialCard.map(v => v.match(/anti prison/i)).flat().filter(i=>i)
             if(specialCard[0]) {
-                setSpecialCardHistory(specialCard[0])
                 return resolve(await specialCardConfirmation({sc: specialCard[0], newValue: 'free', eventContent}))
             }
             return resolve([null, null])
@@ -2258,6 +2302,8 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                     ofcourseButton.onclick = () => {
                         clearInterval(specialCardInterval)
                         notifTimer.textContent = ''
+                        // set history
+                        setSpecialCardHistory(sc)
                         // hide button
                         nopeButton.classList.add('hidden')
                         ofcourseButton.classList.add('hidden')
@@ -2330,4 +2376,467 @@ function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
         }
     }
     return tempSpecialCardArray.length === 0 ? null : tempSpecialCardArray.join(';')
+}
+
+// ========== # BUFF/DEBUFF EVENT ==========
+// ========== # BUFF/DEBUFF EVENT ==========
+function stopByBuffDebuff(area: 'buff'|'debuff', findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // result message
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        // buff/debuff data
+        const buffDebuffList = area == 'buff' ? buff_effects_list.buff : debuff_effects_list.debuff
+        for(let bd of buffDebuffList) {
+            const [minRange, maxRange] = bd.chance
+            // match rng
+            if(+rng[1] >= minRange && +rng[1] <= maxRange) {
+                const bdRNG = +rng[1] % bd.data.length
+                // notif content
+                notifTitle.textContent = area == 'buff' 
+                                        ? translateUI({lang: miscState.language, text: 'Buff Area'})
+                                        : translateUI({lang: miscState.language, text: 'Debuff Area'})
+                notifMessage.textContent = translateUI({lang: miscState.language, text: bd.data[bdRNG].description as any})
+                // run buff/debuff effect
+                const bdData = {
+                    tileName: area,
+                    effectData: bd.data[bdRNG].effect
+                }
+                return resolve(await buffDebuffEffects(bdData, findPlayer, rng, miscState, gameState))
+            }
+        }
+    })
+}
+
+// ========== > BUFF/DEBUFF EFFECTS ==========
+// ========== > BUFF/DEBUFF EFFECTS ==========
+function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+    // notif timer
+    const notifTimer = qS('#result_notif_timer')
+    // buff/debuff data
+    const {tileName, effectData} = bdData
+    // event name
+    const eventName = tileName == 'buff' ? 'get_buff' : 'get_debuff'
+    // current player data (walking)
+    const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+
+    return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // check card separator
+        const isOptionalEffects = effectData.split('|')
+        // buff/debuff has optional effect
+        if(isOptionalEffects.length === 2) {
+            // show notif with button
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif(`card_with_button-2` as any)
+            // get effect prefix
+            const getPrefix = effectData.split('-')
+            // get optional effect
+            const getOptionalEffect = getPrefix[1].split('|')
+            const optionalTypes = getOptionalEffect.map(v => v.split('_')[0])
+            const optionalEffects = getOptionalEffect.map(v => v.split('_')[1])
+            // player choose the optional effect
+            if(getPrefix[0] == 'button') {
+                // run effect
+                const eventData = await executeOptionalBD(6, optionalTypes, optionalEffects)
+                resolve(eventData)
+            }
+            // system choose the optional effect
+            else if(getPrefix[0] == 'random') {
+                // run effect
+                const eventData = await executeOptionalBD(2, optionalTypes, optionalEffects)
+                resolve(eventData)
+            }
+        }
+        else {
+            // check if the event is random (choices but system pick)
+            const getPrefix = effectData.split('-')
+            if(getPrefix[0] == 'random' || getPrefix[0] == 'button') {
+                // get type & effect
+                const [type, effect] = getPrefix[1].split('_')
+                const eventData = await executeEffect(tileName, type, effect, getPrefix[0])
+                resolve(eventData)
+            }
+            else {
+                const [type, effect] = effectData.split('_')
+                const eventData = await executeEffect(tileName, type, effect)
+                resolve(eventData)
+            }
+        }
+    })
+
+    /**
+     * @param timer prefix random = 2 | button = 6
+     * @param types card types
+     * @param effects card effects
+     * @returns 
+     */
+    function executeOptionalBD(timer: number, types: string[], effects: string[]) {
+        return new Promise((resolve: (value: EventDataType)=>void) => {
+            const [leftType, rightType] = types
+            const [leftEffect, rightEffect] = effects
+            // event interval
+            let optionalButtonTimer = timer
+            const optionalButtonInterval = setInterval(async () => {
+                notifTimer.textContent = `${optionalButtonTimer}`
+                optionalButtonTimer--
+                // optional buttons
+                const [leftButton, rightButton] = [qS(`[data-id=notif_button_0]`), qS(`[data-id=notif_button_1]`)] as HTMLInputElement[]
+                // auto click on timer off
+                if(optionalButtonTimer < 0) {
+                    clearInterval(optionalButtonInterval)
+                    notifTimer.textContent = ''
+                    // disable button
+                    leftButton.disabled = true
+                    rightButton.disabled = true
+                    // run event, check prefix (random = 2 | button = 6)
+                    if(timer == 2) {
+                        // rng % 2 buttons
+                        const optionalButtons = [
+                            {button: leftButton, type: leftType, effect: leftEffect},
+                            {button: rightButton, type: rightType, effect: rightEffect},
+                        ]
+                        const optionalRNG = +rng[0] % optionalButtons.length
+                        // modify button
+                        optionalButtons[optionalRNG].button.classList.add('text-green-300')
+                        // run effect
+                        return resolve(await executeEffect(
+                            tileName,
+                            optionalButtons[optionalRNG].type, 
+                            optionalButtons[optionalRNG].effect, 
+                            'button', 'OR'
+                        ))
+                    }
+                    // modify button
+                    leftButton.classList.add('text-green-300')
+                    // run effect
+                    return resolve(await executeEffect(tileName, leftType, leftEffect, 'button', 'OR'))
+                }
+                if(rightButton && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+                    // show buttons
+                    leftButton.classList.remove('hidden')
+                    // modify button (timer 2 == random pick)
+                    timer == 2 ? leftButton.disabled = true : null
+                    leftButton.textContent = leftEffect.match(/\d{4}/) ? moneyFormat(+leftEffect) : leftEffect
+                    // click event
+                    leftButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(tileName, leftType, leftEffect, 'button', 'OR'))
+                    }
+                    // show buttons
+                    rightButton.classList.remove('hidden')
+                    // modify button (timer 2 == random pick)
+                    timer == 2 ? rightButton.disabled = true : null
+                    rightButton.textContent = rightEffect.match(/\d{4}/) ? moneyFormat(+rightEffect) : rightEffect
+                    // click event
+                    rightButton.onclick = async () => {
+                        clearInterval(optionalButtonInterval)
+                        notifTimer.textContent = ''
+                        // hide button
+                        timer == 2 ? null : leftButton.classList.add('hidden')
+                        timer == 2 ? null : rightButton.classList.add('hidden')
+                        // run effect
+                        return resolve(await executeEffect(tileName, rightType, rightEffect, 'button', 'OR'))
+                    }
+                }
+            }, 1000)
+        })
+    }
+
+    /**
+     * @param prefix 'button'|'random'
+     * @description execute buff/debuff effect
+     */
+    function executeEffect(tileName: string, type: string, effect: string, prefix?: string, separator?: 'OR'|'AND') {
+        return new Promise((resolve: (value: EventDataType)=>void) => {
+            // ### effect list
+            // ### get money, lose money, move place, skip turn, tax more
+            // ### pick rarity, reduce price, special card
+            if(type == 'get money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    tileName: tileName,
+                    type: type,
+                    money: +effect * playerTurnData.lap
+                })
+            }
+            else if(type == 'lose money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    tileName: tileName,
+                    type: type,
+                    money: -effect * playerTurnData.lap
+                })
+            }
+            else if(type == 'move place') {
+                // ### must save event data to local storage
+                // get tile data (tile number)
+                const getTileList = getMovePlaceTiles(effect)
+                // interval params
+                // timer = 1, cuz the buff/debuff alr timer on optional function
+                // timer = 2, cuz theres no selection buff/debuff
+                let movePlaceTimer = prefix == 'button' && separator == 'OR' ? 1 : 2
+                let chosenButton: HTMLElement = null
+                const movePlaceInterval = setInterval(() => {
+                    notifTimer.textContent = `${movePlaceTimer}`
+                    movePlaceTimer--
+                    // if timer run out, system pick
+                    if(movePlaceTimer < 0) {
+                        clearInterval(movePlaceInterval)
+                        notifTimer.textContent = ''
+                        // set player dice
+                        const chosenSquare = +chosenButton.dataset.destination
+                        const setChosenDice = playerTurnData.pos > chosenSquare 
+                                            ? (24 + chosenSquare) - playerTurnData.pos
+                                            : chosenSquare - playerTurnData.pos
+                        const rollDiceData = {
+                            playerTurn: playerTurnData.display_name,
+                            playerDice: setChosenDice,
+                            playerRNG: rng
+                        }
+                        // hide notif after data set
+                        miscState.setAnimation(false)
+                        gameState.setShowGameNotif(null)
+                        // move to chosen place
+                        playerMoving(rollDiceData, miscState, gameState)
+                    }
+                    // check if button created
+                    const movePlaceButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
+                    if(movePlaceButtons[0]) {
+                        // set chosen button
+                        const chosenIndex = +rng[0] % movePlaceButtons.length
+                        // destination already set, so it only has 1 array element
+                        // set tile number
+                        movePlaceButtons[chosenIndex].dataset.destination = getTileList[0]
+                        chosenButton = movePlaceButtons[chosenIndex]
+                    }
+                }, 1000);
+            }
+            else if(type == 'skip turn') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    tileName: tileName,
+                    type: type,
+                    money: 0,
+                    debuff: `add-${type}_${effect}`
+                })
+            }
+            else if(type == 'tax more') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    tileName: tileName,
+                    type: type,
+                    money: 0,
+                    debuff: `add-${type}_${effect}`
+                })
+            }
+            else if(type == 'pick rarity') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('with_button-5' as any)
+                // interval
+                let pickRarityTimer = 6
+                const pickRarityInterval = setInterval(() => {
+                    notifTimer.textContent = `${pickRarityTimer}`
+                    pickRarityTimer--
+                    // pick nothing if no click
+                    if(pickRarityTimer < 0) {
+                        clearInterval(pickRarityInterval)
+                        notifTimer.textContent = ''
+                        // hide notif
+                        miscState.setAnimation(false)
+                        gameState.setShowGameNotif(null)
+                        return resolve({
+                            event: eventName,
+                            tileName: tileName,
+                            type: type,
+                            money: 0,
+                        })
+                    }
+                    // get rarity buttons
+                    const pickRarityButtons = qSA(`[data-id^=notif_button]`) as NodeListOf<HTMLInputElement>
+                    // check button
+                    if(pickRarityButtons[0] && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+                        // set rarity number
+                        // A = 8% | B = 15% | C = 25% | D = 47% | S = 5%
+                        //   8    |   23    |   48    |   95    |   100
+                        const rarity = [
+                            // all accumulate + 1 to prevent wrong rarity
+                            // ex: rank A = 8, math.random * 8 only give 0 ~ 7
+                            {rank: 'A', chance: Math.floor(Math.random() * 8) + 1},
+                            {rank: 'B', chance: Math.floor(Math.random() * 15) + 9},
+                            {rank: 'C', chance: Math.floor(Math.random() * 25) + 24},
+                            {rank: 'D', chance: Math.floor(Math.random() * 47) + 49},
+                            {rank: 'S', chance: Math.floor(Math.random() * 5) + 96},
+                        ]
+                        // loop buttons
+                        for(let i=0; i<pickRarityButtons.length; i++) {
+                            const prb = pickRarityButtons[i]
+                            // show button & modify
+                            prb.classList.remove('hidden')
+                            prb.classList.add('border')
+                            prb.textContent = rarity[i].rank
+                            // click event
+                            prb.onclick = () => {
+                                clearInterval(pickRarityInterval)
+                                notifTimer.textContent = `rank ${rarity[i].rank}`
+                                // hide buttons
+                                for(let j=0; j<pickRarityButtons.length; j++) pickRarityButtons[j].classList.add('hidden')
+                                return resolve({
+                                    event: eventName,
+                                    tileName: tileName,
+                                    type: type,
+                                    money: 0,
+                                    buff: `add-${type}_${rarity[i].chance}`
+                                })
+                            }
+                        }
+                    }
+                }, 1000);
+            }
+            else if(type == 'reduce price') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    tileName: tileName,
+                    type: type,
+                    money: 0,
+                    debuff: `add-${type}_${effect}`
+                })
+            }
+            else if(type == 'special card') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    type: type,
+                    tileName: tileName,
+                    money: 0,
+                    card: `add-${effect}`
+                })
+            }
+        })
+    }
+
+    function getMovePlaceTiles(destination: string) {
+        const destinedCity = qS(`[data-tile-info=${destination}]`) as HTMLElement
+        const destinedCitySquare = [destinedCity.dataset.playerPath]
+        // return data
+        return destinedCitySquare
+    }
+}
+
+// ========== > UPDATE BUFF/DEBUFF LIST ==========
+// ========== > UPDATE BUFF/DEBUFF LIST ==========
+function updateBuffDebuffList(bdData: string[], currentBuffDebuff: string) {
+    const tempBuffDebuffArray = currentBuffDebuff?.split(';') || []
+    for(let bd of bdData) {
+        // card null
+        if(!bd) continue
+        // card exist
+        const [action, buffDebuff] = bd.split('-')
+        if(action == 'add') {
+            // check if player already have the buff/debuff
+            const isBuffDebuffOwned = tempBuffDebuffArray.indexOf(buffDebuff)
+            // dont have yet, then add
+            if(isBuffDebuffOwned === -1) tempBuffDebuffArray.push(buffDebuff)
+        }
+        else if(action == 'used') {
+            // remove the buff/debuff
+            const findBuffDebuff = tempBuffDebuffArray.indexOf(buffDebuff)
+            tempBuffDebuffArray.splice(findBuffDebuff, 1)
+        }
+    }
+    return tempBuffDebuffArray.length === 0 ? null : tempBuffDebuffArray.join(';')
+}
+
+// ========== > USE BUFF/DEBUFF ==========
+// ========== > USE BUFF/DEBUFF ==========
+function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, miscState: IMiscContext, gameState: IGameContext) {
+    const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+
+    return new Promise((resolve: (value: [string, string|number])=>void) => {
+        const {type, effect} = data
+        if(type == 'buff') {
+            // split buff
+            const splitBuff = playerTurnData.buff?.split(';')
+            // no buff
+            if(!splitBuff) return resolve([null, null])
+            // buff exist
+            // ### pick rarity, reduce price
+            if(effect == 'reduce price') {
+                // get buff
+                const debuff = splitBuff.map(v => v.match(/reduce price/i)).flat().filter(i=>i)
+                if(debuff[0]) {
+                    setBuffDebuffHistory('get_buff', effect)
+                    const newPrice = data.price * .3
+                    return resolve([`used-${debuff[0]}`, newPrice])
+                }
+            }
+            else if(effect == 'pick rarity') {
+                // get buff
+                const buff = splitBuff.map(v => v.match(/pick rarity_\d{1,3}/i)).flat().filter(i=>i)
+                if(buff[0]) {
+                    setBuffDebuffHistory('get_buff', effect)
+                    const [buffName, buffEffect] = buff[0].split('_')
+                    return resolve([`used-${buffName}`, +buffEffect])
+                }
+            }
+        }
+        else if(type == 'debuff') {
+            // split debuff
+            const splitDebuff = playerTurnData.debuff?.split(';')
+            // no debuff
+            if(!splitDebuff) return resolve([null, null])
+            // debuff exist
+            // ### skip turn, tax more
+            if(effect == 'skip turn') {
+                // get debuff
+                const debuff = splitDebuff.map(v => v.match(/skip turn/i)).flat().filter(i=>i)
+                if(debuff[0]) {
+                    setBuffDebuffHistory('get_debuff', effect)
+                    return resolve([`used-${debuff[0]}`, 'skip'])
+                }
+            }
+            else if(effect == 'tax more') {
+                // get debuff
+                const debuff = splitDebuff.map(v => v.match(/tax more/i)).flat().filter(i=>i)
+                if(debuff[0]) {
+                    setBuffDebuffHistory('get_debuff', effect)
+                    const newPrice = -(data.price * .3)
+                    return resolve([`used-${debuff[0]}`, newPrice])
+                }
+            }
+        }
+        // nothing match
+        return resolve([null, null])
+    })
+
+    /**
+     * @description set buff/debuff to game history & play sound
+     */
+    function setBuffDebuffHistory(keyBuffDebuff: string, valueBuffDebuff: string) {
+        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
+            localStorage.setItem('buffDebuffUsed', `${keyBuffDebuff}: ${valueBuffDebuff} 🙏`)
+        }
+    }
 }
