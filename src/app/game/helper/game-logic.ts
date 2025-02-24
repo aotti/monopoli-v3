@@ -1671,9 +1671,8 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     return setTimeout(() => {
                         notifTimer.textContent = 'nowhere to go'
                         resolve({
-                            event: 'get_card',
-                            type: type,
-                            tileName: tileName,
+                            event: 'buy_city',
+                            status: false,
                             money: 0
                         })
                     }, 1000);
