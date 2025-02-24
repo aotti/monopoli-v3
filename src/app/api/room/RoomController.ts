@@ -333,7 +333,9 @@ export default class RoomController extends Controller {
                 lap: data[0].lap,
                 card: data[0].card,
                 city: data[0].city,
-                prison: data[0].prison
+                prison: data[0].prison,
+                buff: data[0].buff,
+                debuff: data[0].debuff,
             }
             const isGamePublished = await this.pubnubPublish(gameroomChannel, {joinPlayer})
             console.log(isGamePublished);

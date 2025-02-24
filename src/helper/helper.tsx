@@ -296,7 +296,7 @@ export function filterInput(input: InputIDType, value: string) {
         case 'take_money':
         case 'buff':
         case 'debuff':
-            const optionalBuyCity = value === null || value.match(/^[a-zA-Z0-9,;\*]+$/) ? true : false
+            const optionalBuyCity = value === null || value.match(/^[a-zA-Z0-9,;\*]+/) ? true : false
             return optionalBuyCity
         case 'sell_city_name':
         case 'city_left':

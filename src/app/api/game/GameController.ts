@@ -370,6 +370,8 @@ export default class GameController extends Controller {
                 tmp_card: payload.card,
                 tmp_take_money: payload.take_money,
                 tmp_prison: payload.prison,
+                tmp_buff: payload.buff,
+                tmp_debuff: payload.debuff,
             }
         }
         // run query

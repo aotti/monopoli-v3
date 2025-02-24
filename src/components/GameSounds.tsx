@@ -8,6 +8,8 @@ export default function GameSounds() {
         player_join: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/player_join-wBS1tusK4djv4iki8onJHMbVda6ST1.mp3',
         player_leave: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/player_leave-44H1nu79MoW1YJ9X4qwKrpvQUcQYa4.mp3',
         city_broken: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/city_broken-A9OiUUnPvEWCaxHouw5rdCvJ3CJy0B.mp3',
+        area_buff: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/area_buff-R7jxXfMxDuB0ZmR6dU2zwnujMnmvxN.mp3',
+        area_debuff: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sound/area_debuff-w2A9Kjeu2r9pc0k8ZLkO3UZKd17Rc6.mp3',
     }
 
     return (
@@ -20,6 +22,8 @@ export default function GameSounds() {
             <audio id="sound_player_join" src={sounds.player_join}></audio>
             <audio id="sound_player_leave" src={sounds.player_leave}></audio>
             <audio id="sound_city_broken" src={sounds.city_broken}></audio>
+            <audio id="sound_area_buff" src={sounds.area_buff}></audio>
+            <audio id="sound_area_debuff" src={sounds.area_debuff}></audio>
         </div>
     )
 }

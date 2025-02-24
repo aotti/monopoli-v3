@@ -573,10 +573,10 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // move function
         const stepInterval = setInterval(async () => {
             // check debuff
-            const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+            const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
                 {type: 'debuff', effect: 'skip turn'}, findPlayer, miscState, gameState
             )
-            buffCollection.push(buffDebuff)
+            debuffCollection.push(buffDebuff)
             // check if player is arrested / get debuff (skip turn)
             if(prisonNumber !== -1 || buffDebuffEffect) {
                 clearInterval(stepInterval)
@@ -723,6 +723,14 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const eventMoney = throughStart 
                             ? Math.round((eventData?.money || 0) + specialCardMoney + throughStart) 
                             : Math.round((eventData?.money || 0) + specialCardMoney)
+            // check debuff reduce money
+            const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
+                {type: 'debuff', effect: 'reduce money', money: eventMoney},
+                findPlayer, miscState, gameState
+            ) as [string, number];
+            // add debuff reduce money & set notif message
+            debuffCollection.push(buffDebuff)
+            notifMessage.textContent += buffDebuff ? `"debuff reduce money"` : ''
             // update special card list
             const specialCardLeft = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // get buff/debuff event data
@@ -751,11 +759,13 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 action: 'game turn end',
                 channel: `monopoli-gameroom-${gameState.gameRoomId}`,
                 display_name: playerTurnData.display_name,
-                // arrested (0) = stay current pos
-                pos: prisonNumber === -1 ? nextPos.toString() : currentPos.toString(),
+                // arrested (0) || debuff = stay current pos
+                pos: prisonNumber !== -1 || debuffCollection.join(',').match('skip turn') 
+                    ? currentPos.toString() 
+                    : nextPos.toString(),
                 lap: numberLaps.toString(),
                 // money from event that occured
-                event_money: eventMoney.toString(),
+                event_money: (eventMoney - (buffDebuffEffect || 0)).toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
                 history: setEventHistory(`rolled_dice: ${subPlayerDice || playerDice}`, eventData),
                 // nullable data: city, card, taxes, take money, buff, debuff
@@ -949,7 +959,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
             })
         }
         // check buff 
-        const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+        const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
             {type: 'buff', effect: 'reduce price', price: +buyCityPrice},
             findPlayer, miscState, gameState
         ) as [string, number];
@@ -1072,7 +1082,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
 
         async function payingTaxes() {
             // check debuff
-            const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+            const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
                 {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
                 findPlayer, miscState, gameState
             ) as [string, number];
@@ -1284,7 +1294,7 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
         // cards data
         const cardsList = card == 'chance' ? chance_cards_list.cards : community_cards_list.cards
         // check buff
-        const [buffDebuff, buffDebuffEffect] = await useBuffDebuff(
+        const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
             {type: 'buff', effect: 'pick rarity'}, findPlayer, miscState, gameState
         ) as [string, number];
         // loop cards
@@ -1302,7 +1312,7 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                                         ? translateUI({lang: miscState.language, text: 'Chance Card'})
                                         : translateUI({lang: miscState.language, text: 'Community Card'})
                 notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
-                                        + buffDebuff ? `\n"buff pick rarity"` : ''
+                                        + (buffDebuff ? `\n"buff pick rarity"` : '')
                 notifImage.src = cards.data[cardRNG].img
                 // run card effect
                 const cardData = {
@@ -2419,6 +2429,9 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
     const eventName = tileName == 'buff' ? 'get_buff' : 'get_debuff'
     // current player data (walking)
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+    // sound effect
+    const soundAreaBuff = qS('#sound_area_buff') as HTMLAudioElement
+    const soundAreaDebuff = qS('#sound_area_debuff') as HTMLAudioElement
 
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
         // check card separator
@@ -2560,6 +2573,8 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('normal')
+                // play sound
+                eventName == 'get_buff' ? soundAreaBuff.play() : soundAreaDebuff.play()
                 resolve({
                     event: eventName,
                     tileName: tileName,
@@ -2571,6 +2586,8 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('normal')
+                // play sound
+                eventName == 'get_buff' ? soundAreaBuff.play() : soundAreaDebuff.play()
                 resolve({
                     event: eventName,
                     tileName: tileName,
@@ -2578,10 +2595,32 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                     money: -effect * playerTurnData.lap
                 })
             }
+            else if(type == 'reduce money') {
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                resolve({
+                    event: eventName,
+                    tileName: tileName,
+                    type: type,
+                    money: 0,
+                    debuff: `add-${type}_${effect}`
+                })
+            }
             else if(type == 'move place') {
+                // play sound
+                eventName == 'get_buff' ? soundAreaBuff.play() : soundAreaDebuff.play()
                 // ### must save event data to local storage
+                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name) 
+                    localStorage.setItem('buffDebuffUsed', `${eventName}: ${type} 🙏`)
                 // get tile data (tile number)
                 const getTileList = getMovePlaceTiles(effect)
+                // show notif
+                if(!separator) {
+                    // show notif
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif(`with_button-${getTileList.length}` as any)
+                }
                 // interval params
                 // timer = 1, cuz the buff/debuff alr timer on optional function
                 // timer = 2, cuz theres no selection buff/debuff
@@ -2599,10 +2638,12 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                         const setChosenDice = playerTurnData.pos > chosenSquare 
                                             ? (24 + chosenSquare) - playerTurnData.pos
                                             : chosenSquare - playerTurnData.pos
+                        // set new rng to prevent same rarity (free parking)
+                        const newRNG = [rng[0], `${+rng[1] + 20}`]
                         const rollDiceData = {
                             playerTurn: playerTurnData.display_name,
                             playerDice: setChosenDice,
-                            playerRNG: rng
+                            playerRNG: newRNG
                         }
                         // hide notif after data set
                         miscState.setAnimation(false)
@@ -2726,6 +2767,8 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('normal')
+                // play sound
+                eventName == 'get_buff' ? soundAreaBuff.play() : soundAreaDebuff.play()
                 resolve({
                     event: eventName,
                     type: type,
@@ -2771,65 +2814,75 @@ function updateBuffDebuffList(bdData: string[], currentBuffDebuff: string) {
 
 // ========== > USE BUFF/DEBUFF ==========
 // ========== > USE BUFF/DEBUFF ==========
-function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, miscState: IMiscContext, gameState: IGameContext) {
+function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, miscState: IMiscContext, gameState: IGameContext): [string, string|number] {
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
+    // sound effect
+    const soundAreaBuff = qS('#sound_area_buff') as HTMLAudioElement
+    const soundAreaDebuff = qS('#sound_area_debuff') as HTMLAudioElement
 
-    return new Promise((resolve: (value: [string, string|number])=>void) => {
-        const {type, effect} = data
-        if(type == 'buff') {
-            // split buff
-            const splitBuff = playerTurnData.buff?.split(';')
-            // no buff
-            if(!splitBuff) return resolve([null, null])
-            // buff exist
-            // ### pick rarity, reduce price
-            if(effect == 'reduce price') {
-                // get buff
-                const debuff = splitBuff.map(v => v.match(/reduce price/i)).flat().filter(i=>i)
-                if(debuff[0]) {
-                    setBuffDebuffHistory('get_buff', effect)
-                    const newPrice = data.price * .3
-                    return resolve([`used-${debuff[0]}`, newPrice])
-                }
-            }
-            else if(effect == 'pick rarity') {
-                // get buff
-                const buff = splitBuff.map(v => v.match(/pick rarity_\d{1,3}/i)).flat().filter(i=>i)
-                if(buff[0]) {
-                    setBuffDebuffHistory('get_buff', effect)
-                    const [buffName, buffEffect] = buff[0].split('_')
-                    return resolve([`used-${buffName}`, +buffEffect])
-                }
+    const {type, effect} = data
+    // ### pick rarity, reduce price
+    if(type == 'buff') {
+        // split buff
+        const splitBuff = playerTurnData.buff?.split(';')
+        // no buff
+        if(!splitBuff) return [null, null]
+        // buff exist
+        if(effect == 'reduce price') {
+            // get buff
+            const debuff = splitBuff.map(v => v.match(/reduce price/i)).flat().filter(i=>i)
+            if(debuff[0]) {
+                setBuffDebuffHistory('get_buff', effect)
+                const newPrice = data.price * .3
+                return [`used-${debuff[0]}`, newPrice]
             }
         }
-        else if(type == 'debuff') {
-            // split debuff
-            const splitDebuff = playerTurnData.debuff?.split(';')
-            // no debuff
-            if(!splitDebuff) return resolve([null, null])
-            // debuff exist
-            // ### skip turn, tax more
-            if(effect == 'skip turn') {
-                // get debuff
-                const debuff = splitDebuff.map(v => v.match(/skip turn/i)).flat().filter(i=>i)
-                if(debuff[0]) {
-                    setBuffDebuffHistory('get_debuff', effect)
-                    return resolve([`used-${debuff[0]}`, 'skip'])
-                }
-            }
-            else if(effect == 'tax more') {
-                // get debuff
-                const debuff = splitDebuff.map(v => v.match(/tax more/i)).flat().filter(i=>i)
-                if(debuff[0]) {
-                    setBuffDebuffHistory('get_debuff', effect)
-                    const newPrice = -(data.price * .3)
-                    return resolve([`used-${debuff[0]}`, newPrice])
-                }
+        else if(effect == 'pick rarity') {
+            // get buff
+            const buff = splitBuff.map(v => v.match(/pick rarity_\d{1,3}/i)).flat().filter(i=>i)
+            if(buff[0]) {
+                setBuffDebuffHistory('get_buff', effect)
+                const [buffName, buffEffect] = buff[0].split('_')
+                return [`used-${buffName}`, +buffEffect]
             }
         }
-        // nothing match
-        return resolve([null, null])
-    })
+    }
+    // ### skip turn, tax more
+    else if(type == 'debuff') {
+        // split debuff
+        const splitDebuff = playerTurnData.debuff?.split(';')
+        // no debuff
+        if(!splitDebuff) return [null, null]
+        // debuff exist
+        if(effect == 'skip turn') {
+            // get debuff
+            const debuff = splitDebuff.map(v => v.match(/skip turn/i)).flat().filter(i=>i)
+            if(debuff[0]) {
+                setBuffDebuffHistory('get_debuff', effect)
+                return [`used-${debuff[0]}`, 'skip']
+            }
+        }
+        else if(effect == 'tax more') {
+            // get debuff
+            const debuff = splitDebuff.map(v => v.match(/tax more/i)).flat().filter(i=>i)
+            if(debuff[0]) {
+                setBuffDebuffHistory('get_debuff', effect)
+                const newPrice = -(data.price * .3)
+                return [`used-${debuff[0]}`, newPrice]
+            }
+        }
+        else if(effect == 'reduce money') {
+            // get debuff
+            const debuff = splitDebuff.map(v => v.match(/tax more/i)).flat().filter(i=>i)
+            if(debuff[0]) {
+                setBuffDebuffHistory('get_debuff', effect)
+                const newMoney = Math.floor(data.money / 2)
+                return [`used-${debuff[0]}`, newMoney]
+            }
+        }
+    }
+    // nothing match
+    return [null, null]
 
     /**
      * @description set buff/debuff to game history & play sound
@@ -2837,6 +2890,7 @@ function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, miscState:
     function setBuffDebuffHistory(keyBuffDebuff: string, valueBuffDebuff: string) {
         if(playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
             localStorage.setItem('buffDebuffUsed', `${keyBuffDebuff}: ${valueBuffDebuff} 🙏`)
+            keyBuffDebuff == 'get_buff' ? soundAreaBuff.play() : soundAreaDebuff.play()
         }
     }
 }

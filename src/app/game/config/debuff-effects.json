@@ -4,8 +4,8 @@
             "chance": [0, 7],
             "data": [
                 {
-                    "description": "Go to next Debuff Area",
-                    "effect": "move place_debuff"
+                    "description": "Reduce incoming money 50%",
+                    "effect": "reduce money_50%"
                 }
             ]
         },

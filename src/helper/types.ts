@@ -612,7 +612,12 @@ interface IBuffDebuffTaxMore {
     effect: 'tax more',
     price: number,
 }
-export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore
+interface IBuffDebuffReduceMoney {
+    type: 'debuff',
+    effect: 'reduce money',
+    money: number,
+}
+export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:
