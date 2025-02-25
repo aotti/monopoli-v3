@@ -3,8 +3,8 @@ import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValu
 import { BuffDebuffEventType, EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData, SpecialCardEventType, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
 import chance_cards_list from "../config/chance-cards.json"
 import community_cards_list from "../config/community-cards.json"
-import debuff_effects_list from "../config/debuff-effects.json"
-import buff_effects_list from "../config/buff-effects.json"
+import debuff_effect_list from "../config/debuff-effects.json"
+import buff_effect_list from "../config/buff-effects.json"
 
 /*
     TABLE OF CONTENTS
@@ -723,11 +723,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const eventMoney = throughStart 
                             ? Math.round((eventData?.money || 0) + specialCardMoney + throughStart) 
                             : Math.round((eventData?.money || 0) + specialCardMoney)
-            // check debuff reduce money
-            const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
+            // check debuff reduce money (only if player get money)
+            const [buffDebuff, buffDebuffEffect] = eventMoney > 0 ? useBuffDebuff(
                 {type: 'debuff', effect: 'reduce money', money: eventMoney},
                 findPlayer, miscState, gameState
-            ) as [string, number];
+            ) as [string, number] : [null, null];
             // add debuff reduce money & set notif message
             debuffCollection.push(buffDebuff)
             notifMessage.textContent += buffDebuff ? `"debuff reduce money"` : ''
@@ -760,7 +760,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 channel: `monopoli-gameroom-${gameState.gameRoomId}`,
                 display_name: playerTurnData.display_name,
                 // arrested (0) || debuff = stay current pos
-                pos: prisonNumber !== -1 || debuffCollection.join(',').match('skip turn') 
+                pos: prisonNumber !== -1 || debuffCollection.join(',').match('used-skip turn') 
                     ? currentPos.toString() 
                     : nextPos.toString(),
                 lap: numberLaps.toString(),
@@ -1670,11 +1670,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 if(getTileList.length === 0) {
                     return setTimeout(() => {
                         notifTimer.textContent = 'nowhere to go'
-                        resolve({
-                            event: 'buy_city',
-                            status: false,
-                            money: 0
-                        })
+                        resolve(null)
                     }, 1000);
                 }
                 // set timer
@@ -2395,7 +2391,7 @@ function stopByBuffDebuff(area: 'buff'|'debuff', findPlayer: number, rng: string
         const notifTitle = qS('#result_notif_title')
         const notifMessage = qS('#result_notif_message')
         // buff/debuff data
-        const buffDebuffList = area == 'buff' ? buff_effects_list.buff : debuff_effects_list.debuff
+        const buffDebuffList = area == 'buff' ? buff_effect_list.buff : debuff_effect_list.debuff
         for(let bd of buffDebuffList) {
             const [minRange, maxRange] = bd.chance
             // match rng
@@ -2439,7 +2435,7 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
         if(isOptionalEffects.length === 2) {
             // show notif with button
             miscState.setAnimation(true)
-            gameState.setShowGameNotif(`card_with_button-2` as any)
+            gameState.setShowGameNotif(`with_button-2` as any)
             // get effect prefix
             const getPrefix = effectData.split('-')
             // get optional effect
@@ -2613,7 +2609,7 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                 if(playerTurnData.display_name == gameState.myPlayerInfo.display_name) 
                     localStorage.setItem('buffDebuffUsed', `${eventName}: ${type} 🙏`)
                 // get tile data (tile number)
-                const getTileList = getMovePlaceTiles(effect)
+                const getTileList = getMovePlaceTiles(effect, playerTurnData.pos)
                 // show notif
                 if(!separator) {
                     // show notif
@@ -2776,12 +2772,27 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                     card: `add-${effect}`
                 })
             }
+            else {
+                resolve(null)
+            }
         })
     }
 
-    function getMovePlaceTiles(destination: string) {
-        const destinedCity = qS(`[data-tile-info=${destination}]`) as HTMLElement
-        const destinedCitySquare = [destinedCity.dataset.playerPath]
+    function getMovePlaceTiles(destination: string, currentPos: number) {
+        const destinedCity = qSA(`[data-tile-info=${destination}]`) as NodeListOf<HTMLElement>
+        const destinedCitySquare: string[] = []
+        // no similar tiles
+        if(destinedCity.length == 1) {
+            destinedCitySquare.push(destinedCity[0].dataset.playerPath)
+        }
+        // have similar tiles
+        else if(destinedCity.length > 1) {
+            for(let i=0; i< destinedCity.length; i++) {
+                const checkTileSquare = +destinedCity[i].dataset.playerPath - currentPos
+                if(checkTileSquare <= 10) 
+                    destinedCitySquare.push(destinedCity[i].dataset.playerPath)
+            }
+        }
         // return data
         return destinedCitySquare
     }
@@ -2872,7 +2883,7 @@ function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, miscState:
         }
         else if(effect == 'reduce money') {
             // get debuff
-            const debuff = splitDebuff.map(v => v.match(/tax more/i)).flat().filter(i=>i)
+            const debuff = splitDebuff.map(v => v.match(/reduce money/i)).flat().filter(i=>i)
             if(debuff[0]) {
                 setBuffDebuffHistory('get_debuff', effect)
                 const newMoney = Math.floor(data.money / 2)
