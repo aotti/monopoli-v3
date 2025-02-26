@@ -433,7 +433,8 @@ export default class GameController extends Controller {
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
-                token: token
+                token: token,
+                playerTurns: getPlayerTurns
             }
             result = this.respond(200, `${action} success`, [resultData])
         }

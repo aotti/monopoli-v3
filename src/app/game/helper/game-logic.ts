@@ -797,6 +797,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
                         delete playerTurnEndResponse.data[0].token
                     }
+                    // save playerTurns
+                    localStorage.setItem('playerTurns', playerTurnEndResponse.data[0].playerTurns)
                     // reset disable buttons
                     miscState.setDisableButtons(null)
                     return

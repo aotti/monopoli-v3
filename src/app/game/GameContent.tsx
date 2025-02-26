@@ -59,6 +59,8 @@ export default function GameContent({ pubnubSetting }) {
         localStorage.removeItem('subEventData')
         localStorage.removeItem('parkingEventData')
         localStorage.removeItem('specialCardUsed')
+        localStorage.removeItem('buffDebuffUsed')
+        localStorage.removeItem('playerTurns')
     }, [])
 
     useEffect(() => {
