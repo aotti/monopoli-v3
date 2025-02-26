@@ -157,6 +157,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // end turn
     if(getMessage.playerTurnEnd) {
+        // save playerTurns
+        localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
         // show notif next player turn
         playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
         // turn off notif for buttons

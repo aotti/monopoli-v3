@@ -38,8 +38,6 @@ export default function GameContent({ pubnubSetting }) {
         miscState.setShowTutorial(null)
         // set notif to null
         gameState.setShowGameNotif(null)
-        // remove city owned list
-        setTimeout(() => localStorage.removeItem('cityOwnedList'), 1000)
     }
 
     // pubnub

@@ -42,9 +42,7 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory, cityOwnedList } = getPlayerResponse.data[0]
-            // set city owned list
-            localStorage.setItem('cityOwnedList', JSON.stringify(cityOwnedList))
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory } = getPlayerResponse.data[0]
             // set game stage
             gameState.setGameStages(gameStage)
             // set player list
@@ -797,8 +795,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
                         delete playerTurnEndResponse.data[0].token
                     }
-                    // save playerTurns
-                    localStorage.setItem('playerTurns', playerTurnEndResponse.data[0].playerTurns)
                     // reset disable buttons
                     miscState.setDisableButtons(null)
                     return
@@ -2411,6 +2407,8 @@ function stopByBuffDebuff(area: 'buff'|'debuff', findPlayer: number, rng: string
                 }
                 return resolve(await buffDebuffEffects(bdData, findPlayer, rng, miscState, gameState))
             }
+            // get no event (debuff only 65%)
+            else resolve(null)
         }
     })
 }
@@ -2773,9 +2771,6 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                     money: 0,
                     card: `add-${effect}`
                 })
-            }
-            else {
-                resolve(null)
             }
         })
     }
