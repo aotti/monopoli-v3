@@ -44,6 +44,15 @@
                     "effect": "lose money_5000"
                 }
             ]
+        },
+        {
+            "chance": [66, 100],
+            "data": [
+                {
+                    "description": "null",
+                    "effect": "null_null"
+                }
+            ]
         }
     ]
 }

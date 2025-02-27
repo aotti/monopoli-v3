@@ -353,7 +353,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            96, 
             Math.floor(Math.random() * 101)
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -2119,7 +2119,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             notifMessage.textContent = eventContent
                                     .replace('xxx', playerTurnData.display_name) // player name
                                     .replace('xxx', moneyFormat(price)) // city price
-                                    + debuff ? `\n"debuff tax more"` : ''
+                                    + (debuff ? `\n"debuff tax more"` : '')
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // no card, show normal notif
@@ -2407,8 +2407,6 @@ function stopByBuffDebuff(area: 'buff'|'debuff', findPlayer: number, rng: string
                 }
                 return resolve(await buffDebuffEffects(bdData, findPlayer, rng, miscState, gameState))
             }
-            // get no event (debuff only 65%)
-            else resolve(null)
         }
     })
 }
@@ -2772,6 +2770,7 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                     card: `add-${effect}`
                 })
             }
+            else resolve(null)
         })
     }
 
