@@ -147,8 +147,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // update city
             cityLeftInfo[findPlayer].city = getMessage.cityLeft
             cityLeftInfo[findPlayer].money += getMessage.cityPrice
-            // update city owned list
-            localStorage.setItem('cityOwnedList', JSON.stringify(getMessage.cityOwnedList))
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
@@ -159,10 +157,10 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // end turn
     if(getMessage.playerTurnEnd) {
+        // save playerTurns
+        localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
         // show notif next player turn
         playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
-        // update city owned list
-        localStorage.setItem('cityOwnedList', JSON.stringify(getMessage.cityOwnedList))
         // turn off notif for buttons
         if(gameState.showGameNotif?.match('with_button')) {
             miscState.setAnimation(false)

@@ -6,7 +6,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -24,7 +24,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -41,7 +41,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -58,7 +58,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -75,7 +75,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -93,7 +93,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -110,7 +110,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -128,7 +128,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -145,7 +145,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             max-height: 10rem;
             background-color: #363062;
             white-space: pre-line;
@@ -166,7 +166,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -184,7 +184,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -201,7 +201,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -218,7 +218,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -235,7 +235,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -253,7 +253,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -270,7 +270,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -288,7 +288,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;
@@ -305,7 +305,7 @@
             /* static */
             content: attr(data-tooltip);
             position: absolute;
-            z-index: 20;
+            z-index: 50;
             background-color: #363062;
             max-height: 10rem;
             white-space: pre-line;

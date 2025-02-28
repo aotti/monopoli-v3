@@ -36,6 +36,9 @@ function ChatGameRoom({ id }: {id: number}) {
 
     useEffect(() => {
         if(gameState.gameSideButton == 'chat') {
+            // scroll to bottom
+            const chatContainer = qS('#chat_container')
+            if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
             // auto focus
             const chatInput = qS('#message_text') as HTMLInputElement
             chatInput.focus()

@@ -50,6 +50,7 @@
         "players": "pemain",
         "chat": "ngobrol",
         "lose condition": "kondisi kalah",
+        "name & paper icon": "nama & ikon kertas",
 
         "__BOARD__": "__BOARD__",
         "Start line": "Imagine lewat start",
@@ -156,18 +157,19 @@
 
         "__AREA BUFF/DEBUFF__": "__AREA BUFF/DEBUFF__",
         "Buff/Debuff Area": "Area Buff/Debuff",
-        "Normal Area (65% chance)": "Area Normal (65% kesempatan)",
-        "[20%] Take 1 step backward": "[20%] Mundur 1 langkah",
-        "[15%] Take 2 step forward": "[15%] Maju 2 langkah",
-        "[10%] Get sad gaming dice card": "[10%] Kartu sad dadu gaming",
-        "[8%] Get nerf parking card": "[8%] Kartu nerf parkir",
-        "[7%] Go to next Debuff Area": "[7%] Maju ke area debuff selanjutnya",
+        "Debuff Area (65% chance)": "Area Debuff (65% kesempatan)",
+        "[25%] Lose money 5k x laps": "[25%] Hilang uang 5k x putaran",
+        "[15%] Skip 1 turn": "[15%] Tidak jalan 1 putaran",
+        "[10%] Go to cursed city/prison": "[10%] Pergi ke kota terkutuk/penjara",
+        "[8%] Tax multiply by 30%": "[8%] Pajak ditambah 30%",
+        "[7%] Reduce incoming money 50%": "[7%] Uang yang akan didapat berkurang 50%",
+
         "Buff Area (100% chance)": "Area Buff (100% kesempatan)",
-        "[40%] Get money 5k x laps": "[40%] Dapat uang 5k x putaran",
-        "[20%] Get anti jail card": "[20%] Kartu nerf pajak",
-        "[15%] Get nerf gaming dice card": "[15%] Kartu nerf dadu gaming",
-        "[15%] Get nerf tax card": "[15%] Kartu bebas penjara",
-        "[10%] Get city upgrade card": "[10%] Kartu upgrade kota",
+        "[35%] Get money 7k x laps": "[35%] Dapat uang 7k x putaran",
+        "[25%] Select card rarity": "[25%] Pilih tingkatan kartu",
+        "[20%] Reduce buy/upgrade city price by 30%": "[20%] Harga beli/meningkatkan kota berkurang 30%",
+        "[12%] Go to free parking": "[12%] Pergi ke parkir bebas",
+        "[8%] Get curse reverser card": "[8%] Dapat kartu pembalik kutukan",
 
         "click here to continue": "klik ini untuk lanjut",
         "tutorial complete": "tutorial selesai",
@@ -179,7 +181,7 @@
 
         "__ROOM PART 2__":"__ROOM PART 2__",
         "display you/other player game stats. to upload avatar, click the \"upload your avatar\". after upload your avatar, please re-login to make sure the avatar is updated.": "menampilkan stats main kau/orang lain. buat unggah avatar, klik \"unggah avatar kau\". setelah unggah avatar, tolong login ulang agar gambar muncul dengan baik.",
-        "\"worst lost\" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
+        "\"worst lost\" mean the worst money you have when losing a game since you install titkok, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
         
         "__ROOM PART 3__":"__ROOM PART 3__",
         "icon on the right is tutorial button":"ikon di kanan itu tombol tutorial",
@@ -201,7 +203,7 @@
 
         "__GAME PART 3__":"__GAME PART 3__",
         "\"back to room\" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.": "\"kembali\" pergi ke daftar ruang tanpa kabur dari game. disini juga ada tombol tutorial 😎 dan info tentang ruang ini.",
-        "if you turn on the \"game history\" on player setting, it will display a box to see all player actions.": "kalo kau centang \"catatan main\" di setting pemain, akan muncul kotak berisi semua aksi pemain.",
+        "if you turn on the \"game history\" on player setting, it will display a box to see all player actions.": "kalo kau centang \"catatan main\" di pengaturan pemain, akan muncul kotak berisi semua aksi pemain.",
         "i hate css 💀": "css pantek 💀",
 
         "__SYSTEM MESSAGE__": "__SYSTEM MESSAGE__",

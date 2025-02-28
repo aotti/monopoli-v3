@@ -38,14 +38,18 @@ export default function GameContent({ pubnubSetting }) {
         miscState.setShowTutorial(null)
         // set notif to null
         gameState.setShowGameNotif(null)
-        // remove city owned list
-        setTimeout(() => localStorage.removeItem('cityOwnedList'), 1000)
     }
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting)
     // tooltip (the element must have position: relative)
     useEffect(() => {
+        // start room list tutorial for 1st login (1st browser)
+        const isGameRoomTutorialDone = localStorage.getItem('gameRoomTutorial')
+        if(!isGameRoomTutorialDone) {
+            miscState.setShowTutorial('tutorial_gameroom_1')
+            localStorage.setItem('gameRoomTutorial', 'true')
+        }
         applyTooltipEvent()
         // reset disable buttons
         miscState.setDisableButtons(null)
@@ -59,6 +63,8 @@ export default function GameContent({ pubnubSetting }) {
         localStorage.removeItem('subEventData')
         localStorage.removeItem('parkingEventData')
         localStorage.removeItem('specialCardUsed')
+        localStorage.removeItem('buffDebuffUsed')
+        localStorage.removeItem('playerTurns')
     }, [])
 
     useEffect(() => {

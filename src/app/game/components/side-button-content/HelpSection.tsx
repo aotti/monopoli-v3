@@ -75,7 +75,7 @@ function ListWithTabs({ title, data }: {title: string, data: {[key:string]: stri
 }
 
 function getRarityBgColor(key: string) {
-    return key == '>25%' ? 'bg-red-600'
+    return key == '>25%' || key == 'debuff 65%' ? 'bg-red-600'
         : key == '25%' ? 'bg-orange-600'
         : key == '15%' ? 'bg-yellow-600'
         : key == '8%' ? 'bg-emerald-600' 

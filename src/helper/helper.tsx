@@ -266,7 +266,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             // set regex
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex] = [
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex, buffRegex, debuffRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
@@ -276,8 +276,10 @@ export function filterInput(input: InputIDType, value: string) {
                 'cursed: .* 💀',
                 'special_city: .* 💸',
                 'special_card: .* 💳',
+                'get_buff: .* 🙏',
+                'get_debuff: .* 🙏',
             ]
-            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}`, 'g')
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}|${buffRegex}|${debuffRegex}`, 'g')
             // set length
             // used to verify the regex, if client send 2 history 
             // but only match 1, something is wrong 
@@ -292,12 +294,14 @@ export function filterInput(input: InputIDType, value: string) {
         case 'city': 
         case 'card':
         case 'take_money':
-            const optionalCity_1 = value === null || typeof value == 'string' ? true : false
-            return optionalCity_1
+        case 'buff':
+        case 'debuff':
+            const optionalBuyCity = value === null || value.match(/^[a-zA-Z0-9,;\*]+/) ? true : false
+            return optionalBuyCity
         case 'sell_city_name':
         case 'city_left':
-            const optionalCity_2 = value === null || value == '' || value.match(/^[a-zA-Z0-9\-*,;]+$/) ? true : false
-            return optionalCity_2
+            const optionalSellCity = value === null || value == '' || value.match(/^[a-zA-Z0-9\-*,;]+$/) ? true : false
+            return optionalSellCity
         case 'tax_owner': 
         case 'tax_visitor': 
             const optionalTax = value === null || value.match(/^[a-zA-Z0-9\s]+$/) ? true : false
@@ -408,6 +412,8 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
     }
     // check text length
     const text = ev.currentTarget.dataset['tooltip']
+    // text is undefined, return
+    if(!text) return
     switch(true) {
         // 27 = 2 rows (round to 30)
         case text.length <= 30 * 1: applyTooltipStyle(2); break
@@ -422,11 +428,11 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
         // ### LALU CEK X AXIS, LALU CEK JUMLAH ROWS
         // ### JIKA ROWS <= 2, MAKA PILIH KANAN/KIRI, SELAIN ITU ATAS/BAWAH 
         switch(true) {
-            case elementPos.top >= 200:
+            case elementPos.top >= 190:
                 // place left / right if rows == 2
-                if(elementPos.right >= 200 && rows == 2)
+                if(elementPos.right >= 190 && rows == 2)
                     ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 200 && rows == 2) 
+                else if(elementPos.left >= 190 && rows == 2) 
                     ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // place top if rows > 2
                 else {
@@ -437,11 +443,11 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
                     if(rows === 8) ['tooltip-top-100', 'tooltip-top-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 }
                 return
-            case elementPos.bottom >= 200:
+            case elementPos.bottom >= 190:
                 // place left / right if rows == 2
-                if(elementPos.right >= 200 && rows == 2)
+                if(elementPos.right >= 190 && rows == 2)
                     ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 200 && rows == 2) 
+                else if(elementPos.left >= 190 && rows == 2) 
                     ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // place bottom if rows > 2
                 else {
@@ -451,9 +457,9 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
                 return
             default: 
                 // place left / right if rows == 2
-                if(elementPos.right >= 200 && rows == 2)
+                if(elementPos.right >= 190 && rows == 2)
                     ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 200 && rows == 2) 
+                else if(elementPos.left >= 190 && rows == 2) 
                     ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // bottom | bottom-lg
                 else ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))

@@ -11,7 +11,7 @@ export default function TutorialRoomList() {
         ],
         part_2: [
             `display you/other player game stats. to upload avatar, click the "upload your avatar". after upload your avatar, please re-login to make sure the avatar is updated.`,
-            `"worst lost" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.`
+            `"worst lost" mean the worst money you have when losing a game since you install titkok, um..i mean created ur account.`
         ],
         part_3: [
             `icon on the right is tutorial button`,
