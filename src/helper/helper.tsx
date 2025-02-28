@@ -428,11 +428,11 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
         // ### LALU CEK X AXIS, LALU CEK JUMLAH ROWS
         // ### JIKA ROWS <= 2, MAKA PILIH KANAN/KIRI, SELAIN ITU ATAS/BAWAH 
         switch(true) {
-            case elementPos.top >= 200:
+            case elementPos.top >= 190:
                 // place left / right if rows == 2
-                if(elementPos.right >= 200 && rows == 2)
+                if(elementPos.right >= 190 && rows == 2)
                     ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 200 && rows == 2) 
+                else if(elementPos.left >= 190 && rows == 2) 
                     ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // place top if rows > 2
                 else {
@@ -443,11 +443,11 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
                     if(rows === 8) ['tooltip-top-100', 'tooltip-top-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 }
                 return
-            case elementPos.bottom >= 200:
+            case elementPos.bottom >= 190:
                 // place left / right if rows == 2
-                if(elementPos.right >= 200 && rows == 2)
+                if(elementPos.right >= 190 && rows == 2)
                     ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 200 && rows == 2) 
+                else if(elementPos.left >= 190 && rows == 2) 
                     ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // place bottom if rows > 2
                 else {
@@ -457,9 +457,9 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
                 return
             default: 
                 // place left / right if rows == 2
-                if(elementPos.right >= 200 && rows == 2)
+                if(elementPos.right >= 190 && rows == 2)
                     ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 200 && rows == 2) 
+                else if(elementPos.left >= 190 && rows == 2) 
                     ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 // bottom | bottom-lg
                 else ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))

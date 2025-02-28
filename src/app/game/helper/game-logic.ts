@@ -10,6 +10,10 @@ import buff_effect_list from "../config/buff-effects.json"
     TABLE OF CONTENTS
     - GAME PREPARE
     - GAME PLAYING
+        # PLAYER MOVING
+        # EVENT HISTORY
+        # CHECK GAME PROGRESS
+        # GAME OVER
     - GAME TILE EVENT
         # NORMAL CITY EVENT
         # SPECIAL CITY EVENT
@@ -461,68 +465,8 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
     }
 }
 
-export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
-    // notif
-    const notifTitle = qS('#result_notif_title')
-    const notifMessage = qS('#result_notif_message')
-    // get room info
-    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-    // get game mode & lose condition
-    const loseCondition = gameState.gameRoomInfo[findRoom].money_lose
-    const gameMode = gameState.gameRoomInfo[findRoom].mode
-    if(gameMode.match(/survive/i)) {
-        // get alive players
-        const alivePlayers = []
-        for(let pd of playersData) {
-            // check players money amount
-            if(pd.money > loseCondition) 
-                alivePlayers.push(pd.display_name)
-        }
-        // if only 1 left, game over
-        if(alivePlayers.length === 1) {
-            // set game stage
-            gameState.setGameStages('over')
-            // show notif
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('normal')
-            // winner message
-            notifTitle.textContent = `Game Over`
-            notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
-            setTimeout(() => {
-                // set notif to null
-                gameState.setShowGameNotif(null)
-                const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
-                gotoRoom ? gotoRoom.click() : null
-            }, 15_000)
-            // run game over
-            return gameOver(alivePlayers[0], miscState, gameState)
-        }
-    }
-    else if(gameMode.match(/laps/i)) {
-        const lapsLimit = +gameMode.split('_')[0]
-        const highestMoneyPlayer = playersData.map(v => `${v.money},${v.display_name}`).sort().reverse()
-        for(let pd of playersData) {
-            if(pd.lap >= lapsLimit) {
-                // set game stage
-                gameState.setGameStages('over')
-                // show notif
-                miscState.setAnimation(true)
-                gameState.setShowGameNotif('normal')
-                // winner message
-                notifTitle.textContent = `Game Over`
-                notifMessage.textContent = `${highestMoneyPlayer[0].split(',')[1]} has won the game!\nback to room list in 15 seconds`
-                setTimeout(() => {
-                    // set notif to null
-                    gameState.setShowGameNotif(null)
-                    const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
-                    gotoRoom ? gotoRoom.click() : null
-                }, 15_000)
-                return gameOver(highestMoneyPlayer[0].split(',')[1], miscState, gameState)
-            }
-        }
-    }
-}
-
+// ========== # PLAYER MOVING ==========
+// ========== # PLAYER MOVING ==========
 /**
  * @param playerDice dice result number
  */
@@ -811,6 +755,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
     })
 }
 
+// ========== # EVENT HISTORY ==========
+// ========== # EVENT HISTORY ==========
 function setEventHistory(rolled_dice: string, eventData: EventDataType) {
     // check sub event
     const subEventData = localStorage.getItem('subEventData')
@@ -859,7 +805,73 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
     }
 }
 
-export async function gameOver(winPlayer: string, miscState: IMiscContext, gameState: IGameContext) {
+// ========== # CHECK GAME PROGRESS ==========
+// ========== # CHECK GAME PROGRESS ==========
+export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
+    // notif
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // get room info
+    const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+    // get game mode & lose condition
+    const loseCondition = gameState.gameRoomInfo[findRoom].money_lose
+    const gameMode = gameState.gameRoomInfo[findRoom].mode
+    if(gameMode.match(/survive/i)) {
+        // get alive players
+        const alivePlayers = []
+        for(let pd of playersData) {
+            // check players money amount
+            if(pd.money > loseCondition) 
+                alivePlayers.push(pd.display_name)
+        }
+        // if only 1 left, game over
+        if(alivePlayers.length === 1) {
+            // set game stage
+            gameState.setGameStages('over')
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // winner message
+            notifTitle.textContent = `Game Over`
+            notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
+            setTimeout(() => {
+                // set notif to null
+                gameState.setShowGameNotif(null)
+                const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+                gotoRoom ? gotoRoom.click() : null
+            }, 15_000)
+            // run game over
+            return gameOver(miscState, gameState)
+        }
+    }
+    else if(gameMode.match(/laps/i)) {
+        const lapsLimit = +gameMode.split('_')[0]
+        const highestMoneyPlayer = playersData.map(v => `${v.money},${v.display_name}`).sort().reverse()
+        for(let pd of playersData) {
+            if(pd.lap >= lapsLimit) {
+                // set game stage
+                gameState.setGameStages('over')
+                // show notif
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('normal')
+                // winner message
+                notifTitle.textContent = `Game Over`
+                notifMessage.textContent = `${highestMoneyPlayer[0].split(',')[1]} has won the game!\nback to room list in 15 seconds`
+                setTimeout(() => {
+                    // set notif to null
+                    gameState.setShowGameNotif(null)
+                    const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+                    gotoRoom ? gotoRoom.click() : null
+                }, 15_000)
+                return gameOver(miscState, gameState)
+            }
+        }
+    }
+}
+
+// ========== # GAME OVER ==========
+// ========== # GAME OVER ==========
+async function gameOver(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -868,12 +880,10 @@ export async function gameOver(winPlayer: string, miscState: IMiscContext, gameS
     // data for update all player stats
     const allPlayerStats = []
     for(let player of gameState.gamePlayerInfo) {
-        // win player set to -999_999 to prevent updating worst money lose
-        if(player.display_name == winPlayer)
-            allPlayerStats.push(`${player.display_name},${-999999}`)
-        // lose player will update worst money lose
-        else 
-            allPlayerStats.push(`${player.display_name},${player.money}`)
+        // player with plus money set to -999_999 to prevent updating worst money lose
+        if(player.money > 0) allPlayerStats.push(`${player.display_name},${-999999}`)
+        // player with minus money will update worst money lose
+        else allPlayerStats.push(`${player.display_name},${player.money}`)
     }
     // input value container
     const inputValues = {

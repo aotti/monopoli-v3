@@ -29,6 +29,12 @@ export default function RoomContent({ pubnubSetting }) {
     const roomlistChannel = 'monopoli-roomlist'
     // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
+        // start room list tutorial for 1st login (1st browser)
+        const isRoomListTutorialDone = localStorage.getItem('roomListTutorial')
+        if(!isRoomListTutorialDone) {
+            miscState.setShowTutorial('tutorial_roomlist_1')
+            localStorage.setItem('roomListTutorial', 'true')
+        }
         // tooltip (the element must have position: relative)
         applyTooltipEvent()
         // get room list

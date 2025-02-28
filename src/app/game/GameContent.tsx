@@ -44,6 +44,12 @@ export default function GameContent({ pubnubSetting }) {
     const pubnubClient = new PubNub(pubnubSetting)
     // tooltip (the element must have position: relative)
     useEffect(() => {
+        // start room list tutorial for 1st login (1st browser)
+        const isGameRoomTutorialDone = localStorage.getItem('gameRoomTutorial')
+        if(!isGameRoomTutorialDone) {
+            miscState.setShowTutorial('tutorial_gameroom_1')
+            localStorage.setItem('gameRoomTutorial', 'true')
+        }
         applyTooltipEvent()
         // reset disable buttons
         miscState.setDisableButtons(null)

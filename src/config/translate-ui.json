@@ -50,6 +50,7 @@
         "players": "pemain",
         "chat": "ngobrol",
         "lose condition": "kondisi kalah",
+        "name & paper icon": "nama & ikon kertas",
 
         "__BOARD__": "__BOARD__",
         "Start line": "Imagine lewat start",
@@ -180,7 +181,7 @@
 
         "__ROOM PART 2__":"__ROOM PART 2__",
         "display you/other player game stats. to upload avatar, click the \"upload your avatar\". after upload your avatar, please re-login to make sure the avatar is updated.": "menampilkan stats main kau/orang lain. buat unggah avatar, klik \"unggah avatar kau\". setelah unggah avatar, tolong login ulang agar gambar muncul dengan baik.",
-        "\"worst lost\" mean the worst money you have when losing a game since you breathed in this world, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
+        "\"worst lost\" mean the worst money you have when losing a game since you install titkok, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
         
         "__ROOM PART 3__":"__ROOM PART 3__",
         "icon on the right is tutorial button":"ikon di kanan itu tombol tutorial",
@@ -202,7 +203,7 @@
 
         "__GAME PART 3__":"__GAME PART 3__",
         "\"back to room\" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.": "\"kembali\" pergi ke daftar ruang tanpa kabur dari game. disini juga ada tombol tutorial 😎 dan info tentang ruang ini.",
-        "if you turn on the \"game history\" on player setting, it will display a box to see all player actions.": "kalo kau centang \"catatan main\" di setting pemain, akan muncul kotak berisi semua aksi pemain.",
+        "if you turn on the \"game history\" on player setting, it will display a box to see all player actions.": "kalo kau centang \"catatan main\" di pengaturan pemain, akan muncul kotak berisi semua aksi pemain.",
         "i hate css 💀": "css pantek 💀",
 
         "__SYSTEM MESSAGE__": "__SYSTEM MESSAGE__",
