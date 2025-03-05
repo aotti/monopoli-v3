@@ -357,7 +357,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            96, 
+            Math.floor(Math.random() * 101), 
             Math.floor(Math.random() * 101)
         ].toString(),
         special_card: specialCard ? specialCard : null

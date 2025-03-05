@@ -13,19 +13,18 @@ export default function Credit() {
 
     return (
         <>
-            <div className="absolute top-2 left-4">
+            <div className="">
                 <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => setShowCredit(true)}> 
                     credit 
                 </button>
             </div>
-            <div className={`absolute z-40 bg-black/30 
+            <div className={`absolute -left-2 z-40 bg-black/30 
             ${showCredit ? 'flex' : 'hidden'} items-center justify-center
             h-[calc(100vh-1rem)] w-[calc(100vw-1rem)]`}>
                 <div className="flex flex-col gap-2 justify-center bg-darkblue-1 border-8bit-text p-1">
                     {/* head */}
                     <div className="flex justify-between text-center border-b-2">
                         <span> credit </span>
-                        <span> v3.0.0 </span>
                     </div>
                     {/* body */}
                     <div className="flex flex-col gap-2 text-center text-green-400 w-72 lg:w-96 h-40 lg:h-52 overflow-y-scroll">
