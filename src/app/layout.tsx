@@ -25,10 +25,6 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <Head>
-        <link rel="preload" href="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png" as="image" />
-        <link rel="preload" href="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_Backside-FBtLAKUSyJyXjxPThnvo1874A5bw8f.png" as="image" />
-      </Head>
       <MiscProvider accessSecret={accessSecret}>
         <GameProvider>
           <body className={`${retroFont.className}`}>{children}</body>

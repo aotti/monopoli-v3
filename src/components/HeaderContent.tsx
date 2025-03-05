@@ -2,6 +2,7 @@ import { useMisc } from "../context/MiscContext"
 import { useEffect } from "react"
 import { applyTooltipEvent } from "../helper/helper"
 import Credit from "./Credit"
+import Updates from "./Updates"
 
 export default function HeaderContent() {
     const miscState = useMisc()
@@ -13,8 +14,12 @@ export default function HeaderContent() {
     return (
         // height 3rem, padding .25rem
         <nav className="flex justify-center h-10 lg:h-12 p-1 border-b-2">
-            {/* credit button & modal */}
-            <Credit />
+            <div className="absolute top-2 left-4 flex gap-6">
+                {/* credit button & modal */}
+                <Credit />
+                {/* updates, change log */}
+                <Updates />
+            </div>
             {/* title */}
             <span className="font-semibold text-base lg:text-xl"> Monopoli Lemao </span>
             {/* translate button */}
