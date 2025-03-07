@@ -1,6 +1,6 @@
 import { useMisc } from "../../context/MiscContext";
 import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
-import ChatBox, { sendChat } from "../../components/ChatBox";
+import ChatBox, { ChatEmotes, sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/CreateRoom";
 import PlayerList from "./components/PlayerList";
 import PlayerStats from "./components/PlayerStats";
@@ -22,6 +22,9 @@ export default function RoomContent({ pubnubSetting }) {
     // chat input ref
     const chatFocusRef = useRef()
     clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
+    // chat emotes ref
+    const chatEmotesRef = useRef()
+    clickOutsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting)
@@ -109,11 +112,17 @@ export default function RoomContent({ pubnubSetting }) {
                             : <PlayerList onlinePlayers={gameState.onlinePlayers} />
                         }
                         {/* chat form */}
-                        <form ref={chatFocusRef} className="flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState, gameState)}>
+                        <form ref={chatFocusRef} className="relative flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState, gameState)}>
                             {/* inputs */}
                             <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
                             onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
+                            {/* emote list */}
+                            {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
+                            {/* emote button */}
+                            <button ref={chatEmotesRef} type="button" className="relative w-6 lg:w-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
+                            </button>
                             {/* submit chat */}
                             <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                                 <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />

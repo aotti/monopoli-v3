@@ -1,6 +1,13 @@
 {
     "updates": [
         {
+            "version": "v3.1",
+            "changes": [
+                "add emotes to chatbox",
+                "add auto roll dice feature"
+            ]
+        },
+        {
             "version": "v3.0",
             "changes": [
                 "initial release"

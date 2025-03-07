@@ -33,6 +33,8 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
         systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
         return [systemMessage]
     })
+    // emotes
+    const [showEmotes, setShowEmotes] = useState(false)
 
     useEffect(() => {
         const displayOrientation = () => {
@@ -71,7 +73,8 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
         messageItems, setMessageItems,
         screenType, setScreenType,
         showJoinModal, setShowJoinModal,
-        disableButtons, setDisableButtons
+        disableButtons, setDisableButtons,
+        showEmotes, setShowEmotes
     }
 
     return (

@@ -101,6 +101,8 @@ export interface IMiscContext {
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
     disableButtons: 'roomlist'|'gameroom',
     setDisableButtons: Dispatch<SetStateAction<'roomlist'|'gameroom'>>,
+    showEmotes: boolean, 
+    setShowEmotes: Dispatch<SetStateAction<boolean>>,
 }
 
 interface IGameRoomInfo {

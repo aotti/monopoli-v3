@@ -35,12 +35,12 @@ export default function Updates() {
                 <div className="flex flex-col gap-2 justify-center bg-darkblue-1 border-8bit-text p-1">
                     {/* head */}
                     <div className="flex justify-between text-center border-b-2">
-                        <span> change logs </span>
+                        <span> changelog </span>
                         <span> v3.0 </span>
                     </div>
                     {/* body */}
                     <div className="flex flex-col gap-2 text-green-400 w-72 lg:w-96 h-40 lg:h-52 overflow-y-scroll">
-                        {/* change logs */}
+                        {/* changelog */}
                         {changeLogs.map((v, i) => 
                             <div key={i}>
                                 <p> {v.version} </p>
