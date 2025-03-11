@@ -584,18 +584,6 @@ interface ISpecialCardCursed {
 }
 export type SpecialCardEventType = ISpecialCardCity | ISpecialCardStart | ISpecialCardPrison | ISpecialCardDice | ISpecialCardParking | ISpecialCardCursed
 
-interface ISpecialCardAdd {
-    action: 'add',
-    currentSpecialCard: string,
-    specialCard: string, 
-}
-interface ISpecialCardUsed {
-    action: 'used',
-    currentSpecialCard: string,
-    specialCard: string, 
-}
-export type UpdateSpecialCardListType = ISpecialCardAdd | ISpecialCardUsed
-
 interface IBuffDebuffReducePrice {
     type: 'buff',
     effect: 'reduce price',

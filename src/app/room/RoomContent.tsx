@@ -77,7 +77,7 @@ export default function RoomContent({ pubnubSetting }) {
                 }
             }
     
-            // listener for update player lsit
+            // listener for update player list
             document.body.tabIndex = 0
             document.body.addEventListener('click', updatePlayerList)
             document.body.addEventListener('keyup', updatePlayerList)

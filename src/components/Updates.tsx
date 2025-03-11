@@ -43,7 +43,7 @@ export default function Updates() {
                         {/* changelog */}
                         {changeLogs.map((v, i) => 
                             <div key={i}>
-                                <p> {v.version} </p>
+                                <p className="text-white"> {v.version} </p>
                                 {v.changes.map((v, i) => 
                                     <ul key={i} className="text-2xs lg:text-xs">
                                         <li> - {v} </li>

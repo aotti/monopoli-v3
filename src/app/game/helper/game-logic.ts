@@ -1,6 +1,6 @@
 import { FormEvent } from "react"
 import { catchError, fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, shuffle, translateUI } from "../../../helper/helper"
-import { BuffDebuffEventType, EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData, SpecialCardEventType, UpdateCityListType, UpdateSpecialCardListType } from "../../../helper/types"
+import { BuffDebuffEventType, EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData, SpecialCardEventType, UpdateCityListType } from "../../../helper/types"
 import chance_cards_list from "../config/chance-cards.json"
 import community_cards_list from "../config/community-cards.json"
 import debuff_effect_list from "../config/debuff-effects.json"
@@ -46,13 +46,15 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory } = getPlayerResponse.data[0]
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory, playerTurns } = getPlayerResponse.data[0]
             // set game stage
             gameState.setGameStages(gameStage)
             // set player list
             gameState.setGamePlayerInfo(getPlayers)
             // set game history
             gameState.setGameHistory(gameHistory)
+            // set player turns
+            localStorage.setItem('playerTurns', JSON.stringify(playerTurns))
             // set decide players
             if(decidePlayers) {
                 // change game stage
@@ -593,55 +595,60 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         function stopByEvent() {
             return new Promise((resolve: (value: EventDataType)=>void ) => {
                 // match tile info
-                // ### EVENT LIST COMPLETE: city, tax, chance card
-                // ### EVENT LIST NOT COMPLETE: special, curse, community card, prison, free park, buff, debuff
-                switch(tileInfo) {
-                    case 'city': 
-                    case 'special':
-                        stopByCity(tileInfo, findPlayer, tileElement, miscState, gameState)
-                        .then(eventData => resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'chance': 
-                        stopByCards('chance', findPlayer, playerRNG, miscState, gameState)
-                        // only match type "move" if the card is a single effect
-                        .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'community': 
-                        stopByCards('community', findPlayer, playerRNG, miscState, gameState)
-                        // only match type "move" if the card is a single effect
-                        .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'prison': 
-                        stopByPrison(findPlayer, miscState, gameState)
-                        .then(eventData => resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'parking': 
-                        stopByParking(findPlayer, playerRNG, miscState, gameState)
-                        .then(eventData => resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'cursed': 
-                        stopByCursedCity(findPlayer, tileElement, miscState, gameState)
-                        .then(eventData => resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'buff': 
-                        stopByBuffDebuff('buff', findPlayer, playerRNG, miscState, gameState)
-                        .then(eventData => resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    case 'debuff': 
-                        stopByBuffDebuff('debuff', findPlayer, playerRNG, miscState, gameState)
-                        .then(eventData => resolve(eventData))
-                        .catch(err => console.log(err))
-                        break
-                    default: 
-                        resolve(null)
-                        break
+                // only buff/debuff can be triggered since lap 1
+                if(numberLaps > 1) {
+                    switch(tileInfo) {
+                        case 'city': 
+                        case 'special':
+                            stopByCity(tileInfo, findPlayer, tileElement, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        case 'chance': 
+                        case 'community': 
+                            stopByCards(tileInfo, findPlayer, playerRNG, miscState, gameState)
+                            // only match type "move" if the card is a single effect
+                            .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        case 'prison': 
+                            stopByPrison(findPlayer, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        case 'parking': 
+                            stopByParking(findPlayer, playerRNG, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        case 'cursed': 
+                            stopByCursedCity(findPlayer, tileElement, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        case 'buff': 
+                        case 'debuff': 
+                            stopByBuffDebuff(tileInfo, findPlayer, playerRNG, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        default: 
+                            resolve(null)
+                            break
+                    }
+                }
+                else if(numberLaps === 1) {
+                    switch(tileInfo) {
+                        case 'buff': 
+                        case 'debuff': 
+                            stopByBuffDebuff(tileInfo, findPlayer, playerRNG, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        default: 
+                            resolve(null)
+                            break
+                    }
                 }
             })
         }
@@ -661,6 +668,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // accumulate special card effects (only money)
             const specialCardMoney = specialCardCollection.effects.filter(v => typeof v == 'number')
                                     .reduce((accumulate, current) => accumulate + current, 0)
+            // update special card list
+            const specialCardLeft = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // set event money
             const eventMoney = throughStart 
                             ? Math.round((eventData?.money || 0) + specialCardMoney + throughStart) 
@@ -673,8 +682,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // add debuff reduce money & set notif message
             debuffCollection.push(buffDebuff)
             notifMessage.textContent += buffDebuff ? `"debuff reduce money"` : ''
-            // update special card list
-            const specialCardLeft = updateSpecialCardList(specialCardCollection.cards, playerTurnData.card)
             // get buff/debuff event data
             if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
             if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
