@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { applyTooltipEvent, moneyFormat, qS, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
@@ -9,9 +9,15 @@ import { clickOutsideElement } from "../../../../helper/click-outside"
 export default function PlayerSection() {
     const miscState = useMisc()
     const gameState = useGame()
+    // player turns
+    const [playerTurns, setPlayerTurns] = useState<string[]>(null)
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
+        // set player turns
+        const getPlayerTurns = localStorage.getItem('playerTurns') || `[]`
+        const parsedPlayerTurns = JSON.parse(getPlayerTurns) as string[]
+        if(parsedPlayerTurns.length > 1) setPlayerTurns(parsedPlayerTurns)
     }, [])
 
     return (
@@ -22,7 +28,7 @@ export default function PlayerSection() {
             {/* header */}
             <div className="flex items-center justify-center text-xs lg:text-sm border-b-2 pb-2 mb-1">
                 {/* title */}
-                <span data-tooltip={`player turns\n${JSON.parse(localStorage.getItem('playerTurns'))?.join('\n') || null}` || null}> 
+                <span data-tooltip={`player turns\n${playerTurns?.join('\n')}`}> 
                     {translateUI({lang: miscState.language, text: 'players'})} 
                 </span>
                 {/* setting */}
