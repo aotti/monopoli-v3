@@ -3,6 +3,7 @@ import change_logs from "../config/change-logs.json"
 import { qS } from "../helper/helper"
 
 export default function Updates() {
+    const currentVersion = 'v3.1'
     // updates state
     const [showUpdates, setShowUpdates] = useState(false)
     const [showVersion, setShowVersion] = useState(null)
@@ -16,15 +17,15 @@ export default function Updates() {
     const handleShowMarkUpdates = () => {
         setShowUpdates(true)
         // get current version
-        const currentVersion = (qS(`[data-version]`) as HTMLElement).dataset.version
+        const getCurrentVersion = (qS(`[data-version]`) as HTMLElement).dataset.version
         // store current version
-        setShowVersion(currentVersion)
-        localStorage.setItem('version', currentVersion)
+        setShowVersion(getCurrentVersion)
+        localStorage.setItem('version', getCurrentVersion)
     }
 
     return (
         <>
-            <div className={showVersion == 'v3.0' ? `` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`} data-version="v3.0">
+            <div className={showVersion == currentVersion ? `` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`} data-version={currentVersion}>
                 <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={handleShowMarkUpdates}> 
                     updates 
                 </button>
@@ -36,7 +37,7 @@ export default function Updates() {
                     {/* head */}
                     <div className="flex justify-between text-center border-b-2">
                         <span> changelog </span>
-                        <span> v3.0 </span>
+                        <span> {currentVersion} </span>
                     </div>
                     {/* body */}
                     <div className="flex flex-col gap-2 text-green-400 w-72 lg:w-96 h-40 lg:h-52 overflow-y-scroll">
