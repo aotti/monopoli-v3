@@ -1,0 +1,104 @@
+{
+    "list": [
+        {
+            "name": "wat",
+            "alias": "emo+wat",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/wat-uAi8TGwupMz2kFzRK7pr9v4HepMXge.png"
+        },
+        {
+            "name": "owo",
+            "alias": "emo+owo",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/owo-u1EAbrrtVlcxL0zOn5TsLAx9YOAvj3.png"
+        }, 
+        {
+            "name": "tsundere",
+            "alias": "emo+tsundere",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/tsundere-E4kDmAKltqRqTSnYHBYQAuawzyHEdY.png"
+        }, 
+        {
+            "name": "thonk",
+            "alias": "emo+thonk",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/thonk-PJe4gMBfG00RN48BQP27abWScKSaye.png"
+        }, 
+        {
+            "name": "sus",
+            "alias": "emo+sus",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/sus-hVT7abLboJePizf69WpakLDnsBo4tY.png"
+        }, 
+        {
+            "name": "sunglas",
+            "alias": "emo+sunglas",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/sunglas-nYQFffa5mscNhEhnlMheHRqrrAVUTf.png"
+        }, 
+        {
+            "name": "suicid",
+            "alias": "emo+suicid",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/suicid-2L0XL9QLLT2Bf4A9u5w5zafR6G7P88.png"
+        }, 
+        {
+            "name": "stonks",
+            "alias": "emo+stonks",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/stonks-DJUppCKr4OXiXc6gVk0LCjTGMPPIri.png"
+        }, 
+        {
+            "name": "saskeh",
+            "alias": "emo+saskeh",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/saskeh-ecYa2ekyQyOWdKPrAmI30vp7uJmLyz.png"
+        }, 
+        {
+            "name": "peb",
+            "alias": "emo+peb",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/peb-fcIk462GzjUB8hEfuK8RYwluV0kUs9.png"
+        }, 
+        {
+            "name": "ooo",
+            "alias": "emo+ooo",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/ooo-FW1jSEGiuAEBAxCuraNoKvHJ6lmIMk.png"
+        }, 
+        {
+            "name": "juril",
+            "alias": "emo+juril",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/juril-0JICOUH7OEPN1n47MBFI7XQiCdJu10.png"
+        }, 
+        {
+            "name": "jori",
+            "alias": "emo+jori",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/jori-Quss51E0QoFe4wdvWFgmUNngxbrmu4.png"
+        }, 
+        {
+            "name": "jake",
+            "alias": "emo+jake",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/jake-CUYXJdNLPu19nGtExK7aI4Q5R7z01t.png"
+        }, 
+        {
+            "name": "flushed",
+            "alias": "emo+flushed",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/flushed-rxKdY87WT61XGoTSuGTDzDtuRr2PiW.png"
+        }, 
+        {
+            "name": "pleading",
+            "alias": "emo+pleading",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/pleading-MxqiWmEQNOPM4UQPUtMUERrIVEaMIi.png"
+        }, 
+        {
+            "name": "nerd",
+            "alias": "emo+nerd",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/nerd-td6j68AEaxpCbhtj64KnzMQPYQk07M.png"
+        }, 
+        {
+            "name": "joycat",
+            "alias": "emo+joycat",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/joycat-5sHemqmxdSUz7iRFMIdPkofRfXzY8y.png"
+        }, 
+        {
+            "name": "hamil",
+            "alias": "emo+hamil",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/hamil-gCCHeqTrtvm8Jz3XZ932oJUr0YhBfy.png"
+        }, 
+        {
+            "name": "love",
+            "alias": "emo+love",
+            "url": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/emotes/love-iRlSAvc9VCDGul5qQ7THkoA7VfBygA.png"
+        }
+    ]
+}

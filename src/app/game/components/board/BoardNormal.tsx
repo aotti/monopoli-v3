@@ -4,6 +4,7 @@ import { useMisc } from "../../../../context/MiscContext"
 import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import board_normal from '../../config/board-normal.json'
 import { IGameContext } from "../../../../helper/types"
+import Image from "next/image"
 
 export default function BoardNormal() {
     const gameState = useGame()
@@ -169,7 +170,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 <video id={`video_city_broken_house_${cityName || name}`} src={tileBroken.house} className="absolute hidden" />
                 <video id={`video_city_broken_hotel_${cityName || name}`} src={tileBroken.hotel} className="absolute hidden" />
                 {/* tile image */}
-                <img src={img} alt={name} className={`w-[7.5vw] h-[23vh]`} loading="lazy" draggable={false} />
+                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
@@ -213,7 +214,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
-                <img src={img} alt={name} className={`w-[7.5vw] h-[23vh]`} loading="lazy" draggable={false} />
+                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''}
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

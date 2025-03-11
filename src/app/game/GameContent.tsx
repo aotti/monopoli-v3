@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
-import { applyTooltipEvent, translateUI } from "../../helper/helper"
+import { applyTooltipEvent, qS, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
 import BoardDelta from "./components/board/BoardDelta"
 import BoardTwoWay from "./components/board/BoardTwoWay"
@@ -20,6 +20,7 @@ import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
 import { getPlayerInfo } from "./helper/game-logic"
+import PreloadCardImages from "./components/PreloadCardImages"
 
 export default function GameContent({ pubnubSetting }) {
     const miscState = useMisc()
@@ -65,6 +66,23 @@ export default function GameContent({ pubnubSetting }) {
         localStorage.removeItem('specialCardUsed')
         localStorage.removeItem('buffDebuffUsed')
         localStorage.removeItem('playerTurns')
+
+        // set player turn
+        const setPlayerTurnText = () => {
+            const getPlayerTurns = localStorage.getItem('playerTurns') || '[]'
+            const parsePlayerTurns = JSON.parse(getPlayerTurns) as string[]
+            const playerTurnNotif = qS('#player_turn_notif')
+            
+            if(parsePlayerTurns.length > 1) {
+                playerTurnNotif.textContent = `${parsePlayerTurns[0]} turn`
+            }
+        }
+        document.body.tabIndex = 0
+        document.body.addEventListener('click', setPlayerTurnText)
+
+        return () => {
+            document.body.removeEventListener('click', setPlayerTurnText)
+        }
     }, [])
 
     useEffect(() => {
@@ -182,6 +200,8 @@ export default function GameContent({ pubnubSetting }) {
 
             {/* game sounds */}
             <GameSounds />
+            {/* card images */}
+            <PreloadCardImages />
         </div>
     )
 }

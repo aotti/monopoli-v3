@@ -1,8 +1,10 @@
-import { FormEvent, useEffect } from "react"
+import { FormEvent, MouseEvent, useEffect, useRef } from "react"
 import { useGame } from "../context/GameContext"
 import { useMisc } from "../context/MiscContext"
 import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
 import { IChat, IGameContext, IMiscContext, IResponse } from "../helper/types"
+import emotes from "../config/emotes.json"
+import { clickOutsideElement } from "../helper/click-outside"
 
 export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
     const miscState = useMisc()
@@ -33,6 +35,9 @@ function ChatRoomList() {
 function ChatGameRoom({ id }: {id: number}) {
     const miscState = useMisc()
     const gameState = useGame()
+    // chat emotes ref
+    const chatEmotesRef = useRef()
+    clickOutsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
     useEffect(() => {
         if(gameState.gameSideButton == 'chat') {
@@ -59,6 +64,12 @@ function ChatGameRoom({ id }: {id: number}) {
                 {/* input chat */}
                 <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
                 placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
+                {/* emote list */}
+                {miscState.showEmotes ? <ChatEmotes isGameRoom={true} /> : null}
+                {/* emote button */}
+                <button ref={chatEmotesRef} type="button" className="w-6 lg:w-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                    <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
+                </button>
                 {/* submit chat */}
                 <button type="submit" className="w-6 lg:w-10 active:opacity-50">
                     <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
@@ -85,13 +96,51 @@ function ChatContainer() {
 
 function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}) {
     const {display_name, message_text, message_time} = messageData
+    // emote message stuff
+    const emoList = emotes.list
+    const modifiedMessageText = []
+    // find the emote
+    const message_word = message_text.split(' ')
+    message_word.forEach(word => {
+        // (FE) Find Emote format in message text
+        const FE = emoList.map(emo => emo.alias).indexOf(word)
+        FE !== -1
+            // emote found, create img element
+            ? modifiedMessageText.push(<img src={emoList[FE].url} alt={emoList[FE].alias} className="!inline !h-5 lg:!h-6 mx-px" />)
+            // normal word, create span element
+            : modifiedMessageText.push(<span> {word} </span>)
+    })
 
     return (
         <>
             <span className="text-orange-200"> {display_name}: </span>
-            <span> {message_text} </span>
+            {modifiedMessageText.map(v => v)}
             <small className={display_name == 'system' ? 'text-white' : 'text-green-400'}> {message_time} </small>
         </>
+    )
+}
+
+export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
+    const emoteList = emotes.list
+    const emoteListPos = isGameRoom
+                            ? `right-0 -top-40`
+                            : `-right-36 -top-10`
+    const handleChosenEmote = (ev: MouseEvent<HTMLImageElement>) => {
+        // get emote alias
+        const emoteAlias = ev.currentTarget.alt
+        // put into chat input
+        const chatInput = qS('#message_text') as HTMLInputElement
+        chatInput.value += ` ${emoteAlias} `
+        chatInput.value = chatInput.value.trim()
+        chatInput.focus()
+    }
+
+    return (
+        <div className={`absolute ${emoteListPos} top z-40 grid grid-cols-5 gap-2 bg-darkblue-1 border-8bit-text w-40`}>
+            {emoteList.map((v, i) => {
+                return <img key={i} src={v.url} alt={v.alias} title={v.name} className="!h-min my-auto hover:bg-darkblue-3" onClick={handleChosenEmote} />
+            })}
+        </div>
     )
 }
 

@@ -40,7 +40,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             const uploadAvatarClass = `hover:before:absolute hover:before:left-0 hover:before:z-10 hover:before:flex hover:before:items-center hover:before:bg-black/50 hover:before:w-full hover:before:h-full hover:before:content-[attr(data-text)]`
                             return (
                                 <button type="button" id="upload_avatar" data-text={uploadAvatarText} className={`relative w-full h-full ${isUploadAllowed ? uploadAvatarClass : ''}`} onClick={() => open('local')} disabled={!isUploadAllowed}>
-                                    <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" priority 
+                                    <CldImage id="avatar" src={playerData.avatar || '#'} alt="avatar" priority={true} 
                                     className="!w-full hover:text-2xs hover:break-all hover:text-balance" width={125} height={0} />
                                 </button>
                             )

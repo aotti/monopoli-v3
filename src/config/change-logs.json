@@ -1,6 +1,15 @@
 {
     "updates": [
         {
+            "version": "v3.1",
+            "changes": [
+                "add emotes to chat",
+                "remove auto roll dice option",
+                "event is only triggered on laps > 1, buff/debuff excluded",
+                "fix text bug"
+            ]
+        },
+        {
             "version": "v3.0",
             "changes": [
                 "initial release"

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, moneyFormat, qS, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
@@ -9,9 +9,15 @@ import { clickOutsideElement } from "../../../../helper/click-outside"
 export default function PlayerSection() {
     const miscState = useMisc()
     const gameState = useGame()
+    // player turns
+    const [playerTurns, setPlayerTurns] = useState<string[]>(null)
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
+        // set player turns
+        const getPlayerTurns = localStorage.getItem('playerTurns') || `[]`
+        const parsedPlayerTurns = JSON.parse(getPlayerTurns) as string[]
+        if(parsedPlayerTurns.length > 1) setPlayerTurns(parsedPlayerTurns)
     }, [])
 
     return (
@@ -22,7 +28,9 @@ export default function PlayerSection() {
             {/* header */}
             <div className="flex items-center justify-center text-xs lg:text-sm border-b-2 pb-2 mb-1">
                 {/* title */}
-                <span> {translateUI({lang: miscState.language, text: 'players'})} </span>
+                <span data-tooltip={`player turns\n${playerTurns?.join('\n')}`}> 
+                    {translateUI({lang: miscState.language, text: 'players'})} 
+                </span>
                 {/* setting */}
                 <PlayerSettingButton />
             </div>
@@ -83,7 +91,6 @@ function PlayerSettingButton() {
                 {!gameState.spectator
                     // button for players
                     ? <>
-                        <AutoRollDiceOption />
                         <SellUpgradeCityOption />
                         <AttackCityOption />
                         <GameHistoryOption />
@@ -92,19 +99,6 @@ function PlayerSettingButton() {
                     : <GameHistoryOption />
                 }
             </div>
-        </div>
-    )
-}
-
-function AutoRollDiceOption() {
-    const miscState = useMisc()
-
-    return (
-        <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
-            <label htmlFor="auto_roll_dice" className="w-full"> 
-                {translateUI({lang: miscState.language, text: 'Auto roll dice'})} 
-            </label>
-            <input type="checkbox" id="auto_roll_dice" onClick={() => console.log('auto_roll')} />
         </div>
     )
 }
