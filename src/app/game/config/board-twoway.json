@@ -82,13 +82,33 @@
             "info": "100% chance get buff"
         },
         { "type": null },
+        { 
+            "square": "14x", 
+            "type": "city",
+            "name": "Magelang", 
+            "price": 32000,
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100_Revision-fUbfBTaoCf35NafcQvpa9dP7TQa7R6.png",
+            "info": "price +10% for each upgrade"
+        },
         { "type": null },
         { "type": null },
         { "type": null },
         { "type": null },
-        { "type": null },
-        { "type": null },
-        { "type": null },
+        { 
+            "square": "1x", 
+            "type": "city",
+            "name": "Surabaya", 
+            "price": 47000,
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Surabaya_100-Qp3K9VvAIcyUxN0WkNtM8MchxjFY9w.png",
+            "info": "price +10% for each upgrade"
+        },
+        { 
+            "square": "24x", 
+            "type": "other",
+            "name": "Buff Area", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
+            "info": "100% chance get buff"
+        },
         { 
             "square": 23, 
             "type": "city",
@@ -107,13 +127,29 @@
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100_Revision-W32qQihw3gfXiL84wk0e8UHN9wSU9j.png",
             "info": "<Jakarta>\nafter buying, get money every visit"
         },
+        { 
+            "square": "12x", 
+            "type": "other",
+            "name": "Community Card",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
+        },
+        { 
+            "square": "13x", 
+            "type": "other",
+            "name": "Debuff Area", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
+            "info": "65% chance get debuff"
+        },
         { "type": null },
         { "type": null },
         { "type": null },
         { "type": null },
-        { "type": null },
-        { "type": null },
-        { "type": null },
+        { 
+            "square": "2x", 
+            "type": "other",
+            "name": "Chance Card", 
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+        },
         { "type": null },
         { 
             "square": 24, 

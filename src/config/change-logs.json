@@ -1,7 +1,15 @@
 {
     "updates": [
         {
+            "version": "v3.11",
+            "date": "19 Mar 2025",
+            "changes": [
+                "fix screen bug"
+            ]
+        },
+        {
             "version": "v3.1",
+            "date": "11 Mar 2025",
             "changes": [
                 "add emotes to chat",
                 "remove auto roll dice option",
@@ -11,6 +19,7 @@
         },
         {
             "version": "v3.0",
+            "date": "5 Mar 2025",
             "changes": [
                 "initial release"
             ]

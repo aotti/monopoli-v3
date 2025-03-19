@@ -76,8 +76,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.startGame) {
         // change game stage
         gameState.setGameStages('decide')
-        // set fixed player number
-        gameState.setGameFixedPlayers(getMessage.fixedPlayers)
         // remove players ready text
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'click roll turn'})
     }

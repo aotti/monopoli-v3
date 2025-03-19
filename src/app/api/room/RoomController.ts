@@ -190,8 +190,6 @@ export default class RoomController extends Controller {
         // run query
         const {data, error} = await this.dq.insert<ICreateRoom['list']>(queryObject as IQueryInsert)
         if(error) {
-            console.log('create',error.message);
-            
             // player not found error / already created room
             if(error.code == 'P0001') result = this.respond(403, error.message, [])
             // other error

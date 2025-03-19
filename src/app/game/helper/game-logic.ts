@@ -61,8 +61,6 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
                 const isGameStage = decidePlayers.length === preparePlayers.length
                 if(isGameStage) gameState.setGameStages('play')
                 else gameState.setGameStages('decide')
-                // set fixed players
-                gameState.setGameFixedPlayers(preparePlayers.length)
                 // display rolled number
                 displayRolledNumber()
                 return
@@ -562,6 +560,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // check player dice to decide step forward / backward
                 const tempStep = playerDice < 0 ? currentPos - numberStep : currentPos + numberStep
                 const fixedNextStep = tempStep === playerPaths.length ? playerPaths.length : (tempStep % playerPaths.length)
+                // set branch step to walk on branch tile (only board-twoway)
+                // const boardType = gameState.gameRoomInfo[findRoomInfo].board
+                // const branchStep = boardType == 'twoway' && +playerRNG[1] > 50 ? 'x' : ''
                 // match paths & move
                 if(+path.dataset.playerPath === fixedNextStep) {
                     [tileInfo, tileElement] = [path.dataset.tileInfo, path]

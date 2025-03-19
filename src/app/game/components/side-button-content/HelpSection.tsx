@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { translateUI } from "../../../../helper/helper"
-import board_help_items from "../../config/board-help-items.json"
+import board_help_items from "../../config/help-items.json"
 
 export default function HelpSection() {
     const miscState = useMisc()
