@@ -101,14 +101,14 @@ function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}
     const modifiedMessageText = []
     // find the emote
     const message_word = message_text.split(' ')
-    message_word.forEach(word => {
+    message_word.forEach((word, i) => {
         // (FE) Find Emote format in message text
         const FE = emoList.map(emo => emo.alias).indexOf(word)
         FE !== -1
             // emote found, create img element
-            ? modifiedMessageText.push(<img src={emoList[FE].url} alt={emoList[FE].alias} className="!inline !h-5 lg:!h-6 mx-px" />)
+            ? modifiedMessageText.push(<img key={i} src={emoList[FE].url} alt={emoList[FE].alias} className="!inline !h-5 lg:!h-6 mx-px" />)
             // normal word, create span element
-            : modifiedMessageText.push(<span> {word} </span>)
+            : modifiedMessageText.push(<span key={i}> {word} </span>)
     })
 
     return (

@@ -3,7 +3,7 @@ import change_logs from "../config/change-logs.json"
 import { qS } from "../helper/helper"
 
 export default function Updates() {
-    const currentVersion = 'v3.1'
+    const currentVersion = 'v3.11'
     // updates state
     const [showUpdates, setShowUpdates] = useState(false)
     const [showVersion, setShowVersion] = useState(null)
@@ -44,7 +44,7 @@ export default function Updates() {
                         {/* changelog */}
                         {changeLogs.map((v, i) => 
                             <div key={i}>
-                                <p className="text-white"> {v.version} </p>
+                                <p className="text-white"> {v.version} ({v.date}) </p>
                                 {v.changes.map((v, i) => 
                                     <ul key={i} className="text-2xs lg:text-xs">
                                         <li> - {v} </li>

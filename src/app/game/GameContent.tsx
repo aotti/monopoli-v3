@@ -3,8 +3,7 @@ import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
 import { applyTooltipEvent, qS, translateUI } from "../../helper/helper"
 import BoardNormal from "./components/board/BoardNormal"
-import BoardDelta from "./components/board/BoardDelta"
-import BoardTwoWay from "./components/board/BoardTwoWay"
+import BoardTwoway from "./components/board/BoardTwoway"
 import GameInfo from "./components/board/GameInfo"
 import HelpSection from "./components/side-button-content/HelpSection"
 import PlayerSection from "./components/side-button-content/PlayerSection"
@@ -41,8 +40,6 @@ export default function GameContent({ pubnubSetting }) {
         gameState.setShowGameNotif(null)
     }
 
-    // pubnub
-    const pubnubClient = new PubNub(pubnubSetting)
     // tooltip (the element must have position: relative)
     useEffect(() => {
         // start room list tutorial for 1st login (1st browser)
@@ -70,11 +67,11 @@ export default function GameContent({ pubnubSetting }) {
         // set player turn
         const setPlayerTurnText = () => {
             const getPlayerTurns = localStorage.getItem('playerTurns') || '[]'
-            const parsePlayerTurns = JSON.parse(getPlayerTurns) as string[]
+            const parsedPlayerTurns = JSON.parse(getPlayerTurns) as string[]
             const playerTurnNotif = qS('#player_turn_notif')
             
-            if(parsePlayerTurns.length > 1) {
-                playerTurnNotif.textContent = `${parsePlayerTurns[0]} turn`
+            if(parsedPlayerTurns?.length > 1) {
+                playerTurnNotif.textContent = `${parsedPlayerTurns[0]} turn`
             }
         }
         document.body.tabIndex = 0
@@ -85,6 +82,8 @@ export default function GameContent({ pubnubSetting }) {
         }
     }, [])
 
+    // pubnub
+    const pubnubClient = new PubNub(pubnubSetting)
     useEffect(() => {
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
         // pubnub channels
@@ -146,8 +145,7 @@ export default function GameContent({ pubnubSetting }) {
                 {gameState.gameRoomId
                     ? <>
                         {gameState.gamePlayerInfo.length > 0 ? <BoardNormal /> : null}
-                        {/* <BoardDelta /> */}
-                        {/* <BoardTwoWay /> */}
+                        {/* {gameState.gamePlayerInfo.length > 0 ? <BoardTwoway /> : null} */}
                     </>
                     : null
                 }

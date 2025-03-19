@@ -179,8 +179,6 @@ export interface IGameContext {
     setGamePlayerInfo: Dispatch<SetStateAction<IGamePlayerInfo[]>>,
     gameStages: 'prepare'|'decide'|'play'|'over',
     setGameStages: Dispatch<SetStateAction<IGameContext['gameStages']>>,
-    gameFixedPlayers: number,
-    setGameFixedPlayers: Dispatch<SetStateAction<IGameContext['gameFixedPlayers']>>,
     gamePlayerTurns: string[], 
     setGamePlayerTurns: Dispatch<SetStateAction<IGameContext['gamePlayerTurns']>>,
     gameHistory: IGameHistory[], 

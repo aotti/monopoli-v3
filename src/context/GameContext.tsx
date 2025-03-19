@@ -30,7 +30,6 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gameRoomInfo, setGameRoomInfo] = useState<IGameContext['gameRoomInfo']>([])
     const [gamePlayerInfo, setGamePlayerInfo] = useState<IGameContext['gamePlayerInfo']>([])
     const [gameStages, setGameStages] = useState<IGameContext['gameStages']>('prepare')
-    const [gameFixedPlayers, setGameFixedPlayers] = useState<number>(null)
     const [gamePlayerTurns, setGamePlayerTurns] = useState<string[]>([])
     const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
 
@@ -80,7 +79,6 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         gameRoomInfo, setGameRoomInfo,
         gamePlayerInfo, setGamePlayerInfo,
         gameStages, setGameStages,
-        gameFixedPlayers, setGameFixedPlayers,
         gamePlayerTurns, setGamePlayerTurns,
         gameHistory, setGameHistory
     }
