@@ -501,7 +501,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // moving params
         let numberStep = 0
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
-        const currentPos = playerTurnData.pos
+        const currentPos = +playerTurnData.pos.split('x')[0]
         const nextPos = (currentPos + playerDice) === playerPaths.length 
                         ? playerPaths.length 
                         : (currentPos + playerDice) % playerPaths.length
@@ -569,7 +569,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     // update player pos
                     gameState.setGamePlayerInfo(players => {
                         const newPosInfo = [...players]
-                        newPosInfo[findPlayer].pos = fixedNextStep
+                        newPosInfo[findPlayer].pos = fixedNextStep.toString()
                         return newPosInfo
                     })
                     // update laps for moving player
@@ -1708,9 +1708,10 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         if(!separator) chosenButton.classList.add('bg-green-600')
                         // set player dice
                         const chosenSquare = +chosenButton.dataset.destination
-                        const setChosenDice = playerTurnData.pos > chosenSquare 
-                                            ? (24 + chosenSquare) - playerTurnData.pos
-                                            : chosenSquare - playerTurnData.pos
+                        const tempCurrentPos = +playerTurnData.pos.split('x')[0]
+                        const setChosenDice = tempCurrentPos > chosenSquare 
+                                            ? (24 + chosenSquare) - tempCurrentPos
+                                            : chosenSquare - tempCurrentPos
                         const rollDiceData = {
                             playerTurn: playerTurnData.display_name,
                             playerDice: setChosenDice,
@@ -1746,9 +1747,10 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                                         notifTimer.textContent = ''
                                         // set player dice
                                         const chosenSquare = +button.dataset.destination
-                                        const setChosenDice = playerTurnData.pos > chosenSquare 
-                                                            ? (24 + chosenSquare) - playerTurnData.pos
-                                                            : chosenSquare - playerTurnData.pos
+                                        const tempCurrentPos = +playerTurnData.pos.split('x')[0]
+                                        const setChosenDice = tempCurrentPos > chosenSquare 
+                                                            ? (24 + chosenSquare) - tempCurrentPos
+                                                            : chosenSquare - tempCurrentPos
                                         const rollDiceData = {
                                             playerTurn: playerTurnData.display_name,
                                             playerDice: setChosenDice,
@@ -2046,9 +2048,10 @@ function stopByParking(findPlayer: number, rng: string[], miscState: IMiscContex
                         clearInterval(parkingInterval)
                         // set moving parameter
                         const chosenSquare = +pb.dataset.destination
-                        const setChosenDice = playerTurnData.pos > chosenSquare 
-                                            ? (24 + chosenSquare) - playerTurnData.pos
-                                            : chosenSquare - playerTurnData.pos
+                        const tempCurrentPos = +playerTurnData.pos.split('x')[0]
+                        const setChosenDice = tempCurrentPos > chosenSquare 
+                                            ? (24 + chosenSquare) - tempCurrentPos
+                                            : chosenSquare - tempCurrentPos
                         const rollDiceData: IRollDiceData = {
                             playerTurn: playerTurnData.display_name,
                             playerDice: setChosenDice,
@@ -2625,7 +2628,8 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                 if(playerTurnData.display_name == gameState.myPlayerInfo.display_name) 
                     localStorage.setItem('buffDebuffUsed', `${eventName}: ${type} 🙏`)
                 // get tile data (tile number)
-                const getTileList = getMovePlaceTiles(effect, playerTurnData.pos)
+                const tempCurrentPos = +playerTurnData.pos.split('x')[0]
+                const getTileList = getMovePlaceTiles(effect, tempCurrentPos)
                 // show notif
                 if(!separator) {
                     // show notif
@@ -2646,9 +2650,9 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                         notifTimer.textContent = ''
                         // set player dice
                         const chosenSquare = +chosenButton.dataset.destination
-                        const setChosenDice = playerTurnData.pos > chosenSquare 
-                                            ? (24 + chosenSquare) - playerTurnData.pos
-                                            : chosenSquare - playerTurnData.pos
+                        const setChosenDice = tempCurrentPos > chosenSquare 
+                                            ? (24 + chosenSquare) - tempCurrentPos
+                                            : chosenSquare - tempCurrentPos
                         // set new rng to prevent same rarity (free parking)
                         const newRNG = [rng[0], `${+rng[1] + 20}`]
                         const rollDiceData = {

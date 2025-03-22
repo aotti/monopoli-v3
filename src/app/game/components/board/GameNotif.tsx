@@ -61,3 +61,11 @@ function GameNotifWithButtons() {
         </div>
     )
 }
+
+export function GameNotifPlayerTurn() {
+    return (
+        <div className="mx-auto">
+            <span id="player_turn_notif" className="whitespace-pre"></span>
+        </div>
+    )
+}

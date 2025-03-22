@@ -119,7 +119,7 @@ interface IGameRoomInfo {
 interface IGamePlayerInfo {
     display_name: string,
     character: string,
-    pos: number,
+    pos: string,
     lap: number,
     money: number,
     card: string,
