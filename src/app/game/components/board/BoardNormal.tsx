@@ -106,7 +106,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                         ? price + (price * gameState.gamePlayerInfo.length * cursedLaps * curseRNG/100) 
                         : 0
     // highlight
-    const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
+    const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(`${square}`)
     // tile info
     const tileInfo = setTileInfo(name)
     // price label
@@ -163,7 +163,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
-                {gameState.gamePlayerInfo.map((player, i) => player.pos == square ? <Characters key={i} playerData={player}/> : null)}
+                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Characters key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
                 {/* tile broken */}
@@ -192,7 +192,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const { name, img, info, square } = data as TileOtherType 
     const translateInfo = translateUI({lang: miscState.language, text: info as any})
     // highlight
-    const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(square)
+    const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(`${square}`)
     // tile info
     const tileInfo = setTileInfo(name)
     // prison info
@@ -210,7 +210,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
-                {gameState.gamePlayerInfo.map((player, i) => player.pos == square ? <Characters key={i} playerData={player}/> : null)}
+                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Characters key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}

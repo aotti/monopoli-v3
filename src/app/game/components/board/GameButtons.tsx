@@ -4,6 +4,7 @@ import { useMisc } from "../../../../context/MiscContext"
 import { qS, translateUI } from "../../../../helper/helper"
 import { IGameContext, IMiscContext } from "../../../../helper/types"
 import { leaveGameRoom, readyGameRoom, rollDiceGameRoom, rollTurnGameRoom, startGameRoom, surrenderGameRoom } from "../../helper/game-logic"
+import { GameNotifPlayerTurn } from "./GameNotif"
 
 export default function GameButtons() {
     const miscState = useMisc()
@@ -27,9 +28,7 @@ export default function GameButtons() {
             {/* roll dice + surrend */}
             {gameState.gameStages == 'play' ? <RollTurnButtons /> : null}
             {/* player turn notif */}
-            <div className="mx-auto">
-                <span id="player_turn_notif" className="whitespace-pre"></span>
-            </div>
+            <GameNotifPlayerTurn />
         </form>
     )
 }
