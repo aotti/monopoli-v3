@@ -144,8 +144,13 @@ export default function GameContent({ pubnubSetting }) {
                 {/* board */}
                 {gameState.gameRoomId
                     ? <>
-                        {gameState.gamePlayerInfo.length > 0 ? <BoardNormal /> : null}
-                        {/* {gameState.gamePlayerInfo.length > 0 ? <BoardTwoway /> : null} */}
+                        {gameState.gameRoomInfo.map((v, i) => {
+                            return v.room_id === gameState.gameRoomId 
+                                ? v.board == 'normal'
+                                    ? <BoardNormal key={i} /> 
+                                    : <BoardTwoway key={i} />
+                                : null
+                        })}
                     </>
                     : null
                 }

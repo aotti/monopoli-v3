@@ -67,7 +67,7 @@ function ChatGameRoom({ id }: {id: number}) {
                 {/* emote list */}
                 {miscState.showEmotes ? <ChatEmotes isGameRoom={true} /> : null}
                 {/* emote button */}
-                <button ref={chatEmotesRef} type="button" className="w-6 lg:w-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                <button ref={chatEmotesRef} type="button" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
                     <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
                 </button>
                 {/* submit chat */}

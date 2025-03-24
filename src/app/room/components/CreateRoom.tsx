@@ -76,8 +76,7 @@ export default function CreateRoom() {
                         <label htmlFor="select_board"> {translateUI({lang: miscState.language, text: 'Board'})} </label>
                         <select id="select_board" className="w-32 lg:w-44">
                             <option value="normal"> normal </option>
-                            <option value="2_way" disabled> {translateUI({lang: miscState.language, text: '2 way'})} </option>
-                            <option value="delta" disabled> delta </option>
+                            <option value="twoway"> {translateUI({lang: miscState.language, text: '2 way'})} </option>
                         </select>
                     </div>
                     {/* dice */}

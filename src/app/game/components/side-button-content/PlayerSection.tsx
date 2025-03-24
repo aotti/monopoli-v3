@@ -18,7 +18,7 @@ export default function PlayerSection() {
         const getPlayerTurns = localStorage.getItem('playerTurns') || `[]`
         const parsedPlayerTurns = JSON.parse(getPlayerTurns) as string[]
         if(parsedPlayerTurns?.length > 1) setPlayerTurns(parsedPlayerTurns)
-    }, [])
+    }, [gameState.gamePlayerInfo])
 
     return (
         <div className={`${gameState.gameSideButton == 'players' ? 'block' : 'hidden'}

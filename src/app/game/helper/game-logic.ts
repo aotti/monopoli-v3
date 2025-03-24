@@ -349,6 +349,10 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
     const notifMessage = qS('#result_notif_message')
     // roll dice button
     const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+    // set rng for twoway board
+    const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    const currentPos = gameState.gamePlayerInfo[findPlayer].pos
+    const branchRNG: number[] = checkBranchTiles('roll_dice', currentPos)
     // input values container
     const inputValues = {
         action: 'game roll dice',
@@ -358,7 +362,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         // Math.floor(Math.random() * 101).toString()
         rng: [
             Math.floor(Math.random() * 101), 
-            Math.floor(Math.random() * 101)
+            branchRNG[0]
         ].toString(),
         special_card: specialCard ? specialCard : null
     }
@@ -490,6 +494,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         notifTimer.textContent = ''
         // find current room info
         const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+        const boardType = gameState.gameRoomInfo[findRoomInfo].board
         // find current player
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(playerTurn)
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
@@ -502,9 +507,15 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         let numberStep = 0
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
-        const nextPos = (currentPos + playerDice) === playerPaths.length 
-                        ? playerPaths.length 
-                        : (currentPos + playerDice) % playerPaths.length
+        // check next pos (only for board twoway)
+        const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
+        const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
+        const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50 && checkDestinatedPos.length > 0
+        // set destinated pos
+        const destinatedPos = (currentPos + playerDice) === 24 
+                        ? `24${checkNextPos ? 'x' : ''}`
+                        : `${(currentPos + playerDice) % 24}${checkNextPos ? 'x' : ''}`
+        // get prison data for checking prison status
         const prisonNumber = playerTurnData.prison
         // special card container
         // player special card = nerf parking card (nullable)
@@ -559,21 +570,22 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // prevent tile number == 0
                 // check player dice to decide step forward / backward
                 const tempStep = playerDice < 0 ? currentPos - numberStep : currentPos + numberStep
-                const fixedNextStep = tempStep === playerPaths.length ? playerPaths.length : (tempStep % playerPaths.length)
+                const fixedNextStep = tempStep === 24 ? 24 : (tempStep % 24)
+                // check branch tiles
+                const branchTiles = checkBranchTiles('moving', fixedNextStep.toString())
                 // set branch step to walk on branch tile (only board-twoway)
-                // const boardType = gameState.gameRoomInfo[findRoomInfo].board
-                // const branchStep = boardType == 'twoway' && +playerRNG[1] > 50 ? 'x' : ''
+                const branchStep = checkNextPos && branchTiles.length > 0 ? 'x' : ''
                 // match paths & move
-                if(+path.dataset.playerPath === fixedNextStep) {
+                if(path.dataset.playerPath == `${fixedNextStep}${branchStep}`) {
                     [tileInfo, tileElement] = [path.dataset.tileInfo, path]
                     // update player pos
                     gameState.setGamePlayerInfo(players => {
                         const newPosInfo = [...players]
-                        newPosInfo[findPlayer].pos = fixedNextStep.toString()
+                        newPosInfo[findPlayer].pos = `${fixedNextStep}${branchStep}`
                         return newPosInfo
                     })
                     // update laps for moving player
-                    if(fixedNextStep === 1) {
+                    if(fixedNextStep == 1 || `${fixedNextStep}${branchStep}` == '1x') {
                         numberLaps += 1
                         // update laps
                         gameState.setGamePlayerInfo(players => {
@@ -712,7 +724,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // arrested (0) || debuff = stay current pos
                 pos: prisonNumber !== -1 || debuffCollection.join(',').match('used-skip turn') 
                     ? currentPos.toString() 
-                    : nextPos.toString(),
+                    : destinatedPos,
                 lap: numberLaps.toString(),
                 // money from event that occured
                 event_money: (eventMoney - (buffDebuffEffect || 0)).toString(),
@@ -761,6 +773,23 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             }
         }
     })
+}
+
+// ========== # CHECK BRANCH TILES ==========
+// ========== # CHECK BRANCH TILES ==========
+function checkBranchTiles(action: 'roll_dice'|'moving', pos: string) {
+    const tempArray = []
+    switch(pos) {
+        case '12': case '13': case '14': case '24': case '1': case '2': 
+            action == 'roll_dice' ? tempArray.push(50) : tempArray.push('x')
+            break
+        case '12x': case '13x': case '14x': case '24x': case '1x': case '2x': 
+            action == 'roll_dice' ? tempArray.push(51) : null
+            break
+        default:
+            action == 'roll_dice' ? tempArray.push(Math.floor(Math.random() * 101)) : null
+    }
+    return tempArray
 }
 
 // ========== # EVENT HISTORY ==========
@@ -1539,6 +1568,9 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                             // set timeout to hide all buttons
                             return setTimeout(() => {
                                 for(let coin of coinButtons) coin ? coin.classList.add('hidden') : null
+                                // hide notif after click
+                                miscState.setAnimation(false)
+                                gameState.setShowGameNotif(null)
                                 // return event data
                                 resolve({
                                     event: 'get_card',
