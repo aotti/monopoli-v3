@@ -63,6 +63,11 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setGameStages('prepare')
         // set rooms left
         gameState.setRoomList(getMessage.roomsLeft)
+        // if the room player wanna join deleted, reset join prompt
+        getMessage.roomsLeft.forEach(v => {
+            if(!miscState.showJoinModal.match(`${v.room_id}`))
+                miscState.setShowJoinModal(null)
+        })
     }
     // update room status
     if(getMessage.roomGame) {

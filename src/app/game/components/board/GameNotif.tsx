@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { clickOutsideElement } from "../../../../helper/click-outside"
+import { clickInsideElement } from "../../../../helper/click-inside"
 import { useMisc } from "../../../../context/MiscContext"
 import { useGame } from "../../../../context/GameContext"
 
@@ -9,7 +9,7 @@ export default function GameNotif() {
     // hide notif
     const gameNotifRef = useRef()
     // click outside element
-    clickOutsideElement(gameNotifRef, () => {
+    clickInsideElement(gameNotifRef, () => {
         // dont close if notif has button
         if(!gameState.showGameNotif || gameState.showGameNotif.match('with_button')) return
         miscState.setAnimation(false)

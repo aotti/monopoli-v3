@@ -13,13 +13,14 @@ import GameButtons from "./components/board/GameButtons"
 import GameNotif from "./components/board/GameNotif"
 import Link from "next/link"
 import RollNumber from "./components/board/RollNumber"
-import TutorialGameRoom from "./components/TutorialGameRoom"
-import { clickOutsideElement } from "../../helper/click-outside"
+import TutorialGameRoom from "./components/other/TutorialGameRoom"
+import { clickInsideElement } from "../../helper/click-inside"
 import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
 import { getPlayerInfo } from "./helper/game-logic"
-import PreloadCardImages from "./components/PreloadCardImages"
+import PreloadCardImages from "./components/other/PreloadCardImages"
+import { clickOutsideElement } from "../../helper/click-outside"
 
 export default function GameContent({ pubnubSetting }) {
     const miscState = useMisc()

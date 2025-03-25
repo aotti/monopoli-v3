@@ -1700,13 +1700,6 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 }
                 // move player
                 playerMoving(rollDiceData, miscState, gameState)
-                // return event data
-                resolve({
-                    event: 'get_card',
-                    type: type,
-                    tileName: tileName,
-                    money: 0
-                })
             }
             else if(type == 'move place') {
                 // set additional event data for history (only for moving cards, upgrade, take card, optional effect)
@@ -2175,40 +2168,36 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                                     + (debuff ? `\n"debuff tax more"` : '')
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
-            // no card, show normal notif
-            if(!splitSpecialCard) {
-                // show notif (tax)
-                miscState.setAnimation(true)
-                gameState.setShowGameNotif('normal')
-                return resolve([null, null])
-            }
-            // show notif (tax)
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('with_button-2' as any)
             // get card
-            const specialCard = splitSpecialCard.map(v => v.match(/anti tax|nerf tax/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/anti tax|nerf tax/i)).flat().filter(i=>i) || []
             // match special card
             for(let sc of specialCard) {
                 // player has card
                 if(sc == 'nerf tax') {
+                    // show notif (tax)
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif('with_button-2' as any)
                     const newPrice = price * .35
                     return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
                 else if(sc == 'anti tax') {
+                    // show notif (tax)
+                    miscState.setAnimation(true)
+                    gameState.setShowGameNotif('with_button-2' as any)
                     const newPrice = 0
                     return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
             }
+            // no card, show normal notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            return resolve([null, null])
         }
         else if(data.type == 'start') {
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
-            // no card
-            if(!splitSpecialCard) {
-                return resolve([null, null])
-            }
             // get card
-            const specialCard = splitSpecialCard.map(v => v.match(/fortune block/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/fortune block/i)).flat().filter(i=>i)
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = 5000
@@ -2229,33 +2218,25 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             notifMessage.textContent = eventContent
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
-            // no card, show normal notif
-            if(!splitSpecialCard) {
-                // show notif 
-                miscState.setAnimation(true)
-                gameState.setShowGameNotif('normal')
-                return resolve([null, null])
-            }
-            // show notif (tax)
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('with_button-2' as any)
             // get card
-            const specialCard = splitSpecialCard.map(v => v.match(/anti prison/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/anti prison/i)).flat().filter(i=>i)
             if(specialCard[0]) {
+                // show notif (tax)
+                miscState.setAnimation(true)
+                gameState.setShowGameNotif('with_button-2' as any)
                 return resolve(await specialCardConfirmation({sc: specialCard[0], newValue: 'free', eventContent}))
             }
+            // no card, show normal notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
             return resolve([null, null])
         }
         else if(data.type == 'dice') {
             const {diceNumber} = data
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
-            // no card
-            if(!splitSpecialCard) {
-                return resolve([null, null])
-            }
             // get card
-            const specialCard = splitSpecialCard.map(v => v.match(/gaming dice/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/gaming dice/i)).flat().filter(i=>i)
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = diceNumber * 10_000
@@ -2266,12 +2247,8 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
         else if(data.type == 'parking') {
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
-            // no card
-            if(!splitSpecialCard) {
-                return resolve([null, null])
-            }
             // get card
-            const specialCard = splitSpecialCard.map(v => v.match(/nerf parking/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/nerf parking/i)).flat().filter(i=>i)
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 // add nerf tiles
@@ -2304,12 +2281,8 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             const {price} = data
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
-            // no card
-            if(!splitSpecialCard) {
-                return resolve([null, null])
-            }
             // get card
-            const specialCard = splitSpecialCard.map(v => v.match(/curse reverser/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/curse reverser/i)).flat().filter(i=>i)
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = price * .30

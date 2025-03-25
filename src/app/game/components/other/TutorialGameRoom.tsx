@@ -1,5 +1,5 @@
-import { useMisc } from "../../../context/MiscContext";
-import { translateUI } from "../../../helper/helper";
+import { useMisc } from "../../../../context/MiscContext";
+import { translateUI } from "../../../../helper/helper";
 
 export default function TutorialGameRoom() {
     const miscState = useMisc()

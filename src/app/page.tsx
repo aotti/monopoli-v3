@@ -5,7 +5,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const imgHost = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
     return {
         title: 'Monopoli Lemao',
-        description: 'Lets play this shit game together! 😀',
+        description: 'teu ngarti basa sunda aing teh, hayang belajar tapi kumaha.. 😢',
         icons: `https://${imgHost}/misc/Logo-transparent-18GAoQsXBykQtfc3WF2eD85z7yfzhc.png`,
         openGraph: {
             images: [{
