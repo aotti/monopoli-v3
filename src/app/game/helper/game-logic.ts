@@ -2197,7 +2197,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
-            const specialCard = splitSpecialCard?.map(v => v.match(/fortune block/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/fortune block/i)).flat().filter(i=>i) || []
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = 5000
@@ -2219,7 +2219,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
-            const specialCard = splitSpecialCard?.map(v => v.match(/anti prison/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/anti prison/i)).flat().filter(i=>i) || []
             if(specialCard[0]) {
                 // show notif (tax)
                 miscState.setAnimation(true)
@@ -2236,7 +2236,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
-            const specialCard = splitSpecialCard?.map(v => v.match(/gaming dice/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/gaming dice/i)).flat().filter(i=>i) || []
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = diceNumber * 10_000
@@ -2248,7 +2248,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
-            const specialCard = splitSpecialCard?.map(v => v.match(/nerf parking/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/nerf parking/i)).flat().filter(i=>i) || []
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 // add nerf tiles
@@ -2282,7 +2282,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
-            const specialCard = splitSpecialCard?.map(v => v.match(/curse reverser/i)).flat().filter(i=>i)
+            const specialCard = splitSpecialCard?.map(v => v.match(/curse reverser/i)).flat().filter(i=>i) || []
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
                 const newMoney = price * .30

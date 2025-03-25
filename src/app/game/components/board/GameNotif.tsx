@@ -29,6 +29,7 @@ export default function GameNotif() {
                     {gameState.showGameNotif?.match('with_button') ? <GameNotifWithButtons /> : null}
                 </div>
             </div>
+            {!gameState.showGameNotif?.match('with_button') ? <span className="text-red-300"> click notif to dismiss </span> : null}
         </div>
     )
 }
