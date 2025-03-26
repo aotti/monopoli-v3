@@ -4,7 +4,7 @@ import { applyTooltipEvent, moneyFormat, qS, translateUI } from "../../../../hel
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
-import { clickInsideElement } from "../../../../helper/click-inside"
+import { clickOutsideElement } from "../../../../helper/click-outside"
 
 export default function PlayerSection() {
     const miscState = useMisc()
@@ -75,7 +75,7 @@ function PlayerSettingButton() {
     const gameState = useGame()
     // click outside element
     const playerSettingRef = useRef()
-    clickInsideElement(playerSettingRef, () => gameState.setOpenPlayerSetting(false))
+    clickOutsideElement(playerSettingRef, () => gameState.setOpenPlayerSetting(false))
 
     return (
         <div className="absolute z-10 top-0 right-0 w-6 lg:w-8">
