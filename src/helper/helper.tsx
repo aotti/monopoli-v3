@@ -231,7 +231,7 @@ export function filterInput(input: InputIDType, value: string) {
         case 'select_mode':
             return value ? value.match(/^survive$|^5_laps$|^7_laps$/) : null
         case 'select_board':
-            return value ? value.match(/^normal$|^delta$|^2_way$/i) : null
+            return value ? value.match(/^normal$|^twoway$/i) : null
         case 'select_dice':
             return value ? value.match(/^1$|^2$/) : null
         case 'money_start':
@@ -247,7 +247,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/lvu1slpqdkmigp40.public.blob.vercel-storage.com\/characters/) : null
         // ====== JOIN ROOM TYPE ======
         case 'rules': 
-            return value ? value.match(/^board: (normal|delta|2_way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/) : null
+            return value ? value.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/) : null
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
             return value ? value.match(/^[\d]{3}$/) : null
@@ -261,7 +261,7 @@ export function filterInput(input: InputIDType, value: string) {
             return optionalSpecialCard
         // ====== TURN END TYPE ======
         case 'pos': 
-            return value ? value.match(/^[1-9]$|^1[0-9]$|^2[0-4]$/) : null
+            return value ? value.match(/^[1-9]$|^[1-2][x]$|^1[0-9]$|^1[2-4][x]$|^2[0-4]$|^24[x]$/) : null
         case 'lap': 
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 

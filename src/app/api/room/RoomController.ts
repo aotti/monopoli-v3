@@ -89,7 +89,7 @@ export default class RoomController extends Controller {
                 d.characters = getDisabledCharacters
                 // modify room info for gameRoomInfo
                 // split rules
-                const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
+                const splitRules = rules.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
                 // remove main rules
                 splitRules.splice(0, 1)
                 const [board, dice, money_start, money_lose, mode, curse] = [
@@ -218,7 +218,7 @@ export default class RoomController extends Controller {
                 characters: [payload.select_character],
             }
             // split rules
-            const splitRules = rules.match(/^board: (normal|delta|2 way);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
+            const splitRules = rules.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
             // remove main rules
             splitRules.splice(0, 1)
             const [board, dice, money_start, money_lose, mode, curse] = [

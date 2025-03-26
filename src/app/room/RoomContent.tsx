@@ -8,11 +8,12 @@ import RoomCard from "./components/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
-import { clickOutsideElement } from "../../helper/click-outside";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
 import GameSounds from "../../components/GameSounds";
 import { getRoomList } from "./helper/functions";
+import { clickOutsideElement } from "../../helper/click-outside";
+import { clickInsideElement } from "../../helper/click-inside";
 
 export default function RoomContent({ pubnubSetting }) {
     const miscState = useMisc()
@@ -24,7 +25,7 @@ export default function RoomContent({ pubnubSetting }) {
     clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
     // chat emotes ref
     const chatEmotesRef = useRef()
-    clickOutsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
+    clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting)
@@ -120,11 +121,11 @@ export default function RoomContent({ pubnubSetting }) {
                             {/* emote list */}
                             {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
                             {/* emote button */}
-                            <button ref={chatEmotesRef} type="button" className="relative w-6 lg:w-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                            <button ref={chatEmotesRef} type="button" className="relative w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
                                 <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
                             </button>
                             {/* submit chat */}
-                            <button type="submit" className="w-6 lg:w-10 active:opacity-50">
+                            <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
                                 <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                             </button>
                         </form>

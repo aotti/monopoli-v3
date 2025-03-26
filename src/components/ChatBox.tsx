@@ -5,6 +5,7 @@ import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../help
 import { IChat, IGameContext, IMiscContext, IResponse } from "../helper/types"
 import emotes from "../config/emotes.json"
 import { clickOutsideElement } from "../helper/click-outside"
+import { clickInsideElement } from "../helper/click-inside"
 
 export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
     const miscState = useMisc()
@@ -37,7 +38,7 @@ function ChatGameRoom({ id }: {id: number}) {
     const gameState = useGame()
     // chat emotes ref
     const chatEmotesRef = useRef()
-    clickOutsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
+    clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
     useEffect(() => {
         if(gameState.gameSideButton == 'chat') {
@@ -67,11 +68,11 @@ function ChatGameRoom({ id }: {id: number}) {
                 {/* emote list */}
                 {miscState.showEmotes ? <ChatEmotes isGameRoom={true} /> : null}
                 {/* emote button */}
-                <button ref={chatEmotesRef} type="button" className="w-6 lg:w-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                <button ref={chatEmotesRef} type="button" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
                     <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
                 </button>
                 {/* submit chat */}
-                <button type="submit" className="w-6 lg:w-10 active:opacity-50">
+                <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
                     <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
                 </button>
             </form>
@@ -121,6 +122,8 @@ function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}
 }
 
 export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
+    const miscState = useMisc()
+
     const emoteList = emotes.list
     const emoteListPos = isGameRoom
                             ? `right-0 -top-40`
@@ -133,6 +136,8 @@ export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
         chatInput.value += ` ${emoteAlias} `
         chatInput.value = chatInput.value.trim()
         chatInput.focus()
+        // close emote box
+        miscState.setShowEmotes(false)
     }
 
     return (

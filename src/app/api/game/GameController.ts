@@ -362,7 +362,7 @@ export default class GameController extends Controller {
             function: 'mnp_turn_end',
             function_args: {
                 tmp_display_name: payload.display_name,
-                tmp_pos: +payload.pos,
+                tmp_pos: payload.pos,
                 tmp_lap: +payload.lap,
                 tmp_event_money: +payload.event_money,
                 tmp_city: payload.city,

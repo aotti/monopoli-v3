@@ -1,6 +1,15 @@
 {
     "updates": [
         {
+            "version": "v3.2",
+            "date": "26 Mar 2025",
+            "changes": [
+                "add new board",
+                "add notif on game start",
+                "fix small bugs"
+            ]
+        },
+        {
             "version": "v3.12",
             "date": "22 Mar 2025",
             "changes": [
