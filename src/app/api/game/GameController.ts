@@ -108,13 +108,13 @@ export default class GameController extends Controller {
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
         }
-        const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+        const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
         console.log(isGamePublished);
         
         if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // publish to roomlist
         const roomlistChannel = 'monopoli-roomlist'
-        const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+        const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
         console.log(isRoomPublished);
         
         if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -166,13 +166,13 @@ export default class GameController extends Controller {
                 startGame: 'start',
                 fixedPlayers: getReadyPlayers.length,
             }
-            const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // publish to roomlist
             const roomlistChannel = 'monopoli-roomlist'
-            const isRoomPublished = await this.pubnubPublish(roomlistChannel, {startGame: 'start', roomGame: +roomId})
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {startGame: 'start', roomGame: +roomId})
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -220,13 +220,13 @@ export default class GameController extends Controller {
             decidePlayers: sortDecidePlayers,
             gameStage: sortDecidePlayers.length === getFixedPlayers.length ? 'play' : 'decide',
         }
-        const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+        const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
         console.log(isGamePublished);
         
         if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // publish to roomlist
         const roomlistChannel = 'monopoli-roomlist'
-        const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+        const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
         console.log(isRoomPublished);
         
         if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -262,13 +262,13 @@ export default class GameController extends Controller {
             playerRNG: payload.rng.split(','), // send back as array
             playerSpecialCard: payload.special_card
         }
-        const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+        const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
         console.log(isGamePublished);
         
         if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // publish to roomlist
         const roomlistChannel = 'monopoli-roomlist'
-        const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+        const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
         console.log(isRoomPublished);
         
         if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -314,13 +314,13 @@ export default class GameController extends Controller {
             const publishData = {
                 surrendPlayer: data[0].display_name,
             }
-            const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // publish to roomlist
             const roomlistChannel = 'monopoli-roomlist'
-            const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -427,7 +427,7 @@ export default class GameController extends Controller {
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory]
             }
-            const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -489,13 +489,13 @@ export default class GameController extends Controller {
                 cityLeft: payload.city_left == '' ? null : payload.city_left,
                 gameHistory: [...getGameHistory, ...gameHistory]
             }
-            const isGamePublished = await this.pubnubPublish(payload.channel, publishData)
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // publish to roomlist
             const roomlistChannel = 'monopoli-roomlist'
-            const isRoomPublished = await this.pubnubPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])

@@ -5,10 +5,16 @@ import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../help
 import { IChat, IGameContext, IMiscContext, IResponse } from "../helper/types"
 import emotes from "../config/emotes.json"
 import { clickInsideElement } from "../helper/click-inside"
-import PubNub from "pubnub"
+import PubNub, { Listener } from "pubnub"
 
-export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
+interface IChatBox {
+    page: 'room'|'game', 
+    id?: number, 
+    pubnubSetting: {monopoly: any, chatting: any}
+}
+export default function ChatBox({ page, id, pubnubSetting }: IChatBox) {
     const miscState = useMisc()
+    const gameState = useGame()
 
     useEffect(() => {
         // scroll to bottom
@@ -17,6 +23,27 @@ export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}
     }, [miscState.messageItems])
 
     // pubnub for chat
+    const pubnubClient = new PubNub(pubnubSetting.chatting)
+    useEffect(() => {
+        // pubnub channels
+        const chattingChannel = page == 'game' && id ? `monopoli-gameroom-${id}` : 'monopoli-roomlist'
+        // subscribe
+        pubnubClient.subscribe({ 
+            channels: [chattingChannel] 
+        })
+        // get published message
+        const publishedMessage: Listener = {
+            message: (data) => chatMessageListener(data, miscState, gameState)
+        }
+        pubnubClient.addListener(publishedMessage)
+        // unsub and remove listener
+        return () => {
+            pubnubClient.unsubscribe({ 
+                channels: [chattingChannel] 
+            })
+            pubnubClient.removeListener(publishedMessage)
+        }
+    }, [])
     
     return (
         page == 'room'

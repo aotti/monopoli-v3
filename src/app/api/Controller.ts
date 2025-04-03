@@ -12,19 +12,18 @@ const redisClient = redis()
 
 export default class Controller {
     protected dq = new DatabaseQueries()
-    // pubnub for publish
-    private pubnubServer = new PubNub({
-        subscribeKey: process.env.PUBNUB_SUB_KEY,
-        publishKey: process.env.PUBNUB_PUB_KEY,
-        userId: process.env.PUBNUB_UUID
+    // pubnub for monopoly
+    private monopoliPubnubServer = new PubNub({
+        subscribeKey: process.env.MONOPOLY_SUB_KEY,
+        publishKey: process.env.MONOPOLY_PUB_KEY,
+        userId: process.env.MONOPOLY_UUID
     })
-
-    protected async pubnubPublish(channel: string, data: any) {
-        return this.pubnubServer.publish({
-            channel: channel,
-            message: data
-        })
-    }
+    // pubnub for chatting
+    private chattingPubnubServer = new PubNub({
+        subscribeKey: process.env.CHATTING_SUB_KEY,
+        publishKey: process.env.CHATTING_PUB_KEY,
+        userId: process.env.CHATTING_UUID
+    })
 
     constructor() {
         // this.redisReset('loggedPlayers')
@@ -41,6 +40,20 @@ export default class Controller {
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png',
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/square-GcUfnpybETUDXjwbOxSTxdC6fkp4xb.png'
         // ])
+    }
+
+    protected chattingPublish(channel: string, data: any) {
+        return this.chattingPubnubServer.publish({
+            channel: channel,
+            message: data
+        })
+    }
+
+    protected monopoliPublish(channel: string, data: any) {
+        return this.monopoliPubnubServer.publish({
+            channel: channel,
+            message: data
+        })
     }
 
     /**

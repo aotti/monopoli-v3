@@ -4,19 +4,6 @@ import { qS } from "../../../helper/helper"
 
 export function roomMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & RoomListListener
-    // add chat
-    const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
-    if(getMessage.message_text) {
-        const chatData: Omit<IChat, 'channel'|'token'> = {
-            display_name: getMessage.display_name,
-            message_text: getMessage.message_text,
-            message_time: getMessage.message_time
-        }
-        miscState.setMessageItems(data => [...data, chatData])
-        // play notif sound
-        if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
-            soundMessageNotif.play()
-    }
     // update online player
     if(getMessage.onlinePlayers) {
         const onlinePlayersData = getMessage.onlinePlayers
