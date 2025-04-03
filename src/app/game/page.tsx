@@ -16,11 +16,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-    // pubnub settings
+    // pubnub settings 
     const pubnubSetting = {
-      subscribeKey: process.env.PUBNUB_SUB_KEY,
-      publishKey: process.env.PUBNUB_PUB_KEY,
-      userId: process.env.PUBNUB_UUID
+        monopoly: {
+            subscribeKey: process.env.MONOPOLY_SUB_KEY,
+            publishKey: process.env.MONOPOLY_PUB_KEY,
+            userId: process.env.MONOPOLY_UUID
+        },
+        chatting: {
+            subscribeKey: process.env.CHATTING_SUB_KEY,
+            publishKey: process.env.CHATTING_PUB_KEY,
+            userId: process.env.CHATTING_UUID
+        }
     }
 
     return <GamePage pubnubSetting={pubnubSetting} />

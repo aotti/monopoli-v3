@@ -4,8 +4,8 @@ import { useMisc } from "../context/MiscContext"
 import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
 import { IChat, IGameContext, IMiscContext, IResponse } from "../helper/types"
 import emotes from "../config/emotes.json"
-import { clickOutsideElement } from "../helper/click-outside"
 import { clickInsideElement } from "../helper/click-inside"
+import PubNub from "pubnub"
 
 export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
     const miscState = useMisc()
@@ -15,6 +15,8 @@ export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}
         const chatContainer = qS('#chat_container')
         if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
     }, [miscState.messageItems])
+
+    // pubnub for chat
     
     return (
         page == 'room'
@@ -217,5 +219,22 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
             inputValues.message_text = `${chatResponse.status} ${chatResponse.message}`
             miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
             return
+    }
+}
+
+export function chatMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
+    const getMessage = data.message as PubNub.Payload & IChat
+    // add chat
+    if(getMessage.message_text) {
+        const chatData: Omit<IChat, 'channel'|'token'> = {
+            display_name: getMessage.display_name,
+            message_text: getMessage.message_text,
+            message_time: getMessage.message_time
+        }
+        miscState.setMessageItems(data => [...data, chatData])
+        // play notif sound
+        const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
+        if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
+            soundMessageNotif.play()
     }
 }
