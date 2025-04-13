@@ -25,8 +25,9 @@ export default function ChatBox({ page, id, pubnubSetting }: IChatBox) {
     // pubnub for chat
     const pubnubClient = new PubNub(pubnubSetting.chatting)
     useEffect(() => {
+        const gameroomParam = page == 'game' ? +location.search.match(/id=\d+$/)[0].split('=')[1] : null
         // pubnub channels
-        const chattingChannel = page == 'game' && id ? `monopoli-gameroom-${id}` : 'monopoli-roomlist'
+        const chattingChannel = page == 'game' ? `monopoli-gameroom-${gameroomParam}` : 'monopoli-roomlist'
         // subscribe
         pubnubClient.subscribe({ 
             channels: [chattingChannel] 
@@ -215,6 +216,13 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                 messageInput.value = ''
                 return
             }
+            else if(input.value == '/ch') {
+                inputValues.display_name = 'system'
+                inputValues.message_text = inputValues.channel.split('-')[1]
+                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+                messageInput.value = ''
+                return
+            }
             // filter message
             else if(setInputValue('message_text', input)) inputValues.message_text = input.value.trim()
             // error
@@ -250,7 +258,7 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
 }
 
 export function chatMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
-    const getMessage = data.message as PubNub.Payload & IChat
+    const getMessage = data.message as PubNub.Payload & IChat & {onlinePlayers: string}
     // add chat
     if(getMessage.message_text) {
         const chatData: Omit<IChat, 'channel'|'token'> = {
@@ -263,5 +271,11 @@ export function chatMessageListener(data: PubNub.Subscription.Message, miscState
         const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
         if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
             soundMessageNotif.play()
+    }
+    // update online player
+    if(getMessage.onlinePlayers) {
+        const onlinePlayersData = getMessage.onlinePlayers
+        localStorage.setItem('onlinePlayers', onlinePlayersData)
+        gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
     }
 }

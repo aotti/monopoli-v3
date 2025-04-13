@@ -70,7 +70,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             const parsedPlayerTurns = JSON.parse(getPlayerTurns) as string[]
             const playerTurnNotif = qS('#player_turn_notif')
             
-            if(parsedPlayerTurns?.length > 1) {
+            if(playerTurnNotif && parsedPlayerTurns?.length > 1) {
                 playerTurnNotif.textContent = `${parsedPlayerTurns[0]} turn`
             }
         }
@@ -191,7 +191,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 {/* chat */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'chat'} setGameSideButton={gameState.setGameSideButton} />
-                    <ChatBox page="game" id={gameState.gameRoomId} pubnubSetting={pubnubSetting} />
+                    {gameState.gameRoomId ? <ChatBox page="game" id={gameState.gameRoomId} pubnubSetting={pubnubSetting} /> : null}
                 </div>
             </div>
 

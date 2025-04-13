@@ -144,3 +144,17 @@ fix 30 jan 2025
 - ~~data game stats tidak apdet realtime (game over), coba simpan local storage stlh game over~~
 - ~~jangan hash password di client side~~
 - ~~hapus smua sub event data (local storage) saat masuk game room~~
+
+fix 24 feb 2025
+- ~~fix flowchard untuk **city** dan **buff/debuff**~~
+- ~~buat component khusus preload gambar kartu chance/community **(class hidden)**~~
+- ~~worst lose masih ngebug karna bisa ambil angka positif (harus negatif)~~
+- ~~debuff skip turn tidak hilang stelah dipakai~~
+- ~~skip turn masih bisa jalan walau tidak ada animasi berjalan (playerDice tidak 0)~~
+- ~~scroll chat box saat dibuka (game room)~~
+- ~~debuff pergi ke cursed/penjara, saat ke cursed otomatis ke cursed 2~~
+- ~~notif bayar pajak salah teks~~
+- ~~smua buff/debuff tidak bekerja~~
+- ~~saat sedang select character, lalu room dihapus, nanti stuck di select character & gk bisa join room~~
+- ~~event clickOutside untuk **(mobile)** emoji jalan lebih dulu daripada click emoji~~
+- ~~menu item di player setting (game room) tidak bisa diklik dalam mode mobile/phone~~
