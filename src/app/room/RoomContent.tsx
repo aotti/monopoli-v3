@@ -15,7 +15,7 @@ import { getRoomList } from "./helper/functions";
 import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
 
-export default function RoomContent({ pubnubSetting }) {
+export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
     const gameState = useGame()
     const playerData = gameState.otherPlayerInfo || gameState.myPlayerInfo
@@ -28,7 +28,7 @@ export default function RoomContent({ pubnubSetting }) {
     clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
     // pubnub
-    const pubnubClient = new PubNub(pubnubSetting)
+    const pubnubClient = new PubNub(pubnubSetting.monopoly)
     // pubnub subscribe
     const roomlistChannel = 'monopoli-roomlist'
     // tooltip event, get room list, pubnub subscribe
@@ -108,7 +108,7 @@ export default function RoomContent({ pubnubSetting }) {
                     <div className="w-full h-[calc(100%-1rem)]">
                         {miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
                             // chat box
-                            ? <ChatBox page="room" />
+                            ? <ChatBox page="room" pubnubSetting={pubnubSetting} />
                             // list of online players
                             : <PlayerList onlinePlayers={gameState.onlinePlayers} />
                         }

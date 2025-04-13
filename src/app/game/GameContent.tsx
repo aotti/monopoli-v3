@@ -14,7 +14,6 @@ import GameNotif from "./components/board/GameNotif"
 import Link from "next/link"
 import RollNumber from "./components/board/RollNumber"
 import TutorialGameRoom from "./components/other/TutorialGameRoom"
-import { clickInsideElement } from "../../helper/click-inside"
 import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
@@ -22,7 +21,7 @@ import { getPlayerInfo } from "./helper/game-logic"
 import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
 
-export default function GameContent({ pubnubSetting }) {
+export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
     const gameState = useGame()
     
@@ -71,7 +70,7 @@ export default function GameContent({ pubnubSetting }) {
             const parsedPlayerTurns = JSON.parse(getPlayerTurns) as string[]
             const playerTurnNotif = qS('#player_turn_notif')
             
-            if(parsedPlayerTurns?.length > 1) {
+            if(playerTurnNotif && parsedPlayerTurns?.length > 1) {
                 playerTurnNotif.textContent = `${parsedPlayerTurns[0]} turn`
             }
         }
@@ -84,7 +83,7 @@ export default function GameContent({ pubnubSetting }) {
     }, [])
 
     // pubnub
-    const pubnubClient = new PubNub(pubnubSetting)
+    const pubnubClient = new PubNub(pubnubSetting.monopoly)
     useEffect(() => {
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
         // pubnub channels
@@ -192,7 +191,7 @@ export default function GameContent({ pubnubSetting }) {
                 {/* chat */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'chat'} setGameSideButton={gameState.setGameSideButton} />
-                    <ChatBox page="game" id={gameState.gameRoomId} />
+                    {gameState.gameRoomId ? <ChatBox page="game" id={gameState.gameRoomId} pubnubSetting={pubnubSetting} /> : null}
                 </div>
             </div>
 

@@ -4,17 +4,47 @@ import { useMisc } from "../context/MiscContext"
 import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
 import { IChat, IGameContext, IMiscContext, IResponse } from "../helper/types"
 import emotes from "../config/emotes.json"
-import { clickOutsideElement } from "../helper/click-outside"
 import { clickInsideElement } from "../helper/click-inside"
+import PubNub, { Listener } from "pubnub"
 
-export default function ChatBox({ page, id }: {page: 'room'|'game', id?: number}) {
+interface IChatBox {
+    page: 'room'|'game', 
+    id?: number, 
+    pubnubSetting: {monopoly: any, chatting: any}
+}
+export default function ChatBox({ page, id, pubnubSetting }: IChatBox) {
     const miscState = useMisc()
+    const gameState = useGame()
 
     useEffect(() => {
         // scroll to bottom
         const chatContainer = qS('#chat_container')
         if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
     }, [miscState.messageItems])
+
+    // pubnub for chat
+    const pubnubClient = new PubNub(pubnubSetting.chatting)
+    useEffect(() => {
+        const gameroomParam = page == 'game' ? +location.search.match(/id=\d+$/)[0].split('=')[1] : null
+        // pubnub channels
+        const chattingChannel = page == 'game' ? `monopoli-gameroom-${gameroomParam}` : 'monopoli-roomlist'
+        // subscribe
+        pubnubClient.subscribe({ 
+            channels: [chattingChannel] 
+        })
+        // get published message
+        const publishedMessage: Listener = {
+            message: (data) => chatMessageListener(data, miscState, gameState)
+        }
+        pubnubClient.addListener(publishedMessage)
+        // unsub and remove listener
+        return () => {
+            pubnubClient.unsubscribe({ 
+                channels: [chattingChannel] 
+            })
+            pubnubClient.removeListener(publishedMessage)
+        }
+    }, [])
     
     return (
         page == 'room'
@@ -186,6 +216,13 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                 messageInput.value = ''
                 return
             }
+            else if(input.value == '/ch') {
+                inputValues.display_name = 'system'
+                inputValues.message_text = inputValues.channel.split('-')[1]
+                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+                messageInput.value = ''
+                return
+            }
             // filter message
             else if(setInputValue('message_text', input)) inputValues.message_text = input.value.trim()
             // error
@@ -217,5 +254,28 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
             inputValues.message_text = `${chatResponse.status} ${chatResponse.message}`
             miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
             return
+    }
+}
+
+export function chatMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
+    const getMessage = data.message as PubNub.Payload & IChat & {onlinePlayers: string}
+    // add chat
+    if(getMessage.message_text) {
+        const chatData: Omit<IChat, 'channel'|'token'> = {
+            display_name: getMessage.display_name,
+            message_text: getMessage.message_text,
+            message_time: getMessage.message_time
+        }
+        miscState.setMessageItems(data => [...data, chatData])
+        // play notif sound
+        const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
+        if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
+            soundMessageNotif.play()
+    }
+    // update online player
+    if(getMessage.onlinePlayers) {
+        const onlinePlayersData = getMessage.onlinePlayers
+        localStorage.setItem('onlinePlayers', onlinePlayersData)
+        gameState.setOnlinePlayers(JSON.parse(onlinePlayersData))
     }
 }

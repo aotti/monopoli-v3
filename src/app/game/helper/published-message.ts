@@ -9,19 +9,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     const playerTurnNotif = qS('#player_turn_notif')
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
-    // add chat
-    if(getMessage.message_text) {
-        const chatData: Omit<IChat, 'channel'|'token'> = {
-            display_name: getMessage.display_name,
-            message_text: getMessage.message_text,
-            message_time: getMessage.message_time
-        }
-        miscState.setMessageItems(data => [...data, chatData])
-        // play notif sound
-        const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
-        if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
-            soundMessageNotif.play()
-    }
     // join
     if(getMessage.joinPlayer) {
         gameState.setGamePlayerInfo(players => [...players, getMessage.joinPlayer])

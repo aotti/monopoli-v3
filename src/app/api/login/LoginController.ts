@@ -34,7 +34,7 @@ export default class LoginController extends Controller {
             if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            const isPublished = await this.monopoliPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
@@ -97,7 +97,7 @@ export default class LoginController extends Controller {
             if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
             const onlineplayer_channel = 'monopoli-onlineplayer'
-            const isPublished = await this.pubnubPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            const isPublished = await this.monopoliPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
             console.log(isPublished);
             
             if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])

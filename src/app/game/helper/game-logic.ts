@@ -759,6 +759,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
                         delete playerTurnEndResponse.data[0].token
                     }
+                    // update player turns
+                    localStorage.setItem('playerTurns', JSON.stringify(playerTurnEndResponse.data[0].playerTurns))
                     // reset disable buttons
                     miscState.setDisableButtons(null)
                     return
@@ -1136,7 +1138,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
             ) as [string, number];
             // set tax price
-            const taxPrice = specialCard == 'anti tax' ? 0 
+            const taxPrice = specialCard.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
             // set event data (for history)
             const eventData: EventDataType = {
@@ -1893,13 +1895,13 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
             }
             else if(type == 'destroy property') {
                 // destroy city property
-                const isDestroyed = updateCityList({
+                const cityPropertyLeft = updateCityList({
                     action: 'destroy', 
                     currentCity: playerTurnData.city,
                     rng: +rng[1]
                 })
                 // get destroyed city
-                const getDestroyedCity = isDestroyed ? isDestroyed.split(';') : null
+                const getDestroyedCity = cityPropertyLeft ? cityPropertyLeft.split(';') : null
                 // index 0 = city | index 1 = property
                 const destroyedCity = getDestroyedCity ? getDestroyedCity[getDestroyedCity.length-1].split('*') : null
                 // use notif timer as addition message
@@ -1929,7 +1931,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                     tileName: tileName,
                     type: type,
                     money: 0,
-                    city: isDestroyed || null
+                    city: cityPropertyLeft || null
                 })
             }
             else if(type == 'take card') {
@@ -2780,7 +2782,7 @@ function buffDebuffEffects(bdData: Record<'tileName'|'effectData', string>, find
                     tileName: tileName,
                     type: type,
                     money: 0,
-                    debuff: `add-${type}_${effect}`
+                    buff: `add-${type}_${effect}`
                 })
             }
             else if(type == 'special card') {
@@ -2908,8 +2910,8 @@ function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, miscState:
             // get debuff
             const debuff = splitDebuff.map(v => v.match(/reduce money/i)).flat().filter(i=>i)
             if(debuff[0]) {
-                setBuffDebuffHistory('get_debuff', effect)
                 const newMoney = Math.floor(data.money / 2)
+                setBuffDebuffHistory('get_debuff', `${effect} (+${moneyFormat(newMoney)})`)
                 return [`used-${debuff[0]}`, newMoney]
             }
         }

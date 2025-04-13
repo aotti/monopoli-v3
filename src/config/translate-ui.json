@@ -163,6 +163,11 @@
         "[10%] Go to cursed city/prison": "[10%] Pergi ke kota terkutuk/penjara",
         "[8%] Tax multiply by 30%": "[8%] Pajak ditambah 30%",
         "[7%] Reduce incoming money 50%": "[7%] Uang yang akan didapat berkurang 50%",
+        "Lose money 5k x laps": "Hilang uang 5k x putaran",
+        "Skip 1 turn": "Tidak jalan 1 putaran",
+        "Go to cursed city/prison": "Pergi ke kota terkutuk/penjara",
+        "Tax multiply by 30%": "Pajak ditambah 30%",
+        "Reduce incoming money 50%": "Uang yang akan didapat berkurang 50%",
 
         "Buff Area (100% chance)": "Area Buff (100% kesempatan)",
         "[35%] Get money 7k x laps": "[35%] Dapat uang 7k x putaran",
@@ -170,6 +175,11 @@
         "[20%] Reduce buy/upgrade city price by 30%": "[20%] Harga beli/meningkatkan kota berkurang 30%",
         "[12%] Go to free parking": "[12%] Pergi ke parkir bebas",
         "[8%] Get curse reverser card": "[8%] Dapat kartu pembalik kutukan",
+        "Get money 7k x laps": "Dapat uang 7k x putaran",
+        "Select card rarity": "Pilih tingkatan kartu",
+        "Reduce buy/upgrade city price by 30%": "Harga beli/meningkatkan kota berkurang 30%",
+        "Go to free parking": "Pergi ke parkir bebas",
+        "Get curse reverser card": "Dapat kartu pembalik kutukan",
 
         "click here to continue": "klik ini untuk lanjut",
         "tutorial complete": "tutorial selesai",
