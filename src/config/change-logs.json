@@ -1,6 +1,13 @@
 {
     "updates": [
         {
+            "version": "v3.21",
+            "date": "13 Apr 2025",
+            "changes": [
+                "fix some bugs"
+            ]
+        },
+        {
             "version": "v3.2",
             "date": "26 Mar 2025",
             "changes": [
