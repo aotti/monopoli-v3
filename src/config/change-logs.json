@@ -1,14 +1,14 @@
 {
     "updates": [
         {
-            "version": "v3.21",
+            "version": "v3.06",
             "date": "13 Apr 2025",
             "changes": [
                 "fix some bugs"
             ]
         },
         {
-            "version": "v3.2",
+            "version": "v3.05",
             "date": "26 Mar 2025",
             "changes": [
                 "add new board",
@@ -17,21 +17,21 @@
             ]
         },
         {
-            "version": "v3.12",
+            "version": "v3.04",
             "date": "22 Mar 2025",
             "changes": [
                 "add preparation before add new board"
             ]
         },
         {
-            "version": "v3.11",
+            "version": "v3.03",
             "date": "19 Mar 2025",
             "changes": [
                 "fix screen bug"
             ]
         },
         {
-            "version": "v3.1",
+            "version": "v3.02",
             "date": "11 Mar 2025",
             "changes": [
                 "add emotes to chat",
@@ -41,7 +41,7 @@
             ]
         },
         {
-            "version": "v3.0",
+            "version": "v3.01",
             "date": "5 Mar 2025",
             "changes": [
                 "initial release"

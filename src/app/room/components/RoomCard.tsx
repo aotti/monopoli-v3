@@ -22,8 +22,23 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
     const isRoomLocked = roomConfirmPassword ? `🔒` : ''
     // modify curse text
     const getCurse = roomData.rules.match(/curse: \d{1,2}/)[0].split(': ')[1]
-    const setCurseRange = +getCurse > 5 ? `curse: 5~${getCurse}%` : `curse: ${getCurse}%`
-    const modifiedRules = roomData.rules.replace(/curse: \d{1,2}/, setCurseRange)
+    const setCurseRange = +getCurse > 5 ? `5~${getCurse}%` : `${getCurse}%`
+    const roomRules = roomData.rules
+    const rule = {
+        board: roomRules.match(/board: \w+/)[0].split(' ')[1],
+        dice: roomRules.match(/dice: \d+/)[0].split(' ')[1],
+        start: roomRules.match(/start: \d+/)[0].split(' ')[1],
+        lose: roomRules.match(/lose: -\d+/)[0].split(' ')[1],
+        mode: roomRules.match(/mode: \w+/)[0].split(' ')[1],
+        curse: roomRules.match(/curse: \d{1,2}/)[0].split(' ')[1],
+    }
+    const modifiedRules = roomRules.replace(/board: normal|twoway/, 'board: bbb').replace(/dice: \d+/, 'dice: ddd')
+                        .replace(/start: \d+/, 'start: sss').replace(/lose: -\d+/, 'lose: lll')
+                        .replace(/mode: \w+|\d_\w+/, 'mode: mmm').replace(/curse: \d{1,2}/, 'curse: ccc')
+    const translateRules = translateUI({lang: miscState.language, text: modifiedRules as any})
+                        .replace('bbb', rule.board).replace('ddd', rule.dice)
+                        .replace('sss', rule.start).replace('lll', rule.lose)
+                        .replace('mmm', rule.mode).replace('ccc', setCurseRange)
     // room status
     const roomStatusColor = roomData.status == 'prepare' ? 'bg-green-500/30' : 'bg-orange-500/30'
 
@@ -36,7 +51,6 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                 {/* room id */}
                 <input type="hidden" id="room_id" value={roomId} />
                 <input type="hidden" id={`room_password_${roomId}`} />
-                <input type="hidden" id="confirm_room_password" value={roomConfirmPassword} />
                 <input type="hidden" id={`select_character_${roomId}`} />
                 {/* room name */}
                 <div className="flex justify-between p-2">
@@ -55,7 +69,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                     </label>
                     <div className="w-3/5 border-b border-b-white">
                         {/* hover rules */}
-                        <p data-tooltip={modifiedRules.replaceAll(';', '\n')} className="relative w-full text-center bg-transparent" > 
+                        <p data-tooltip={translateRules.replaceAll(';', '\n')} className="relative w-full text-center bg-transparent" > 
                             ??? 
                         </p>
                         {/* input */}
@@ -182,7 +196,7 @@ function JoinRoomPrompt({ roomId, showInputPassword, setShowInputPassword }) {
                         <input type="text" id={`input_password_${roomId}`} className="w-full px-1" minLength={3} maxLength={8} placeholder="password" />
                     </div>
                 </div>
-                {/* submit */}
+                {/* join room submit */}
                 <div className="flex justify-between mx-6">
                     <button type="button" className="text-red-300 p-1 active:opacity-75"
                     onClick={() => {miscState.setShowJoinModal(null); setShowInputPassword(false)}}> 

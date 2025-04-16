@@ -9,6 +9,9 @@ import buff_effect_list from "../config/buff-effects.json"
 /*
     TABLE OF CONTENTS
     - GAME PREPARE
+        # START GAME
+        # ROLL TURN
+        # ROLL DICE
     - GAME PLAYING
         # PLAYER MOVING
         # EVENT HISTORY
@@ -240,6 +243,9 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
 
 // ========== GAME PLAYING ==========
 // ========== GAME PLAYING ==========
+
+// ========== # START GAME ==========
+// ========== # START GAME ==========
 export async function startGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -284,6 +290,8 @@ export async function startGameRoom(miscState: IMiscContext, gameState: IGameCon
     }
 }
 
+// ========== # ROLL TURN ==========
+// ========== # ROLL TURN ==========
 export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -343,6 +351,8 @@ export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, t
     }
 }
 
+// ========== # ROLL DICE ==========
+// ========== # ROLL DICE ==========
 export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext, specialCard?: string) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -407,8 +417,9 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
             // error message
+            const translateError = translateUI({lang: miscState.language, text: rollDiceResponse.message as any})
             notifTitle.textContent = `error ${rollDiceResponse.status}`
-            notifMessage.textContent = `${rollDiceResponse.message}`
+            notifMessage.textContent = `${translateError || rollDiceResponse.message}`
             // button to normal
             rollDiceButton.textContent = tempButtonText
             rollDiceButton.removeAttribute('disabled')
@@ -694,7 +705,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             ) as [string, number] : [null, null];
             // add debuff reduce money & set notif message
             debuffCollection.push(buffDebuff)
-            notifMessage.textContent += buffDebuff ? `"debuff reduce money"` : ''
+            notifMessage.textContent += buffDebuff ? translateUI({lang: miscState.language, text: '"debuff reduce money"'}) : ''
             // get buff/debuff event data
             if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
             if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
@@ -871,8 +882,8 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
             // winner message
-            notifTitle.textContent = `Game Over`
-            notifMessage.textContent = `${alivePlayers[0]} has won the game!\nback to room list in 15 seconds`
+            notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Over'})
+            notifMessage.textContent = translateUI({lang: miscState.language, text: 'ppp has won the game!\nback to room list in 15 seconds'}).replace('ppp', alivePlayers[0])
             setTimeout(() => {
                 // set notif to null
                 gameState.setShowGameNotif(null)
@@ -894,8 +905,8 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('normal')
                 // winner message
-                notifTitle.textContent = `Game Over`
-                notifMessage.textContent = `${highestMoneyPlayer[0].split(',')[1]} has won the game!\nback to room list in 15 seconds`
+                notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Over'})
+                notifMessage.textContent = translateUI({lang: miscState.language, text: 'ppp has won the game!\nback to room list in 15 seconds'}).replace('ppp', highestMoneyPlayer[0].split(',')[1])
                 setTimeout(() => {
                     // set notif to null
                     gameState.setShowGameNotif(null)
@@ -986,9 +997,10 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
     
         // if you own the city and its special, get money
         if(tileInfo == 'special' && buyCityProperty == '1house') {
-            // notif message
-            notifTitle.textContent = 'Special City'
-            notifMessage.textContent = `You get ${moneyFormat(+buyCityPrice)} when visiting your grandma`
+            // notif message 
+            notifTitle.textContent = translateUI({lang: miscState.language, text: 'Special City'})
+            notifMessage.textContent = translateUI({lang: miscState.language, text: 'You get xxx when visiting your grandma'})
+                                    .replace('xxx', moneyFormat(+buyCityPrice))
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
@@ -1014,7 +1026,9 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
         const buyCityPriceFixed = buffDebuff ? +buyCityPrice - buffDebuffEffect : +buyCityPrice
         // set event text for notif
         let [eventTitle, eventContent] = [
-            !isCityNotMine ? 'Upgrade City' : 'Buy City', 
+            !isCityNotMine 
+                ? translateUI({lang: miscState.language, text: 'Upgrade City'}) 
+                : translateUI({lang: miscState.language, text: 'Buy City'}), 
             !isCityNotMine 
                 // upgrade city content
                 ? translateUI({lang: miscState.language, text: 'Do you wanna upgrade xxx city for xxx?'})
@@ -1032,7 +1046,9 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
         // set timer
         let buyCityTimer = 6
         const buyCityInterval = setInterval(() => {
-            notifTimer.textContent = buffDebuff ? `"buff reduce price" ${buyCityTimer}` :`${buyCityTimer}`
+            notifTimer.textContent = buffDebuff 
+                                ? `${translateUI({lang: miscState.language, text: '"buff reduce price"'})} ${buyCityTimer}` 
+                                : `${buyCityTimer}`
             buyCityTimer--
             // event buttons (2 buttons)
             const [nopeButton, ofcourseButton] = [
@@ -1054,7 +1070,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 // show buttons
                 ofcourseButton.classList.remove('hidden')
                 // modify button 
-                ofcourseButton.textContent = 'Of course'
+                ofcourseButton.textContent = translateUI({lang: miscState.language, text: 'Of course'})
                 ofcourseButton.classList.add('text-green-300')
                 // click event
                 ofcourseButton.onclick = () => {
@@ -1103,7 +1119,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 // show buttons
                 nopeButton.classList.remove('hidden')
                 // modify button 
-                nopeButton.textContent = 'Nope'
+                nopeButton.textContent = translateUI({lang: miscState.language, text: 'Nope'})
                 nopeButton.classList.add('text-red-300')
                 // click event
                 nopeButton.onclick = () => {
@@ -1303,8 +1319,8 @@ function updateCityList(data: UpdateCityListType) {
 // ========== > SPECIAL UPGRADE CITY ==========
 // ========== > SPECIAL UPGRADE CITY ==========
 function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number) {
-    // get all owned city
-    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel/))
+    // get all owned city, except special & fully upgrade city
+    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel|special/))
     // get city name
     const upgradeRNG = rng % myCityList.length
     const upgradeCityName = myCityList[upgradeRNG].split('*')[0]
@@ -1359,12 +1375,11 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                                         ? translateUI({lang: miscState.language, text: 'Chance Card'})
                                         : translateUI({lang: miscState.language, text: 'Community Card'})
                 notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
-                                        + (buffDebuff ? `\n"buff pick rarity"` : '')
+                                        + (buffDebuff ? `\n${translateUI({lang: miscState.language, text: '"buff pick rarity"'})}` : '')
                 notifImage.src = cards.data[cardRNG].img
                 // run card effect
                 const cardData = {
                     tileName: card,
-                    rank: cards.category,
                     effectData: cards.data[cardRNG].effect
                 }
                 // get event data
@@ -1378,11 +1393,11 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
     })
 }
 
-function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
     // notif timer
     const notifTimer = qS('#result_notif_timer')
     // ### rank will be used for rarity border
-    const {tileName, rank, effectData} = cardData
+    const {tileName, effectData} = cardData
     // current player data (walking)
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
 
@@ -1905,7 +1920,9 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 // index 0 = city | index 1 = property
                 const destroyedCity = getDestroyedCity ? getDestroyedCity[getDestroyedCity.length-1].split('*') : null
                 // use notif timer as addition message
-                notifTimer.textContent = destroyedCity ? `"${destroyedCity[0]} city collapse"` : '"go get a house, homeless"'
+                notifTimer.textContent = destroyedCity 
+                                    ? translateUI({lang: miscState.language, text: '"ccc city collapse"'}).replace('ccc', destroyedCity[0])
+                                    : translateUI({lang: miscState.language, text: '"go get a house, homeless"'})
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
@@ -2118,8 +2135,9 @@ function stopByCursedCity(findPlayer: number, tileElement: HTMLElement, miscStat
             {type: 'cursed', price: +cityPrice}, findPlayer, miscState, gameState
         ) as [string, number]
         // notif message
-        notifTitle.textContent = 'Cursed City'
-        notifMessage.textContent = `The city curse you for ${moneyFormat(+cityPrice)}`
+        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Cursed City'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'The city curse you for xxx'})
+                                .replace('xxx', moneyFormat(+cityPrice))
         notifTimer.textContent = specialCard ? `"${specialCard}"` : ''
         // show notif 
         miscState.setAnimation(true)
@@ -2160,14 +2178,14 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             const {price, debuff} = data;
             // set event text for notif
             const [eventTitle, eventContent] = [
-                'Paying Taxes', 
+                translateUI({lang: miscState.language, text: 'Paying Taxes'}), 
                 translateUI({lang: miscState.language, text: `xxx paid taxes of xxx`})
             ]
             notifTitle.textContent = eventTitle
             notifMessage.textContent = eventContent
                                     .replace('xxx', playerTurnData.display_name) // player name
                                     .replace('xxx', moneyFormat(price)) // city price
-                                    + (debuff ? `\n"debuff tax more"` : '')
+                                    + (debuff ? `\n${translateUI({lang: miscState.language, text: '"debuff tax more"'})}` : '')
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
@@ -2212,12 +2230,14 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
             const [eventTitle, eventContent] = [
-                'Prison',
-                `${gameState.gamePlayerInfo[findPlayer].display_name} get arrested for being silly. accumulate > ${prisonAccumulateLimit} dice number to be free.`
+                translateUI({lang: miscState.language, text: 'Prison'}),
+                translateUI({lang: miscState.language, text: 'ppp get arrested for being silly. accumulate > aaa dice number to be free.'}),
             ]
             // notif message
             notifTitle.textContent = eventTitle
             notifMessage.textContent = eventContent
+                                    .replace('ppp', gameState.gamePlayerInfo[findPlayer].display_name)
+                                    .replace('aaa', prisonAccumulateLimit.toString())
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
@@ -2305,7 +2325,8 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
         return new Promise((resolve: (value: [string, string|number])=>void) => {
             let specialCardTimer = 6
             const specialCardInterval = setInterval(() => {
-                notifTimer.textContent = `"wanna use ${sc} card?" ${specialCardTimer}`
+                notifTimer.textContent = translateUI({lang: miscState.language, text: `"wanna use sss card?" ttt`})
+                                        .replace('sss', sc).replace('ttt', specialCardTimer.toString())
                 specialCardTimer--
                 // get buttons
                 const [nopeButton, ofcourseButton] = [
@@ -2327,7 +2348,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                     // show buttons
                     ofcourseButton.classList.remove('hidden')
                     // modify button 
-                    ofcourseButton.textContent = 'Of course'
+                    ofcourseButton.textContent = translateUI({lang: miscState.language, text: 'Of course'})
                     ofcourseButton.classList.add('text-green-300')
                     // click event
                     ofcourseButton.onclick = () => {
@@ -2346,7 +2367,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
                     // show buttons
                     nopeButton.classList.remove('hidden')
                     // modify button 
-                    nopeButton.textContent = 'Nope'
+                    nopeButton.textContent = translateUI({lang: miscState.language, text: 'Nope'})
                     nopeButton.classList.add('text-red-300')
                     // click event
                     nopeButton.onclick = () => {

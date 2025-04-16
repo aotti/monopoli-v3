@@ -93,6 +93,8 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // tile data
     type TileCityType = {name: string, price: number, img: string, info: string, square: number}
     const { name, price, img, info, square } = data as TileCityType 
+    // tile name
+    const translateCityName = name.match(/\d/) ? translateUI({lang: miscState.language, text: name as any}) : name
     // get room info
     const getGameRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
     // set curse
@@ -143,6 +145,8 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     })
     const [cityName, cityOwner, cityPrice, cityProperty, cityIcon] = getCityData as [string, string, number, string, string]
     // city info
+    // ### DONT TRANSLATE CITY INFO
+    // ### ITS USED ON GAME LOGIC
     const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},land,${cursedCityPrice || price}`
     // modify info
     const cityBoughtInfo = cityOwner 
@@ -152,8 +156,8 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                         : null
     const translateInfo = translateUI({lang: miscState.language, text: info as any})
     const newInfo = name.match('Cursed')
-                    ? `${name};${curseRand};${translateInfo}`
-                    : cityBoughtInfo ? `${name};${cityBoughtInfo}` : `${name};${translateInfo}`
+                    ? `${translateCityName};${curseRand};${translateInfo}`
+                    : cityBoughtInfo ? `${translateCityName};${cityBoughtInfo}` : `${translateCityName};${translateInfo}`
     // tile broken & destroy
     const tileBroken = {
         house: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_House_100-aO1wZX4zHUd83tK6b1uVbxSsi1sDeE.mp4',
@@ -176,7 +180,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
                     <p className={`${cityProperty ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
                     data-price={moneyFormat(cityPrice || (cursedCityPrice || price))}> 
-                        {cityProperty ? `${cityName}\n${cityIcon}` : cityName || name} 
+                        {cityProperty ? `${cityName}\n${cityIcon}` : cityName || translateCityName} 
                     </p>
                 </div>
             </div>

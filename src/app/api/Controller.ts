@@ -194,11 +194,12 @@ export default class Controller {
             // save user agent to redis
             // used for check account in use
             await this.redisSet(`userAgent_${payload.display_name}`, [payload.user_agent])
+            // filter to prevent duplicate
             const filteredLoggedPlayers = loggedPlayers.filter((v1, i, arr) => arr.findLastIndex(v2 => v2.display_name == v1.display_name) === i)
             // save to redis
             await this.redisSet('loggedPlayers', filteredLoggedPlayers)
             // response
-            return this.respond(200, 'user logged', filteredLoggedPlayers)
+            return this.respond(200, 'user logged', loggedPlayersWithoutUA(filteredLoggedPlayers))
         }
         // renew user timeout token
         else if(action == 'renew') {
@@ -213,7 +214,7 @@ export default class Controller {
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response
-            return this.respond(200, 'user logged', loggedPlayers)
+            return this.respond(200, 'user logged', loggedPlayersWithoutUA(loggedPlayers))
         }
         // remove user
         else if(action == 'out') {
@@ -221,7 +222,7 @@ export default class Controller {
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
             // response
-            return this.respond(200, 'user logged', loggedPlayers)
+            return this.respond(200, 'user logged', loggedPlayersWithoutUA(loggedPlayers))
         }
 
         /**
@@ -231,6 +232,20 @@ export default class Controller {
             if(userAgent && userAgent == loggedPlayers[index]?.user_agent)
                 return true
             return false
+        }
+
+        /**
+         * @description remove user agent before send it to client
+         */
+        function loggedPlayersWithoutUA(tempLoggedPlayers: ILoggedUsers[]) {
+            const newLoggedPlayers = tempLoggedPlayers.map(v => {
+                return {
+                    display_name: v.display_name,
+                    status: v.status,
+                    timeout_token: v.timeout_token,
+                }
+            })
+            return newLoggedPlayers
         }
     }
 

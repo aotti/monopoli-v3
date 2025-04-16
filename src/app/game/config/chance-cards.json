@@ -6,7 +6,7 @@
             "data": [
                 {
                     "description": "Home Renovation TV Show gives you upgrade city card",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_S-HeOnWKulBma1kRBB97laqdfLCJpVh3.png",
                     "effect": "special card_city upgrade"
                 }
             ]
@@ -17,17 +17,17 @@
             "data": [
                 {
                     "description": "You are caught red-handed in corruption, go to jail & fined 90% of the total money",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_A-PqkByzOifuXooKWUliXPdxR4kfDBI9.png",
                     "effect": "lose money_90%&move place_prison"
                 },
                 {
                     "description": "Your police neighbor gives you an anti jail card as a Christmas present",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_A-PqkByzOifuXooKWUliXPdxR4kfDBI9.png",
                     "effect": "special card_anti prison"
                 },
                 {
                     "description": "You get a surprise money of 200.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_A-PqkByzOifuXooKWUliXPdxR4kfDBI9.png",
                     "effect": "get money_200000"
                 }
             ]
@@ -38,27 +38,27 @@
             "data": [
                 {
                     "description": "Head to someone else's city (random)",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "random-move place_other city"
                 },
                 {
                     "description": "Earthquake, 1 building collapse #sadge",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "destroy property_city"
                 },
                 {
                     "description": "Try your luck, go to free parking or prison",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "random-move place_parking|move place_prison"
                 },
                 {
                     "description": "Gilang drops his ichi ocha, you have to take 1 steps back to return it",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "move backward_1"
                 },
                 {
                     "description": "Due to number of vehicles in Indonesia is more than 160 million, players are given nerf parking card so they dont travel often",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "special card_parking nerf"
                 }
             ]
@@ -69,27 +69,27 @@
             "data": [
                 {
                     "description": "The kind Gilang gives you 5.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_C-cI6wyoLk6OjqhTIPrjNHq01wcXKTF4.png",
                     "effect": "get money_5000"
                 },
                 {
                     "description": "You chased by a monitor lizard, take 2 steps back",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_C-cI6wyoLk6OjqhTIPrjNHq01wcXKTF4.png",
                     "effect": "move backward_2"
                 },
                 {
                     "description": "Go forward to the start or take a community card",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_C-cI6wyoLk6OjqhTIPrjNHq01wcXKTF4.png",
                     "effect": "button-move place_start|take card_community"
                 },
                 {
                     "description": "You found gaming dice card under your PC desk",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_C-cI6wyoLk6OjqhTIPrjNHq01wcXKTF4.png",
                     "effect": "special card_gaming dice"
                 },
                 {
                     "description": "Upgrade 1 owned city (random)",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_C-cI6wyoLk6OjqhTIPrjNHq01wcXKTF4.png",
                     "effect": "upgrade city_city property"
                 }
             ]
@@ -100,17 +100,17 @@
             "data": [
                 {
                     "description": "You stumbled, take 2 step forward",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_D-9SWrEHsNrr9QEvvT8n9zQPKcqVWcb2.png",
                     "effect": "move forward_2"
                 },
                 {
                     "description": "You find 30.000 in your pocket",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_D-9SWrEHsNrr9QEvvT8n9zQPKcqVWcb2.png",
                     "effect": "get money_30000"
                 },
                 {
                     "description": "You find 20.000 on the road, take the money or take 1 steps forward (choose)",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_Backside-O5k7QzCQoO6AeHNDkXYrEDVQBa2Bls.png",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_D-9SWrEHsNrr9QEvvT8n9zQPKcqVWcb2.png",
                     "effect": "button-get money_20000|move forward_1"
                 }
             ]

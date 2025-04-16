@@ -26,7 +26,7 @@ export default function HomeContent() {
                             miscState.setAnimation(true); 
                             // show the modal
                             miscState.setShowModal('login') 
-                        }}> Login </button>
+                        }}> {translateUI({lang: miscState.language, text: 'Login'})} </button>
                     </div>
                     {/* register button */}
                     <div className="h-12 w-[calc(9rem+2rem)]">
@@ -36,7 +36,7 @@ export default function HomeContent() {
                             miscState.setAnimation(true); 
                             // show the modal
                             miscState.setShowModal('register') 
-                        }}> Register </button>
+                        }}> {translateUI({lang: miscState.language, text: 'Register'})} </button>
                     </div>
                 </div>
             </div> 

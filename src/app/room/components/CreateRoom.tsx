@@ -12,6 +12,7 @@ export default function CreateRoom() {
     const [createRoomPage, setCreateRoomPage] = useState<1|2|3>(1)
     // tooltip
     const tooltip = {
+        mode: translateUI({lang: miscState.language, text: 'survive: until 1 player left;laps: 1st player get 5/7 laps, will end the game'}),
         moneyStart: translateUI({lang: miscState.language, text: 'money that player have on start'}),
         moneyLose: translateUI({lang: miscState.language, text: 'player lose if the money less than this limit'}),
         curse: translateUI({lang: miscState.language, text: 'cursed tile price will go up/down around this %'}),
@@ -36,20 +37,22 @@ export default function CreateRoom() {
                     {/* set room name */}
                     <div className="flex justify-between">
                         <label htmlFor="name"> {translateUI({lang: miscState.language, text: 'Name'})} </label>
-                        <input type="text" className="w-36 lg:w-48 px-1" id="room_name" minLength={4} maxLength={12} placeholder="max 12 letters" />
+                        <input type="text" className="w-36 lg:w-48 px-1" id="room_name" minLength={4} maxLength={12} placeholder={translateUI({lang: miscState.language, text: 'max 12 letters'})} />
                     </div>
                     {/* set password */}
                     <div className="flex justify-between">
                         <label htmlFor="room_password"> Password </label>
-                        <input type="text" className="w-36 lg:w-48 px-1" id="room_password" minLength={3} maxLength={8} placeholder="optional" />
+                        <input type="text" className="w-36 lg:w-48 px-1" id="room_password" minLength={3} maxLength={8} placeholder={translateUI({lang: miscState.language, text: 'optional'})} />
                     </div>
                     {/* select mode */}
                     <div className="flex justify-between">
-                        <label htmlFor="select_mode"> Mode </label>
+                        <label htmlFor="select_mode" data-tooltip={tooltip.mode.replace(';', '\n')} className="relative flex flex-col text-left">
+                            <span className={`${questionMark()}`}> Mode </span>
+                        </label>
                         <select id="select_mode" className="w-32 lg:w-44">
-                            <option value="survive"> survive </option>
-                            <option value="5_laps"> 5 laps </option>
-                            <option value="7_laps"> 7 laps </option>
+                            <option value="survive"> {translateUI({lang: miscState.language, text: 'survive'})} </option>
+                            <option value="5_laps"> {translateUI({lang: miscState.language, text: '5 laps'})} </option>
+                            <option value="7_laps"> {translateUI({lang: miscState.language, text: '7 laps'})} </option>
                         </select>
                     </div>
                     {/* submit */}
@@ -75,7 +78,7 @@ export default function CreateRoom() {
                     <div className="flex justify-between">
                         <label htmlFor="select_board"> {translateUI({lang: miscState.language, text: 'Board'})} </label>
                         <select id="select_board" className="w-32 lg:w-44">
-                            <option value="normal"> normal </option>
+                            <option value="normal"> {translateUI({lang: miscState.language, text: 'normal'})} </option>
                             <option value="twoway"> {translateUI({lang: miscState.language, text: '2 way'})} </option>
                         </select>
                     </div>

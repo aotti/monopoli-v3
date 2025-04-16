@@ -1,5 +1,5 @@
 import { useMisc } from "../../../context/MiscContext"
-import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper"
 import { FormEvent, useEffect, useRef } from "react"
 import { IGameContext, IMiscContext, IResponse, IUser } from "../../../helper/types"
 import { useGame } from "../../../context/GameContext"
@@ -21,19 +21,19 @@ export default function Login() {
             ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'} w-[calc(100vw-50%)] lg:w-[calc(100vw-65%)]`}>
             {/* modal head */}
             <div className="border-b-2 mb-4">
-                <span> Login </span>
+                <span> {translateUI({lang: miscState.language, text: 'Enter to the game'})} </span>
             </div>
             {/* modal body */}
             <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => userLogin(ev, miscState, gameState)}>
                 {/* username */}
                 <div className="flex justify-between">
                     <label htmlFor="username" className="w-min"> Username </label>
-                    <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder="max 10 letters" autoComplete="off" required />
+                    <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder={translateUI({lang: miscState.language, text: 'max 10 letters'})} autoComplete="off" required />
                 </div>
                 {/* password */}
                 <div className="flex justify-between">
                     <label htmlFor="password" className="w-min"> Password </label>
-                    <input type="password" className="w-2/3 px-1 !text-2xs" id="password" minLength={8} maxLength={16} placeholder="max 16 letters" required />
+                    <input type="password" className="w-2/3 px-1 !text-2xs" id="password" minLength={8} maxLength={16} placeholder={translateUI({lang: miscState.language, text: 'max 16 letters'})} required />
                 </div>
                 {/* message */}
                 <ResultMessage id="result_login" />

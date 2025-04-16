@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { clickInsideElement } from "../../../../helper/click-inside"
 import { useMisc } from "../../../../context/MiscContext"
 import { useGame } from "../../../../context/GameContext"
+import { translateUI } from "../../../../helper/helper"
 
 export default function GameNotif() {
     const miscState = useMisc()
@@ -29,7 +30,10 @@ export default function GameNotif() {
                     {gameState.showGameNotif?.match('with_button') ? <GameNotifWithButtons /> : null}
                 </div>
             </div>
-            {!gameState.showGameNotif?.match('with_button') ? <span className="text-red-300"> click notif to dismiss </span> : null}
+            {!gameState.showGameNotif?.match('with_button') ? 
+                <span className="text-red-300">
+                    {translateUI({lang: miscState.language, text: 'click notif to dismiss'})}
+                </span> : null}
         </div>
     )
 }

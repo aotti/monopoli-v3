@@ -26,22 +26,22 @@ export default function Register() {
                 {/* username */}
                 <div className="flex justify-between">
                     <label htmlFor="username" className="w-min"> Username </label>
-                    <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder="max 10 letters"  autoComplete="off" required />
+                    <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder={translateUI({lang: miscState.language, text: 'max 10 letters'})}  autoComplete="off" required />
                 </div>
                 {/* password */}
                 <div className="flex justify-between">
                     <label htmlFor="password" className="w-min"> Password </label>
-                    <input type="password" className="w-2/3 px-1 !text-2xs" id="password" minLength={8} maxLength={16} placeholder="max 16 letters" required />
+                    <input type="password" className="w-2/3 px-1 !text-2xs" id="password" minLength={8} maxLength={16} placeholder={translateUI({lang: miscState.language, text: 'max 16 letters'})} required />
                 </div>
                 {/* confirm password */}
                 <div className="flex justify-between">
                     <label htmlFor="confirm_password" className="w-min"> {translateUI({lang: miscState.language, text: 'Confirm Password'})} </label>
-                    <input type="password" className="w-2/3 px-1 !text-2xs" id="confirm_password" maxLength={16} placeholder="max 16 letters" required />
+                    <input type="password" className="w-2/3 px-1 !text-2xs" id="confirm_password" maxLength={16} placeholder={translateUI({lang: miscState.language, text: 're-type your password'})} required />
                 </div>
                 {/* name */}
                 <div className="flex justify-between">
                     <label htmlFor="display_name" className="w-min"> {translateUI({lang: miscState.language, text: 'Name'})} </label>
-                    <input type="text" className="w-2/3 px-1" id="display_name" minLength={4} maxLength={12} placeholder="max 12 letters" required />
+                    <input type="text" className="w-2/3 px-1" id="display_name" minLength={4} maxLength={12} placeholder={translateUI({lang: miscState.language, text: 'max 12 letters'})} required />
                 </div>
                 {/* message */}
                 <ResultMessage id="result_register" />
@@ -91,7 +91,7 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
     // confirm password
     if(inputValues.password != inputValues.confirm_password) {
         resultMessage.classList.add('text-red-300')
-        resultMessage.textContent = 'confirm password doesnt match!'
+        resultMessage.textContent = translateUI({lang: miscState.language, text: 'confirm password doesnt match!'})
         return
     }
     // confirm password matched
@@ -105,10 +105,13 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
     const registerResponse: IResponse = await (await fetcher('/register', registerFetchOptions)).json()
     // response
     switch(registerResponse.status) {
-        // success
+        // success 
         case 201: 
             resultMessage.classList.add('text-green-400')
-            resultMessage.textContent = `✅ '${registerResponse.data[0].display_name}' registered!`
+            resultMessage.textContent = translateUI({
+                lang: miscState.language, 
+                text: '✅ xxx registered!'
+            }).replace('xxx', registerResponse.data[0].display_name)
             // submit button normal
             registerButton.textContent = tempButtonText
             registerButton.removeAttribute('disabled')

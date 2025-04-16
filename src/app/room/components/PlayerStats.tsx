@@ -47,10 +47,9 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         }}
                     </CldUploadWidget>
                     {/* logout */}
-                    {
-                    playerData.display_name == gameState.myPlayerInfo.display_name
+                    {playerData.display_name == gameState.myPlayerInfo.display_name
                         ? <form className="text-center mt-2" onSubmit={ev => userLogout(ev, miscState, gameState)}>
-                            <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75"> logout </button>
+                            <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75"> {translateUI({lang: miscState.language, text: 'Logout'})} </button>
                             <Link id="gotoHome" href={location.origin}></Link>
                         </form>
                         : null
@@ -60,7 +59,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                 <div className="lg:flex lg:flex-col lg:gap-4">
                     <div>
                         <p> {translateUI({lang: miscState.language, text: 'game count'})}: </p>
-                        <p className="text-green-400"> {playerData.game_played} games </p>
+                        <p className="text-green-400"> {playerData.game_played} {translateUI({lang: miscState.language, text: 'games'})} </p>
                     </div>
                     <div>
                         <p> {translateUI({lang: miscState.language, text: 'worst lost'})}: </p>
