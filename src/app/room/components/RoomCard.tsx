@@ -24,6 +24,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
     const getCurse = roomData.rules.match(/curse: \d{1,2}/)[0].split(': ')[1]
     const setCurseRange = +getCurse > 5 ? `5~${getCurse}%` : `${getCurse}%`
     const roomRules = roomData.rules
+    // split per rules
     const rule = {
         board: roomRules.match(/board: \w+/)[0].split(' ')[1],
         dice: roomRules.match(/dice: \d+/)[0].split(' ')[1],
@@ -32,9 +33,9 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
         mode: roomRules.match(/mode: \w+/)[0].split(' ')[1],
         curse: roomRules.match(/curse: \d{1,2}/)[0].split(' ')[1],
     }
-    const modifiedRules = roomRules.replace(/board: normal|twoway/, 'board: bbb').replace(/dice: \d+/, 'dice: ddd')
-                        .replace(/start: \d+/, 'start: sss').replace(/lose: -\d+/, 'lose: lll')
-                        .replace(/mode: \w+|\d_\w+/, 'mode: mmm').replace(/curse: \d{1,2}/, 'curse: ccc')
+    const modifiedRules = roomRules.replace(/board: (normal|twoway)/, 'board: bbb').replace(/dice: \d+/, 'dice: ddd')
+                                   .replace(/start: \d+/, 'start: sss').replace(/lose: -\d+/, 'lose: lll')
+                                   .replace(/mode: \w+|\d_\w+/, 'mode: mmm').replace(/curse: \d{1,2}/, 'curse: ccc')
     const translateRules = translateUI({lang: miscState.language, text: modifiedRules as any})
                         .replace('bbb', rule.board).replace('ddd', rule.dice)
                         .replace('sss', rule.start).replace('lll', rule.lose)

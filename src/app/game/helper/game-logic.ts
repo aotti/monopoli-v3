@@ -519,9 +519,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
         // check next pos (only for board twoway)
-        const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
-        const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
-        const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50 && checkDestinatedPos.length > 0
+        // const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
+        // const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
+        const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50 //&& checkDestinatedPos.length > 0
         // set destinated pos
         const destinatedPos = (currentPos + playerDice) === 24 
                         ? `24${checkNextPos ? 'x' : ''}`
@@ -1332,7 +1332,8 @@ function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], r
 }
 
 export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
-    if(!confirm('Only use if you have any city! Otherwise, the card will be used and do nothing.\nProceed to upgrade city?')) return
+    const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
+    if(!confirm(upgradeCityWarning)) return
     // roll dice button
     const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
     // sound effect

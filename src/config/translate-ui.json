@@ -267,6 +267,7 @@
         "if all players are ready, room creator have to click the \"start\" button": "kalo semua pemain sudah siap, pembuat ruangan harus klik tombol \"mulai\"",
         "Game Start": "Permainan Mulai",
         "Only buff & debuff area works on lap 1, other event starts on laps >= 2": "Hanya area buff & debuff yang bekerja di lap 1, sisanya di lap >= 2",
+        "Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?": "Hanya pakai jika anda punya kota! (bukan kota khusus) Kalau tidak, kartu akan terpakai tanpa efek.\nYakin mau renovasi?",
         "click roll turn": "klik putar angka",
         "Of course": "Ok gas",
         "Nope": "Tidac",

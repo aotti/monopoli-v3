@@ -1,6 +1,15 @@
 {
     "updates": [
         {
+            "version": "v3.07",
+            "date": "xxxxxxxx",
+            "changes": [
+                "fix some bugs",
+                "add rarity to chance & community cards",
+                "game translation 99%"
+            ]
+        },
+        {
             "version": "v3.06",
             "date": "13 Apr 2025",
             "changes": [
@@ -13,7 +22,7 @@
             "changes": [
                 "add new board",
                 "add notif on game start",
-                "fix small bugs"
+                "fix some bugs"
             ]
         },
         {
