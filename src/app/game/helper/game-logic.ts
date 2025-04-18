@@ -519,13 +519,13 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
         // check next pos (only for board twoway)
-        // const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
-        // const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
-        const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50 //&& checkDestinatedPos.length > 0
+        const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
+        const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
+        const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50
         // set destinated pos
         const destinatedPos = (currentPos + playerDice) === 24 
-                        ? `24${checkNextPos ? 'x' : ''}`
-                        : `${(currentPos + playerDice) % 24}${checkNextPos ? 'x' : ''}`
+                        ? `24${checkNextPos && checkDestinatedPos.length > 0 ? 'x' : ''}`
+                        : `${(currentPos + playerDice) % 24}${checkNextPos && checkDestinatedPos.length > 0 ? 'x' : ''}`
         // get prison data for checking prison status
         const prisonNumber = playerTurnData.prison
         // special card container
