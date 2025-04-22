@@ -225,7 +225,6 @@ export function filterInput(input: InputIDType, value: string) {
         case 'room_id': 
             return value ? value.match(/\d+/) : null
         case 'room_password':
-        case 'confirm_room_password': 
             const optionalPassword = value == '' || value === null || value.match(/^[a-zA-Z0-9\s.,#\-+@]{3,8}$/) ? true : false
             return optionalPassword
         case 'select_mode':

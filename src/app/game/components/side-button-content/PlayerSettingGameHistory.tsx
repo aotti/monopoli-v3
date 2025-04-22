@@ -20,12 +20,20 @@ export default function PlayerSettingGameHistory() {
             <div id="history_container" className="flex flex-col gap-2 w-full h-[47vh] overflow-y-scroll scrollbar-none p-1">
                 {gameState.gameHistory.map((v,i) => {
                     const myHistories = v.display_name == gameState.myPlayerInfo.display_name
+                    // split history
+                    const [historyTitle, historyContent] = v.history.split(':')
+                    // check if its buy city, chance, community history
+                    const checkHistoryContent = historyContent.match(/land|1house|2house|chance|community/) || ''
+                    // translate history
+                    const translateHistoryTitle = translateUI({lang: miscState.language, text: historyTitle as any}) || historyTitle
+                    const translateHistoryContent = translateUI({lang: miscState.language, text: historyContent.trim() as any}) || historyContent.trim()
+                    const finalizedHistoryContent = `${translateHistoryTitle} ${translateHistoryContent.replace(checkHistoryContent[0], translateUI({lang: miscState.language, text: checkHistoryContent[0] as any}))}`
 
                     return (
                         v.room_id != gameState.gameRoomId ? null 
                         : <div key={i} className={`${myHistories ? 'bg-primary/30' : ''} border-b-2 border-dashed`}>
                             <p className="text-green-400"> {v.display_name} </p>
-                            <p className="lg:text-[10px]"> {v.history.replace(':', '')} </p>
+                            <p className="lg:text-[10px]"> {finalizedHistoryContent} </p>
                         </div>
                     )
                 }

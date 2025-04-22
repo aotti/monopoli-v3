@@ -383,7 +383,6 @@ export interface IShiftRoom extends ITokenPayload {
     action?: 'room join'|'room leave',
     room_id: string,
     room_password: string,
-    confirm_room_password?: string,
     display_name: string,
     money_start: string,
     select_character: string,

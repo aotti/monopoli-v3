@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { clickInsideElement } from "../../../../helper/click-inside"
 import { useMisc } from "../../../../context/MiscContext"
 import { useGame } from "../../../../context/GameContext"
+import { translateUI } from "../../../../helper/helper"
 
 export default function GameNotif() {
     const miscState = useMisc()
@@ -17,7 +18,7 @@ export default function GameNotif() {
     })
     
     return (
-        <div ref={gameNotifRef} className={`relative z-10 top-1/3 flex-col gap-2 bg-darkblue-1 border-8bit-text w-2/5 leading-relaxed
+        <div ref={gameNotifRef} className={`relative z-10 top-1/3 flex-col gap-2 bg-darkblue-1 border-8bit-text w-2/4 lg:w-2/5 leading-relaxed
         ${gameState.showGameNotif ? 'flex' : 'hidden'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p id="result_notif_title" className="border-b-2 p-1"></p>
@@ -29,7 +30,10 @@ export default function GameNotif() {
                     {gameState.showGameNotif?.match('with_button') ? <GameNotifWithButtons /> : null}
                 </div>
             </div>
-            {!gameState.showGameNotif?.match('with_button') ? <span className="text-red-300"> click notif to dismiss </span> : null}
+            {!gameState.showGameNotif?.match('with_button') ? 
+                <span className="text-red-300">
+                    {translateUI({lang: miscState.language, text: 'click notif to dismiss'})}
+                </span> : null}
         </div>
     )
 }

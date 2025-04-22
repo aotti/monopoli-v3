@@ -1,6 +1,9 @@
 import { useState } from "react"
+import { translateUI } from "../../../helper/helper"
+import { useMisc } from "../../../context/MiscContext"
 
 export default function SelectCharacter({ disabledCharacters }: {disabledCharacters: string[]}) {
+    const miscState = useMisc()
     const [selectedChar, setSelectedChar] = useState<string>('circle')
     // characters
     const character = {
@@ -13,7 +16,7 @@ export default function SelectCharacter({ disabledCharacters }: {disabledCharact
 
     return (
         <div className="flex flex-col gap-2 text-center">
-            <p> select character </p>
+            <p> {translateUI({lang: miscState.language, text: 'select character'})} </p>
             <div className="grid grid-cols-3 gap-2">
                 {Object.entries(character).map(([key, val], i) => {
                     // check if the character is disabled
@@ -23,7 +26,9 @@ export default function SelectCharacter({ disabledCharacters }: {disabledCharact
                         <div key={i} className={isCharacterDisabled ? 'saturate-0' : ''}> 
                             <label htmlFor={`select_character_${key}`} className={`flex flex-col ${selectedChar == key ? 'bg-primary/60' : 'bg-darkblue-2'}`} onClick={() => setSelectedChar(key)}>
                                 <img src={val} alt={key} className="w-8 mx-auto" draggable={false} />
-                                <span className="text-2xs lg:text-xs"> {key} </span>
+                                <span className="text-2xs lg:text-xs"> 
+                                    {translateUI({lang: miscState.language, text: key as any})} 
+                                </span>
                             </label>
                             <input type="radio" className="hidden" id={`select_character_${key}`} name="select_character" value={val} />
                         </div>

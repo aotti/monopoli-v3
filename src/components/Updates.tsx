@@ -3,7 +3,7 @@ import change_logs from "../config/change-logs.json"
 import { qS } from "../helper/helper"
 
 export default function Updates() {
-    const currentVersion = 'v3.21'
+    const currentVersion = 'v3.07'
     // updates state
     const [showUpdates, setShowUpdates] = useState(false)
     const [showVersion, setShowVersion] = useState(null)

@@ -289,7 +289,6 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
         action: 'room join',
         room_id: roomId.toString(),
         room_password: null, // from player input
-        confirm_room_password: null, // from input value
         display_name: gameState.myPlayerInfo.display_name,
         money_start: null,
         select_character: null
@@ -304,7 +303,6 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
                 const moneyStart = input.value.match(/start: \d+/)[0].split(': ')[1]
                 inputValues.money_start = moneyStart
             }
-            else if(setInputValue('confirm_room_password', input)) inputValues.confirm_room_password = input.value.trim().toLowerCase()
             // skip other inputs
             else if(input.id.match(/room_id|room_name|room_password_\d+|player_count|player_max|creator|select_character/)) continue
             // error
@@ -326,15 +324,16 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
     inputValues.select_character = selectCharacter.value
     // matching password
     const roomPassword = qS(`#room_password_${inputValues.room_id}`) as HTMLInputElement
+    const getRoomInfo = gameState.roomList.map(v => v.room_id == roomId ? v : null).filter(i => i)[0]
+    const confirmRoomPassword = getRoomInfo.room_password
     // password doesnt match
-    if(roomPassword.value != '' && roomPassword.value != inputValues.confirm_room_password) {
+    if(roomPassword.value != '' && roomPassword.value != confirmRoomPassword) {
         gameState.setRoomError(inputValues.room_id)
         setTimeout(() => gameState.setRoomError(null), 2000);
         resultMessage.textContent = translateUI({lang: miscState.language, text: 'wrong password'})
         return
     }
     inputValues.room_password = roomPassword.value == '' ? null : roomPassword.value
-    delete inputValues.confirm_room_password
     // submit button loading
     const tempButtonText = joinButton.textContent
     joinButton.textContent = 'Loading'

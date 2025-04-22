@@ -552,8 +552,6 @@ export default class RoomController extends Controller {
                 return {player, worst_money}
             })
             // publish realtime data
-            // ### KIRIM DATA KE GAME ROOM & ROOM LIST UNTUK APDET WORST MONEY LOSE
-            // ### KIRIM DATA KE GAME ROOM & ROOM LIST UNTUK APDET WORST MONEY LOSE
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 roomOverId: data[0].room_id,

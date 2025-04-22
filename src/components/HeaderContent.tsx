@@ -23,7 +23,7 @@ export default function HeaderContent() {
             {/* title */}
             <span className="font-semibold text-base lg:text-xl"> Monopoli Lemao </span>
             {/* translate button */}
-            <div data-tooltip={miscState.language == 'english' ? '🇮🇩 indonesia' : '🇬🇧  inggris'} 
+            <div data-tooltip={miscState.language == 'english' ? '🇬🇧  inggris' : '🇮🇩 indonesia'} 
             className="absolute top-2 w-8 lg:w-10 right-4">
                 <button type="button" id="translate" className="active:opacity-75"
                 onClick={() => miscState.setLanguage(lang => {

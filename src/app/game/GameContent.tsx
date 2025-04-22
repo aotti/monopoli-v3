@@ -148,7 +148,9 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             return v.room_id === gameState.gameRoomId 
                                 ? v.board == 'normal'
                                     ? <BoardNormal key={i} /> 
-                                    : <BoardTwoway key={i} />
+                                    : miscState.showTutorial == 'tutorial_gameroom_2' 
+                                        ? <BoardNormal key={i} /> 
+                                        : <BoardTwoway key={i} />
                                 : null
                         })}
                     </>
