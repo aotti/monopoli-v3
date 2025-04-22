@@ -151,6 +151,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
         // show notif next player turn
         playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
+        // play player turn sound
+        if(getMessage.playerTurns[0] === gameState.myPlayerInfo.display_name) {
+            const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
+            soundPlayerTurn.play()
+        }
         // turn off notif for buttons
         if(gameState.showGameNotif?.match('with_button')) {
             miscState.setAnimation(false)

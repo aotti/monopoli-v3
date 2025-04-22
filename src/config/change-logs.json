@@ -2,10 +2,11 @@
     "updates": [
         {
             "version": "v3.07",
-            "date": "xxxxxxxx",
+            "date": "22 Apr 2025",
             "changes": [
                 "fix some bugs",
                 "add rarity to chance & community cards",
+                "add sound for player turn",
                 "game translation 99%"
             ]
         },

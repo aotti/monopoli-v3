@@ -268,7 +268,7 @@ export function chatMessageListener(data: PubNub.Subscription.Message, miscState
         }
         miscState.setMessageItems(data => [...data, chatData])
         // play notif sound
-        const soundMessageNotif = qS('#sound_message_notif') as HTMLAudioElement
+        const soundMessageNotif = qS('#sound_message') as HTMLAudioElement
         if(getMessage.display_name != gameState.myPlayerInfo.display_name) 
             soundMessageNotif.play()
     }

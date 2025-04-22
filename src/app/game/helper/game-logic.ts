@@ -678,7 +678,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         }
 
         async function turnEnd(eventData: EventDataType) {
-            playerTurnNotif.textContent = `${playerTurn} turn ending..`
+            playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn ending..'})
+                                        .replace('ppp', playerTurn)
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
             // check sub player dice
@@ -1217,6 +1218,10 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
             }
         }
     }
+    // CONFIRMATION TO SELL CITY
+    const sellCityWarning = translateUI({lang: miscState.language, text: 'Do you really wanna sell ccc city?'})
+                            .replace('ccc', inputValues.sell_city_name)
+    if(!confirm(sellCityWarning)) return false
     // loading button
     const tempButtonText = sellButton.textContent
     sellButton.textContent = 'Loading'
@@ -1853,9 +1858,6 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                 }, 2000)
             }
             else if(type == 'sell city') {
-                // set additional event data for history (only for moving cards, upgrade/sell city, take card)
-                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
                 // notif message
                 notifTimer.textContent = 'getting city data..'
                 // show notif
@@ -1883,7 +1885,8 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                     sellCityTimer--
                     if(sellCityTimer < 0) {
                         clearInterval(sellCityInterval)
-                        notifTimer.textContent = `${chosenSellCity} city sold`
+                        notifTimer.textContent = translateUI({lang: miscState.language, text: 'ccc city sold'})
+                                                .replace('ccc', chosenSellCity)
                         // selling city
                         const cityLeft = updateCityList({
                             action: 'sell', 
