@@ -23,6 +23,15 @@ export default class GameController extends Controller {
         }
     }
 
+    async getLogs(action: string, payload: IGamePlay['get_players']) {
+        const getGameLog = await this.redisGet(`gameLog_${payload.room_id}`)
+        return {
+            status: 200,
+            message: `${action} for room ${payload.room_id}`,
+            data: getGameLog
+        }
+    }
+
     async getPlayers(action: string, payload: IGamePlay['get_players']) {
         let result: IResponse
         
@@ -342,6 +351,8 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        // get room id
+        const roomId = payload.channel.match(/\d+/)[0]
         // check taxes
         const isTaxes = payload.tax_owner && payload.tax_visitor
         const taxes = isTaxes ? {
@@ -374,6 +385,9 @@ export default class GameController extends Controller {
                 tmp_debuff: payload.debuff,
             }
         }
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, queryObject.function_args])
         // run query
         const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
         if(error) {
@@ -387,7 +401,6 @@ export default class GameController extends Controller {
             }
             delete (newPlayerTurnEndData as any).player_character
             // update game history (buy city, get cards, etc)
-            const roomId = payload.channel.match(/\d+/)[0]
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
             // fill game history
             const gameHistory: IGameContext['gameHistory'] = []

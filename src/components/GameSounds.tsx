@@ -16,7 +16,7 @@ export default function GameSounds() {
 
     return (
         <div>
-            {Object.entries(sounds).map(([key, value], i) => <audio id={`sound_${key}`} src={value}></audio>)}
+            {Object.entries(sounds).map(([key, value], i) => <audio key={key} id={`sound_${key}`} src={value}></audio>)}
         </div>
     )
 }

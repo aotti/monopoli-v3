@@ -79,7 +79,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
         notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
-        notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps >= 2'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
     }
     // roll dice
     if(getMessage.playerTurn && typeof getMessage.playerDice == 'number') {

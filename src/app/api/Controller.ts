@@ -316,7 +316,7 @@ export default class Controller {
     }
 
     /**
-     * @param payload embedded access token to payload in route
+     * @param payload payload with access token key
      * @description verify access / refresh token
      * @returns verified token & get payload | error if no refresh token
      */

@@ -1770,6 +1770,15 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                         gameState.setShowGameNotif(null)
                         // move to chosen place
                         playerMoving(rollDiceData, miscState, gameState)
+                        // resolve only for multiple effect
+                        if(separator == 'AND') {
+                            return resolve({
+                                event: 'get_card',
+                                type: type,
+                                tileName: tileName,
+                                money: 0
+                            })
+                        }
                     }
                     // check if button created
                     const movePlaceButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>

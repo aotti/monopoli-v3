@@ -1,6 +1,5 @@
 import PubNub from "pubnub"
 import { IChat, IGameContext, IMiscContext, RoomListListener } from "../../../helper/types"
-import { qS } from "../../../helper/helper"
 
 export function roomMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & RoomListListener
