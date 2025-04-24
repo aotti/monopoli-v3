@@ -487,6 +487,7 @@ interface IEventPayTax {
 
 interface IEventCards {
     event: 'get_card',
+    rank: string,
     type: string,
     tileName: string,
     money: number,

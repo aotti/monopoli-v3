@@ -836,7 +836,7 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
             historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
             return historyArray.join(';')
         case 'get_card': 
-            historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName})`)
+            historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName} ${eventData.rank})`)
             return historyArray.join(';')
         case 'get_arrested': 
             historyArray.push(`${eventData.event}: lemao 😂`)
@@ -1386,6 +1386,7 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
                 // run card effect
                 const cardData = {
                     tileName: card,
+                    rank: cards.category.split('_')[0],
                     effectData: cards.data[cardRNG].effect
                 }
                 // get event data
@@ -1399,11 +1400,11 @@ function stopByCards(card: 'chance'|'community', findPlayer: number, rng: string
     })
 }
 
-function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
+function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, findPlayer: number, rng: string[], miscState: IMiscContext, gameState: IGameContext) {
     // notif timer
     const notifTimer = qS('#result_notif_timer')
     // ### rank will be used for rarity border
-    const {tileName, effectData} = cardData
+    const {tileName, rank, effectData} = cardData
     // current player data (walking)
     const playerTurnData = gameState.gamePlayerInfo[findPlayer]
 
@@ -1416,6 +1417,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
             // combine container
             const eventDataCombined: EventDataType = {
                 event: 'get_card',
+                rank: rank,
                 type: '',
                 tileName: tileName,
                 money: 0
@@ -1597,6 +1599,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                                 // return event data
                                 resolve({
                                     event: 'get_card',
+                                    rank: rank,
                                     type: type,
                                     tileName: tileName,
                                     money: +effect * coinPrizes[0]
@@ -1622,6 +1625,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                                         // return event data
                                         resolve({
                                             event: 'get_card',
+                                            rank: rank,
                                             type: type,
                                             tileName: tileName,
                                             money: +effect * coinPrizes[i]
@@ -1644,6 +1648,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                         const moreMoney = (playerTurnData.money + +effect) * +getMoreMoney
                         return resolve({
                             event: 'get_card',
+                            rank: rank,
                             type: type,
                             tileName: tileName,
                             money: playerTurnData.money + moreMoney
@@ -1652,6 +1657,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                     // return event data
                     resolve({
                         event: 'get_card',
+                        rank: rank,
                         type: type,
                         tileName: tileName,
                         money: +effect
@@ -1667,6 +1673,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                 localStorage.setItem('moreMoney', `${isPercent}`)
                 resolve({
                     event: 'get_card',
+                    rank: rank,
                     type: type,
                     tileName: tileName,
                     money: 0
@@ -1681,12 +1688,14 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                 resolve(isEffectPercent
                     ? {
                         event: 'get_card',
+                        rank: rank,
                         type: type,
                         tileName: tileName,
                         money: -(playerTurnData.money * +effect.split('%')[0] / 100)
                     } 
                     : {
                         event: 'get_card',
+                        rank: rank,
                         type: type,
                         tileName: tileName,
                         money: -effect.split('%')[0]
@@ -1701,6 +1710,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                 const otherPlayerNames = gameState.gamePlayerInfo.map(v => v.display_name).join(',')
                 resolve({
                     event: 'get_card',
+                    rank: rank,
                     type: type,
                     tileName: tileName,
                     money: +effect,
@@ -1774,6 +1784,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                         if(separator == 'AND') {
                             return resolve({
                                 event: 'get_card',
+                                rank: rank,
                                 type: type,
                                 tileName: tileName,
                                 money: 0
@@ -1859,6 +1870,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                     notifTimer.textContent = 'smh my head, homeless'
                     resolve({
                         event: 'get_card',
+                        rank: rank,
                         type: type,
                         tileName: tileName,
                         money: 0,
@@ -1880,6 +1892,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                         notifTimer.textContent = 'can you buy a city pls?'
                         return resolve({
                             event: 'get_card',
+                            rank: rank,
                             type: type,
                             tileName: tileName,
                             money: 0
@@ -1910,6 +1923,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                         // return event data
                         resolve({
                             event: 'get_card',
+                            rank: rank,
                             type: type,
                             tileName: tileName,
                             money: +cityPrice,
@@ -1958,6 +1972,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                 // return event data
                 resolve({
                     event: 'get_card',
+                    rank: rank,
                     tileName: tileName,
                     type: type,
                     money: 0,
@@ -1986,6 +2001,7 @@ function cardEffects(cardData: Record<'tileName'|'effectData', string>, findPlay
                 gameState.setShowGameNotif('card')
                 resolve({
                     event: 'get_card',
+                    rank: rank,
                     type: type,
                     tileName: tileName,
                     money: 0,

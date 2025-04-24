@@ -269,7 +269,7 @@ export function filterInput(input: InputIDType, value: string) {
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
-                'get_card: .* \\(chance\\)|get_card: .* \\(community\\)',
+                'get_card: .* \\(chance \\w\\)|get_card: .* \\(community \\w\\)',
                 'get_arrested: lemao 😂',
                 'parking: tile \\d+ 😎',
                 'cursed: .* 💀',
