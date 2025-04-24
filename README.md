@@ -1,5 +1,5 @@
 # monopoli v3
-rework game monopoli menggunakan NextJS, Pubnub dan Tailwind
+rework game monopoli menggunakan NextJS, Tailwind, Pubnub(websocket), Supabase(postgresql)
 
 #### Design UI
 *orang gk bisa design* 😎
