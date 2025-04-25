@@ -1731,7 +1731,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                 gameState.setShowGameNotif('card')
                 // set additional event data for history (only for moving cards, upgrade, take card)
                 if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // set dice number
                 const diceNumber = type == 'move forward' ? +effect : -effect
                 const rollDiceData = {
@@ -1745,7 +1745,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
             else if(type == 'move place') {
                 // set additional event data for history (only for moving cards, upgrade, take card, optional effect)
                 if(separator != 'AND' && playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // get tile data (tile number)
                 const getTileList = getMovePlaceTiles(effect, separator)
                 // if tile data empty, just resolve
@@ -1860,7 +1860,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                         // set additional event data for history (only for moving cards, upgrade, take card)
                         // only add sub event data if player have any city
                         if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-                            localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                            localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                         // hide timer
                         notifTimer.textContent = ''
                         // filter fully upgrade city
@@ -1990,7 +1990,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
             else if(type == 'take card') {
                 // set additional event data for history (only for moving cards, upgrade, take card)
                 if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName})`)
+                    localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
