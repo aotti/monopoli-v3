@@ -73,7 +73,7 @@
                     "effect": "lose money_20000"
                 },
                 {
-                    "description": "Due to the small amount of aid, you only get a fortune block card",
+                    "description": "Due to the small amount of aid from the government, you only get a fortune block card",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
                     "effect": "special card_fortune block"
                 },

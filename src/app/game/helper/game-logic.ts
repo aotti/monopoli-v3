@@ -1146,11 +1146,15 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
 
         async function payingTaxes() {
             // check debuff
+            console.log('paying tax, checking buff debuff');
+            
             const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
                 {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
                 findPlayer, miscState, gameState
             ) as [string, number];
             // check if special card exist
+            console.log('paying tax, checking special card');
+            
             const [specialCard, specialEffect] = await useSpecialCard(
                 {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
             ) as [string, number];
@@ -1158,6 +1162,8 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
             const taxPrice = specialCard.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
             // set event data (for history)
+            console.log('paying tax, set tax price', taxPrice);
+            
             const eventData: EventDataType = {
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
@@ -1166,6 +1172,8 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 card: specialCard,
                 debuff: buffDebuff
             }
+            console.log('paying tax, done');
+            
             // return event history
             return eventData
         }

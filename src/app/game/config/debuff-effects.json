@@ -22,7 +22,7 @@
             "chance": [16, 25],
             "data": [
                 {
-                    "description": "Go to cursed city/prison",
+                    "description": "Go to cursed city/prison (random)",
                     "effect": "random-move place_cursed|move place_prison"
                 }
             ]
