@@ -760,6 +760,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             localStorage.removeItem('parkingEventData')
             localStorage.removeItem('specialCardUsed')
             localStorage.removeItem('buffDebuffUsed')
+            localStorage.removeItem('moreMoney')
             // fetch
             const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
             const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
@@ -1146,24 +1147,18 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
 
         async function payingTaxes() {
             // check debuff
-            console.log('paying tax, checking buff debuff');
-            
             const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
                 {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
                 findPlayer, miscState, gameState
             ) as [string, number];
             // check if special card exist
-            console.log('paying tax, checking special card');
-            
             const [specialCard, specialEffect] = await useSpecialCard(
                 {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
             ) as [string, number];
             // set tax price
-            const taxPrice = specialCard.match('anti tax') ? 0 
+            const taxPrice = specialCard?.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
             // set event data (for history)
-            console.log('paying tax, set tax price', taxPrice);
-            
             const eventData: EventDataType = {
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
@@ -1659,7 +1654,7 @@ function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', string>, f
                             rank: rank,
                             type: type,
                             tileName: tileName,
-                            money: playerTurnData.money + moreMoney
+                            money: +effect + moreMoney
                         })
                     }
                     // return event data
@@ -2226,6 +2221,7 @@ function useSpecialCard(data: SpecialCardEventType, findPlayer: number, miscStat
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
+            // ### KEMUNGKINAN ERROR DISINI
             const specialCard = splitSpecialCard?.map(v => v.match(/anti tax|nerf tax/i)).flat().filter(i=>i) || []
             // match special card
             for(let sc of specialCard) {

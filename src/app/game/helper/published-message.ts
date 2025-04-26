@@ -49,7 +49,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     // ready
     if(getMessage.readyPlayers) {
         // set players ready text
-        playerTurnNotif.textContent = `${getMessage.readyPlayers.length} player(s) ready`
+        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp player(s) ready'})
+                                    .replace('ppp', getMessage.readyPlayers.length.toString())
         // if > 2 players ready, set notif
         if(getMessage.readyPlayers.length >= 2) {
             // show notif

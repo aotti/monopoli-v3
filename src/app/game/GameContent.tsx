@@ -62,6 +62,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         localStorage.removeItem('parkingEventData')
         localStorage.removeItem('specialCardUsed')
         localStorage.removeItem('buffDebuffUsed')
+        localStorage.removeItem('moreMoney')
         localStorage.removeItem('playerTurns')
 
         // set player turn
