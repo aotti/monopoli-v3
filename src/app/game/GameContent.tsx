@@ -72,7 +72,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             const playerTurnNotif = qS('#player_turn_notif')
             
             if(playerTurnNotif && parsedPlayerTurns?.length > 1) {
-                playerTurnNotif.textContent = `${parsedPlayerTurns[0]} turn`
+                playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                            .replace('ppp', parsedPlayerTurns[0])
             }
         }
         document.body.tabIndex = 0

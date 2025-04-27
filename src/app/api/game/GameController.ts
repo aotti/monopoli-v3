@@ -10,7 +10,7 @@ export default class GameController extends Controller {
         // token payload data
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent, action)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)

@@ -51,8 +51,6 @@ export default class RoomController extends Controller {
     }
 
     async getRooms(action: string, payload: ICreateRoom['input']) {
-        console.log(action);
-        
         let result: IResponse
 
         // get token payload
@@ -277,7 +275,7 @@ export default class RoomController extends Controller {
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent, action)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
@@ -313,7 +311,7 @@ export default class RoomController extends Controller {
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
-                joinedPlayers: data[0].player_count,
+                playerCount: data[0].player_count,
                 joinedRoomId: data[0].room_id,
                 disabledCharacters: [...getDisabledCharacters, payload.select_character],
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
@@ -395,11 +393,17 @@ export default class RoomController extends Controller {
             // remove from ready players
             const getReadyPlayers = await this.redisGet(`readyPlayers_${payload.room_id}`)
             await this.redisSet(`readyPlayers_${payload.room_id}`, getReadyPlayers.filter(v => v != payload.display_name))
+            // remove chosen character
+            const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
+            const removeChosenCharacter = getDisabledCharacters.filter(char => char != payload.select_character)
+            await this.redisSet(`disabledCharacters_${payload.room_id}`, removeChosenCharacter)
             // publish online players
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 onlinePlayers: JSON.stringify(onlinePlayers.data),
-                leavePlayer: payload.display_name
+                leavePlayer: payload.display_name,
+                leaveRoomId: +payload.room_id,
+                playerCount: removeChosenCharacter.length,
             }
             const isPublished = await this.monopoliPublish(roomlistChannel, publishData)
             console.log(isPublished);
@@ -411,10 +415,6 @@ export default class RoomController extends Controller {
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-            // remove chosen character
-            const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
-            const removeChosenCharacter = getDisabledCharacters.filter(char => char != payload.select_character)
-            await this.redisSet(`disabledCharacters_${payload.room_id}`, removeChosenCharacter)
             // remove joined room cookie
             cookies().set('joinedRoom', '', {
                 path: '/',

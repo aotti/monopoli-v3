@@ -36,8 +36,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // show notif
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
-        notifTitle.textContent = 'Room Deleted'
-        notifMessage.textContent = 'this room has been deleted, redirect to room list'
+        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Room Deleted'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'this room has been deleted, redirect to room list..'})
         // redirect to room list
         setTimeout(() => {
             // set notif to null

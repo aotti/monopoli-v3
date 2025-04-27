@@ -13,8 +13,10 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
     const isUploadAllowed = playerData.display_name == gameState.myPlayerInfo.display_name ? true : false
     // set my player status
     const getMyData = onlinePlayers.length > 0 ? onlinePlayers.map(v => v.display_name).indexOf(playerData.display_name) : -1
-    const isMeOnline = getMyData === -1 
+    const isPlayerOnline = getMyData === -1 
+                    // token expired, assume afk/offline
                     ? translateUI({lang: miscState.language, text: 'away'}) 
+                    // token active, assume online
                     : translateUI({lang: miscState.language, text: onlinePlayers[getMyData].status})
 
     return (
@@ -67,7 +69,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                     </div>
                     <div>
                         <p> status: </p>
-                        <p className="text-green-400"> {isMeOnline} </p>
+                        <p className="text-green-400"> {isPlayerOnline} </p>
                     </div>
                 </div>
             </div>

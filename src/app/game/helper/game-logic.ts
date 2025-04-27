@@ -1167,8 +1167,6 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                 card: specialCard,
                 debuff: buffDebuff
             }
-            console.log('paying tax, done');
-            
             // return event history
             return eventData
         }

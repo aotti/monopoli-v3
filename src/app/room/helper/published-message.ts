@@ -22,10 +22,10 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setRoomList(rooms => {
             const updatedRooms = [...rooms]
             // find joined room
-            const findJoined = rooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
+            const findJoined = updatedRooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
             if(findJoined !== -1) {
                 // update player count
-                updatedRooms[findJoined].player_count = getMessage.joinedPlayers
+                updatedRooms[findJoined].player_count = getMessage.playerCount
                 // update disabled characters
                 updatedRooms[findJoined].characters = getMessage.disabledCharacters
             }
@@ -35,12 +35,17 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // player leave
     if(getMessage.leavePlayer) {
-        gameState.setGamePlayerInfo(players => {
-            const playersLeft = [...players]
-            // remove player
-            const findLeavePlayer = playersLeft.map(v => v.display_name).indexOf(getMessage.leavePlayer)
-            playersLeft.splice(findLeavePlayer, 1)
-            return playersLeft
+        // update room list
+        gameState.setRoomList(rooms => {
+            const updatedRooms = [...rooms]
+            // find joined room
+            const findJoined = updatedRooms.map(v => v.room_id).indexOf(getMessage.leaveRoomId)
+            if(findJoined !== -1) {
+                // update player count
+                updatedRooms[findJoined].player_count = getMessage.playerCount
+            }
+            // return rooms
+            return updatedRooms
         })
     }
     // room deleted

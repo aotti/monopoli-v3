@@ -30,7 +30,7 @@
         "games": "permainan",
         "game count": "total main",
         "worst lost": "terburuk",
-        "online": "online",
+        "online": "menyala",
         "playing": "bermain",
         "away": "pergi",
         "Room List": "Daftar Ruang",
@@ -295,6 +295,8 @@
         "\"buff pick rarity\"": "\"buff pilih kelangkaan\"",
         "\"ccc city collapse\"": "\"kota ccc roboh\"",
         "\"go get a house, homeless\"": "\"beli rumah lah, miskin\"",
+        "Room Deleted": "Ruang Terhapus",
+        "this room has been deleted, redirect to room list..": "ruangan ini sudah dihapus, kembali ke daftar ruang..",
         "Game Over": "Permainan Selesai",
         "ppp has won the game!\nback to room list in 15 seconds": "ppp menjadi pemenangnya!\nkembali ke daftar ruang dalam 15 detik",
 
