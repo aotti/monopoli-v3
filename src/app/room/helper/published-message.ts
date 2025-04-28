@@ -72,8 +72,6 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.roomOverId) {
-        // remove city owned list
-        localStorage.removeItem('cityOwnedList')
         // update room list
         gameState.setRoomList(rooms => {
             const newRoomList = [...rooms]
@@ -83,19 +81,6 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
             // delete room
             newRoomList.splice(findRoom, 1)
             return newRoomList
-        })
-        // update worst money
-        gameState.setMyPlayerInfo(player => {
-            const newPlayerInfo = {...player}
-            getMessage.gameOverPlayers.forEach(v => {
-                if(newPlayerInfo.display_name == v.player) {
-                    newPlayerInfo.worst_money_lost = v.worst_money === -999999 
-                                                    ? newPlayerInfo.worst_money_lost 
-                                                    : v.worst_money
-                    newPlayerInfo.game_played += 1
-                }
-            })
-            return newPlayerInfo
         })
     }
 }

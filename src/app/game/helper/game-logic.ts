@@ -706,7 +706,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             ) as [string, number] : [null, null];
             // add debuff reduce money & set notif message
             debuffCollection.push(buffDebuff)
-            notifMessage.textContent += buffDebuff ? translateUI({lang: miscState.language, text: '"debuff reduce money"'}) : ''
+            notifMessage.textContent += buffDebuff ? `\n${translateUI({lang: miscState.language, text: '"debuff reduce money"'})}` : ''
             // get buff/debuff event data
             if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
             if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
@@ -893,7 +893,7 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
                 gotoRoom ? gotoRoom.click() : null
             }, 15_000)
             // run game over
-            return gameOver(miscState, gameState)
+            return gameOver(playersData, miscState, gameState)
         }
     }
     else if(gameMode.match(/laps/i)) {
@@ -915,7 +915,7 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
                     const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
                     gotoRoom ? gotoRoom.click() : null
                 }, 15_000)
-                return gameOver(miscState, gameState)
+                return gameOver(playersData, miscState, gameState)
             }
         }
     }
@@ -923,7 +923,7 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
 
 // ========== # GAME OVER ==========
 // ========== # GAME OVER ==========
-async function gameOver(miscState: IMiscContext, gameState: IGameContext) {
+async function gameOver(playersData: IGameContext['gamePlayerInfo'], miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -931,11 +931,11 @@ async function gameOver(miscState: IMiscContext, gameState: IGameContext) {
     const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
     // data for update all player stats
     const allPlayerStats = []
-    for(let player of gameState.gamePlayerInfo) {
+    for(let pd of playersData) {
         // player with plus money set to -999_999 to prevent updating worst money lose
-        if(player.money > 0) allPlayerStats.push(`${player.display_name},${-999999}`)
+        if(pd.money > 0) allPlayerStats.push(`${pd.display_name},${-999999}`)
         // player with minus money will update worst money lose
-        else allPlayerStats.push(`${player.display_name},${player.money}`)
+        else allPlayerStats.push(`${pd.display_name},${pd.money}`)
     }
     // input value container
     const inputValues = {
@@ -1082,7 +1082,7 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                     ofcourseButton.classList.add('hidden')
                     nopeButton.classList.add('hidden')
                     // is money enough
-                    const isMoneyEnough = playerTurnData.money > buyCityPriceFixed
+                    const isMoneyEnough = playerTurnData.money >= buyCityPriceFixed
                     if(!isMoneyEnough) {
                         notifTimer.textContent = 'smh my head, you poor'
                         // set event data (for history)
@@ -1113,7 +1113,8 @@ function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileElement:
                         city: buyingCity,
                         name: buyCityName,
                         property: buyCityProperty == '2house1hotel' ? '1hotel' : buyCityProperty,
-                        money: -buyCityPriceFixed
+                        money: -buyCityPriceFixed,
+                        buff: buffDebuff
                     }
                     // return event data
                     return resolve(eventData)

@@ -461,6 +461,7 @@ interface IEventBuyCity_Yes {
     name: string,
     property: string,
     money: number,
+    buff?: string,
 }
 interface IEventBuyCity_No {
     event: 'buy_city'

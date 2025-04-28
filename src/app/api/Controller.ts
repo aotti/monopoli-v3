@@ -77,9 +77,7 @@ export default class Controller {
 
     protected async redisReset(key: string) {
         // reset existing data
-        const resetResult = await redisClient.del(key)
-        console.log(resetResult);
-        
+        await redisClient.del(key)
     }
 
     protected filterPayload<T>(action: string, payload: T) {

@@ -196,6 +196,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
+        console.log('game over',getMessage.gameOverPlayers);
+        
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player == gameState.myPlayerInfo.display_name) {
