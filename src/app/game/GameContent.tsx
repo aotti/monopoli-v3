@@ -17,7 +17,7 @@ import TutorialGameRoom from "./components/other/TutorialGameRoom"
 import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
-import { getPlayerInfo } from "./helper/game-logic"
+import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
 import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
 

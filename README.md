@@ -41,3 +41,5 @@ rework game monopoli yang hasilnya ngebug doang 💀
 
 - game room
 <img src="https://github.com/aotti/monopoli-v3/blob/main/docs/design/monopoli-gameroom.jpg" width="70%" height="70%">
+
+readme by @Ni-zav

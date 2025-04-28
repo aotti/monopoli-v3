@@ -1,7 +1,7 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
-import { checkGameProgress, playerMoving } from "./game-logic"
+import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
