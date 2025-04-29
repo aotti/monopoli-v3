@@ -504,6 +504,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // find current room info
         const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
         const boardType = gameState.gameRoomInfo[findRoomInfo].board
+        const loseCondition = gameState.gameRoomInfo[findRoomInfo].money_lose
         // find current player
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(playerTurn)
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
@@ -726,8 +727,10 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // 1 dice = 6, 2 dice = 12
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
+            // check if player is losing
+            const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (buffDebuffEffect || 0)))
             // input values container
-            const inputValues: IGamePlay['turn_end'] | {action: string} = {
+            const inputValues: IGamePlay['turn_end'] & {action: string} = {
                 action: 'game turn end',
                 channel: `monopoli-gameroom-${gameState.gameRoomId}`,
                 display_name: playerTurnData.display_name,
@@ -747,6 +750,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 card: specialCardLeft,
                 buff: buffLeft,
                 debuff: debuffLeft,
+                // player losing status
+                is_lose: playerTurnEndMoney < loseCondition,
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate
@@ -774,6 +779,16 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     localStorage.setItem('playerTurns', JSON.stringify(playerTurnEndResponse.data[0].playerTurns))
                     // reset disable buttons
                     miscState.setDisableButtons(null)
+                    // set temp player info (if losing)
+                    if(inputValues.is_lose) {
+                        const newPlayerInfo = gameState.myPlayerInfo
+                        newPlayerInfo.game_played += 1
+                        newPlayerInfo.worst_money_lost = playerTurnEndMoney < newPlayerInfo.worst_money_lost
+                                                        ? playerTurnEndMoney 
+                                                        : newPlayerInfo.worst_money_lost
+                        // save to local storage
+                        localStorage.setItem('playerData', JSON.stringify(newPlayerInfo))
+                    }
                     return
                 default: 
                     // show notif

@@ -425,10 +425,10 @@ export default class GameController extends Controller {
                 // player is playing in this game
                 // now check if it exist in player turns (walking player should not exist)
                 if(getPlayerTurns.indexOf(payload.display_name) === -1) {
-                    // player doesnt exist, now modify player turns
+                    // player doesnt exist, now remove empty player turns
                     getPlayerTurns.splice(0, 1)
-                    // push player
-                    getPlayerTurns.push(payload.display_name)
+                    // check is player losing, if lose then dont push the player
+                    payload.is_lose ? null : getPlayerTurns.push(payload.display_name)
                     await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
                 }
             }
