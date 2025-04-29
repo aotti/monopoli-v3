@@ -378,7 +378,7 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
                 // set additional event data for history (only for moving cards, upgrade, take card)
-                if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+                if(separator != 'AND' && playerTurnData.display_name == gameState.myPlayerInfo.display_name)
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // set dice number
                 const diceNumber = type == 'move forward' ? +effect : -effect
@@ -389,6 +389,16 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                 }
                 // move player
                 playerMoving(rollDiceData, miscState, gameState)
+                // resolve only for multiple effect
+                if(separator == 'AND') {
+                    return resolve({
+                        event: 'get_card',
+                        rank: rank,
+                        type: type,
+                        tileName: tileName,
+                        money: 0
+                    })
+                }
             }
             else if(type == 'move place') {
                 // set additional event data for history (only for moving cards, upgrade, take card, optional effect)
