@@ -1,6 +1,6 @@
 import { IGameContext } from "../../../../helper/types"
 
-export default function Characters({ playerData }: {playerData: IGameContext['gamePlayerInfo'][0]}) {
+export default function Character({ playerData }: {playerData: IGameContext['gamePlayerInfo'][0]}) {
     // match player in city owned list
     const cityOwned = playerData.city?.split(';').length || 0
     const cityOwnedTooltip = `city: ${cityOwned}`

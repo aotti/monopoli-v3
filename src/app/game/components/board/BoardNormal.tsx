@@ -3,9 +3,8 @@ import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import board_normal from '../../config/board-normal.json'
-import { IGameContext } from "../../../../helper/types"
 import Image from "next/image"
-import Characters from "./Characters"
+import Character from "./Character"
 
 export default function BoardNormal() {
     const gameState = useGame()
@@ -168,7 +167,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
-                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Characters key={i} playerData={player}/> : null)}
+                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
                 {/* tile broken */}
@@ -215,7 +214,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
-                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Characters key={i} playerData={player}/> : null)}
+                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
