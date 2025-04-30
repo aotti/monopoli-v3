@@ -346,13 +346,17 @@ export default class GameController extends Controller {
     async turnEnd(action: string, payload: IGamePlay['turn_end']) {
         let result: IResponse
         
+        // get room id
+        const roomId = payload.channel.match(/\d+/)[0]
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
+        // filter payload
         const filtering = await this.filters(action, payload)
         if(filtering.status !== 200) return filtering
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
-        // get room id
-        const roomId = payload.channel.match(/\d+/)[0]
         // check taxes
         const isTaxes = payload.tax_owner && payload.tax_visitor
         const taxes = isTaxes ? {
@@ -385,9 +389,6 @@ export default class GameController extends Controller {
                 tmp_debuff: payload.debuff,
             }
         }
-        // log query args to redis
-        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
-        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, queryObject.function_args])
         // run query
         const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
         if(error) {

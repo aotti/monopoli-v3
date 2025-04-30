@@ -304,7 +304,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            20, 
             branchRNG[0]
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -729,6 +729,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // check if player is losing
             const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (buffDebuffEffect || 0)))
+            const playerTurnEndLose = playerTurnEndMoney < loseCondition
             // input values container
             const inputValues: IGamePlay['turn_end'] & {action: string} = {
                 action: 'game turn end',
@@ -742,16 +743,17 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // money from event that occured
                 event_money: (eventMoney - (buffDebuffEffect || 0)).toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
-                history: setEventHistory(`rolled_dice: ${subPlayerDice || playerDice}`, eventData),
+                // Math.abs to prevent move backward event cuz dice number gonna be minus
+                history: setEventHistory(`rolled_dice: ${subPlayerDice || Math.abs(playerDice)}`, eventData),
                 // nullable data: city, card, taxes, take money, buff, debuff
-                city: (eventData as any)?.city || playerTurnData.city,
+                city: playerTurnEndLose ? null : (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
                 card: specialCardLeft,
                 buff: buffLeft,
                 debuff: debuffLeft,
                 // player losing status
-                is_lose: playerTurnEndMoney < loseCondition,
+                is_lose: playerTurnEndLose,
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate

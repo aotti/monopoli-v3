@@ -28,7 +28,7 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                                 : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
             if(pickRarityRNG) {
-                const cardRNG = +rng[0] % cards.data.length
+                const cardRNG = 0
                 // notif content
                 // ### BELUM ADA CARD BORDER RANK
                 notifTitle.textContent = card == 'chance' 

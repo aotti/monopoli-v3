@@ -39,7 +39,7 @@
                 {
                     "description": "You take 1 step back when being chased by debt collectors, then get caught and pay 30%",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png",
-                    "effect": "move backward_1&lose money_60000"
+                    "effect": "lose money_60000&move backward_1"
                 },
                 {
                     "description": "Pay the hospital 50.000",
