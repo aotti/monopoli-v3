@@ -18,7 +18,7 @@
                 {
                     "description": "You are caught red-handed in corruption, go to jail & fined 90% of the total money",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_A-PqkByzOifuXooKWUliXPdxR4kfDBI9.png",
-                    "effect": "move place_prison&lose money_90%"
+                    "effect": "lose money_90%&move place_prison"
                 },
                 {
                     "description": "Your police neighbor gives you an anti jail card as a Christmas present",
@@ -37,7 +37,7 @@
             "chance": [8, 22],
             "data": [
                 {
-                    "description": "It's halloween day, you head to someone else's city (random)",
+                    "description": "Head to someone else's city (random)",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "random-move place_other city"
                 },
@@ -57,7 +57,7 @@
                     "effect": "move backward_1"
                 },
                 {
-                    "description": "Due to number of vehicles in Indonesia is >160 million, players are given nerf parking card so they dont travel often",
+                    "description": "Due to number of vehicles in Indonesia is more than 160 million, players are given nerf parking card so they dont travel often",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png",
                     "effect": "special card_parking nerf"
                 }

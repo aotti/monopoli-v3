@@ -1,7 +1,7 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { moneyFormat, qSA, translateUI } from "../../../../helper/helper"
-import { handleUpgradeCity, sellCity } from "../../helper/game-tile-event-city-logic"
+import { moneyFormat, qS, qSA, translateUI } from "../../../../helper/helper"
+import { handleUpgradeCity, sellCity } from "../../helper/game-logic"
 
 export default function PlayerSettingSellCity() {
     const miscState = useMisc()

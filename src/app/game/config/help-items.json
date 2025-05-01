@@ -7,7 +7,7 @@
         ],
         "25%": [
             "Gilang the hacker hacks your bank account and loses 20.000",
-            "Due to the small amount of aid from the government, you only get a fortune block card",
+            "Due to the small amount of aid, you only get a fortune block card",
             "Your car is broken, pay 35.000 repair costs",
             "You pick up the tax nerf card that Gilang dropped",
             "You get 20.000 times the number on the selected coin"
@@ -40,9 +40,9 @@
             "Upgrade 1 owned city (random)"
         ],
         "15%": [
-            "It's halloween day, you head to someone else's city (random)",
+            "Head to someone else's city (random)",
             "Gilang drops his ichi ocha, you have to take 1 steps back to return it",
-            "Try your luck, go to free parking or prison",
+            "Try your luck, go to free parking or go to jail",
             "Due to number of vehicles in Indonesia is >160 million, players are given nerf parking card so they dont travel often",
             "Earthquake, 1 building collapse #sadge"
         ],
@@ -66,7 +66,7 @@
             "Nerf Parking = your tile selection on stepping free parking is 40% less"
         ],
         "page 2": [
-            "Fortune Block = when passing start line, only get 5000",
+            "Fortune Block = when passing start line, only get 5k",
             "City Upgrade = can upgrade your city without getting there, but random",
             "The Striker = can attack other player city (coming soon)",
             "Curse Reverser = make cursed city effect to be reversed, everyone lose money (30% price) except card owner"
@@ -74,16 +74,16 @@
     },
     "area_items": {
         "buff 100%": [
-            "[35%] Get money 7000 x laps",
+            "[35%] Get money 7k x laps",
             "[25%] Select card rarity",
             "[20%] Reduce buy/upgrade city price by 30%",
             "[12%] Go to free parking",
             "[8%] Get curse reverser card"
         ],
         "debuff 65%": [
-            "[25%] Lose money 5000 x laps",
+            "[25%] Lose money 5k x laps",
             "[15%] Skip 1 turn",
-            "[10%] Go to cursed city/prison (random)",
+            "[10%] Go to cursed city/prison",
             "[8%] Tax multiply by 30%",
             "[7%] Reduce incoming money 50%"
         ]

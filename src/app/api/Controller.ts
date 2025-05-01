@@ -77,7 +77,9 @@ export default class Controller {
 
     protected async redisReset(key: string) {
         // reset existing data
-        await redisClient.del(key)
+        const resetResult = await redisClient.del(key)
+        console.log(resetResult);
+        
     }
 
     protected filterPayload<T>(action: string, payload: T) {
@@ -133,10 +135,10 @@ export default class Controller {
         }
     }
 
-    protected async getOnlinePlayers(data: IPlayer, userAgent: string, action?: string) {
+    protected async getOnlinePlayers(data: IPlayer, userAgent: string) {
         const logData: Partial<ILoggedUsers> = {
             display_name: data.display_name,
-            status: action?.match(/game|room join/) ? 'playing' : 'online',
+            status: 'online',
             user_agent: userAgent
         }
         // renew my player
@@ -167,6 +169,7 @@ export default class Controller {
             }
             // check for account in use
             // match the user agent
+            console.log(action, 'checking account in use');
             const findUser = loggedPlayers.map(v => v.display_name).indexOf(payload.display_name)
             const isUserAgentMatch = matchUserAgent(payload.user_agent, findUser)
             if(findUser !== -1 && !isUserAgentMatch) {
@@ -206,8 +209,7 @@ export default class Controller {
             if(renewUser === -1) return this.respond(401, 'no access', [])
             // create token for timeout
             const timeoutToken = await this.generateAccessToken(payload as any, '5min')
-            // update status & token
-            loggedPlayers[renewUser].status = payload.status
+            // update my token
             loggedPlayers[renewUser].timeout_token = timeoutToken
             // save to redis
             await this.redisSet('loggedPlayers', loggedPlayers)
@@ -314,7 +316,7 @@ export default class Controller {
     }
 
     /**
-     * @param payload payload with access token key
+     * @param payload embedded access token to payload in route
      * @description verify access / refresh token
      * @returns verified token & get payload | error if no refresh token
      */
