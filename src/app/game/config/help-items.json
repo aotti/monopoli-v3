@@ -66,7 +66,7 @@
             "Nerf Parking = your tile selection on stepping free parking is 40% less"
         ],
         "page 2": [
-            "Fortune Block = when passing start line, only get 5k",
+            "Fortune Block = when passing start line, only get 5000",
             "City Upgrade = can upgrade your city without getting there, but random",
             "The Striker = can attack other player city (coming soon)",
             "Curse Reverser = make cursed city effect to be reversed, everyone lose money (30% price) except card owner"
@@ -74,14 +74,14 @@
     },
     "area_items": {
         "buff 100%": [
-            "[35%] Get money 7k x laps",
+            "[35%] Get money 7000 x laps",
             "[25%] Select card rarity",
             "[20%] Reduce buy/upgrade city price by 30%",
             "[12%] Go to free parking",
             "[8%] Get curse reverser card"
         ],
         "debuff 65%": [
-            "[25%] Lose money 5k x laps",
+            "[25%] Lose money 5000 x laps",
             "[15%] Skip 1 turn",
             "[10%] Go to cursed city/prison (random)",
             "[8%] Tax multiply by 30%",

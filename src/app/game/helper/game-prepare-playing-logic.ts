@@ -883,14 +883,14 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
     // get game mode & lose condition
     const loseCondition = gameState.gameRoomInfo[findRoom].money_lose
     const gameMode = gameState.gameRoomInfo[findRoom].mode
+    // get alive players
+    const alivePlayers = []
+    for(let pd of playersData) {
+        // check players money amount
+        if(pd.money > loseCondition) 
+            alivePlayers.push(pd.display_name)
+    }
     if(gameMode.match(/survive/i)) {
-        // get alive players
-        const alivePlayers = []
-        for(let pd of playersData) {
-            // check players money amount
-            if(pd.money > loseCondition) 
-                alivePlayers.push(pd.display_name)
-        }
         // if only 1 left, game over
         if(alivePlayers.length === 1) {
             // set game stage
@@ -915,7 +915,7 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
         const lapsLimit = +gameMode.split('_')[0]
         const highestMoneyPlayer = playersData.map(v => `${v.money},${v.display_name}`).sort().reverse()
         for(let pd of playersData) {
-            if(pd.lap >= lapsLimit) {
+            if(pd.lap >= lapsLimit || alivePlayers.length === 1) {
                 // set game stage
                 gameState.setGameStages('over')
                 // show notif

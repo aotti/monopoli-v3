@@ -324,8 +324,8 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
                 // set more money to local storage
-                const isPercent = effect.match('%') ? +effect / 100 : +effect
-                localStorage.setItem('moreMoney', `${isPercent}`)
+                const isEffectPercent = effect.match('%') ? +effect.split('%')[0] / 100 : +effect
+                localStorage.setItem('moreMoney', `${isEffectPercent}`)
                 resolve({
                     event: 'get_card',
                     rank: rank,
