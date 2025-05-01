@@ -13,8 +13,9 @@ export default function PlayerSettingAttackCity() {
                     <span className="border-b-2 pb-1"> attack city </span>
                 </div>
                 {/* history list */}
-                <div className="flex flex-col gap-2 h-36 lg:h-[17rem] overflow-y-scroll">
-                    <span> coming not soon 😂 </span>
+                <div className="flex flex-col gap-2 items-center h-36 lg:h-[17rem] overflow-y-scroll">
+                    <span> in progress </span>
+                    <img src="https://media.discordapp.net/stickers/1276026788279226468.webp?size=160&quality=lossless" className="w-36 !h-40" alt="" />
                 </div>
                 {/* close button */}
                 <div className="w-[calc(100%-.5rem)] p-1 border-t-2 active:opacity-75">

@@ -150,6 +150,12 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" draggable={false} />
                         </button>
                     </div>
+                    {/* tutorial button */}
+                    <div data-tooltip="shop (soon)" className="w-8 my-auto">
+                        <button type="button" className="invert active:opacity-75">
+                            <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" draggable={false} />
+                        </button>
+                    </div>
                     {/* title */}
                     <div className="flex items-center justify-end mr-10 w-3/5">
                         <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
