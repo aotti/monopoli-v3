@@ -27,9 +27,10 @@ export type RoomListListener = {
     roomCreated: ICreateRoom['list'], 
     roomInfo: IGameRoomInfo,
     roomsLeft:  ICreateRoom['list'][],
-    joinedPlayers: number,
+    playerCount: number,
     joinedRoomId: number,
     leavePlayer: string,
+    leaveRoomId: number,
     disabledCharacters: string[],
     roomGame: number,
     roomOverId: number,
@@ -287,7 +288,7 @@ type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mo
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'|'rng'|'special_card'
-type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'|'buff'|'debuff'
+type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
@@ -440,6 +441,7 @@ export interface IGamePlay {
         buff: string,
         debuff: string,
         history: string,
+        is_lose: boolean,
         tax_visitor: string,
         tax_owner: string,
         take_money: string,
@@ -460,6 +462,7 @@ interface IEventBuyCity_Yes {
     name: string,
     property: string,
     money: number,
+    buff?: string,
 }
 interface IEventBuyCity_No {
     event: 'buy_city'
@@ -487,6 +490,7 @@ interface IEventPayTax {
 
 interface IEventCards {
     event: 'get_card',
+    rank: string,
     type: string,
     tileName: string,
     money: number,

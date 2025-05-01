@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse, userAgent } from "next/server";
 import PlayerController from "../PlayerController";
-import { IResponse } from "../../../../helper/types";
-import { cookies } from "next/headers";
 import Controller from "../../Controller";
 
 export async function PUT(req: NextRequest) {

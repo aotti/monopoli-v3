@@ -3,7 +3,7 @@ import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { qS, translateUI } from "../../../../helper/helper"
 import { IGameContext, IMiscContext } from "../../../../helper/types"
-import { leaveGameRoom, readyGameRoom, rollDiceGameRoom, rollTurnGameRoom, startGameRoom, surrenderGameRoom } from "../../helper/game-logic"
+import { leaveGameRoom, readyGameRoom, rollDiceGameRoom, rollTurnGameRoom, startGameRoom, surrenderGameRoom } from "../../helper/game-prepare-playing-logic"
 import { GameNotifPlayerTurn } from "./GameNotif"
 
 export default function GameButtons() {

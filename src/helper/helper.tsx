@@ -269,7 +269,7 @@ export function filterInput(input: InputIDType, value: string) {
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
-                'get_card: .* \\(chance\\)|get_card: .* \\(community\\)',
+                'get_card: .* \\(chance \\w\\)|get_card: .* \\(community \\w\\)',
                 'get_arrested: lemao 😂',
                 'parking: tile \\d+ 😎',
                 'cursed: .* 💀',
@@ -297,6 +297,8 @@ export function filterInput(input: InputIDType, value: string) {
         case 'debuff':
             const optionalBuyCity = value === null || value.match(/^[a-zA-Z0-9,;\*]+/) ? true : false
             return optionalBuyCity
+        case 'is_lose': 
+            return typeof value == 'boolean' ? true : false
         case 'sell_city_name':
         case 'city_left':
             const optionalSellCity = value === null || value == '' || value.match(/^[a-zA-Z0-9\-*,;]+$/) ? true : false

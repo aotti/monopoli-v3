@@ -3,8 +3,8 @@ import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import board_normal from '../../config/board-normal.json'
-import { IGameContext } from "../../../../helper/types"
 import Image from "next/image"
+import Character from "./Character"
 
 export default function BoardNormal() {
     const gameState = useGame()
@@ -167,7 +167,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
-                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Characters key={i} playerData={player}/> : null)}
+                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
                 {/* tile broken */}
@@ -214,7 +214,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     return (
         <div className="relative">
             <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
-                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Characters key={i} playerData={player}/> : null)}
+                {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
@@ -227,27 +227,6 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
                     </p>
                 </div>
             </div>
-        </div>
-    )
-}
-
-function Characters({ playerData }: {playerData: IGameContext['gamePlayerInfo'][0]}) {
-    // match player in city owned list
-    const cityOwned = playerData.city?.split(';').length || 0
-    const cityOwnedTooltip = `city owned: ${cityOwned}`
-    // get buff data
-    const buffList = playerData.buff?.split(';').length || 0
-    const buffTooltip = `buff: ${buffList}`
-    // get debuff data
-    const debuffList = playerData.debuff?.split(';').length || 0
-    const debuffTooltip = `debuff: ${debuffList}`
-    // set player tooltip (display_name & city owned)
-    const playerTooltip = `${playerData.display_name};${cityOwnedTooltip};${buffTooltip};${debuffTooltip}`
-
-    return (
-        <div data-tooltip={playerTooltip.replaceAll(';', '\n')} data-player-name={playerData.display_name} 
-        className="inline-block cursor-pointer w-[3.5vw] p-1 lg:p-2">
-            <img src={playerData.character} alt={playerData.display_name} />
         </div>
     )
 }
