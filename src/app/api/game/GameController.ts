@@ -10,7 +10,7 @@ export default class GameController extends Controller {
         // token payload data
         const { tpayload, token } = tokenPayload.data[0]
         // renew log online player
-        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent, action)
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
@@ -20,15 +20,6 @@ export default class GameController extends Controller {
             status: 200,
             message: 'filter success',
             data: [{token, onlinePlayersData: onlinePlayers.data}]
-        }
-    }
-
-    async getLogs(action: string, payload: IGamePlay['get_players']) {
-        const getGameLog = await this.redisGet(`gameLog_${payload.room_id}`)
-        return {
-            status: 200,
-            message: `${action} for room ${payload.room_id}`,
-            data: getGameLog
         }
     }
 
@@ -346,12 +337,6 @@ export default class GameController extends Controller {
     async turnEnd(action: string, payload: IGamePlay['turn_end']) {
         let result: IResponse
         
-        // get room id
-        const roomId = payload.channel.match(/\d+/)[0]
-        // log query args to redis
-        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
-        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
-        // filter payload
         const filtering = await this.filters(action, payload)
         if(filtering.status !== 200) return filtering
         delete payload.token
@@ -402,6 +387,7 @@ export default class GameController extends Controller {
             }
             delete (newPlayerTurnEndData as any).player_character
             // update game history (buy city, get cards, etc)
+            const roomId = payload.channel.match(/\d+/)[0]
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
             // fill game history
             const gameHistory: IGameContext['gameHistory'] = []
@@ -426,10 +412,10 @@ export default class GameController extends Controller {
                 // player is playing in this game
                 // now check if it exist in player turns (walking player should not exist)
                 if(getPlayerTurns.indexOf(payload.display_name) === -1) {
-                    // player doesnt exist, now remove empty player turns
+                    // player doesnt exist, now modify player turns
                     getPlayerTurns.splice(0, 1)
-                    // check is player losing, if lose then dont push the player
-                    payload.is_lose ? null : getPlayerTurns.push(payload.display_name)
+                    // push player
+                    getPlayerTurns.push(payload.display_name)
                     await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
                 }
             }

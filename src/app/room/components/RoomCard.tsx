@@ -39,8 +39,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
     const translateRules = translateUI({lang: miscState.language, text: modifiedRules as any})
                         .replace('bbb', rule.board).replace('ddd', rule.dice)
                         .replace('sss', rule.start).replace('lll', rule.lose)
-                        .replace('mmm', translateUI({lang: miscState.language, text: rule.mode as any}))
-                        .replace('ccc', setCurseRange)
+                        .replace('mmm', rule.mode).replace('ccc', setCurseRange)
     // room status
     const roomStatusColor = roomData.status == 'prepare' ? 'bg-green-500/30' : 'bg-orange-500/30'
 

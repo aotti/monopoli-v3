@@ -18,9 +18,7 @@ export default function GameInfo({ roomId }: {roomId: number}) {
             {/* mode */}
             <div className="flex flex-col">
                 <span> mode: </span>
-                <span className="text-green-400"> 
-                    {translateUI({lang: miscState.language, text: gameState.gameRoomInfo[getGameRoomInfo]?.mode as any})} 
-                </span>
+                <span className="text-green-400"> {gameState.gameRoomInfo[getGameRoomInfo]?.mode} </span>
             </div>
             {/* money lose */}
             <div className="flex flex-col">

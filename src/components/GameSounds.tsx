@@ -2,7 +2,6 @@ export default function GameSounds() {
     const hostname = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
     const sounds = {
         message: `https://${hostname}/sound/message_notif-DgTswdqDvWjUqgZhXNsbgl9c6DAWPg.mp3`,
-        game_notif: `https://${hostname}/sound/game_notif-YzBafun0qLBhCH4Qhdzsp1IaE9yvLW.mp3`,
         footstep_1: `https://${hostname}/sound/footstep_1-1Q5XIEv89asfSop2tUZBchz5DeHyN5.mp3`,
         footstep_2: `https://${hostname}/sound/footstep_2-tCSGUyQcL0FtWPXsNfjSinwqNcbdzv.mp3`,
         roll_number: `https://${hostname}/sound/roll_number-ZG4g11XWaf6RLDUfSFimQoDEwgrglG.mp3`,
@@ -17,7 +16,7 @@ export default function GameSounds() {
 
     return (
         <div>
-            {Object.entries(sounds).map(([key, value], i) => <audio key={key} id={`sound_${key}`} src={value}></audio>)}
+            {Object.entries(sounds).map(([key, value], i) => <audio id={`sound_${key}`} src={value}></audio>)}
         </div>
     )
 }
