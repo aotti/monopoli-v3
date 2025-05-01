@@ -21,19 +21,24 @@ export default function PlayerSettingGameHistory() {
                 {gameState.gameHistory.map((v,i) => {
                     const myHistories = v.display_name == gameState.myPlayerInfo.display_name
                     // split history
-                    const [historyTitle, historyContent] = v.history.split(':')
+                    const [historyTitle, historyContent] = v.history.split(': ')
+                    // check card content
+                    const checkHistoryContent1 = historyContent.match(/lose money,move place|get money,more money|special card|more money|get money|lose money|take money|move place|move forward|move backward|take card|destroy property|upgrade city|sell city/) || ''
                     // check if its buy city, chance, community history
-                    const checkHistoryContent = historyContent.match(/land|1house|2house|chance|community/) || ''
+                    const checkHistoryContent2 = historyContent.match(/land|1house|2house|chance|community/) || ''
                     // translate history
                     const translateHistoryTitle = translateUI({lang: miscState.language, text: historyTitle as any}) || historyTitle
-                    const translateHistoryContent = translateUI({lang: miscState.language, text: historyContent.trim() as any}) || historyContent.trim()
-                    const finalizedHistoryContent = `${translateHistoryTitle} ${translateHistoryContent.replace(checkHistoryContent[0], translateUI({lang: miscState.language, text: checkHistoryContent[0] as any}))}`
+                    const translateHistoryContent = historyContent.replace(checkHistoryContent1[0], 
+                                                    translateUI({lang: miscState.language, text: checkHistoryContent1[0] as any}))
+                                                    .replace(checkHistoryContent2[0], translateUI({lang: miscState.language, text: checkHistoryContent2[0] as any}))
+                    // finalized translate
+                    const finalizedHistoryContent = `${translateHistoryTitle} ${translateHistoryContent}`
 
                     return (
                         v.room_id != gameState.gameRoomId ? null 
                         : <div key={i} className={`${myHistories ? 'bg-primary/30' : ''} border-b-2 border-dashed`}>
                             <p className="text-green-400"> {v.display_name} </p>
-                            <p className="lg:text-[10px]"> {finalizedHistoryContent} </p>
+                            <p className="text-[7px] lg:text-[9px]"> {finalizedHistoryContent} </p>
                         </div>
                     )
                 }

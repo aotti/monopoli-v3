@@ -17,7 +17,7 @@ import TutorialGameRoom from "./components/other/TutorialGameRoom"
 import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
-import { getPlayerInfo } from "./helper/game-logic"
+import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
 import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
 
@@ -62,6 +62,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         localStorage.removeItem('parkingEventData')
         localStorage.removeItem('specialCardUsed')
         localStorage.removeItem('buffDebuffUsed')
+        localStorage.removeItem('moreMoney')
         localStorage.removeItem('playerTurns')
 
         // set player turn
@@ -71,7 +72,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             const playerTurnNotif = qS('#player_turn_notif')
             
             if(playerTurnNotif && parsedPlayerTurns?.length > 1) {
-                playerTurnNotif.textContent = `${parsedPlayerTurns[0]} turn`
+                playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                            .replace('ppp', parsedPlayerTurns[0])
             }
         }
         document.body.tabIndex = 0

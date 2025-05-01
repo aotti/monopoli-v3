@@ -1,7 +1,7 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
-import { checkGameProgress, playerMoving } from "./game-logic"
+import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -36,8 +36,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // show notif
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
-        notifTitle.textContent = 'Room Deleted'
-        notifMessage.textContent = 'this room has been deleted, redirect to room list'
+        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Room Deleted'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'this room has been deleted, redirect to room list..'})
         // redirect to room list
         setTimeout(() => {
             // set notif to null
@@ -49,7 +49,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     // ready
     if(getMessage.readyPlayers) {
         // set players ready text
-        playerTurnNotif.textContent = `${getMessage.readyPlayers.length} player(s) ready`
+        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp player(s) ready'})
+                                    .replace('ppp', getMessage.readyPlayers.length.toString())
         // if > 2 players ready, set notif
         if(getMessage.readyPlayers.length >= 2) {
             // show notif
@@ -79,7 +80,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
         notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
-        notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps >= 2'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
     }
     // roll dice
     if(getMessage.playerTurn && typeof getMessage.playerDice == 'number') {
@@ -150,7 +151,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // save playerTurns
         localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
         // show notif next player turn
-        playerTurnNotif.textContent = `${getMessage.playerTurns[0]} turn`
+        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                    .replace('ppp', getMessage.playerTurns[0])
         // play player turn sound
         if(getMessage.playerTurns[0] === gameState.myPlayerInfo.display_name) {
             const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
@@ -194,6 +196,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
+        console.log('game over',getMessage.gameOverPlayers);
+        
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player == gameState.myPlayerInfo.display_name) {

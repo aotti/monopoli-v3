@@ -1,6 +1,5 @@
 import PubNub from "pubnub"
 import { IChat, IGameContext, IMiscContext, RoomListListener } from "../../../helper/types"
-import { qS } from "../../../helper/helper"
 
 export function roomMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & RoomListListener
@@ -23,10 +22,10 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setRoomList(rooms => {
             const updatedRooms = [...rooms]
             // find joined room
-            const findJoined = rooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
+            const findJoined = updatedRooms.map(v => v.room_id).indexOf(getMessage.joinedRoomId)
             if(findJoined !== -1) {
                 // update player count
-                updatedRooms[findJoined].player_count = getMessage.joinedPlayers
+                updatedRooms[findJoined].player_count = getMessage.playerCount
                 // update disabled characters
                 updatedRooms[findJoined].characters = getMessage.disabledCharacters
             }
@@ -36,12 +35,17 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // player leave
     if(getMessage.leavePlayer) {
-        gameState.setGamePlayerInfo(players => {
-            const playersLeft = [...players]
-            // remove player
-            const findLeavePlayer = playersLeft.map(v => v.display_name).indexOf(getMessage.leavePlayer)
-            playersLeft.splice(findLeavePlayer, 1)
-            return playersLeft
+        // update room list
+        gameState.setRoomList(rooms => {
+            const updatedRooms = [...rooms]
+            // find joined room
+            const findJoined = updatedRooms.map(v => v.room_id).indexOf(getMessage.leaveRoomId)
+            if(findJoined !== -1) {
+                // update player count
+                updatedRooms[findJoined].player_count = getMessage.playerCount
+            }
+            // return rooms
+            return updatedRooms
         })
     }
     // room deleted
@@ -68,8 +72,6 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.roomOverId) {
-        // remove city owned list
-        localStorage.removeItem('cityOwnedList')
         // update room list
         gameState.setRoomList(rooms => {
             const newRoomList = [...rooms]
@@ -79,19 +81,6 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
             // delete room
             newRoomList.splice(findRoom, 1)
             return newRoomList
-        })
-        // update worst money
-        gameState.setMyPlayerInfo(player => {
-            const newPlayerInfo = {...player}
-            getMessage.gameOverPlayers.forEach(v => {
-                if(newPlayerInfo.display_name == v.player) {
-                    newPlayerInfo.worst_money_lost = v.worst_money === -999999 
-                                                    ? newPlayerInfo.worst_money_lost 
-                                                    : v.worst_money
-                    newPlayerInfo.game_played += 1
-                }
-            })
-            return newPlayerInfo
         })
     }
 }

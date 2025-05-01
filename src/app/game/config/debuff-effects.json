@@ -22,7 +22,7 @@
             "chance": [16, 25],
             "data": [
                 {
-                    "description": "Go to cursed city/prison",
+                    "description": "Go to cursed city/prison (random)",
                     "effect": "random-move place_cursed|move place_prison"
                 }
             ]
@@ -40,7 +40,7 @@
             "chance": [41, 65],
             "data": [
                 {
-                    "description": "Lose money 5k x laps",
+                    "description": "Lose money 5000 x laps",
                     "effect": "lose money_5000"
                 }
             ]
