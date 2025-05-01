@@ -18,7 +18,7 @@
                 {
                     "description": "Your catfish business is successful, profits increased by 50%. Then, Gilang stops by to buy catfish for 80.000",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_A-uCDUMj13x0hEW8aBUbIR4TY5JBB15r.png",
-                    "effect": "get money_80000&more money_50%"
+                    "effect": "more money_50%&get money_80000"
                 },
                 {
                     "description": "Pay electricity & water bills 100.000",
@@ -73,7 +73,7 @@
                     "effect": "lose money_20000"
                 },
                 {
-                    "description": "Due to the small amount of aid, you only get a fortune block card",
+                    "description": "Due to the small amount of aid from the government, you only get a fortune block card",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
                     "effect": "special card_fortune block"
                 },

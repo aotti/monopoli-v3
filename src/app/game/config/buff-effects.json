@@ -40,7 +40,7 @@
             "chance": [66, 100],
             "data": [
                 {
-                    "description": "Get money 7k x laps",
+                    "description": "Get money 7000 x laps",
                     "effect": "get money_7000"
                 }
             ]
