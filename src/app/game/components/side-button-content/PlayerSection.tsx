@@ -23,7 +23,7 @@ export default function PlayerSection() {
     return (
         <div className={`${gameState.gameSideButton == 'players' ? 'block' : 'hidden'}
         absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
-        [writing-mode:horizontal-tb] p-1 overflow-y-scroll
+        [writing-mode:horizontal-tb] p-1 overflow-x-hidden overflow-y-scroll
         bg-darkblue-1 border-8bit-text w-[35vw] h-[calc(100%-1rem)]`}>
             {/* header */}
             <div className="flex items-center justify-center text-xs lg:text-sm border-b-2 pb-2 mb-1">
