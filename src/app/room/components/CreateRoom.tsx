@@ -57,7 +57,7 @@ export default function CreateRoom() {
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1 active:opacity-75" onClick={() => { 
+                        <button type="button" className="text-red-300 p-1 active:opacity-75 hover:animate-jump" onClick={() => { 
                             // set false to give zoom-out animate class
                             miscState.setAnimation(false); 
                             // timeout to wait the animation zoom-out
@@ -65,7 +65,7 @@ export default function CreateRoom() {
                         }}> 
                             {translateUI({lang: miscState.language, text: 'Close'})} 
                         </button>
-                        <button type="button" className="text-green-300 p-1 active:opacity-75" 
+                        <button type="button" className="text-green-300 p-1 active:opacity-75 hover:animate-jump" 
                         onClick={() => setCreateRoomPage(2)}> 
                             {translateUI({lang: miscState.language, text: 'Next'})} 
                         </button>
@@ -134,11 +134,11 @@ export default function CreateRoom() {
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1 active:opacity-75"
+                        <button type="button" className="text-red-300 p-1 active:opacity-75 hover:animate-jump"
                         onClick={() => setCreateRoomPage(1)}> 
                             {translateUI({lang: miscState.language, text: 'Back'})} 
                         </button>
-                        <button type="button" className="text-green-300 p-1 active:opacity-75" 
+                        <button type="button" className="text-green-300 p-1 active:opacity-75 hover:animate-jump" 
                         onClick={() => setCreateRoomPage(3)}> 
                             {translateUI({lang: miscState.language, text: 'Next'})} 
                         </button>
@@ -156,11 +156,11 @@ export default function CreateRoom() {
                     </div>
                     {/* submit */}
                     <div className="flex justify-between mx-6">
-                        <button type="button" className="text-red-300 p-1 active:opacity-75"
+                        <button type="button" className="text-red-300 p-1 active:opacity-75 hover:animate-jump"
                         onClick={() => setCreateRoomPage(2)}> 
                             {translateUI({lang: miscState.language, text: 'Back'})} 
                         </button>
-                        <button type="submit" id="create_room" className="text-green-300 p-1 active:opacity-75"> 
+                        <button type="submit" id="create_room" className="text-green-300 p-1 active:opacity-75 hover:animate-jump"> 
                             {translateUI({lang: miscState.language, text: 'Create'})} 
                         </button>
                     </div>

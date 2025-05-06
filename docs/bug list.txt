@@ -158,3 +158,34 @@ fix 24 feb 2025
 - ~~saat sedang select character, lalu room dihapus, nanti stuck di select character & gk bisa join room~~
 - ~~event clickOutside untuk **(mobile)** emoji jalan lebih dulu daripada click emoji~~
 - ~~menu item di player setting (game room) tidak bisa diklik dalam mode mobile/phone~~
+
+fix 9 feb 2025
+- ~~animasi gempa untuk **kartu earthquake (chance)** + sound gempa~~
+- ~~gambar pulau komodo rework blm pasang~~
+- ~~kartu special harus tes smua (fortune block utama)~~
+- ~~player join / leave~~
+- ~~fix tombol upgrade city~~
+- ~~data worst lost untuk pemenang malah -999_999~~
+
+fix 5 april 2025
+- ~~tutorial game room 2way terhalang~~
+- ~~tidak bisa chat di game room, karna publish ke channel yg beda~~
+- ~~saat chat, online player tidak terupdate~~
+- ~~saat lagi di cabang, terkadang bisa lanjut jalan dari luar~~
+- ~~worst lost hanya boleh apdet jika kekalahan lebih buruk dari saat ini~~
+- ~~buff reduce price tidak efek~~
+- ~~kartu korupsi + masuk penjara ngebug~~
+> > ~~tambah resolve di kartu type **move place**~~
+- ~~kartu city upgrade bisa masuk ke special city~~
+- ~~notif box untuk mobile terlalu kecil, harus tambah width~~
+- ~~kartu dana umum jual kota bug~~
+- ~~function payingTaxes error karna specialCard = null~~
+- ~~saat main 3-4 player, jika 1 player kalah, player tsb tidak langsung update player stats & masih dianggap bermain & tidak bisa join room lain~~
+> > ~~hapus nama player kalah dari player turns (redis)~~ 
+> > ~~data player **deleted_at** tidak terupdate~~
+> > ~~player tetap tidak bisa join room lain, karna jika creator join, ada validasi untuk **room creator** tidak boleh join jika roomnya blm selesai~~
+- ~~kartu curse reverser tidak hilang setelah pakai~~
+- ~~kartu dana umum **debt collector** ngebug history not match~~
+- ~~saat player kalah, reset smua data city jadi null~~
+- ~~jika main mode **laps**, saat tersisa 1 player, jalankan function gameOver~~
+- ~~kartu more money (community) masih bug~~

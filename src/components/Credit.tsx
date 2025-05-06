@@ -14,7 +14,7 @@ export default function Credit() {
     return (
         <>
             <div className="">
-                <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => setShowCredit(true)}> 
+                <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75 hover:animate-pulse" onClick={() => setShowCredit(true)}> 
                     credit 
                 </button>
             </div>

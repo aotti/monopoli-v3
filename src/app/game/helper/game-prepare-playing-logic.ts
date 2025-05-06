@@ -149,8 +149,9 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
                 delete readyGameResponse.data[0].token
             }
             // button for creator
-            const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo.display_name)
-            if(findCreator !== -1) {
+            const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+            const roomCreator = gameState.gameRoomInfo[findRoom].creator
+            if(roomCreator === gameState.myPlayerInfo.display_name) {
                 readyButton.removeAttribute('disabled')
                 readyButton.id = 'start_button'
                 readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
@@ -502,9 +503,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // reset notif timer
         notifTimer.textContent = ''
         // find current room info
-        const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-        const boardType = gameState.gameRoomInfo[findRoomInfo].board
-        const loseCondition = gameState.gameRoomInfo[findRoomInfo].money_lose
+        const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+        const boardType = gameState.gameRoomInfo[findRoom].board
+        const loseCondition = gameState.gameRoomInfo[findRoom].money_lose
         // find current player
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(playerTurn)
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
@@ -725,7 +726,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                                         : -1
             // check if accumulate dice is enough
             // 1 dice = 6, 2 dice = 12
-            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
+            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // check if player is losing
             const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (buffDebuffEffect || 0)))

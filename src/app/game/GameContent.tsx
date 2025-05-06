@@ -179,8 +179,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* right side | help, player, chat buttons */}
             {/* tutorial: relative z-10 */}
             <div ref={gameSideButtonRef} className={`${miscState.showTutorial == 'tutorial_gameroom_1' ? 'z-10' : ''}
-            absolute top-[20vh] right-[calc(0rem+1rem)]            flex items-center [writing-mode:vertical-lr] 
-            text-center text-2xs lg:text-sm             h-60 lg:h-96 w-6 lg:w-8
+            absolute top-[20vh] right-[calc(0rem+1rem)]     flex items-center [writing-mode:vertical-lr] 
+            text-center text-2xs lg:text-sm     h-60 lg:h-96 w-6 lg:w-8
             bg-darkblue-1 border-8bit-text`}>
                 {/* help */}
                 <div className="h-20 lg:h-32 p-1">

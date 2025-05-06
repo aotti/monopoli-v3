@@ -22,7 +22,7 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
     return (
         <>
             <span> {`${playerData.display_name} stats`} </span>
-            <div className="flex gap-2 text-2xs lg:text-xs mt-1">
+            <div className="flex gap-2 text-2xs lg:text-xs mt-1 animate-fade-up">
                 {/* profile picture */}
                 <div className="border-2 w-[4rem] h-[4rem] lg:w-32 lg:h-32">
                     <CldUploadWidget signatureEndpoint="/api/cloudinary"

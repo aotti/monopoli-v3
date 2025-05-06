@@ -20,7 +20,7 @@ export default function HomeContent() {
                 <div className="flex justify-center gap-14 mt-2">
                     {/* login button */}
                     <div className="h-12 w-[calc(9rem+2rem)]">
-                        <button type="button" className="bg-green-500 border-8bit-success px-2 py-1 w-36 active:opacity-75" 
+                        <button type="button" className="bg-green-500 border-8bit-success px-2 py-1 w-36 active:opacity-75 hover:animate-jump" 
                         onClick={() => {
                             // to give zoom-in animate class
                             miscState.setAnimation(true); 
@@ -30,7 +30,7 @@ export default function HomeContent() {
                     </div>
                     {/* register button */}
                     <div className="h-12 w-[calc(9rem+2rem)]">
-                        <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75" 
+                        <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75 hover:animate-jump" 
                         onClick={() => { 
                             // to give zoom-in animate class
                             miscState.setAnimation(true); 

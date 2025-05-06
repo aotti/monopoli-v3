@@ -41,7 +41,7 @@ export default function TutorialGameRoom() {
                     {translateUI({lang: miscState.language, text: tutorialText.part_1[2] as any})}
                 </p>
                 <hr className="my-1" />
-                <button type="button" className="text-green-400 px-1"
+                <button type="button" className="text-green-400 px-1 animate-pulse animate-infinite"
                 onClick={() => miscState.setShowTutorial('tutorial_gameroom_2')}>
                     {translateUI({lang: miscState.language, text: 'click here to continue'})}
                 </button>
@@ -57,7 +57,7 @@ export default function TutorialGameRoom() {
                 </p>
                 <p className="whitespace-pre-line h-[4.5rem] lg:h-32 p-px">
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[2] as any})}
-                    <button type="button" className="text-green-400 px-1"
+                    <button type="button" className="text-green-400 px-1 animate-pulse animate-infinite"
                     onClick={() => miscState.setShowTutorial('tutorial_gameroom_3')}>
                         {translateUI({lang: miscState.language, text: 'click here to continue'})}
                     </button>
@@ -78,7 +78,7 @@ export default function TutorialGameRoom() {
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[2] as any})}
                 </p>
                 <hr className="my-1" />
-                <button type="button" className="text-green-400 px-1"
+                <button type="button" className="text-green-400 px-1 animate-pulse animate-infinite"
                 onClick={() => miscState.setShowTutorial(null)}>
                     {translateUI({lang: miscState.language, text: 'tutorial complete'})}
                 </button>

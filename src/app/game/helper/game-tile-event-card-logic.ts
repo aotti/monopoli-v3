@@ -552,10 +552,10 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                 // get owned city
                 const getOwnedCity = playerTurnData.city ? playerTurnData.city.split(';') : null
                 if(!getOwnedCity) {
-                    setTimeout(() => {
+                    return setTimeout(() => {
                         // notif message
                         notifTimer.textContent = 'can you buy a city pls?'
-                        return resolve({
+                        resolve({
                             event: 'get_card',
                             rank: rank,
                             type: type,

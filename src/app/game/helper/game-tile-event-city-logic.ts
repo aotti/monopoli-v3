@@ -247,8 +247,9 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
         }
     }
     // CONFIRMATION TO SELL CITY
+    const translatedCityName = translateUI({lang: miscState.language, text: inputValues.sell_city_name as any}) || inputValues.sell_city_name
     const sellCityWarning = translateUI({lang: miscState.language, text: 'Do you really wanna sell ccc city?'})
-                            .replace('ccc', inputValues.sell_city_name)
+                            .replace('ccc', translatedCityName)
     if(!confirm(sellCityWarning)) return false
     // loading button
     const tempButtonText = sellButton.textContent
@@ -379,5 +380,20 @@ export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameConte
     // set history
     localStorage.setItem('specialCardUsed', `special_card: upgrade city 💳`)
     soundSpecialCard.play()
+    // ### check if player really have the card
+    // ### check if player really have the card
+    const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    const isUpgradeCityCardExist = gameState.gamePlayerInfo[findPlayer].card.match(/upgrade city/i)
+    // player dont have upgrade city card
+    if(!isUpgradeCityCardExist) {
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = 'error 400'
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'you dont have upgrade city card 💀'})
+        return
+    }
     rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
 }

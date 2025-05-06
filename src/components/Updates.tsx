@@ -25,7 +25,7 @@ export default function Updates() {
 
     return (
         <>
-            <div className={showVersion == currentVersion ? `` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`} data-version={currentVersion}>
+            <div className={showVersion == currentVersion ? `hover:animate-pulse` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full hover:animate-pulse`} data-version={currentVersion}>
                 <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={handleShowMarkUpdates}> 
                     updates 
                 </button>

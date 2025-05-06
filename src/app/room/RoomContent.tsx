@@ -105,7 +105,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             ? translateUI({lang: miscState.language, text: 'chat box'}) 
                             : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
-                    <div className="w-full h-[calc(100%-1rem)]">
+                    <div className="relative z-10 w-full h-[calc(100%-1rem)] animate-fade-down">
                         {miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
                             // chat box
                             ? <ChatBox page="room" pubnubSetting={pubnubSetting} />
@@ -162,7 +162,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     </div>
                     {/* create room button */}
                     <div className="text-right w-2/5">
-                        <button type="button" className="border-8bit-primary bg-primary active:opacity-75"
+                        <button type="button" className="border-8bit-primary bg-primary active:opacity-75 hover:animate-pulse hover:animate-duration-500"
                         onClick={() => {
                             // close join modal
                             miscState.setShowJoinModal(null)

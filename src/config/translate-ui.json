@@ -117,6 +117,7 @@
         "Game History": "Catatan Main",
         "Attack City": "Serang Kota",
         "sell": "jual",
+        "raid": "gas",
         "Upgrade": "Renovasi",
         "only player in this room can see the chat": "obrolan ini hanya bisa dilihat pemain yang ada disini",
 
@@ -154,6 +155,7 @@
         "Pay electricity & water bills 100.000": "Bayar tagihan listrik & air 100.000",
         "Sell 1 owned city (random)": "Menjual 1 kota yang dimiliki (acak)",
         "Home Renovation TV Show gives you upgrade city card": "Acara TV Rumah Debah memberikan anda kartu untuk upgrade kota",
+        "You are dreaming about getting hit by truck and going to other world then get attack city card": "Saat sedang tidur, anda bermimpi ditabrak truk dan pergi ke isekai, lalu mendapat kartu serang kota",
 
         "__KARTU KESEMPATAN__": "__KARTU KESEMPATAN__",
         "You stumbled, take 2 step forward": "Kaki anda tersandung, maju 2 langkah",
@@ -262,6 +264,7 @@
         "you have joined a room": "anda sudah gabung ke ruang",
         "you have created a room": "anda sudah buat ruang",
         "creator cannot leave this way, please delete the room to leave": "pembuat tidak bisa kabur, kalo mau hapus ruangnya",
+        "you dont have upgrade city card 💀": "anda tidak punya kartu upgrade kota 💀",
 
         "__GAMEPLAY TRANSLATE__": "__GAMEPLAY TRANSLATE__",
         "Preparation": "Persiapan",

@@ -26,10 +26,10 @@ export default function BoardTwoway() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -42,10 +42,10 @@ export default function BoardTwoway() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -58,10 +58,10 @@ export default function BoardTwoway() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -74,10 +74,10 @@ export default function BoardTwoway() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -112,7 +112,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // tile info
     const tileInfo = setTileInfo(name)
     // price label
-    const priceText = `after:block after:content-[attr(data-price)]`
+    const priceTextClass = `after:block after:content-[attr(data-price)]`
     // match city with player data
     const getCityData = []
     gameState.gamePlayerInfo.map(player => {
@@ -178,7 +178,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
-                    <p className={`${cityProperty ? '' : priceText} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
+                    <p className={`${cityProperty ? 'text-red-600' : priceTextClass} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
                     data-price={moneyFormat(cityPrice || (cursedCityPrice || price))}> 
                         {cityProperty ? `${cityName}\n${cityIcon}` : cityName || translateCityName} 
                     </p>
