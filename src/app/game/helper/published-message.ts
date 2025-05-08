@@ -90,6 +90,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             playerRNG: getMessage.playerRNG,
             playerSpecialCard: getMessage.playerSpecialCard
         }
+        // ### VALIDATE SPECIAL CARD
+        // ### REMOVE IF PLAYER HAS NO CARD
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos

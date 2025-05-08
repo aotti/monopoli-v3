@@ -1,20 +1,13 @@
 {
     "updates": [
         {
-            "version": "v3.05",
+            "version": "v3.04",
             "date": "22 Apr 2025",
             "changes": [
                 "fix some bugs",
                 "add rarity to chance & community cards",
                 "add sound for player turn",
                 "game translation 99%"
-            ]
-        },
-        {
-            "version": "v3.04",
-            "date": "13 Apr 2025",
-            "changes": [
-                "fix some bugs"
             ]
         },
         {

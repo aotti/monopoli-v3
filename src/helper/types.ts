@@ -541,6 +541,7 @@ interface IEventDebuff {
     card?: string,
     debuff?: string,
 }
+
 export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff
 
 interface IBuyCity {
@@ -609,6 +610,13 @@ interface IBuffDebuffReduceMoney {
     money: number,
 }
 export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
+
+// attack city
+export interface IAttackCityList {
+    cityOwner: string,
+    currentCity: string,
+    cityList: string[],
+}
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

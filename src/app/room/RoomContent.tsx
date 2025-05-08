@@ -105,7 +105,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             ? translateUI({lang: miscState.language, text: 'chat box'}) 
                             : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
-                    <div className="relative z-10 w-full h-[calc(100%-1rem)] animate-fade-down">
+                    <div className={`${miscState.showTutorial ? '' : 'relative z-10'} w-full h-[calc(100%-1rem)] animate-fade-down`}>
                         {miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
                             // chat box
                             ? <ChatBox page="room" pubnubSetting={pubnubSetting} />

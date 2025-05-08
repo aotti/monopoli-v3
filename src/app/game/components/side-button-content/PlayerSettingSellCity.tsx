@@ -20,8 +20,8 @@ export default function PlayerSettingSellCity() {
             upgradeCityCard.push(v.card?.match(/upgrade city/i))
             // loop city
             const dataCityInfo = qSA(`[data-city-info]`) as NodeListOf<HTMLElement>
-            for(let dci of dataCityInfo) {
-                const [cityName, cityProperty, cityPrice, cityOwner] = dci.dataset.cityInfo.split(',')
+            for(let city of dataCityInfo) {
+                const [cityName, cityProperty, cityPrice, cityOwner] = city.dataset.cityInfo.split(',')
                 // match owned city then push
                 v.city?.match(cityName) ? mySellCityList.push(`${cityName},${cityPrice}`) : null
             }

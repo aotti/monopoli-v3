@@ -255,6 +255,8 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
     const tempButtonText = sellButton.textContent
     sellButton.textContent = 'Loading'
     sellButton.disabled = true
+    // set state to disable "back to room & surrender" buttons
+    miscState.setDisableButtons('gameroom')
     // fetch
     const sellCityFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
     const sellCityResponse: IResponse = await (await fetcher('/game', sellCityFetchOptions)).json()
@@ -266,11 +268,15 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
                 localStorage.setItem('accessToken', sellCityResponse.data[0].token)
                 delete sellCityResponse.data[0].token
             }
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
             // submit button normal
             sellButton.textContent = tempButtonText
             sellButton.removeAttribute('disabled')
             return
         default: 
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
@@ -370,10 +376,10 @@ export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'
 export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
     const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
     if(!confirm(upgradeCityWarning)) return
-    // roll dice button
-    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
     // sound effect
     const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
+    // roll dice button
+    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
     // loading button
     const tempRollDiceText = rollDiceButton.textContent
     rollDiceButton.textContent = 'Loading'
@@ -382,6 +388,7 @@ export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameConte
     soundSpecialCard.play()
     // ### check if player really have the card
     // ### check if player really have the card
+    // ### ONLY DO CHECKING IN published-message
     const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     const isUpgradeCityCardExist = gameState.gamePlayerInfo[findPlayer].card.match(/upgrade city/i)
     // player dont have upgrade city card
