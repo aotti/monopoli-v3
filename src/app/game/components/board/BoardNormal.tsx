@@ -158,10 +158,17 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const newInfo = name.match('Cursed')
                     ? `${translateCityName};${curseRand};${translateInfo}`
                     : cityBoughtInfo ? `${translateCityName};${cityBoughtInfo}` : `${translateCityName};${translateInfo}`
-    // tile broken & destroy
-    const tileBroken = {
-        house: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_House_100-aO1wZX4zHUd83tK6b1uVbxSsi1sDeE.mp4',
-        hotel: 'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Broken_Hotel_100-h4YRBkWKUrluT7d17MhkXjDeFiBZBl.mp4',
+    // tile broken & meteor
+    const hostname = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
+    const attackAnimation = {
+        broken: {
+            house: `https://${hostname}/tile_city/House_Broken_100-FKeJBA9E3MhmM8ARoBxdRLEW7HdxKw.mp4`,
+            hotel: `https://${hostname}/tile_city/Hotel_Broken_100-4nxqgou0Zr9nZ8KJ82wZ8rDZvHwQti.mp4`
+        },
+        meteor: {
+            house: `https://${hostname}/tile_city/House_Meteor_100-cU4vFNIV932WtP4whmXlV7eRTGMONK.mp4`,
+            hotel: `https://${hostname}/tile_city/Hotel_Meteor_100-j0xIfdMXF1hLNlKtxCXWKz5ml4GlvJ.mp4`
+        }
     }
 
     return (
@@ -171,8 +178,11 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
                 {/* tile broken */}
-                <video id={`video_city_broken_house_${cityName || name}`} src={tileBroken.house} className="absolute hidden" />
-                <video id={`video_city_broken_hotel_${cityName || name}`} src={tileBroken.hotel} className="absolute hidden" />
+                <video id={`video_city_broken_house_${cityName || name}`} src={attackAnimation.broken.house} className="absolute hidden" />
+                <video id={`video_city_broken_hotel_${cityName || name}`} src={attackAnimation.broken.hotel} className="absolute hidden" />
+                {/* tile meteor */}
+                <video id={`video_city_meteor_house_${cityName || name}`} src={attackAnimation.meteor.house} className="absolute hidden" />
+                <video id={`video_city_meteor_hotel_${cityName || name}`} src={attackAnimation.meteor.hotel} className="absolute hidden" />
                 {/* tile image */}
                 <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
                 {/* tile label */}

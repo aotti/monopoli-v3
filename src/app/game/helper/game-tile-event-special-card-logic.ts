@@ -257,6 +257,11 @@ export function useSpecialCard(data: SpecialCardEventType, findPlayer: number, m
 
 // ========== > UPDATE SPECIAL CARD LIST ==========
 // ========== > UPDATE SPECIAL CARD LIST ==========
+/**
+ * @param cardData array of special card (ex: ['used-upgrade city', 'add-anti tax'])
+ * @param currentSpecialCard current player card data
+ * @returns 
+ */
 export function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
     const tempSpecialCardArray = currentSpecialCard?.split(';') || []
     for(let cd of cardData) {

@@ -1,10 +1,9 @@
-import PubNub from 'pubnub'
 import { GameProvider } from '../context/GameContext'
 import { MiscProvider } from '../context/MiscContext'
 import './globals.css'
 import { Viewport } from 'next'
 import { Press_Start_2P } from 'next/font/google'
-import Head from 'next/head'
+import { Analytics } from "@vercel/analytics/next"
 
 export const viewport: Viewport = {
   initialScale: 1,
@@ -27,7 +26,10 @@ export default function RootLayout({
     <html lang="en">
       <MiscProvider accessSecret={accessSecret}>
         <GameProvider>
-          <body className={`${retroFont.className}`}>{children}</body>
+          <body className={`${retroFont.className}`}>
+            {children}
+            <Analytics />
+          </body>
         </GameProvider>
       </MiscProvider>
     </html>

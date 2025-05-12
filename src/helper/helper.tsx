@@ -258,6 +258,16 @@ export function filterInput(input: InputIDType, value: string) {
         case 'special_card': 
             const optionalSpecialCard = value === null || value.match(/used\W.*/) ? true : false
             return optionalSpecialCard
+        // ====== DECLARE ATTACK CITY TYPE ======
+        case 'target_city':
+        case 'target_city_left':
+        case 'target_city_owner':
+        case 'attacker_name':
+        case 'attacker_city':
+            const optionalAttackCity = value === null || value.match(/^[a-zA-Z0-9,;\-*\s]+$/) ? true : false
+            return optionalAttackCity
+        case 'attack_type':
+            return value ? value.match(/^[a-z_]+$/) : null
         // ====== TURN END TYPE ======
         case 'pos': 
             return value ? value.match(/^[1-9]$|^[1-2][x]$|^1[0-9]$|^1[2-4][x]$|^2[0-4]$|^24[x]$/) : null
@@ -295,13 +305,13 @@ export function filterInput(input: InputIDType, value: string) {
         case 'take_money':
         case 'buff':
         case 'debuff':
-            const optionalBuyCity = value === null || value.match(/^[a-zA-Z0-9,;\*]+/) ? true : false
+            const optionalBuyCity = value === null || value.match(/^[a-zA-Z0-9,;\-*\s]+$/) ? true : false
             return optionalBuyCity
         case 'is_lose': 
             return typeof value == 'boolean' ? true : false
         case 'sell_city_name':
         case 'city_left':
-            const optionalSellCity = value === null || value == '' || value.match(/^[a-zA-Z0-9\-*,;]+$/) ? true : false
+            const optionalSellCity = value === null || value == '' || value.match(/^[a-zA-Z0-9,;\-*\s]+$/) ? true : false
             return optionalSellCity
         case 'tax_owner': 
         case 'tax_visitor': 

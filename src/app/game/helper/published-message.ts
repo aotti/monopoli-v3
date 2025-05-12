@@ -76,11 +76,13 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = decidePlayersRank.join('\n')
         // change game stage
         gameState.setGameStages(getMessage.gameStage)
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
-        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
-        notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
+        // show notif if game stage == play
+        if(getMessage.gameStage == 'play') {
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
+            notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
+        }
     }
     // roll dice
     if(getMessage.playerTurn && typeof getMessage.playerDice == 'number') {
@@ -148,6 +150,46 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return cityLeftInfo
         })
     }
+    // attack city
+    if(getMessage.attackType) {
+        // update game history
+        gameState.setGameHistory(getMessage.gameHistory)
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Attack City'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: `ccc city attacked by ppp with ttt`})
+                                .replace('ccc', getMessage.targetCity)
+                                .replace('ppp', getMessage.attackerName)
+                                .replace('ttt', getMessage.attackType)
+        // attack city animation
+        if(getMessage.attackType == 'quake') {
+            // ### use house property for now
+            // ### use house property for now
+            const videoCityBroken = qS(`#video_city_broken_${'house'}_${getMessage.targetCity}`) as HTMLVideoElement
+            const soundCityBroken = qS('#sound_city_broken') as HTMLAudioElement
+            videoCityBroken.classList.remove('hidden')
+            // play
+            videoCityBroken.play()
+            soundCityBroken.play()
+        }
+        else if(getMessage.attackType == 'meteor') {
+            // ### use house property for now
+            // ### use house property for now
+            const videoCityMeteor = qS(`#video_city_meteor_${'house'}_${getMessage.targetCity}`) as HTMLVideoElement
+            // const soundCityMeteor = qS('#sound_city_meteor') as HTMLAudioElement
+            videoCityMeteor.classList.remove('hidden')
+            // play
+            videoCityMeteor.play()
+            // soundCityMeteor.play()
+        }
+        // update player data
+        // gameState.setGamePlayerInfo(players => {
+        //     const newPlayerInfo = [...players]
+        //     // loop player data
+        //     return newPlayerInfo
+        // })
+    }
     // end turn
     if(getMessage.playerTurnEnd) {
         // save playerTurns
@@ -198,8 +240,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
-        console.log('game over',getMessage.gameOverPlayers);
-        
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player == gameState.myPlayerInfo.display_name) {

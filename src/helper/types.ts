@@ -68,7 +68,17 @@ export type GameRoomListener = {
         from: string[],
         to: string,
         money: number
-    }
+    },
+    attackerName: string,
+    attackType: string,
+    targetCity: string,
+    brokenCity: string[],
+    playerData: {
+        display_name: string,
+        city: string,
+        money: number,
+        card: string,
+    }[]
 }
 
 // context
@@ -291,8 +301,9 @@ type RollDiceType = 'rolled_dice'|'rng'|'special_card'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
-type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|'user_agent'
+type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
+type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -428,6 +439,18 @@ export interface IGamePlay {
         sell_city_name: string,
         sell_city_price: string,
         city_left: string,
+    } & ITokenPayload,
+    declare_attack_city: {
+        channel: string,
+        attacker_name: string,
+        attacker_city: null,
+        attack_type: string,
+        special_card: string,
+        target_city_owner: string,
+        target_city_left: string,
+        target_city: string,
+        event_money: string,
+        card: string,
     } & ITokenPayload,
     turn_end: {
         channel: string,
