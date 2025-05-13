@@ -54,9 +54,9 @@ export default class GameController extends Controller {
         }
         else {
             // extract data
-            const extractData = data.map(v => Object.entries(v))
+            const extractPlayerData = data.map(v => Object.entries(v))
             // convert data to array object
-            const extractedData = extractData.map(temp => {
+            const extractedPlayerData = extractPlayerData.map(temp => {
                 // extract nested object to array
                 const tempExtractedData = temp.map(v => v[1] && typeof v[1] == 'object' ? Object.entries(v[1]).flat() : v)
                 // set new data
@@ -76,6 +76,8 @@ export default class GameController extends Controller {
             const sortDecidePlayers = getDecidePlayers.sort((a,b) => b.rolled_number - a.rolled_number)
             // get player turns
             const getPlayerTurns = await this.redisGet(`playerTurns_${payload.room_id}`)
+            // get quake city
+            const getQuakeCity = await this.redisGet(`gameQuakeCity_${payload.room_id}`)
             // get game history
             const getGameHistory = await this.redisGet(`gameHistory_${payload.room_id}`)
             // set result
@@ -86,8 +88,9 @@ export default class GameController extends Controller {
                     arr.findLastIndex(obj2 => obj2.display_name == obj1.display_name) === i
                 ) : null,
                 playerTurns: getPlayerTurns.length > 0 ? getPlayerTurns : null,
+                quakeCity: getQuakeCity.length > 0 ? getQuakeCity : null,
                 gameHistory: getGameHistory,
-                getPlayers: extractedData,
+                getPlayers: extractedPlayerData,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -568,15 +571,21 @@ export default class GameController extends Controller {
                 history: `attack_city: ${payload.target_city} city attacked by ${payload.attacker_name} (${attackType})`
             }]
             await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
+            // get quake city data
+            const getQuakeCity = await this.redisGet(`gameQuakeCity_${roomId}`)
+            let filteredQuakeCity = null
             // set redis for attack type QUAKE
-            const getBrokenCity = await this.redisGet(`gameBrokenCity_${roomId}`)
-            await this.redisSet(`gameBrokenCity_${roomId}`, [...getBrokenCity, payload.target_city])
+            if(attackType == 'quake') {
+                filteredQuakeCity = [...getQuakeCity, payload.target_city].filter((v, i, arr) => arr.indexOf(v) == i)
+                await this.redisSet(`gameQuakeCity_${roomId}`, filteredQuakeCity)
+            }
             // publish data
             const publishData = {
                 attackerName: payload.attacker_name,
                 attackType: attackType,
                 targetCity: payload.target_city,
-                brokenCity: [...getBrokenCity, payload.target_city],
+                targetCityProperty: payload.target_city_property,
+                quakeCity: filteredQuakeCity,
                 playerData: data,
                 gameHistory: [...getGameHistory, ...gameHistory]
             }

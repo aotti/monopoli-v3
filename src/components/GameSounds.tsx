@@ -10,7 +10,8 @@ export default function GameSounds() {
         player_join: `https://${hostname}/sound/player_join-wBS1tusK4djv4iki8onJHMbVda6ST1.mp3`,
         player_leave: `https://${hostname}/sound/player_leave-44H1nu79MoW1YJ9X4qwKrpvQUcQYa4.mp3`,
         player_turn: `https://${hostname}/sound/player_turn-xfALmtNybddwUtX4rakVzbBcIXMPdC.mp3`,
-        city_broken: `https://${hostname}/sound/city_broken-A9OiUUnPvEWCaxHouw5rdCvJ3CJy0B.mp3`,
+        city_quake: `https://${hostname}/sound/city_quake-T7V5iXu89utARVBqjxMLIevPPtsSiK.mp3`,
+        city_meteor: `https://${hostname}/sound/city_meteor-Pnna8rJnAq1KktrXY8vYxAFGweFOz8.mp3`,
         area_buff: `https://${hostname}/sound/area_buff-R7jxXfMxDuB0ZmR6dU2zwnujMnmvxN.mp3`,
         area_debuff: `https://${hostname}/sound/area_debuff-w2A9Kjeu2r9pc0k8ZLkO3UZKd17Rc6.mp3`,
     }

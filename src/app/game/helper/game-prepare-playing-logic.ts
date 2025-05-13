@@ -44,11 +44,13 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory, playerTurns } = getPlayerResponse.data[0]
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, quakeCity, gameHistory, playerTurns } = getPlayerResponse.data[0]
             // set game stage
             gameState.setGameStages(gameStage)
             // set player list
             gameState.setGamePlayerInfo(getPlayers)
+            // set game quake city
+            gameState.setGameQuakeCity(quakeCity)
             // set game history
             gameState.setGameHistory(gameHistory)
             // set player turns

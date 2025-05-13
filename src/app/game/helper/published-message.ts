@@ -2,6 +2,7 @@ import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
+import { attackCityAnimation } from "./game-tile-event-attack-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -162,33 +163,30 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                 .replace('ccc', getMessage.targetCity)
                                 .replace('ppp', getMessage.attackerName)
                                 .replace('ttt', getMessage.attackType)
-        // attack city animation
-        if(getMessage.attackType == 'quake') {
-            // ### use house property for now
-            // ### use house property for now
-            const videoCityBroken = qS(`#video_city_broken_${'house'}_${getMessage.targetCity}`) as HTMLVideoElement
-            const soundCityBroken = qS('#sound_city_broken') as HTMLAudioElement
-            videoCityBroken.classList.remove('hidden')
-            // play
-            videoCityBroken.play()
-            soundCityBroken.play()
-        }
-        else if(getMessage.attackType == 'meteor') {
-            // ### use house property for now
-            // ### use house property for now
-            const videoCityMeteor = qS(`#video_city_meteor_${'house'}_${getMessage.targetCity}`) as HTMLVideoElement
-            // const soundCityMeteor = qS('#sound_city_meteor') as HTMLAudioElement
-            videoCityMeteor.classList.remove('hidden')
-            // play
-            videoCityMeteor.play()
-            // soundCityMeteor.play()
-        }
+        // attack city animation 
+        const attackTimer = getMessage.attackType == 'meteor' ? 4000 : 2500
+        attackCityAnimation({
+            attackTimer: attackTimer,
+            attackType: getMessage.attackType,
+            targetCity: getMessage.targetCity,
+            targetCityProperty: getMessage.targetCityProperty
+        })
+        // set game quake city
+        gameState.setGameQuakeCity(getMessage.quakeCity)
         // update player data
-        // gameState.setGamePlayerInfo(players => {
-        //     const newPlayerInfo = [...players]
-        //     // loop player data
-        //     return newPlayerInfo
-        // })
+        setTimeout(() => {
+            gameState.setGamePlayerInfo(players => {
+                const newPlayerInfo = [...players]
+                // loop player data
+                newPlayerInfo.forEach((np, i) => {
+                    const findPlayer = getMessage.playerData.map(v => v.display_name).indexOf(np.display_name)
+                    newPlayerInfo[i].money = getMessage.playerData[findPlayer].money
+                    newPlayerInfo[i].city = getMessage.playerData[findPlayer].city
+                    newPlayerInfo[i].card = getMessage.playerData[findPlayer].card
+                })
+                return newPlayerInfo
+            })
+        }, attackTimer);
     }
     // end turn
     if(getMessage.playerTurnEnd) {

@@ -18,9 +18,9 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         const getCityInfo = tileElement.dataset.cityInfo.split(',')
         const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
         // if city owner not current player
-        // === paying taxes ===
-        const isCityNotMine = buyCityOwner != playerTurnData.display_name
-        if(isCityNotMine && buyCityProperty != 'land') 
+        const isCityMine = buyCityOwner != playerTurnData.display_name
+        // paying taxes
+        if(isCityMine && buyCityProperty != 'land') 
             return resolve(await payingTaxes())
     
         // if you own the city and its special, get money
@@ -54,10 +54,10 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         const buyCityPriceFixed = buffDebuff ? +buyCityPrice - buffDebuffEffect : +buyCityPrice
         // set event text for notif
         let [eventTitle, eventContent] = [
-            !isCityNotMine 
+            !isCityMine 
                 ? translateUI({lang: miscState.language, text: 'Upgrade City'}) 
                 : translateUI({lang: miscState.language, text: 'Buy City'}), 
-            !isCityNotMine 
+            !isCityMine 
                 // upgrade city content
                 ? translateUI({lang: miscState.language, text: 'Do you wanna upgrade xxx city for xxx?'})
                 // buy city content
@@ -182,6 +182,8 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
             const [specialCard, specialEffect] = await useSpecialCard(
                 {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
             ) as [string, number];
+            // if city quaked, set 0.5 multiplier, else 1
+            const cityQuake = gameState.gameQuakeCity.indexOf(buyCityName) !== -1 ? 0.5 : 1
             // set tax price
             const taxPrice = specialCard?.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
@@ -190,7 +192,7 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
                 visitor: playerTurnData.display_name,
-                money: taxPrice,
+                money: taxPrice * cityQuake,
                 card: specialCard,
                 debuff: buffDebuff
             }

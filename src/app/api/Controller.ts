@@ -40,6 +40,7 @@ export default class Controller {
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png',
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/square-GcUfnpybETUDXjwbOxSTxdC6fkp4xb.png'
         // ])
+        // this.redisSet('gameQuakeCity_207', ['Palembang', 'Special-4'])
     }
 
     protected chattingPublish(channel: string, data: any) {

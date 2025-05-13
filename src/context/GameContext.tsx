@@ -31,6 +31,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gamePlayerInfo, setGamePlayerInfo] = useState<IGameContext['gamePlayerInfo']>([])
     const [gameStages, setGameStages] = useState<IGameContext['gameStages']>('prepare')
     const [gamePlayerTurns, setGamePlayerTurns] = useState<string[]>([])
+    const [gameQuakeCity, setGameQuakeCity] = useState<string[]>([])
     const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
 
     useEffect(() => {
@@ -80,6 +81,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         gamePlayerInfo, setGamePlayerInfo,
         gameStages, setGameStages,
         gamePlayerTurns, setGamePlayerTurns,
+        gameQuakeCity, setGameQuakeCity,
         gameHistory, setGameHistory
     }
 

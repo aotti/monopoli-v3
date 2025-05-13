@@ -123,27 +123,28 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
         const isCityBought = cityList.map(v => v.split('*')[0]).indexOf(name)
         if(isCityBought !== -1) {
             // check city property (match the latest prop)
-            type CityPropertyType = 'land'|'1house'|'2house'|'2house1hotel'
-            const tempCityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0] as CityPropertyType
+            const tempCityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0]
+            // check if city is quaked
+            const isCityQuake = gameState.gameQuakeCity.indexOf(tempCityName) !== -1 ? 'quake' : null
             switch(tempCityProperty) {
                 // [owner, price, property]
                 case 'land': 
                     // set city owner (only after bought land property)
-                    getCityData.push(`${tempCityName}\n${player.display_name}`, player.display_name, price + (price * .10), '1house', '')
+                    getCityData.push(`${tempCityName}\n${player.display_name}`, player.display_name, price + (price * .10), '1house', '', isCityQuake)
                     return
                 case '1house': 
-                    getCityData.push(tempCityName, player.display_name, price + (price * .20), '2house', '🏡')
+                    getCityData.push(tempCityName, player.display_name, price + (price * .20), '2house', '🏡', isCityQuake)
                     return
                 case '2house': 
-                    getCityData.push(tempCityName, player.display_name, price + (price * .30), '2house1hotel', '🏡🏡')
+                    getCityData.push(tempCityName, player.display_name, price + (price * .30), '2house1hotel', '🏡🏡', isCityQuake)
                     return
                 case '2house1hotel': 
-                    getCityData.push(tempCityName, player.display_name, price + (price * .40), 'realestate', '🏡🏡🏨')
+                    getCityData.push(tempCityName, player.display_name, price + (price * .40), 'realestate', '🏡🏡🏨', isCityQuake)
                     return
             }
         }
     })
-    const [cityName, cityOwner, cityPrice, cityProperty, cityIcon] = getCityData as [string, string, number, string, string]
+    const [cityName, cityOwner, cityPrice, cityProperty, cityIcon, cityQuake] = getCityData as [string, string, number, string, string, string]
     // city info
     // ### DONT TRANSLATE CITY INFO
     // ### ITS USED ON GAME LOGIC
@@ -161,9 +162,9 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     // tile broken & meteor
     const hostname = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
     const attackAnimation = {
-        broken: {
-            house: `https://${hostname}/tile_city/House_Broken_100-FKeJBA9E3MhmM8ARoBxdRLEW7HdxKw.mp4`,
-            hotel: `https://${hostname}/tile_city/Hotel_Broken_100-4nxqgou0Zr9nZ8KJ82wZ8rDZvHwQti.mp4`
+        quake: {
+            house: `https://${hostname}/tile_city/House_Quake_100-hYEYVKh2As7GCYOZs5LXN65zx0Ie6t.mp4`,
+            hotel: `https://${hostname}/tile_city/Hotel_Quake_100-0nVkj3hGoNg3P16WkQv4tWnOo1wCHA.mp4`
         },
         meteor: {
             house: `https://${hostname}/tile_city/House_Meteor_100-cU4vFNIV932WtP4whmXlV7eRTGMONK.mp4`,
@@ -177,14 +178,14 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
-                {/* tile broken */}
-                <video id={`video_city_broken_house_${cityName || name}`} src={attackAnimation.broken.house} className="absolute hidden" />
-                <video id={`video_city_broken_hotel_${cityName || name}`} src={attackAnimation.broken.hotel} className="absolute hidden" />
+                {/* tile quake */}
+                <video id={`video_city_quake_house_${cityName || name}`} src={attackAnimation.quake.house} className="absolute hidden" />
+                <video id={`video_city_quake_hotel_${cityName || name}`} src={attackAnimation.quake.hotel} className="absolute hidden" />
                 {/* tile meteor */}
                 <video id={`video_city_meteor_house_${cityName || name}`} src={attackAnimation.meteor.house} className="absolute hidden" />
                 <video id={`video_city_meteor_hotel_${cityName || name}`} src={attackAnimation.meteor.hotel} className="absolute hidden" />
                 {/* tile image */}
-                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

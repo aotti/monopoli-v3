@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 import { fetcher, fetcherOptions, moneyFormat, qS, translateUI } from "../../../helper/helper";
-import { IAttackCityList, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
+import { IAttackAnimationData, IAttackCityList, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
 import { updateCityList } from "./game-tile-event-city-logic";
 import { updateSpecialCardList } from "./game-tile-event-special-card-logic";
 
@@ -25,9 +25,21 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     // get declared city
     const targetCity = qS('#attack_confirmation_city').textContent
     // get city price for steal attack
-    const [targetCityOwner, targetCurrentCity, targetCityName, targetCityPrice] = attackCityList.map(v => v.cityList.map(city => {
+    const [targetCityOwner, targetCurrentCity, targetCityName, targetCityProperty, targetCityPrice] = attackCityList.map(v => v.cityList.map(city => {
         const findCity = city.indexOf(targetCity)
-        if(findCity !== -1) return [v.cityOwner, v.currentCity, city.split(',')]
+        if(findCity !== -1) {
+            const [cityName, cityPrice] = city.split(',')
+            // get city property list
+            const getCityProperty = v.currentCity.split(';').map(v => 
+                // split city from properties
+                v.match(cityName) ? v.split('*')[1] : null
+            // split all properties
+            ).filter(i=>i)[0].split(',')
+            // get city last property
+            const cityLastProperty = getCityProperty[getCityProperty.length-1]
+            // return data
+            return [v.cityOwner, v.currentCity, cityName, cityLastProperty, cityPrice]
+        }
         else return null
     })).flat(10).filter(i => i)
     // submit button
@@ -40,7 +52,8 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
         attacker_city: null,
         target_city_owner: targetCityOwner, // used for db
         target_city_left: null,
-        target_city: targetCity,
+        target_city_property: targetCityProperty,
+        target_city: targetCityName,
         attack_type: submitButton.id,
         event_money: '0',
         special_card: 'used-attack city',
@@ -114,22 +127,33 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     }
 }
 
-export function attackCity(attackData: string, miscState: IMiscContext, gameState: IGameContext) {
-    // result message
-    const notifTitle = qS('#result_notif_title')
-    const notifMessage = qS('#result_notif_message')
-    // get city target & attack type
-    const [targetCity, attackType] = attackData.split('-')
-    // get city element
-    const attackCityElement = qS(`[data-city-info^='${targetCity}']`) as HTMLElement
-    // attack the city
-    if(attackType.match('quake')) {
-
+export function attackCityAnimation(attackAnimationData: IAttackAnimationData) {
+    const {attackTimer, attackType, targetCity, targetCityProperty} = attackAnimationData
+    // get attacked city property
+    const cityProperty = targetCityProperty == '2house1hotel' ? 'hotel' : 'house'
+    // attack animation
+    if(attackType == 'quake') {
+        // get video & audio elements
+        const videoCityQuake = qS(`#video_city_quake_${cityProperty}_${targetCity}`) as HTMLVideoElement
+        const soundCityQuake = qS('#sound_city_quake') as HTMLAudioElement
+        // show video
+        videoCityQuake.classList.remove('hidden')
+        // play video & audio
+        videoCityQuake.play()
+        soundCityQuake.play()
+        // hide quake video
+        setTimeout(() => videoCityQuake.classList.add('hidden'), attackTimer)
     }
-    else if(attackType.match('meteor')) {
-
-    }
-    else if(attackType.match('steal')) {
-
+    else if(attackType == 'meteor') {
+        // get video & audio elements
+        const videoCityMeteor = qS(`#video_city_meteor_${cityProperty}_${targetCity}`) as HTMLVideoElement
+        const soundCityMeteor = qS('#sound_city_meteor') as HTMLAudioElement
+        // display video
+        videoCityMeteor.classList.remove('hidden')
+        // play video & audio
+        videoCityMeteor.play()
+        soundCityMeteor.play()
+        // hide broken video
+        setTimeout(() => videoCityMeteor.classList.add('hidden'), attackTimer)
     }
 }

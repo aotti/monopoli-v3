@@ -260,6 +260,7 @@ export function filterInput(input: InputIDType, value: string) {
             return optionalSpecialCard
         // ====== DECLARE ATTACK CITY TYPE ======
         case 'target_city':
+        case 'target_city_property':
         case 'target_city_left':
         case 'target_city_owner':
         case 'attacker_name':

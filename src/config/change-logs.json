@@ -1,6 +1,13 @@
 {
     "updates": [
         {
+            "version": "v3.05",
+            "date": "xxxxxxxxxxxxx",
+            "changes": [
+                "add attack city feature"
+            ]
+        },
+        {
             "version": "v3.04",
             "date": "22 Apr 2025",
             "changes": [
