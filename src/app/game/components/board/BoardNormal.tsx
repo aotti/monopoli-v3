@@ -18,7 +18,7 @@ export default function BoardNormal() {
     }, [gameState.gamePlayerInfo])
 
     return (
-        <div className="relative z-10">
+        <div className="relative z-10 animate-fade animate-delay-200">
             {/* row 1 */}
             <div className="flex">
             {boardNormal.row_1.map((tile, i) => {
@@ -26,10 +26,10 @@ export default function BoardNormal() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -42,10 +42,10 @@ export default function BoardNormal() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-down`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -58,10 +58,10 @@ export default function BoardNormal() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
@@ -74,10 +74,10 @@ export default function BoardNormal() {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
+                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileCity data={tile} />
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle} animate-fade-up`} data-square={tile.square}>
+                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
                                 <TileOther data={tile} />
                             </div>
                 )
