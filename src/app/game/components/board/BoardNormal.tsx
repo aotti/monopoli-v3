@@ -125,7 +125,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
             // check city property (match the latest prop)
             const tempCityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0]
             // check if city is quaked
-            const isCityQuake = gameState.gameQuakeCity.indexOf(tempCityName) !== -1 ? 'quake' : null
+            const isCityQuake = gameState.gameQuakeCity?.indexOf(tempCityName) !== -1 ? 'quake' : null
             switch(tempCityProperty) {
                 // [owner, price, property]
                 case 'land': 
