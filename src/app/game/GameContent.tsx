@@ -161,7 +161,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 {/* game buttons */
                 gameState.spectator || miscState.showTutorial == 'tutorial_gameroom_2'
                     ? null
-                    : <div className="absolute top-[45%] w-full text-2xs lg:text-xs">
+                    : <div className="absolute z-10 top-[45%] w-full text-2xs lg:text-xs">
                         <GameButtons />
                     </div>
                 }

@@ -14,7 +14,7 @@ export default function GameButtons() {
     const myLap = gameState.gamePlayerInfo[findLap]?.lap
 
     return (
-        <form className="flex flex-col gap-2 lg:gap-3 mx-auto w-fit px-2 text-center animate-fade animate-delay-100" onSubmit={ev => manageFormSubmits(ev, miscState, gameState)}>
+        <form className="flex flex-col gap-2 lg:gap-3 mx-auto w-fit px-2 text-center animate-fade animate-delay-400" onSubmit={ev => manageFormSubmits(ev, miscState, gameState)}>
             {/* username + laps */}
             <div className="flex justify-around mx-auto w-52 lg:w-72">
                 <p> {gameState.myPlayerInfo?.display_name} </p>
