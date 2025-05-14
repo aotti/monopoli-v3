@@ -24,7 +24,8 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
             return resolve(await payingTaxes())
     
         // if you own the city and its special, get money
-        if(tileInfo == 'special' && buyCityProperty == '1house') {
+        const isCitySpecialOrFullUpgrade = (tileInfo == 'city' || tileInfo == 'special') && (buyCityProperty == '1house' || buyCityProperty == 'realestate')
+        if(isCitySpecialOrFullUpgrade) {
             // notif message 
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Special City'})
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'You get xxx when visiting your grandma'})

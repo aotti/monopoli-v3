@@ -171,6 +171,8 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
             hotel: `https://${hostname}/tile_city/Hotel_Meteor_100-j0xIfdMXF1hLNlKtxCXWKz5ml4GlvJ.mp4`
         }
     }
+    // tile crack 
+    const crackImage = `https://${hostname}/tile_city/crack-YTcUa49T5ggR81xgez23xHdkSvn8k0.png`
 
     return (
         <div className="relative">
@@ -185,7 +187,13 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 <video id={`video_city_meteor_house_${cityName || name}`} src={attackAnimation.meteor.house} className="absolute hidden" />
                 <video id={`video_city_meteor_hotel_${cityName || name}`} src={attackAnimation.meteor.hotel} className="absolute hidden" />
                 {/* tile image */}
-                <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                <div className="relative">
+                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                    {/* tile image crack */}
+                    {cityQuake
+                        ? <Image src={crackImage} alt="crack" width={100} height={100} className={`absolute z-10 top-0 saturate-0 w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                        : null}
+                </div>
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

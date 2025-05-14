@@ -4,7 +4,9 @@
             "version": "v3.05",
             "date": "xxxxxxxxxxxxx",
             "changes": [
-                "add attack city feature"
+                "add attack city feature",
+                "add some animations",
+				"normal city will act like special city on full upgrade"
             ]
         },
         {
