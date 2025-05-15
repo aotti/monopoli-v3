@@ -185,7 +185,8 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
                 {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
             ) as [string, number];
             // if city quaked, set 0.5 multiplier, else 1
-            const cityQuake = gameState.gameQuakeCity.indexOf(buyCityName) !== -1 ? 0.5 : 1
+            const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(buyCityName) : null
+            const cityQuake = findQuakeCity && findQuakeCity !== -1 ? 0.5 : 1
             // set tax price
             const taxPrice = specialCard?.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
