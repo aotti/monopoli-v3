@@ -48,6 +48,8 @@ export default class RoomController extends Controller {
         await this.redisReset(`cityOwned_${payload.roomId}`)
         // remove game log
         await this.redisReset(`gameLog_${payload.room_id}`)
+        // remove game quake city
+        await this.redisReset(`gameQuakeCity_${payload.room_id}`)
     }
 
     async getRooms(action: string, payload: ICreateRoom['input']) {

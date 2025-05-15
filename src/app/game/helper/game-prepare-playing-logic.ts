@@ -307,7 +307,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            Math.floor(Math.random() * 101).toString(), 
             branchRNG[0]
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -516,18 +516,22 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // set tile info & element if theres special card
         if(playerSpecialCard && playerTurnData.city) 
             [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
+
         // moving params
         let numberStep = 0
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
         // check next pos (only for board twoway)
-        const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
+        const tempDestinatedPos = (currentPos + playerDice) === 24 || (currentPos + playerDice) === 0 
+                                ? 24 
+                                : (currentPos + playerDice) % 24
         const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
         const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50
         // set destinated pos
-        const destinatedPos = (currentPos + playerDice) === 24 
+        const destinatedPos = (currentPos + playerDice) === 24 || (currentPos + playerDice) === 0
                         ? `24${checkNextPos && checkDestinatedPos.length > 0 ? 'x' : ''}`
                         : `${(currentPos + playerDice) % 24}${checkNextPos && checkDestinatedPos.length > 0 ? 'x' : ''}`
+
         // get prison data for checking prison status
         const prisonNumber = playerTurnData.prison
         // special card container
@@ -536,6 +540,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // buff/debuff container
         const buffCollection = []
         const debuffCollection = []
+        
         // move function
         const stepInterval = setInterval(async () => {
             // check debuff
@@ -583,7 +588,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // prevent tile number == 0
                 // check player dice to decide step forward / backward
                 const tempStep = playerDice < 0 ? currentPos - numberStep : currentPos + numberStep
-                const fixedNextStep = tempStep === 24 ? 24 : (tempStep % 24)
+                const fixedNextStep = tempStep === 24 || tempStep === 0 ? 24 : (tempStep % 24)
                 // check branch tiles
                 const branchTiles = checkBranchTiles('moving', fixedNextStep.toString())
                 // set branch step to walk on branch tile (only board-twoway)
@@ -813,12 +818,16 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
 function checkBranchTiles(action: 'roll_dice'|'moving', pos: string) {
     const tempArray = []
     switch(pos) {
+        // if action = roll dice, set the RNG so it continue move on right tiles
+        // action = moving only run on non-x tiles case
         case '12': case '13': case '14': case '24': case '1': case '2': 
             action == 'roll_dice' ? tempArray.push(50) : tempArray.push('x')
             break
+        // this x tiles only run on action = roll dice
         case '12x': case '13x': case '14x': case '24x': case '1x': case '2x': 
             action == 'roll_dice' ? tempArray.push(51) : null
             break
+        // normal tiles number
         default:
             action == 'roll_dice' ? tempArray.push(Math.floor(Math.random() * 101)) : null
     }

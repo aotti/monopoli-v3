@@ -24,7 +24,9 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
         for(let cards of cardsList) {
             const [minRange, maxRange] = cards.chance
             const pickRarityRNG = buffDebuff 
+                                // pick card with buff
                                 ? buffDebuffEffect >= minRange && buffDebuffEffect <= maxRange
+                                // pick card with rng
                                 : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
             if(pickRarityRNG) {
