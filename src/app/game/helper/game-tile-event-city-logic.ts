@@ -17,26 +17,29 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         // get city info
         const getCityInfo = tileElement.dataset.cityInfo.split(',')
         const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
+        // if city quaked, set 0.5 multiplier, else 1
+        const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(buyCityName) : null
+        const cityQuake = findQuakeCity && findQuakeCity !== -1 ? 0.5 : 1
         // if city owner not current player
         const isCityMine = buyCityOwner != playerTurnData.display_name
         // paying taxes
         if(isCityMine && buyCityProperty != 'land') 
             return resolve(await payingTaxes())
     
-        // if you own the city and its special, get money
+        // if you own the city (max upgrade) and its special, get money
         const isCitySpecialOrFullUpgrade = (tileInfo == 'city' && buyCityProperty == 'realestate') || 
                                         (tileInfo == 'special' && buyCityProperty == '1house')
         if(isCitySpecialOrFullUpgrade) {
             // notif message 
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Special City'})
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'You get xxx when visiting your grandma'})
-                                    .replace('xxx', moneyFormat(+buyCityPrice))
+                                    .replace('xxx', moneyFormat(+buyCityPrice * cityQuake))
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
             return resolve({
                 event: 'special_city',
-                money: +buyCityPrice
+                money: +buyCityPrice * cityQuake
             })
         }
         // if you own the city and its property is maxed, stop
@@ -177,16 +180,14 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         async function payingTaxes() {
             // check debuff
             const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
-                {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
+                {type: 'debuff', effect: 'tax more', price: (+buyCityPrice * cityQuake)},
                 findPlayer, miscState, gameState
             ) as [string, number];
             // check if special card exist
             const [specialCard, specialEffect] = await useSpecialCard(
-                {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
+                {type: 'city', price: (+buyCityPrice * cityQuake), debuff: buffDebuff}, 
+                findPlayer, miscState, gameState
             ) as [string, number];
-            // if city quaked, set 0.5 multiplier, else 1
-            const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(buyCityName) : null
-            const cityQuake = findQuakeCity && findQuakeCity !== -1 ? 0.5 : 1
             // set tax price
             const taxPrice = specialCard?.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)

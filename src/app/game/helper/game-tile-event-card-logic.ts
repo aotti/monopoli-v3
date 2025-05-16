@@ -634,7 +634,7 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     videoCityQuake.play()
                     soundCityQuake.play()
                     // hide quake video
-                    setTimeout(() => videoCityQuake.classList.add('hidden'), 2000)
+                    setTimeout(() => videoCityQuake.classList.add('hidden'), 2500)
                 }
                 // return event data
                 resolve({

@@ -93,12 +93,15 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             playerRNG: getMessage.playerRNG,
             playerSpecialCard: getMessage.playerSpecialCard
         }
-        // ### VALIDATE SPECIAL CARD
-        // ### REMOVE IF PLAYER HAS NO CARD
+        // check if player have special card (upgrade city)
+        const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurn)
+        const tempCurrentSpecialCard = gameState.gamePlayerInfo[findPlayer].card
+        // player have no special card, delete it
+        if(!tempCurrentSpecialCard.match(getMessage.playerSpecialCard))
+            delete rollDiceData.playerSpecialCard
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos
-        // ### player turn = display_name
         playerMoving(rollDiceData, miscState, gameState)
     }
     // surrender
