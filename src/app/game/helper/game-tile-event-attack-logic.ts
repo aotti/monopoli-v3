@@ -61,8 +61,8 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     }
     // warning message
     const quakeWarning = translateUI({lang: miscState.language, text: 'Send earthquake to destined city and cause permanent damage that reduce city tax by 50%. Are you sure wanna attack?'})
-    const meteorWarning = translateUI({lang: miscState.language, text: 'Send meteor to destined city and destroy the whole city (must have > 1 city). Are you sure wanna attack?'})
-    const stealWarning = translateUI({lang: miscState.language, text: 'Threaten destined city with military force to sell the city for 30% price (ppp). Are you sure wanna attack?'})
+    const meteorWarning = translateUI({lang: miscState.language, text: 'Send meteor to destined city and destroy the whole city (enemy must have > 2 city). Are you sure wanna attack?'})
+    const stealWarning = translateUI({lang: miscState.language, text: 'Threaten destined city with military force to sell the city for 30% price (ppp, you must have < 2 cities). Are you sure wanna attack?'})
     
     // confirmation & attack logic
     if(submitButton.id.match('quake')) {
