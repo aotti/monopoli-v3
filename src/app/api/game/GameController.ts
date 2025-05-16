@@ -536,6 +536,8 @@ export default class GameController extends Controller {
         const {token, onlinePlayersData} = filtering.data[0]
         
         const roomId = payload.channel.match(/\d+/)[0]
+        // get attack type
+        const attackType = payload.attack_type.match(/quake|meteor|steal/i)[0]
         // check player turn
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
         if(getPlayerTurns[0] != payload.attacker_name) 
@@ -547,6 +549,7 @@ export default class GameController extends Controller {
             function_args: {
                 tmp_attacker_name: payload.attacker_name,
                 tmp_attacker_city: payload.attacker_city,
+                tmp_attack_type: attackType,
                 tmp_special_card: payload.special_card.split('-')[1], // split 'used-attack city'
                 tmp_target_city_owner: payload.target_city_owner,
                 tmp_target_city_left: payload.target_city_left,
@@ -560,7 +563,6 @@ export default class GameController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            const attackType = payload.attack_type.match(/quake|meteor|steal/i)[0]
             // update game history
             // ### add game history special card
             // ### add game history special card
