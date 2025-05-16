@@ -480,6 +480,7 @@ export default class GameController extends Controller {
             function: 'mnp_sell_city',
             function_args: {
                 tmp_display_name: payload.display_name,
+                tmp_sell_city: payload.sell_city_name,
                 tmp_city: payload.city_left == '' ? null : payload.city_left,
                 tmp_price: +payload.sell_city_price
             }
