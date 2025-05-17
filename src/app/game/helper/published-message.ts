@@ -158,8 +158,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.attackType) {
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
-        console.log('game history updated');
-        
         // show notif
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
@@ -168,36 +166,28 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                 .replace('ccc', getMessage.targetCity)
                                 .replace('ppp', getMessage.attackerName)
                                 .replace('ttt', getMessage.attackType)
-        console.log('start attack animation');
-        
         // attack city animation 
-        const attackTimer = getMessage.attackType == 'meteor' ? 4000 : 2500
+        const attackTimer = getMessage.attackType == 'meteor' ? 5000 : 3000
         attackCityAnimation({
             attackTimer: attackTimer,
             attackType: getMessage.attackType,
             targetCity: getMessage.targetCity,
             targetCityProperty: getMessage.targetCityProperty
         })
-        console.log('animation done');
-        
         // set game quake city
         gameState.setGameQuakeCity(getMessage.quakeCity)
-        console.log('quake city updated');
-        
         // update player data
-        setTimeout(() => {
-            gameState.setGamePlayerInfo(players => {
-                const newPlayerInfo = [...players]
-                // loop player data
-                newPlayerInfo.forEach((np, i) => {
-                    const findPlayer = getMessage.playerData.map(v => v.display_name).indexOf(np.display_name)
-                    newPlayerInfo[i].money = getMessage.playerData[findPlayer].money
-                    newPlayerInfo[i].city = getMessage.playerData[findPlayer].city
-                    newPlayerInfo[i].card = getMessage.playerData[findPlayer].card
-                })
-                return newPlayerInfo
+        gameState.setGamePlayerInfo(players => {
+            const newPlayerInfo = [...players]
+            // loop player data
+            newPlayerInfo.forEach((np, i) => {
+                const findPlayer = getMessage.playerData.map(v => v.display_name).indexOf(np.display_name)
+                newPlayerInfo[i].money = getMessage.playerData[findPlayer].money
+                newPlayerInfo[i].city = getMessage.playerData[findPlayer].city
+                newPlayerInfo[i].card = getMessage.playerData[findPlayer].card
             })
-        }, attackTimer);
+            return newPlayerInfo
+        })
     }
     // end turn
     if(getMessage.playerTurnEnd) {

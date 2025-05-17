@@ -627,14 +627,14 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     // else is house destroyed
                     const destroyedProperty = destroyedCity[1].match(/2house1hotel$|2house$|1house$|land$/)[0] == '2house'
                                             ? 'hotel' : 'house'
-                    const videoCityQuake = qS(`#video_city_quake_${destroyedProperty}_${destroyedCity[0]}`) as HTMLVideoElement
+                    const videoCityQuake = qS(`[id="video_city_quake_${destroyedProperty}_${destroyedCity[0]}"]`) as HTMLVideoElement
                     const soundCityQuake = qS('#sound_city_quake') as HTMLAudioElement
                     videoCityQuake.classList.remove('hidden')
                     // play
                     videoCityQuake.play()
                     soundCityQuake.play()
                     // hide quake video
-                    setTimeout(() => videoCityQuake.classList.add('hidden'), 2500)
+                    setTimeout(() => videoCityQuake.classList.add('hidden'), 3000)
                 }
                 // return event data
                 resolve({
