@@ -128,31 +128,41 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
 }
 
 export function attackCityAnimation(attackAnimationData: IAttackAnimationData) {
+    console.log(attackAnimationData);
+    
     const {attackTimer, attackType, targetCity, targetCityProperty} = attackAnimationData
     // get attacked city property
     const cityProperty = targetCityProperty == '2house1hotel' ? 'hotel' : 'house'
+    console.log('set attack property');
+    
     // attack animation
     if(attackType == 'quake') {
         // get video & audio elements
-        const videoCityQuake = qS(`#video_city_quake_${cityProperty}_${targetCity}`) as HTMLVideoElement
+        const videoCityQuake = qS(`[id="video_city_quake_${cityProperty}_${targetCity}"]`) as HTMLVideoElement
         const soundCityQuake = qS('#sound_city_quake') as HTMLAudioElement
+        console.log('quake media data', videoCityQuake, soundCityQuake);
         // show video
         videoCityQuake.classList.remove('hidden')
         // play video & audio
         videoCityQuake.play()
         soundCityQuake.play()
+        console.log('play quake');
+        
         // hide quake video
         setTimeout(() => videoCityQuake.classList.add('hidden'), attackTimer)
     }
     else if(attackType == 'meteor') {
         // get video & audio elements
-        const videoCityMeteor = qS(`#video_city_meteor_${cityProperty}_${targetCity}`) as HTMLVideoElement
+        const videoCityMeteor = qS(`[id="video_city_meteor_${cityProperty}_${targetCity}"]`) as HTMLVideoElement
         const soundCityMeteor = qS('#sound_city_meteor') as HTMLAudioElement
+        console.log('meteor media data', videoCityMeteor, soundCityMeteor);
         // display video
         videoCityMeteor.classList.remove('hidden')
         // play video & audio
         videoCityMeteor.play()
         soundCityMeteor.play()
+        console.log('play meteor');
+        
         // hide broken video
         setTimeout(() => videoCityMeteor.classList.add('hidden'), attackTimer)
     }

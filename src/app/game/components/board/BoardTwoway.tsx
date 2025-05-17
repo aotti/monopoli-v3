@@ -182,11 +182,11 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
                 {/* tile quake */}
-                <video id={`video_city_quake_house_${cityName || name}`} src={attackAnimation.quake.house} className="absolute hidden" />
-                <video id={`video_city_quake_hotel_${cityName || name}`} src={attackAnimation.quake.hotel} className="absolute hidden" />
+                <video id={`video_city_quake_house_${name}`} src={attackAnimation.quake.house} className="absolute z-10 hidden" />
+                <video id={`video_city_quake_hotel_${name}`} src={attackAnimation.quake.hotel} className="absolute z-10 hidden" />
                 {/* tile meteor */}
-                <video id={`video_city_meteor_house_${cityName || name}`} src={attackAnimation.meteor.house} className="absolute hidden" />
-                <video id={`video_city_meteor_hotel_${cityName || name}`} src={attackAnimation.meteor.hotel} className="absolute hidden" />
+                <video id={`video_city_meteor_house_${name}`} src={attackAnimation.meteor.house} className="absolute z-10 hidden" />
+                <video id={`video_city_meteor_hotel_${name}`} src={attackAnimation.meteor.hotel} className="absolute z-10 hidden" />
                 {/* tile image */}
                 <div className="relative">
                     <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />

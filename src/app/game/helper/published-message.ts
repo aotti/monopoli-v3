@@ -97,8 +97,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurn)
         const tempCurrentSpecialCard = gameState.gamePlayerInfo[findPlayer].card
         // player have no special card, delete it
-        if(!tempCurrentSpecialCard.match(getMessage.playerSpecialCard))
-            delete rollDiceData.playerSpecialCard
+        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard))
+            rollDiceData.playerSpecialCard = null
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos
@@ -158,6 +158,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.attackType) {
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
+        console.log('game history updated');
+        
         // show notif
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
@@ -166,6 +168,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                 .replace('ccc', getMessage.targetCity)
                                 .replace('ppp', getMessage.attackerName)
                                 .replace('ttt', getMessage.attackType)
+        console.log('start attack animation');
+        
         // attack city animation 
         const attackTimer = getMessage.attackType == 'meteor' ? 4000 : 2500
         attackCityAnimation({
@@ -174,8 +178,12 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             targetCity: getMessage.targetCity,
             targetCityProperty: getMessage.targetCityProperty
         })
+        console.log('animation done');
+        
         // set game quake city
         gameState.setGameQuakeCity(getMessage.quakeCity)
+        console.log('quake city updated');
+        
         // update player data
         setTimeout(() => {
             gameState.setGamePlayerInfo(players => {

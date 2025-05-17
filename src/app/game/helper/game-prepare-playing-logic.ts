@@ -79,8 +79,9 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
                 }
                 // change to start button (for creator)
                 // creator has clicked ready
-                const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo?.display_name)
-                if(readyButton && isReadyClicked !== -1 && findCreator !== -1) {
+                const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+                const roomCreator = gameState.gameRoomInfo[findRoom].creator
+                if(readyButton && isReadyClicked !== -1 && roomCreator == gameState.myPlayerInfo.display_name) {
                     readyButton.id = 'start_button'
                     readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
                     return

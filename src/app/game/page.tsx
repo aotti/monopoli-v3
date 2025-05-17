@@ -16,17 +16,23 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
+    // monopoly uuid
+    const monopolyUUIDs = process.env.MONOPOLY_UUID.split('.')
+    const monopolyRNG = Math.floor(Math.random() * 5)
+    // chatting uuid
+    const chattingUUIDs = process.env.CHATTING_UUID.split('.')
+    const chattingRNG = Math.floor(Math.random() * 5)
     // pubnub settings 
     const pubnubSetting = {
         monopoly: {
             subscribeKey: process.env.MONOPOLY_SUB_KEY,
             publishKey: process.env.MONOPOLY_PUB_KEY,
-            userId: process.env.MONOPOLY_UUID
+            userId: monopolyUUIDs[monopolyRNG]
         },
         chatting: {
             subscribeKey: process.env.CHATTING_SUB_KEY,
             publishKey: process.env.CHATTING_PUB_KEY,
-            userId: process.env.CHATTING_UUID
+            userId: chattingUUIDs[chattingRNG]
         }
     }
 
