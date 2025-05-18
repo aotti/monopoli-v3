@@ -60,7 +60,7 @@ export default function PlayerSection() {
                 })}
             </div>
             {/* tooltip info */}
-            <div className="absolute bottom-0 w-[33vw] text-2xs lg:text-xs text-center">
+            <div className="absolute bottom-0 mb-1 w-[33vw] text-2xs lg:text-xs text-center">
                 <span> tooltip: {translateUI({lang: miscState.language, text: 'name & paper icon'})} </span>
             </div>
             {/* sell city box */}

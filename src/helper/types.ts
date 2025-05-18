@@ -68,7 +68,18 @@ export type GameRoomListener = {
         from: string[],
         to: string,
         money: number
-    }
+    },
+    attackerName: string,
+    attackType: string,
+    targetCity: string,
+    targetCityProperty: string,
+    quakeCity: string[],
+    playerData: {
+        display_name: string,
+        city: string,
+        money: number,
+        card: string,
+    }[]
 }
 
 // context
@@ -182,6 +193,8 @@ export interface IGameContext {
     setGameStages: Dispatch<SetStateAction<IGameContext['gameStages']>>,
     gamePlayerTurns: string[], 
     setGamePlayerTurns: Dispatch<SetStateAction<IGameContext['gamePlayerTurns']>>,
+    gameQuakeCity: string[], 
+    setGameQuakeCity: Dispatch<SetStateAction<IGameContext['gameQuakeCity']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
 }
@@ -291,8 +304,9 @@ type RollDiceType = 'rolled_dice'|'rng'|'special_card'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
-type SellCityType = 'sell_city_name'|'sell_city_price'|'city_left'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|'user_agent'
+type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
+type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
+export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -429,6 +443,19 @@ export interface IGamePlay {
         sell_city_price: string,
         city_left: string,
     } & ITokenPayload,
+    declare_attack_city: {
+        channel: string,
+        attacker_name: string,
+        attacker_city: null,
+        attack_type: string,
+        special_card: string,
+        target_city_owner: string,
+        target_city_left: string,
+        target_city_property: string,
+        target_city: string,
+        event_money: string,
+        card: string,
+    } & ITokenPayload,
     turn_end: {
         channel: string,
         display_name: string,
@@ -541,6 +568,7 @@ interface IEventDebuff {
     card?: string,
     debuff?: string,
 }
+
 export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff
 
 interface IBuyCity {
@@ -609,6 +637,20 @@ interface IBuffDebuffReduceMoney {
     money: number,
 }
 export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
+
+// attack city
+export interface IAttackCityList {
+    cityOwner: string,
+    currentCity: string,
+    cityList: string[],
+}
+
+export interface IAttackAnimationData {
+    attackTimer: number, 
+    attackType: string, 
+    targetCity: string, 
+    targetCityProperty: string,
+}
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

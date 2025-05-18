@@ -117,6 +117,7 @@
         "Game History": "Catatan Main",
         "Attack City": "Serang Kota",
         "sell": "jual",
+        "raid": "gas",
         "Upgrade": "Renovasi",
         "only player in this room can see the chat": "obrolan ini hanya bisa dilihat pemain yang ada disini",
 
@@ -154,6 +155,7 @@
         "Pay electricity & water bills 100.000": "Bayar tagihan listrik & air 100.000",
         "Sell 1 owned city (random)": "Menjual 1 kota yang dimiliki (acak)",
         "Home Renovation TV Show gives you upgrade city card": "Acara TV Rumah Debah memberikan anda kartu untuk upgrade kota",
+        "You are dreaming about getting hit by truck and going to other world then get attack city card": "Saat sedang tidur, anda bermimpi ditabrak truk dan pergi ke isekai, lalu mendapat kartu serang kota",
 
         "__KARTU KESEMPATAN__": "__KARTU KESEMPATAN__",
         "You stumbled, take 2 step forward": "Kaki anda tersandung, maju 2 langkah",
@@ -262,6 +264,7 @@
         "you have joined a room": "anda sudah gabung ke ruang",
         "you have created a room": "anda sudah buat ruang",
         "creator cannot leave this way, please delete the room to leave": "pembuat tidak bisa kabur, kalo mau hapus ruangnya",
+        "you dont have upgrade city card 💀": "anda tidak punya kartu upgrade kota 💀",
 
         "__GAMEPLAY TRANSLATE__": "__GAMEPLAY TRANSLATE__",
         "Preparation": "Persiapan",
@@ -270,6 +273,9 @@
         "Game Start": "Permainan Mulai",
         "Only buff & debuff area works on lap 1, other event starts on laps > 1": "Hanya area buff & debuff yang bekerja di lap 1, sisanya di lap > 1",
         "Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?": "Hanya pakai jika anda punya kota! (bukan kota khusus) Kalau tidak, kartu akan terpakai tanpa efek.\nYakin mau renovasi?",
+        "Send earthquake to destined city and cause permanent damage that reduce city tax by 50%. Are you sure wanna attack?": "Mengirim gempa ke kota yang dituju dan menyebabkan kerusakan permanen serta mengurangi pajak 50%. Anda yakin mau serang?",
+        "Send meteor to destined city and destroy the whole city (enemy must have > 2 city). Are you sure wanna attack?": "Mengirim meteor ke kota yang dituju dan menghancurkannya (musuh harus ada > 2 kota). Anda yakin mau serang?",
+        "Threaten destined city with military force to sell the city for 30% price (ppp, you must have < 2 cities). Are you sure wanna attack?": "Mengancam kota yang dituju dengan kekuatan militer agar mau menjual kotanya dengan harga 30% (ppp, anda harus punya < 2 kota). Anda yakin mau serang?",
         "Do you really wanna sell ccc city?": "Apakah anda ingin menjual kota ccc?",
         "click roll turn": "klik putar angka",
         "ppp turn": "giliran ppp",
@@ -289,6 +295,7 @@
         "The city curse you for xxx": "Kota ini mengutuk anda sebanyak xxx",
         "Prison": "Penjara",
         "ppp get arrested for being silly. accumulate > aaa dice number to be free.": "ppp ditahan karna tindakan golbok. kumpulkan > aaa angka dadu untuk bebas.",
+        "ccc city attacked by ppp with ttt": "kota ccc diserang oleh ppp dengan ttt",
         "\"wanna use sss card?\" ttt": "\"ingin pakai kartu sss?\" ttt",
         "\"debuff reduce money\"": "\"debuff pengurangan uang\"",
         "\"buff reduce price\"": "\"buff pengurangan harga\"",

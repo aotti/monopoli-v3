@@ -25,7 +25,7 @@ export default function GameNotif() {
             <div className="flex items-center justify-around">
                 <GameNotifWithImage />
                 <div className="w-[50vw] lg:w-[35vw]">
-                    <p id="result_notif_message"></p>
+                    <p id="result_notif_message" className="whitespace-pre-line"></p>
                     <p id="result_notif_timer"></p>
                     {gameState.showGameNotif?.match('with_button') ? <GameNotifWithButtons /> : null}
                 </div>

@@ -7,7 +7,12 @@
                 {
                     "description": "Home Renovation TV Show gives you upgrade city card",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_S-Y3gSceoeaywaS2ABkaIresagoyBHRh.png",
-                    "effect": "special card_city upgrade"
+                    "effect": "special card_upgrade city"
+                },
+                {
+                    "description": "You are dreaming about getting hit by truck and going to other world then get attack city card",
+                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_S-HeOnWKulBma1kRBB97laqdfLCJpVh3.png",
+                    "effect": "special card_attack city"
                 }
             ]
         },

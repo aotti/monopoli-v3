@@ -2,19 +2,21 @@
     "updates": [
         {
             "version": "v3.05",
+            "date": "14 May 2025",
+            "changes": [
+                "add attack city feature",
+                "add some animations",
+				"normal city will act like special city on full upgrade"
+            ]
+        },
+        {
+            "version": "v3.04",
             "date": "22 Apr 2025",
             "changes": [
                 "fix some bugs",
                 "add rarity to chance & community cards",
                 "add sound for player turn",
                 "game translation 99%"
-            ]
-        },
-        {
-            "version": "v3.04",
-            "date": "13 Apr 2025",
-            "changes": [
-                "fix some bugs"
             ]
         },
         {

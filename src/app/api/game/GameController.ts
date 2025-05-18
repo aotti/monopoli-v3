@@ -54,9 +54,9 @@ export default class GameController extends Controller {
         }
         else {
             // extract data
-            const extractData = data.map(v => Object.entries(v))
+            const extractPlayerData = data.map(v => Object.entries(v))
             // convert data to array object
-            const extractedData = extractData.map(temp => {
+            const extractedPlayerData = extractPlayerData.map(temp => {
                 // extract nested object to array
                 const tempExtractedData = temp.map(v => v[1] && typeof v[1] == 'object' ? Object.entries(v[1]).flat() : v)
                 // set new data
@@ -76,6 +76,8 @@ export default class GameController extends Controller {
             const sortDecidePlayers = getDecidePlayers.sort((a,b) => b.rolled_number - a.rolled_number)
             // get player turns
             const getPlayerTurns = await this.redisGet(`playerTurns_${payload.room_id}`)
+            // get quake city
+            const getQuakeCity = await this.redisGet(`gameQuakeCity_${payload.room_id}`)
             // get game history
             const getGameHistory = await this.redisGet(`gameHistory_${payload.room_id}`)
             // set result
@@ -86,8 +88,9 @@ export default class GameController extends Controller {
                     arr.findLastIndex(obj2 => obj2.display_name == obj1.display_name) === i
                 ) : null,
                 playerTurns: getPlayerTurns.length > 0 ? getPlayerTurns : null,
+                quakeCity: getQuakeCity.length > 0 ? getQuakeCity : null,
                 gameHistory: getGameHistory,
-                getPlayers: extractedData,
+                getPlayers: extractedPlayerData,
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
@@ -477,6 +480,7 @@ export default class GameController extends Controller {
             function: 'mnp_sell_city',
             function_args: {
                 tmp_display_name: payload.display_name,
+                tmp_sell_city: payload.sell_city_name,
                 tmp_city: payload.city_left == '' ? null : payload.city_left,
                 tmp_price: +payload.sell_city_price
             }
@@ -515,7 +519,91 @@ export default class GameController extends Controller {
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
-                data: data[0],
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
+    async attackCity(action: string, payload: IGamePlay['declare_attack_city']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        
+        const roomId = payload.channel.match(/\d+/)[0]
+        // get attack type
+        const attackType = payload.attack_type.match(/quake|meteor|steal/i)[0]
+        // check player turn
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.attacker_name) 
+            return this.respond(400, 'only allowed on your turn', [])
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_attack_city',
+            function_args: {
+                tmp_attacker_name: payload.attacker_name,
+                tmp_attacker_city: payload.attacker_city,
+                tmp_attack_type: attackType,
+                tmp_special_card: payload.special_card.split('-')[1], // split 'used-attack city'
+                tmp_target_city_owner: payload.target_city_owner,
+                tmp_target_city_left: payload.target_city_left,
+                tmp_event_money: +payload.event_money,
+                tmp_card: payload.card
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            // update game history
+            // ### add game history special card
+            // ### add game history special card
+            const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            const gameHistory: IGameContext['gameHistory'] = [{
+                display_name: payload.attacker_name,
+                room_id: +roomId,
+                history: `attack_city: ${payload.target_city} city attacked by ${payload.attacker_name} (${attackType})`
+            }]
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
+            // get quake city data
+            const getQuakeCity = await this.redisGet(`gameQuakeCity_${roomId}`)
+            let filteredQuakeCity = null
+            // set redis for attack type QUAKE
+            if(attackType == 'quake') {
+                filteredQuakeCity = [...getQuakeCity, payload.target_city].filter((v, i, arr) => arr.indexOf(v) == i)
+                await this.redisSet(`gameQuakeCity_${roomId}`, filteredQuakeCity)
+            }
+            // publish data
+            const publishData = {
+                attackerName: payload.attacker_name,
+                attackType: attackType,
+                targetCity: payload.target_city,
+                targetCityProperty: payload.target_city_property,
+                quakeCity: filteredQuakeCity,
+                playerData: data,
+                gameHistory: [...getGameHistory, ...gameHistory]
+            }
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // publish to roomlist
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            console.log(isRoomPublished);
+            
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
                 token: token
             }
             result = this.respond(200, `${action} success`, [resultData])

@@ -44,11 +44,13 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameStage, decidePlayers, preparePlayers, gameHistory, playerTurns } = getPlayerResponse.data[0]
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, quakeCity, gameHistory, playerTurns } = getPlayerResponse.data[0]
             // set game stage
             gameState.setGameStages(gameStage)
             // set player list
             gameState.setGamePlayerInfo(getPlayers)
+            // set game quake city
+            gameState.setGameQuakeCity(quakeCity)
             // set game history
             gameState.setGameHistory(gameHistory)
             // set player turns
@@ -77,8 +79,9 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
                 }
                 // change to start button (for creator)
                 // creator has clicked ready
-                const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo?.display_name)
-                if(readyButton && isReadyClicked !== -1 && findCreator !== -1) {
+                const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+                const roomCreator = gameState.gameRoomInfo[findRoom].creator
+                if(readyButton && isReadyClicked !== -1 && roomCreator == gameState.myPlayerInfo.display_name) {
                     readyButton.id = 'start_button'
                     readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
                     return
@@ -149,8 +152,9 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
                 delete readyGameResponse.data[0].token
             }
             // button for creator
-            const findCreator = gameState.gameRoomInfo.map(v => v.creator).indexOf(gameState.myPlayerInfo.display_name)
-            if(findCreator !== -1) {
+            const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+            const roomCreator = gameState.gameRoomInfo[findRoom].creator
+            if(roomCreator === gameState.myPlayerInfo.display_name) {
                 readyButton.removeAttribute('disabled')
                 readyButton.id = 'start_button'
                 readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
@@ -502,9 +506,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // reset notif timer
         notifTimer.textContent = ''
         // find current room info
-        const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-        const boardType = gameState.gameRoomInfo[findRoomInfo].board
-        const loseCondition = gameState.gameRoomInfo[findRoomInfo].money_lose
+        const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
+        const boardType = gameState.gameRoomInfo[findRoom].board
+        const loseCondition = gameState.gameRoomInfo[findRoom].money_lose
         // find current player
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(playerTurn)
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
@@ -513,18 +517,22 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // set tile info & element if theres special card
         if(playerSpecialCard && playerTurnData.city) 
             [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
+
         // moving params
         let numberStep = 0
         let [numberLaps, throughStart] = [playerTurnData.lap, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
         // check next pos (only for board twoway)
-        const tempDestinatedPos = (currentPos + playerDice) === 24 ? 24 : (currentPos + playerDice) % 24
+        const tempDestinatedPos = (currentPos + playerDice) === 24 || (currentPos + playerDice) === 0 
+                                ? 24 
+                                : (currentPos + playerDice) % 24
         const checkDestinatedPos = checkBranchTiles('moving', tempDestinatedPos.toString())
         const checkNextPos = boardType == 'twoway' && +playerRNG[1] > 50
         // set destinated pos
-        const destinatedPos = (currentPos + playerDice) === 24 
+        const destinatedPos = (currentPos + playerDice) === 24 || (currentPos + playerDice) === 0
                         ? `24${checkNextPos && checkDestinatedPos.length > 0 ? 'x' : ''}`
                         : `${(currentPos + playerDice) % 24}${checkNextPos && checkDestinatedPos.length > 0 ? 'x' : ''}`
+
         // get prison data for checking prison status
         const prisonNumber = playerTurnData.prison
         // special card container
@@ -533,6 +541,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // buff/debuff container
         const buffCollection = []
         const debuffCollection = []
+        
         // move function
         const stepInterval = setInterval(async () => {
             // check debuff
@@ -580,7 +589,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // prevent tile number == 0
                 // check player dice to decide step forward / backward
                 const tempStep = playerDice < 0 ? currentPos - numberStep : currentPos + numberStep
-                const fixedNextStep = tempStep === 24 ? 24 : (tempStep % 24)
+                const fixedNextStep = tempStep === 24 || tempStep === 0 ? 24 : (tempStep % 24)
                 // check branch tiles
                 const branchTiles = checkBranchTiles('moving', fixedNextStep.toString())
                 // set branch step to walk on branch tile (only board-twoway)
@@ -725,7 +734,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                                         : -1
             // check if accumulate dice is enough
             // 1 dice = 6, 2 dice = 12
-            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
+            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // check if player is losing
             const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (buffDebuffEffect || 0)))
@@ -810,12 +819,16 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
 function checkBranchTiles(action: 'roll_dice'|'moving', pos: string) {
     const tempArray = []
     switch(pos) {
+        // if action = roll dice, set the RNG so it continue move on right tiles
+        // action = moving only run on non-x tiles case
         case '12': case '13': case '14': case '24': case '1': case '2': 
             action == 'roll_dice' ? tempArray.push(50) : tempArray.push('x')
             break
+        // this x tiles only run on action = roll dice
         case '12x': case '13x': case '14x': case '24x': case '1x': case '2x': 
             action == 'roll_dice' ? tempArray.push(51) : null
             break
+        // normal tiles number
         default:
             action == 'roll_dice' ? tempArray.push(Math.floor(Math.random() * 101)) : null
     }

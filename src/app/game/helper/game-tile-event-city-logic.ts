@@ -17,24 +17,29 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         // get city info
         const getCityInfo = tileElement.dataset.cityInfo.split(',')
         const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
+        // if city quaked, set 0.5 multiplier, else 1
+        const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(buyCityName) : null
+        const cityQuake = findQuakeCity && findQuakeCity !== -1 ? 0.5 : 1
         // if city owner not current player
-        // === paying taxes ===
-        const isCityNotMine = buyCityOwner != playerTurnData.display_name
-        if(isCityNotMine && buyCityProperty != 'land') 
+        const isCityMine = buyCityOwner != playerTurnData.display_name
+        // paying taxes
+        if(isCityMine && buyCityProperty != 'land') 
             return resolve(await payingTaxes())
     
-        // if you own the city and its special, get money
-        if(tileInfo == 'special' && buyCityProperty == '1house') {
+        // if you own the city (max upgrade) and its special, get money
+        const isCitySpecialOrFullUpgrade = (tileInfo == 'city' && buyCityProperty == 'realestate') || 
+                                        (tileInfo == 'special' && buyCityProperty == '1house')
+        if(isCitySpecialOrFullUpgrade) {
             // notif message 
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Special City'})
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'You get xxx when visiting your grandma'})
-                                    .replace('xxx', moneyFormat(+buyCityPrice))
+                                    .replace('xxx', moneyFormat(+buyCityPrice * cityQuake))
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
             return resolve({
                 event: 'special_city',
-                money: +buyCityPrice
+                money: +buyCityPrice * cityQuake
             })
         }
         // if you own the city and its property is maxed, stop
@@ -54,10 +59,10 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         const buyCityPriceFixed = buffDebuff ? +buyCityPrice - buffDebuffEffect : +buyCityPrice
         // set event text for notif
         let [eventTitle, eventContent] = [
-            !isCityNotMine 
+            !isCityMine 
                 ? translateUI({lang: miscState.language, text: 'Upgrade City'}) 
                 : translateUI({lang: miscState.language, text: 'Buy City'}), 
-            !isCityNotMine 
+            !isCityMine 
                 // upgrade city content
                 ? translateUI({lang: miscState.language, text: 'Do you wanna upgrade xxx city for xxx?'})
                 // buy city content
@@ -175,12 +180,13 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         async function payingTaxes() {
             // check debuff
             const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
-                {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
+                {type: 'debuff', effect: 'tax more', price: (+buyCityPrice * cityQuake)},
                 findPlayer, miscState, gameState
             ) as [string, number];
             // check if special card exist
             const [specialCard, specialEffect] = await useSpecialCard(
-                {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, findPlayer, miscState, gameState
+                {type: 'city', price: (+buyCityPrice * cityQuake), debuff: buffDebuff}, 
+                findPlayer, miscState, gameState
             ) as [string, number];
             // set tax price
             const taxPrice = specialCard?.match('anti tax') ? 0 
@@ -190,7 +196,7 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
                 visitor: playerTurnData.display_name,
-                money: taxPrice,
+                money: taxPrice * cityQuake,
                 card: specialCard,
                 debuff: buffDebuff
             }
@@ -247,13 +253,16 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
         }
     }
     // CONFIRMATION TO SELL CITY
+    const translatedCityName = translateUI({lang: miscState.language, text: inputValues.sell_city_name as any}) || inputValues.sell_city_name
     const sellCityWarning = translateUI({lang: miscState.language, text: 'Do you really wanna sell ccc city?'})
-                            .replace('ccc', inputValues.sell_city_name)
+                            .replace('ccc', translatedCityName)
     if(!confirm(sellCityWarning)) return false
     // loading button
     const tempButtonText = sellButton.textContent
     sellButton.textContent = 'Loading'
     sellButton.disabled = true
+    // set state to disable "back to room & surrender" buttons
+    miscState.setDisableButtons('gameroom')
     // fetch
     const sellCityFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
     const sellCityResponse: IResponse = await (await fetcher('/game', sellCityFetchOptions)).json()
@@ -265,11 +274,15 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
                 localStorage.setItem('accessToken', sellCityResponse.data[0].token)
                 delete sellCityResponse.data[0].token
             }
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
             // submit button normal
             sellButton.textContent = tempButtonText
             sellButton.removeAttribute('disabled')
             return
         default: 
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
@@ -369,15 +382,31 @@ export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'
 export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
     const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
     if(!confirm(upgradeCityWarning)) return
-    // roll dice button
-    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
     // sound effect
     const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
+    // roll dice button
+    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
     // loading button
     const tempRollDiceText = rollDiceButton.textContent
     rollDiceButton.textContent = 'Loading'
     // set history
     localStorage.setItem('specialCardUsed', `special_card: upgrade city 💳`)
     soundSpecialCard.play()
+    // ### check if player really have the card
+    // ### check if player really have the card
+    // ### ONLY DO CHECKING IN published-message
+    const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    const isUpgradeCityCardExist = gameState.gamePlayerInfo[findPlayer].card.match(/upgrade city/i)
+    // player dont have upgrade city card
+    if(!isUpgradeCityCardExist) {
+        const notifTitle = qS('#result_notif_title')
+        const notifMessage = qS('#result_notif_message')
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = 'error 400'
+        notifMessage.textContent = translateUI({lang: miscState.language, text: 'you dont have upgrade city card 💀'})
+        return
+    }
     rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
 }

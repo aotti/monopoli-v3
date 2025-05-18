@@ -48,7 +48,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
     const [showInputPassword, setShowInputPassword] = useState(false)
 
     return (
-        <div className={`relative w-[calc(100%-52.5%)] h-56 lg:h-60 border-2 ${roomStatusColor}`}>
+        <div className={`relative w-[calc(100%-52.5%)] h-56 lg:h-60 border-2 ${roomStatusColor} animate-fade-down animate-once`}>
             <form onSubmit={ev => manageFormSubmits(ev, roomId, miscState, gameState)}>
                 {/* room id */}
                 <input type="hidden" id="room_id" value={roomId} />

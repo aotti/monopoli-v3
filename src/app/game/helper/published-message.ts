@@ -2,6 +2,7 @@ import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
 import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
+import { attackCityAnimation } from "./game-tile-event-attack-logic"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -76,11 +77,13 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = decidePlayersRank.join('\n')
         // change game stage
         gameState.setGameStages(getMessage.gameStage)
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
-        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
-        notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
+        // show notif if game stage == play
+        if(getMessage.gameStage == 'play') {
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
+            notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
+        }
     }
     // roll dice
     if(getMessage.playerTurn && typeof getMessage.playerDice == 'number') {
@@ -90,10 +93,15 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             playerRNG: getMessage.playerRNG,
             playerSpecialCard: getMessage.playerSpecialCard
         }
+        // check if player have special card (upgrade city)
+        const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurn)
+        const tempCurrentSpecialCard = gameState.gamePlayerInfo[findPlayer].card
+        // player have no special card, delete it
+        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard))
+            rollDiceData.playerSpecialCard = null
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos
-        // ### player turn = display_name
         playerMoving(rollDiceData, miscState, gameState)
     }
     // surrender
@@ -146,6 +154,41 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return cityLeftInfo
         })
     }
+    // attack city
+    if(getMessage.attackType) {
+        // update game history
+        gameState.setGameHistory(getMessage.gameHistory)
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = translateUI({lang: miscState.language, text: 'Attack City'})
+        notifMessage.textContent = translateUI({lang: miscState.language, text: `ccc city attacked by ppp with ttt`})
+                                .replace('ccc', getMessage.targetCity)
+                                .replace('ppp', getMessage.attackerName)
+                                .replace('ttt', getMessage.attackType)
+        // attack city animation 
+        const attackTimer = getMessage.attackType == 'meteor' ? 5000 : 3000
+        attackCityAnimation({
+            attackTimer: attackTimer,
+            attackType: getMessage.attackType,
+            targetCity: getMessage.targetCity,
+            targetCityProperty: getMessage.targetCityProperty
+        })
+        // set game quake city
+        gameState.setGameQuakeCity(getMessage.quakeCity)
+        // update player data
+        gameState.setGamePlayerInfo(players => {
+            const newPlayerInfo = [...players]
+            // loop player data
+            newPlayerInfo.forEach((np, i) => {
+                const findPlayer = getMessage.playerData.map(v => v.display_name).indexOf(np.display_name)
+                newPlayerInfo[i].money = getMessage.playerData[findPlayer].money
+                newPlayerInfo[i].city = getMessage.playerData[findPlayer].city
+                newPlayerInfo[i].card = getMessage.playerData[findPlayer].card
+            })
+            return newPlayerInfo
+        })
+    }
     // end turn
     if(getMessage.playerTurnEnd) {
         // save playerTurns
@@ -196,8 +239,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
-        console.log('game over',getMessage.gameOverPlayers);
-        
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player == gameState.myPlayerInfo.display_name) {

@@ -3,7 +3,7 @@ import change_logs from "../config/change-logs.json"
 import { qS } from "../helper/helper"
 
 export default function Updates() {
-    const currentVersion = 'v3.05'
+    const currentVersion = change_logs.updates[0].version
     // updates state
     const [showUpdates, setShowUpdates] = useState(false)
     const [showVersion, setShowVersion] = useState(null)
@@ -25,7 +25,7 @@ export default function Updates() {
 
     return (
         <>
-            <div className={showVersion == currentVersion ? `` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`} data-version={currentVersion}>
+            <div className={showVersion == currentVersion ? `hover:animate-pulse` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full hover:animate-pulse`} data-version={currentVersion}>
                 <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={handleShowMarkUpdates}> 
                     updates 
                 </button>

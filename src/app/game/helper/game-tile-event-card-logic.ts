@@ -24,7 +24,9 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
         for(let cards of cardsList) {
             const [minRange, maxRange] = cards.chance
             const pickRarityRNG = buffDebuff 
+                                // pick card with buff
                                 ? buffDebuffEffect >= minRange && buffDebuffEffect <= maxRange
+                                // pick card with rng
                                 : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
             if(pickRarityRNG) {
@@ -552,10 +554,10 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                 // get owned city
                 const getOwnedCity = playerTurnData.city ? playerTurnData.city.split(';') : null
                 if(!getOwnedCity) {
-                    setTimeout(() => {
+                    return setTimeout(() => {
                         // notif message
                         notifTimer.textContent = 'can you buy a city pls?'
-                        return resolve({
+                        resolve({
                             event: 'get_card',
                             rank: rank,
                             type: type,
@@ -618,21 +620,21 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                 // show notif
                 miscState.setAnimation(true)
                 gameState.setShowGameNotif('card')
-                // if destroyed, show broken video & sound
+                // if destroyed, show quake video & sound
                 if(destroyedCity) {
                     // get destroyed property
                     // if the last property is 2house, then hotel destroyed
                     // else is house destroyed
                     const destroyedProperty = destroyedCity[1].match(/2house1hotel$|2house$|1house$|land$/)[0] == '2house'
                                             ? 'hotel' : 'house'
-                    const videoCityBroken = qS(`#video_city_broken_${destroyedProperty}_${destroyedCity[0]}`) as HTMLVideoElement
-                    const soundCityBroken = qS('#sound_city_broken') as HTMLAudioElement
-                    videoCityBroken.classList.remove('hidden')
+                    const videoCityQuake = qS(`[id="video_city_quake_${destroyedProperty}_${destroyedCity[0]}"]`) as HTMLVideoElement
+                    const soundCityQuake = qS('#sound_city_quake') as HTMLAudioElement
+                    videoCityQuake.classList.remove('hidden')
                     // play
-                    videoCityBroken.play()
-                    soundCityBroken.play()
-                    // hide broken video
-                    setTimeout(() => videoCityBroken.classList.add('hidden'), 2000)
+                    videoCityQuake.play()
+                    soundCityQuake.play()
+                    // hide quake video
+                    setTimeout(() => videoCityQuake.classList.add('hidden'), 3000)
                 }
                 // return event data
                 resolve({

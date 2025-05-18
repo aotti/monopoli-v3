@@ -24,7 +24,10 @@
             "Pay electricity & water bills 100.000",
             "Sell 1 owned city (random)"
         ],
-        "5%": ["Home Renovation TV Show gives you upgrade city card"]
+        "5%": [
+            "Home Renovation TV Show gives you upgrade city card",
+            "You are dreaming about getting hit by truck and going to other world then get attack city card"
+        ]
     },
     "chance_card": {
         ">25%": [
@@ -51,7 +54,10 @@
             "Your police neighbor gives you an anti jail card as a Christmas present",
             "You get a surprise money of 200.000"
         ],
-        "5%": ["Home Renovation TV Show gives you upgrade city card"]
+        "5%": [
+            "Home Renovation TV Show gives you upgrade city card",
+            "You are dreaming about getting hit by truck and going to other world then get attack city card"
+        ]
     },
     "special_card": {
         "reminder": [

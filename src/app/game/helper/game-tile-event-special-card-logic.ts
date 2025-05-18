@@ -257,8 +257,13 @@ export function useSpecialCard(data: SpecialCardEventType, findPlayer: number, m
 
 // ========== > UPDATE SPECIAL CARD LIST ==========
 // ========== > UPDATE SPECIAL CARD LIST ==========
+/**
+ * @param cardData array of special card (ex: ['used-upgrade city', 'add-anti tax'])
+ * @param currentSpecialCard current player card data
+ * @returns 
+ */
 export function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
-    const tempSpecialCardArray = currentSpecialCard?.split(';') || []
+    const tempCurrentSpecialCard = currentSpecialCard?.split(';') || []
     for(let cd of cardData) {
         // card null
         if(!cd) continue
@@ -266,15 +271,15 @@ export function updateSpecialCardList(cardData: string[], currentSpecialCard: st
         const [action, specialCard] = cd.split('-')
         if(action == 'add') {
             // check if player already have the card
-            const isSpecialCardOwned = tempSpecialCardArray.indexOf(specialCard)
+            const isSpecialCardOwned = tempCurrentSpecialCard.indexOf(specialCard)
             // dont have yet, then add
-            if(isSpecialCardOwned === -1) tempSpecialCardArray.push(specialCard)
+            if(isSpecialCardOwned === -1) tempCurrentSpecialCard.push(specialCard)
         }
         else if(action == 'used') {
             // remove the card
-            const findSpecialCard = tempSpecialCardArray.indexOf(specialCard)
-            tempSpecialCardArray.splice(findSpecialCard, 1)
+            const findSpecialCard = tempCurrentSpecialCard.indexOf(specialCard)
+            tempCurrentSpecialCard.splice(findSpecialCard, 1)
         }
     }
-    return tempSpecialCardArray.length === 0 ? null : tempSpecialCardArray.join(';')
+    return tempCurrentSpecialCard.length === 0 ? null : tempCurrentSpecialCard.join(';')
 }
