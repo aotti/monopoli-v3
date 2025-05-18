@@ -12,17 +12,23 @@ const redisClient = redis()
 
 export default class Controller {
     protected dq = new DatabaseQueries()
+    // monopoly uuid
+    private monopolyUUIDs = process.env.MONOPOLY_UUID.split('.')
+    private monopolyRNG = Math.floor(Math.random() * 5)
+    // chatting uuid
+    private chattingUUIDs = process.env.CHATTING_UUID.split('.')
+    private chattingRNG = Math.floor(Math.random() * 5)
     // pubnub for monopoly
     private monopoliPubnubServer = new PubNub({
         subscribeKey: process.env.MONOPOLY_SUB_KEY,
         publishKey: process.env.MONOPOLY_PUB_KEY,
-        userId: process.env.MONOPOLY_UUID
+        userId: this.monopolyUUIDs[this.monopolyRNG]
     })
     // pubnub for chatting
     private chattingPubnubServer = new PubNub({
         subscribeKey: process.env.CHATTING_SUB_KEY,
         publishKey: process.env.CHATTING_PUB_KEY,
-        userId: process.env.CHATTING_UUID
+        userId: this.chattingUUIDs[this.chattingRNG]
     })
 
     constructor() {
