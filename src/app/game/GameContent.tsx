@@ -30,7 +30,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
     clickOutsideElement(gameSideButtonRef, () => gameState.setGameSideButton(null))
     // game history ref
     const gameHistoryRef = useRef()
-    clickOutsideElement(gameHistoryRef, () => gameState.setShowGameHistory(false))
+    clickOutsideElement(gameHistoryRef, () => gameState.setExpandGameHistory(false))
     // return spectator to false
     const spectatorLeave = () => {
         gameState.setSpectator(false)
@@ -133,7 +133,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 {gameState.gameRoomId ? <GameInfo roomId={gameState.gameRoomId} /> : null}
                 {/* game history */}
                 <div ref={gameHistoryRef} className={`relative top-10 lg:top-36 text-2xs lg:text-xs
-                ${gameState.displaySettingItem == 'game_history' || miscState.showTutorial == 'tutorial_gameroom_3' ? 'visible' : 'invisible'} `}>
+                ${gameState.showGameHistory || miscState.showTutorial == 'tutorial_gameroom_3' ? 'visible' : 'invisible'} `}>
                     <PlayerSettingGameHistory />
                 </div>
             </div>
@@ -141,7 +141,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* middle side */}
             {/* tutorial: relative z-10 */}
             <section className={`${miscState.showTutorial == 'tutorial_gameroom_2' ? 'relative z-10' : ''}
-            col-span-10 grid grid-rows-6 gap-8 justify-center 
+            col-span-10 grid grid-rows-6 gap-8 justify-center
             h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
                 {/* board */}
                 {gameState.gameRoomId
@@ -161,7 +161,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 {/* game buttons */
                 gameState.spectator || miscState.showTutorial == 'tutorial_gameroom_2'
                     ? null
-                    : <div className="absolute z-10 top-[45%] w-full text-2xs lg:text-xs">
+                    : <div className="absolute top-[45%] w-full text-2xs lg:text-xs">
                         <GameButtons />
                     </div>
                 }

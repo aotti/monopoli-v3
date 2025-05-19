@@ -611,4 +611,16 @@ export default class GameController extends Controller {
         // return result
         return result
     }
+
+    async fixPlayerTurns(action: string, payload) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        
+        const roomId = payload.channel.match(/\d+/)[0]
+    }
 }

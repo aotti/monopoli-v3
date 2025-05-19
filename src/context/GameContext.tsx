@@ -15,6 +15,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [openPlayerSetting, setOpenPlayerSetting] = useState(false)
     const [displaySettingItem, setDisplaySettingItem] = useState<IGameContext['displaySettingItem']>(null)
     const [showGameHistory, setShowGameHistory] = useState(false)
+    const [expandGameHistory, setExpandGameHistory] = useState(false)
     // player
     const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
@@ -47,14 +48,11 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     }
     
     const sideButtonStates = {
-        gameSideButton: gameSideButton,
-        setGameSideButton: setGameSideButton,
-        openPlayerSetting: openPlayerSetting,
-        setOpenPlayerSetting: setOpenPlayerSetting,
-        displaySettingItem: displaySettingItem,
-        setDisplaySettingItem: setDisplaySettingItem,
-        showGameHistory: showGameHistory,
-        setShowGameHistory: setShowGameHistory,
+        gameSideButton, setGameSideButton,
+        openPlayerSetting, setOpenPlayerSetting,
+        displaySettingItem, setDisplaySettingItem,
+        showGameHistory, setShowGameHistory,
+        expandGameHistory, setExpandGameHistory
     }
 
     const playerStates = {

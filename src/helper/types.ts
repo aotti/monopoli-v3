@@ -160,10 +160,12 @@ export interface IGameContext {
     setGameSideButton: Dispatch<SetStateAction<IGameContext['gameSideButton']>>,
     openPlayerSetting: boolean,
     setOpenPlayerSetting: Dispatch<SetStateAction<boolean>>,
-    displaySettingItem: 'sell_city'|'game_history'|'attack_city',
+    displaySettingItem: 'sell_city'|'attack_city',
     setDisplaySettingItem: Dispatch<SetStateAction<IGameContext['displaySettingItem']>>,
     showGameHistory: boolean,
     setShowGameHistory: Dispatch<SetStateAction<boolean>>,
+    expandGameHistory: boolean,
+    setExpandGameHistory: Dispatch<SetStateAction<boolean>>,
     // player
     myPlayerInfo: IPlayer,
     setMyPlayerInfo: Dispatch<SetStateAction<IPlayer>>,

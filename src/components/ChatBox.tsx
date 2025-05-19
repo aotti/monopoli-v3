@@ -56,8 +56,11 @@ export default function ChatBox({ page, id, pubnubSetting }: IChatBox) {
 }
 
 function ChatRoomList() {
+    const miscState = useMisc()
+    
     return (
-        <div id="chat_container" className="h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2">
+        <div id="chat_container" className={`h-4/5 p-1 overflow-y-scroll bg-darkblue-1/60 border-b-2
+        ${miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay' ? 'block' : 'hidden'}`}>
             <ChatContainer />
         </div>
     )

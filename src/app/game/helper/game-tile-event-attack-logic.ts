@@ -4,14 +4,18 @@ import { IAttackAnimationData, IAttackCityList, IGameContext, IMiscContext, IRes
 import { updateCityList } from "./game-tile-event-city-logic";
 import { updateSpecialCardList } from "./game-tile-event-special-card-logic";
 
-export function pickCityToRaid(ev: FormEvent<HTMLFormElement>, setShowAttackConfirmation: any, attackCityData: string[]) {
+export function pickCityToRaid(ev: FormEvent<HTMLFormElement>, setShowAttackConfirmation: any, attackCityData: string[], miscState: IMiscContext) {
     ev.preventDefault()
     // attack city data
     const [cityName, cityPrice] = attackCityData
+    const translateCityName = translateUI({lang: miscState.language, text: cityName as any})
     // show attack popup
     setShowAttackConfirmation(true)
-    const attackConfirmationCity = qS('#attack_confirmation_city')
-    attackConfirmationCity.textContent = cityName
+    const attackConfirmationCity = qS('#attack_confirmation_city') as HTMLElement
+    attackConfirmationCity.dataset.cityName = cityName
+    attackConfirmationCity.textContent = miscState.language == 'english' 
+                                        ? `${translateCityName} city` 
+                                        : `kota ${translateCityName}`
 }
 
 export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCityList: IAttackCityList[], setShowAttackConfirmation, miscState: IMiscContext, gameState: IGameContext) {
@@ -23,7 +27,7 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     const findAttacker = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     const attackerData = gameState.gamePlayerInfo[findAttacker]
     // get declared city
-    const targetCity = qS('#attack_confirmation_city').textContent
+    const targetCity = (qS('#attack_confirmation_city') as HTMLElement).dataset.cityName
     // get city price for steal attack
     const [targetCityOwner, targetCurrentCity, targetCityName, targetCityProperty, targetCityPrice] = attackCityList.map(v => v.cityList.map(city => {
         const findCity = city.indexOf(targetCity)
@@ -91,6 +95,7 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     }
     // close attack modal & player setting
     setShowAttackConfirmation(false)
+    gameState.setDisplaySettingItem(null)
     gameState.setGameSideButton(null)
     // set state to disable "back to room & surrender" buttons
     miscState.setDisableButtons('gameroom')
