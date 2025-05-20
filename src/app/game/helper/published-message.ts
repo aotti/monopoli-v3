@@ -191,6 +191,14 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             })
         }, attackTimer);
     }
+    // fix player turns
+    if(getMessage.fixPlayerTurns) {
+        // save playerTurns
+        localStorage.setItem('playerTurns', JSON.stringify(getMessage.fixPlayerTurns))
+        // show notif next player turn
+        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                    .replace('ppp', getMessage.fixPlayerTurns[0])
+    }
     // end turn
     if(getMessage.playerTurnEnd) {
         // save playerTurns

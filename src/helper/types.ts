@@ -79,7 +79,8 @@ export type GameRoomListener = {
         city: string,
         money: number,
         card: string,
-    }[]
+    }[],
+    fixPlayerTurns: string[],
 }
 
 // context
@@ -479,6 +480,9 @@ export interface IGamePlay {
         room_id: string,
         room_name: string,
         all_player_stats: string,
+    } & ITokenPayload,
+    fix_player_turns: {
+        channel: string,
     } & ITokenPayload,
 }
 

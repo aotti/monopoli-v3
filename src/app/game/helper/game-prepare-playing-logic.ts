@@ -373,12 +373,12 @@ export async function fixPlayerTurnsGameRoom(ev: FormEvent<HTMLFormElement>, mis
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
+    const playerTurnNotif = qS('#player_turn_notif')
     // input values container
     const inputValues = {
         action: 'game fix player turns',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
     }
-    return
     // set state to disable "back to room & surrender" buttons
     miscState.setDisableButtons('gameroom')
     // fetch
@@ -387,6 +387,11 @@ export async function fixPlayerTurnsGameRoom(ev: FormEvent<HTMLFormElement>, mis
     // response
     switch(fixPlayerResponse.status) {
         case 200:
+            // set player turns
+            localStorage.setItem('playerTurns', JSON.stringify(fixPlayerResponse.data[0].fixPlayerTurns))
+            // show notif next player turn
+            playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                        .replace('ppp', fixPlayerResponse.data[0].fixPlayerTurns[0])
             // reset disable buttons
             miscState.setDisableButtons(null)
             return

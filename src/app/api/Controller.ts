@@ -116,6 +116,7 @@ export default class Controller {
             case 'game sell city': 
             case 'game attack city': 
             case 'game turn end': 
+            case 'game fix player turns': 
             case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
