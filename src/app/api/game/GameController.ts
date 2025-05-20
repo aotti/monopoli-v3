@@ -620,14 +620,25 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        // check player name
+        if(payload.display_name !== 'gandesblood') 
+            return result = this.respond(200, `${action} success`, [])
         
         const roomId = payload.channel.match(/\d+/)[0]
         // get player turns
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
         // check empty player turns
         if(getPlayerTurns.indexOf('') === -1) {
-            // theres no empty, return player turns
-            return result = this.respond(200, `${action} success`, [{fixPlayerTurns: getPlayerTurns}])
+            // theres no empty, publish player turns
+            const publishData = {
+                fixPlayerTurns: getPlayerTurns,
+            }
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // return result
+            return result = this.respond(200, `${action} success`, [1])
         }
         // empty player found
         // get game history
@@ -640,7 +651,7 @@ export default class GameController extends Controller {
         }).filter(i => i)[0]
         // set fixed player turns
         await this.redisSet(`playerTurns_${roomId}`, [findMissingPlayer, ...getPlayerTurns].filter(i => i))
-        // publish online players
+        // publish player turns
         const publishData = {
             // filter to remove the empty value
             fixPlayerTurns: [findMissingPlayer, ...getPlayerTurns].filter(i => i),
@@ -650,7 +661,7 @@ export default class GameController extends Controller {
         
         if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
         // set result
-        result = this.respond(200, `${action} success`, [])
+        result = this.respond(200, `${action} success`, [1])
         // return result
         return result
     }

@@ -1,15 +1,11 @@
-import { useMisc } from "../context/MiscContext"
-import { useEffect } from "react"
-import { applyTooltipEvent } from "../helper/helper"
 import Credit from "./Credit"
 import Updates from "./Updates"
+import FixBugs from "./FixBugs"
+import LanguageButton from "./LanguageButton"
+import { useGame } from "../context/GameContext"
 
 export default function HeaderContent() {
-    const miscState = useMisc()
-    // tooltip (the element must have position: relative)
-    useEffect(() => {
-        applyTooltipEvent()
-    }, [])
+    const gameState = useGame()
 
     return (
         // height 3rem, padding .25rem
@@ -22,18 +18,13 @@ export default function HeaderContent() {
             </div>
             {/* title */}
             <span className="font-semibold text-base lg:text-xl"> Monopoli Lemao </span>
-            {/* translate button */}
-            <div data-tooltip={miscState.language == 'english' ? '🇬🇧  inggris' : '🇮🇩 indonesia'} 
-            className="absolute top-2 w-8 lg:w-10 right-4">
-                <button type="button" id="translate" className="active:opacity-75"
-                onClick={() => miscState.setLanguage(lang => {
-                    const chosenLang = lang == 'english' ? 'indonesia' : 'english'
-                    // save the language in localstorage
-                    localStorage.setItem('language', chosenLang)
-                    return chosenLang
-                })}>
-                    <img src="https://img.icons8.com/?id=12455&format=png&color=FFFFFF" alt="lang" draggable={false} />
-                </button>
+            <div className="absolute top-2 right-4 flex gap-4">
+                {/* fix bug only admin */}
+                {gameState.myPlayerInfo && gameState.myPlayerInfo.display_name == 'gandesblood'
+                    ? <FixBugs />
+                    : null}
+                {/* translate button */}
+                <LanguageButton />
             </div>
         </nav>
     )

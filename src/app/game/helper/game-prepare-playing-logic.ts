@@ -7,7 +7,6 @@ import { stopByParking } from "./game-tile-event-parking-logic"
 import { stopByCursedCity } from "./game-tile-event-cursed-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff, stopByBuffDebuff, updateBuffDebuffList } from "./game-tile-event-buff-debuff-logic"
-import { FormEvent } from "react"
 
 /*
     TABLE OF CONTENTS
@@ -362,49 +361,6 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
             // button to normal
             rollDiceButton.textContent = tempButtonText
             rollDiceButton.removeAttribute('disabled')
-            return
-    }
-}
-
-// ========== # FIX PLAYER TURNS ==========
-// ========== # FIX PLAYER TURNS ==========
-export async function fixPlayerTurnsGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
-    ev.preventDefault()
-    // result message
-    const notifTitle = qS('#result_notif_title')
-    const notifMessage = qS('#result_notif_message')
-    const playerTurnNotif = qS('#player_turn_notif')
-    // input values container
-    const inputValues = {
-        action: 'game fix player turns',
-        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
-    }
-    // set state to disable "back to room & surrender" buttons
-    miscState.setDisableButtons('gameroom')
-    // fetch
-    const fixPlayerFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
-    const fixPlayerResponse: IResponse = await (await fetcher('/game', fixPlayerFetchOptions)).json()
-    // response
-    switch(fixPlayerResponse.status) {
-        case 200:
-            // set player turns
-            localStorage.setItem('playerTurns', JSON.stringify(fixPlayerResponse.data[0].fixPlayerTurns))
-            // show notif next player turn
-            playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
-                                        .replace('ppp', fixPlayerResponse.data[0].fixPlayerTurns[0])
-            // reset disable buttons
-            miscState.setDisableButtons(null)
-            return
-        default:
-            // reset disable buttons
-            miscState.setDisableButtons(null)
-            // show notif
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('normal')
-            // error message
-            const translateError = translateUI({lang: miscState.language, text: fixPlayerResponse.message as any})
-            notifTitle.textContent = `error ${fixPlayerResponse.status}`
-            notifMessage.textContent = `${translateError || fixPlayerResponse.message}`
             return
     }
 }
