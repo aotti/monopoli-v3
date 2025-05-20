@@ -5,6 +5,7 @@ import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
 import { clickOutsideElement } from "../../../../helper/click-outside"
+import { fixPlayerTurnsGameRoom } from "../../helper/game-prepare-playing-logic"
 
 export default function PlayerSection() {
     const miscState = useMisc()
@@ -78,10 +79,10 @@ function PlayerSettingButton() {
     clickOutsideElement(playerSettingRef, () => gameState.setOpenPlayerSetting(false))
 
     return (
-        <div className="absolute z-10 top-0 right-0 w-6 lg:w-8">
+        <div className="absolute z-10 top-0 right-1 w-6 lg:w-8">
             {/* setting button */}
             <button type="button" onClick={() => gameState.setOpenPlayerSetting(b => !b)}>
-                <img src="https://img.icons8.com/?size=50&id=4511GGVppfIx&format=png&color=FFFFFF" alt="setting" />
+                <img src="https://img.icons8.com/?size=100&id=95245&format=png&color=FFFFFF" alt="setting" />
             </button>
             {/* setting menu */}
             <div ref={playerSettingRef} className={`${gameState.openPlayerSetting ? 'block' : 'hidden'}
@@ -94,6 +95,7 @@ function PlayerSettingButton() {
                         <SellUpgradeCityOption />
                         <AttackCityOption />
                         <GameHistoryOption />
+                        <FixPlayerTurns />
                     </>
                     // button for spectator
                     : <GameHistoryOption />
@@ -148,9 +150,24 @@ function GameHistoryOption() {
             </label>
             <input type="checkbox" id="game_history" onChange={ev => {
                 ev.currentTarget.checked
-                    ? gameState.setDisplaySettingItem('game_history')
+                    ? gameState.setShowGameHistory(true)
                     : gameState.setDisplaySettingItem(null)
             }} />
+        </div>
+    )
+}
+
+function FixPlayerTurns() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="flex items-center p-1 hover:bg-darkblue-2">
+            <form onSubmit={ev => fixPlayerTurnsGameRoom(ev, miscState, gameState)}>
+                <button type="submit" id="fix_player_turns"  onClick={() => gameState.setOpenPlayerSetting(false)}>
+                    {translateUI({lang: miscState.language, text: 'Fix Player Turns'})}
+                </button>
+            </form>
         </div>
     )
 }

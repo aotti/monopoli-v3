@@ -33,11 +33,11 @@ export default class LoginController extends Controller {
             const onlinePlayers = await this.getOnlinePlayers(data[0], payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
-            const onlineplayer_channel = 'monopoli-onlineplayer'
-            const isPublished = await this.monopoliPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
-            console.log(isPublished);
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            console.log(isRoomPublished);
             
-            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // generate refresh token
             const refreshToken = await this.generateToken({type: 'refresh', payload: data[0]})
             // save refresh token
@@ -96,11 +96,11 @@ export default class LoginController extends Controller {
             const onlinePlayers = await this.getOnlinePlayers(renewData, payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
             // publish online players
-            const onlineplayer_channel = 'monopoli-onlineplayer'
-            const isPublished = await this.monopoliPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
-            console.log(isPublished);
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
+            console.log(isRoomPublished);
             
-            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // set result
             const resultData = {
                 player: newRenewData,

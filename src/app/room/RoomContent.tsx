@@ -29,8 +29,6 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting.monopoly)
-    // pubnub subscribe
-    const roomlistChannel = 'monopoli-roomlist'
     // tooltip event, get room list, pubnub subscribe
     useEffect(() => {
         // start room list tutorial for 1st login (1st browser)
@@ -44,7 +42,8 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
         // get room list
         getRoomList(gameState)
 
-        // subscribe
+        // pubnub subscribe
+        const roomlistChannel = 'monopoli-roomlist'
         pubnubClient.subscribe({ 
             channels: [roomlistChannel] 
         })
@@ -100,18 +99,17 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 {/* tutorial: relative z-10 */}
                 <div className={`${miscState.showTutorial == 'tutorial_roomlist_1' ? 'relative z-10' : ''}
                 h-[calc(100vh-52vh)] lg:h-[calc(100vh-50vh)] p-1`}>
+                    {/* player list + chat title */}
                     <span className="border-b-2">
                         { miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
                             ? translateUI({lang: miscState.language, text: 'chat box'}) 
                             : translateUI({lang: miscState.language, text: 'player list'})  }
                     </span>
                     <div className={`${miscState.showTutorial ? '' : 'relative z-10'} w-full h-[calc(100%-1rem)] animate-fade-down`}>
-                        {miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay'
-                            // chat box
-                            ? <ChatBox page="room" pubnubSetting={pubnubSetting} />
-                            // list of online players
-                            : <PlayerList onlinePlayers={gameState.onlinePlayers} />
-                        }
+                        {/* player list */}
+                        <PlayerList onlinePlayers={gameState.onlinePlayers} />
+                        {/* chat box */}
+                        <ChatBox page="room" pubnubSetting={pubnubSetting} />
                         {/* chat form */}
                         <form ref={chatFocusRef} className="relative flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState, gameState)}>
                             {/* inputs */}

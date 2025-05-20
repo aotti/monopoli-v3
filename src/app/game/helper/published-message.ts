@@ -165,7 +165,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         notifMessage.textContent = translateUI({lang: miscState.language, text: `ccc city attacked by ppp with ttt`})
                                 .replace('ccc', getMessage.targetCity)
                                 .replace('ppp', getMessage.attackerName)
-                                .replace('ttt', getMessage.attackType)
+                                .replace('ttt', translateUI({lang: miscState.language, text: getMessage.attackType as any}))
         // attack city animation 
         const attackTimer = getMessage.attackType == 'meteor' ? 5000 : 3000
         attackCityAnimation({
@@ -174,20 +174,30 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             targetCity: getMessage.targetCity,
             targetCityProperty: getMessage.targetCityProperty
         })
-        // set game quake city
-        gameState.setGameQuakeCity(getMessage.quakeCity)
-        // update player data
-        gameState.setGamePlayerInfo(players => {
-            const newPlayerInfo = [...players]
-            // loop player data
-            newPlayerInfo.forEach((np, i) => {
-                const findPlayer = getMessage.playerData.map(v => v.display_name).indexOf(np.display_name)
-                newPlayerInfo[i].money = getMessage.playerData[findPlayer].money
-                newPlayerInfo[i].city = getMessage.playerData[findPlayer].city
-                newPlayerInfo[i].card = getMessage.playerData[findPlayer].card
+        setTimeout(() => {
+            // set game quake city
+            gameState.setGameQuakeCity(getMessage.quakeCity)
+            // update player data
+            gameState.setGamePlayerInfo(players => {
+                const newPlayerInfo = [...players]
+                // loop player data
+                newPlayerInfo.forEach((np, i) => {
+                    const findPlayer = getMessage.playerData.map(v => v.display_name).indexOf(np.display_name)
+                    newPlayerInfo[i].money = getMessage.playerData[findPlayer].money
+                    newPlayerInfo[i].city = getMessage.playerData[findPlayer].city
+                    newPlayerInfo[i].card = getMessage.playerData[findPlayer].card
+                })
+                return newPlayerInfo
             })
-            return newPlayerInfo
-        })
+        }, attackTimer);
+    }
+    // fix player turns
+    if(getMessage.fixPlayerTurns) {
+        // save playerTurns
+        localStorage.setItem('playerTurns', JSON.stringify(getMessage.fixPlayerTurns))
+        // show notif next player turn
+        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                    .replace('ppp', getMessage.fixPlayerTurns[0])
     }
     // end turn
     if(getMessage.playerTurnEnd) {
@@ -201,11 +211,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
             soundPlayerTurn.play()
         }
-        // turn off notif for buttons
-        if(gameState.showGameNotif?.match('with_button')) {
-            miscState.setAnimation(false)
-            gameState.setShowGameNotif(null)
-        }
+        // set notif to normal, so player can close it
+        gameState.setShowGameNotif('normal')
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
         // update player

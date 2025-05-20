@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
         case 'game roll turn': result = await gameController.decideTurn(action, payload); break
         case 'game roll dice': result = await gameController.rollDice(action, payload); break
         case 'game attack city': result = await gameController.attackCity(action, payload); break
+        case 'game fix player turns': result = await gameController.fixPlayerTurns(action, payload); break
         // error
         default: result = {status: 404, message: 'request failed', data: []}
     }

@@ -9,7 +9,8 @@ export default function PlayerList({ onlinePlayers }: {onlinePlayers: ILoggedUse
     const gameState = useGame()
 
     return (
-        <div className="flex flex-col gap-2 h-4/5 p-1 overflow-y-scroll border-b-2">
+        <div className={`flex-col gap-2 h-4/5 p-1 overflow-y-scroll border-b-2
+        ${miscState.isChatFocus == 'on' || miscState.isChatFocus == 'stay' ? 'hidden' : 'flex'}`}>
             {/* player */}
             {onlinePlayers.map((v, i) => 
                 <form key={i} className="flex justify-between" onSubmit={ev => viewPlayerStats(ev, gameState)}>

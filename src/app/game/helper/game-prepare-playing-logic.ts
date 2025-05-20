@@ -7,6 +7,7 @@ import { stopByParking } from "./game-tile-event-parking-logic"
 import { stopByCursedCity } from "./game-tile-event-cursed-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff, stopByBuffDebuff, updateBuffDebuffList } from "./game-tile-event-buff-debuff-logic"
+import { FormEvent } from "react"
 
 /*
     TABLE OF CONTENTS
@@ -65,18 +66,13 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
                 displayRolledNumber()
                 return
             }
-            // set prepare players
+            // set prepare players (ready players)
             else if(preparePlayers) {
                 playerTurnNotif ? playerTurnNotif.textContent = `${preparePlayers.length} player(s) ready` : null
                 // if > 2 players ready, set start notif
                 if(preparePlayers.length >= 2) gameStartNotif()
-                // disable button if ready is clicked (for other)
+
                 const isReadyClicked = preparePlayers.indexOf(gameState.myPlayerInfo?.display_name)
-                if(readyButton && isReadyClicked !== -1) {
-                    readyButton.disabled = true
-                    readyButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
-                    return
-                }
                 // change to start button (for creator)
                 // creator has clicked ready
                 const findRoom = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
@@ -84,6 +80,12 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
                 if(readyButton && isReadyClicked !== -1 && roomCreator == gameState.myPlayerInfo.display_name) {
                     readyButton.id = 'start_button'
                     readyButton.textContent = translateUI({lang: miscState.language, text: 'start'})
+                    return
+                }
+                // disable button if ready is clicked (for other)
+                if(readyButton && isReadyClicked !== -1) {
+                    readyButton.disabled = true
+                    readyButton.className = 'min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0'
                     return
                 }
             }
@@ -308,7 +310,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            Math.floor(Math.random() * 101), 
+            20, 
             branchRNG[0]
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -360,6 +362,49 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
             // button to normal
             rollDiceButton.textContent = tempButtonText
             rollDiceButton.removeAttribute('disabled')
+            return
+    }
+}
+
+// ========== # FIX PLAYER TURNS ==========
+// ========== # FIX PLAYER TURNS ==========
+export async function fixPlayerTurnsGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    const playerTurnNotif = qS('#player_turn_notif')
+    // input values container
+    const inputValues = {
+        action: 'game fix player turns',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+    }
+    // set state to disable "back to room & surrender" buttons
+    miscState.setDisableButtons('gameroom')
+    // fetch
+    const fixPlayerFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const fixPlayerResponse: IResponse = await (await fetcher('/game', fixPlayerFetchOptions)).json()
+    // response
+    switch(fixPlayerResponse.status) {
+        case 200:
+            // set player turns
+            localStorage.setItem('playerTurns', JSON.stringify(fixPlayerResponse.data[0].fixPlayerTurns))
+            // show notif next player turn
+            playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                        .replace('ppp', fixPlayerResponse.data[0].fixPlayerTurns[0])
+            // reset disable buttons
+            miscState.setDisableButtons(null)
+            return
+        default:
+            // reset disable buttons
+            miscState.setDisableButtons(null)
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            const translateError = translateUI({lang: miscState.language, text: fixPlayerResponse.message as any})
+            notifTitle.textContent = `error ${fixPlayerResponse.status}`
+            notifMessage.textContent = `${translateError || fixPlayerResponse.message}`
             return
     }
 }
@@ -640,7 +685,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         case 'community': 
                             stopByCards(tileInfo, findPlayer, playerRNG, miscState, gameState)
                             // only match type "move" if the card is a single effect
-                            .then(eventData => (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData))
+                            .then(eventData => {
+                                console.log(tileInfo, eventData);
+                                
+                                (eventData as any)?.type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData)
+                            })
                             .catch(err => console.log(err))
                             break
                         case 'prison': 

@@ -56,6 +56,12 @@ export default function PlayerSettingAttackCity() {
                 {/* city list */}
                 <div className="flex flex-col gap-2 h-36 lg:h-[17rem] overflow-y-scroll">
                     {attackCityList.map(v => {
+                        // exclude quake city from list
+                        gameState.gameQuakeCity?.forEach(city => {
+                            const findQuakeCity = v.cityList.map(v => v.split(',')).flat().indexOf(city)
+                            v.cityList.splice(findQuakeCity, 1)
+                        })
+
                         return v.cityList.map((cityData, i) => 
                             <AttackCityForm key={i} cityData={cityData} isAttackCityCardExist={isAttackCityCardExist} setShowAttackConfirmation={setShowAttackConfirmation} />
                         )
@@ -81,7 +87,7 @@ function AttackCityForm({cityData, isAttackCityCardExist, setShowAttackConfirmat
     const translatedCityName = translateUI({lang: miscState.language, text: cityName as any}) 
 
     return (
-        <form onSubmit={ev => pickCityToRaid(ev, setShowAttackConfirmation, cityData.split(','))} 
+        <form onSubmit={ev => pickCityToRaid(ev, setShowAttackConfirmation, cityData.split(','), miscState)} 
         className="grid grid-cols-5 gap-1 items-center">
             <span className="col-span-2"> {translatedCityName || cityName} </span>
             <span className="col-span-2"> {moneyFormat(+cityPrice)} </span>
@@ -121,12 +127,22 @@ function AttackCityConfirmation({
         flex-col justify-center absolute bg-darkblue-1 w-[calc(100%-.5rem)] h-[calc(100%-0.5rem)] p-1`}>
             <div className="flex flex-col gap-4 grow justify-center">
                 {/* confirmation text */}
-                <p> what type of attack you wanna declare to <span id="attack_confirmation_city"></span> city? </p>
+                <p>
+                    {translateUI({lang: miscState.language, text: 'what type of attack you wanna declare to '})}
+                    <span id="attack_confirmation_city"></span>
+                    ?
+                </p>
                 {/* attack types */}
                 <div className="flex justify-around">
-                    <button type="submit" id="attack_city_quake" className="text-green-400 border rounded-md p-1 w-14 lg:w-24 h-6 lg:h-10 hover:bg-darkblue-2"> quake </button>
-                    <button type="submit" id="attack_city_meteor" className="text-green-400 border rounded-md p-1 w-14 lg:w-24 h-6 lg:h-10 hover:bg-darkblue-2"> meteor </button>
-                    <button type="submit" id="attack_city_steal" className="text-green-400 border rounded-md p-1 w-14 lg:w-24 h-6 lg:h-10 hover:bg-darkblue-2"> steal </button>
+                    <button type="submit" id="attack_city_quake" className="text-green-400 border rounded-md p-1 w-14 lg:w-24 h-6 lg:h-10 hover:bg-darkblue-2">
+                        {translateUI({lang: miscState.language, text: 'quake'})}
+                    </button>
+                    <button type="submit" id="attack_city_meteor" className="text-green-400 border rounded-md p-1 w-14 lg:w-24 h-6 lg:h-10 hover:bg-darkblue-2">
+                        {translateUI({lang: miscState.language, text: 'meteor'})}
+                    </button>
+                    <button type="submit" id="attack_city_steal" className="text-green-400 border rounded-md p-1 w-14 lg:w-24 h-6 lg:h-10 hover:bg-darkblue-2">
+                        {translateUI({lang: miscState.language, text: 'steal'})}
+                    </button>
                 </div>
             </div>
             <div className="flex justify-center border-t-2">

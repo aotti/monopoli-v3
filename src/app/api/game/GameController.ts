@@ -611,4 +611,47 @@ export default class GameController extends Controller {
         // return result
         return result
     }
+
+    async fixPlayerTurns(action: string, payload: IGamePlay['fix_player_turns']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        
+        const roomId = payload.channel.match(/\d+/)[0]
+        // get player turns
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        // check empty player turns
+        if(getPlayerTurns.indexOf('') === -1) {
+            // theres no empty, return player turns
+            return result = this.respond(200, `${action} success`, [{fixPlayerTurns: getPlayerTurns}])
+        }
+        // empty player found
+        // get game history
+        const getGameHistory: IGameContext['gameHistory'] = await this.redisGet(`gameHistory_${roomId}`)
+        const gameHistoryPlayers = getGameHistory.map(v => v.display_name).filter((v, i, arr) => arr.indexOf(v) === i)
+        // compare playerTurns with historyPlayers to get the missing player
+        const findMissingPlayer = gameHistoryPlayers.map(player => {
+            const isPlayerMissing = getPlayerTurns.indexOf(player)
+            return isPlayerMissing === -1 ? player : null
+        }).filter(i => i)[0]
+        // set fixed player turns
+        await this.redisSet(`playerTurns_${roomId}`, [findMissingPlayer, ...getPlayerTurns].filter(i => i))
+        // publish online players
+        const publishData = {
+            // filter to remove the empty value
+            fixPlayerTurns: [findMissingPlayer, ...getPlayerTurns].filter(i => i),
+        }
+        const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+        console.log(isGamePublished);
+        
+        if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+        // set result
+        result = this.respond(200, `${action} success`, [])
+        // return result
+        return result
+    }
 }

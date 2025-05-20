@@ -15,11 +15,11 @@ export default function PlayerSettingGameHistory() {
 
     return (
         <div className={`absolute -left-2 bottom-8 flex flex-col items-center transition-all ease-in-out duration-500
-        w-[14vw] ${gameState.showGameHistory ? 'h-[55vh]' : 'h-[5vh]'} bg-darkblue-1 border-2`}>
+        w-[14vw] ${gameState.expandGameHistory ? 'h-[55vh]' : 'h-[5vh]'} bg-darkblue-1 border-2`}>
             {/* history content */}
             <div id="history_container" className="flex flex-col gap-2 w-full h-[47vh] overflow-y-scroll scrollbar-none p-1">
                 {gameState.gameHistory.map((v,i) => {
-                    const myHistories = v.display_name == gameState.myPlayerInfo.display_name
+                    const myHistories = v.display_name == gameState.myPlayerInfo?.display_name
                     // split history
                     const [historyTitle, historyContent] = v.history.split(': ')
                     // check card content
@@ -45,7 +45,7 @@ export default function PlayerSettingGameHistory() {
                 )}
             </div>
             <p className="absolute bottom-0 z-20 w-full text-[1vw] text-center py-1 lg:py-2 cursor-pointer bg-darkblue-1 border-t-2"
-            onClick={() => gameState.setShowGameHistory(b => !b)} > 
+            onClick={() => gameState.setExpandGameHistory(b => !b)} > 
                 {translateUI({lang: miscState.language, text: 'Game History', lowercase: true})} 
             </p>
         </div>

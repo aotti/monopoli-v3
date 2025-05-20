@@ -18,10 +18,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Page() {
     // monopoly uuid
     const monopolyUUIDs = process.env.MONOPOLY_UUID.split('.')
-    const monopolyRNG = Math.floor(Math.random() * 5)
+    const monopolyRNG = Math.floor(Math.random() * 10)
     // chatting uuid
     const chattingUUIDs = process.env.CHATTING_UUID.split('.')
-    const chattingRNG = Math.floor(Math.random() * 5)
+    const chattingRNG = Math.floor(Math.random() * 10)
     // pubnub settings 
     const pubnubSetting = {
         monopoly: {

@@ -30,7 +30,8 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                                 : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
             if(pickRarityRNG) {
-                const cardRNG = +rng[0] % cards.data.length
+                // const cardRNG = +rng[0] % cards.data.length
+                const cardRNG = 0
                 // notif content
                 notifTitle.textContent = card == 'chance' 
                                         ? translateUI({lang: miscState.language, text: 'Chance Card'})
@@ -407,6 +408,8 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // get tile data (tile number)
                 const getTileList = getMovePlaceTiles(effect, separator)
+                console.log({getTileList});
+                
                 // if tile data empty, just resolve
                 if(getTileList.length === 0) {
                     return setTimeout(() => {
@@ -460,7 +463,7 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     }
                     // check if button created
                     const movePlaceButtons = qSA('[data-id^=notif_button]') as NodeListOf<HTMLElement>
-                    if(movePlaceButtons[0]) {
+                    if(movePlaceButtons[0] && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
                         // buttons created, then modify buttons
                         // set chosen button
                         const chosenIndex = +rng[0] % movePlaceButtons.length
