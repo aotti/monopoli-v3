@@ -483,6 +483,7 @@ export interface IGamePlay {
     } & ITokenPayload,
     fix_player_turns: {
         channel: string,
+        display_name: string,
     } & ITokenPayload,
 }
 

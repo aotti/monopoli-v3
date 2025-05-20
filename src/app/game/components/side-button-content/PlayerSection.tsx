@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { applyTooltipEvent, moneyFormat, qS, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
 import { clickOutsideElement } from "../../../../helper/click-outside"
-import { fixPlayerTurnsGameRoom } from "../../helper/game-prepare-playing-logic"
 
 export default function PlayerSection() {
     const miscState = useMisc()
@@ -95,7 +94,6 @@ function PlayerSettingButton() {
                         <SellUpgradeCityOption />
                         <AttackCityOption />
                         <GameHistoryOption />
-                        <FixPlayerTurns />
                     </>
                     // button for spectator
                     : <GameHistoryOption />
@@ -153,21 +151,6 @@ function GameHistoryOption() {
                     ? gameState.setShowGameHistory(true)
                     : gameState.setDisplaySettingItem(null)
             }} />
-        </div>
-    )
-}
-
-function FixPlayerTurns() {
-    const miscState = useMisc()
-    const gameState = useGame()
-
-    return (
-        <div className="flex items-center p-1 hover:bg-darkblue-2">
-            <form onSubmit={ev => fixPlayerTurnsGameRoom(ev, miscState, gameState)}>
-                <button type="submit" id="fix_player_turns"  onClick={() => gameState.setOpenPlayerSetting(false)}>
-                    {translateUI({lang: miscState.language, text: 'Fix Player Turns'})}
-                </button>
-            </form>
         </div>
     )
 }
