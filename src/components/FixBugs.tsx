@@ -99,7 +99,7 @@ async function fixPlayerTurnsGameRoom(ev: FormEvent<HTMLFormElement>, miscState:
             miscState.setDisableButtons(null)
             // success message
             resultMessage.classList.add('text-green-400')
-            resultMessage.textContent = `✅ bug fixed`
+            resultMessage.textContent = `✅ bug fixed ${fixPlayerResponse.data[0]}`
             return
         default:
             // reset disable buttons
