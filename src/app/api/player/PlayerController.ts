@@ -47,6 +47,38 @@ export default class PlayerController extends Controller {
         // return result
         return result
     }
+
+    async viewRanking(action: string, payload) {
+        let result: IResponse
+
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
+        if(onlinePlayers.status !== 200) return onlinePlayers
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+
+        // set payload for db query
+        const queryObject: IQuerySelect = {
+            table: 'players',
+            function: 'mnp_ranking'
+        }
+        // run query
+        const {data, error} = await this.dq.select(queryObject)
+        if(error) {
+            result = this.respond(500, error.message, [])
+        }
+        else {
+            result = this.respond(200, `${action} success`, data)
+            return result
+        }
+    }
     
     async avatarUpload(action: string, payload: IPlayer) {
         let result: IResponse

@@ -30,7 +30,9 @@ export default function CreateRoom() {
             <div className="border-b-2 mb-2">
                 <span> {translateUI({lang: miscState.language, text: 'Create Room'})} </span>
             </div>
-            {/* modal body */}
+            {/* modal body, 
+                novalidate to prevent native validation
+                cuz create room have > 1 page it will be error */}
             <form onSubmit={ev => createRoom(ev, miscState, gameState, setCreateRoomPage)} noValidate>
                 {/* part 1 */}
                 <div className={`${createRoomPage === 1 ? 'flex' : 'hidden'} flex-col gap-2 lg:gap-4 my-auto`}>

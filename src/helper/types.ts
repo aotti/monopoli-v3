@@ -96,7 +96,7 @@ export interface IMiscContext {
     setScreenType: Dispatch<SetStateAction<IMiscContext['screenType']>>,
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
-    showModal: 'login'|'register'|'create room'|'join room',
+    showModal: 'login'|'register'|'create room'|'join room'|'ranking',
     setShowModal: Dispatch<SetStateAction<IMiscContext['showModal']>>,
     showJoinModal: string, 
     setShowJoinModal: Dispatch<SetStateAction<IMiscContext['showJoinModal']>>,
@@ -176,6 +176,8 @@ export interface IGameContext {
     setOnlinePlayers: Dispatch<SetStateAction<ILoggedUsers[]>>,
     spectator: boolean,
     setSpectator: Dispatch<SetStateAction<boolean>>,
+    rankingInfo: {display_name: string, worst_money_lost: number}[],
+    setRankingInfo: Dispatch<SetStateAction<IGameContext['rankingInfo']>>,
     // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,

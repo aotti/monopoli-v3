@@ -191,6 +191,54 @@ export async function viewPlayerStats(ev: FormEvent<HTMLFormElement>, gameState:
     }
 }
 
+export async function viewRanking(gameState: IGameContext, refresh?: boolean) {
+    // result message
+    const resultMessageRanking = qS('#result_message_ranking')
+    const rankingLastUpdated = qS('#last_updated_ranking')
+    // loading
+    gameState.setRankingInfo([])
+    // get ranking from localStorage if exist
+    const getRankingStale = localStorage.getItem('rankingInfo')
+    const [lastRankingUpdate, rankingStaleData] = getRankingStale ? getRankingStale.split(';') : [null, null]
+    if(!refresh && getRankingStale) {
+        rankingLastUpdated.textContent = `${new Date(+lastRankingUpdate * 1000)
+                                        .toLocaleString('id-ID', {dateStyle: 'short', timeStyle: 'short'})}`
+        gameState.setRankingInfo(JSON.parse(rankingStaleData))
+        return
+    }
+    // fetch
+    const getRankingFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
+    const getRankingResponse: IResponse = await (await fetcher('/player/ranking', getRankingFetchOptions)).json()
+    // response
+    switch(getRankingResponse.status) {
+        case 200:
+            const rankingData: IGameContext['rankingInfo'] = getRankingResponse.data
+            // no data found
+            if(!rankingData || rankingData.length === 0) {
+                return resultMessageRanking.textContent = 'no ranking 😢'
+            }
+            // sort ranking
+            const sortRankingInfo = []
+            const worstMoneyLoses: number[] = rankingData.map(v => v.worst_money_lost).sort((a, b) => a - b)
+            for(let i in worstMoneyLoses) {
+                const findPlayer = rankingData.map(v => v.worst_money_lost).indexOf(worstMoneyLoses[i])
+                sortRankingInfo.push(rankingData[findPlayer])
+            }
+            // unix timestamp
+            const lastUpdated = Math.floor(Date.now() / 1000)
+            // save to localStorage
+            localStorage.setItem('rankingInfo', `${lastUpdated};${JSON.stringify(sortRankingInfo)}`)
+            // set ranking
+            rankingLastUpdated.textContent = `${new Date(lastUpdated * 1000)
+                                            .toLocaleString('ja-JA', {dateStyle: 'short', timeStyle: 'short'})}`
+            gameState.setRankingInfo(sortRankingInfo)
+            return
+        default:
+            resultMessageRanking.textContent = `❌ ${getRankingResponse.status}: ${getRankingResponse.message}`
+            return
+    }
+}
+
 /**
  * @param display_name player in game name
  * @param publicId avatar pathname
