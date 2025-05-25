@@ -19,7 +19,8 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
         // if city quaked, set 0.5 multiplier, else 1
         const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(buyCityName) : null
-        const cityQuake = findQuakeCity && findQuakeCity !== -1 ? 0.5 : 1
+        // check type of number to prevent bug, because 0 == false
+        const cityQuake = typeof findQuakeCity == 'number' && findQuakeCity !== -1 ? 0.5 : 1
         // if city owner not current player
         const isCityMine = buyCityOwner != playerTurnData.display_name
         // paying taxes

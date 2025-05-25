@@ -499,7 +499,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
     const playerPaths = qSA(`[data-player-path]`) as NodeListOf<HTMLElement>
     // get players
     const playerNames = qSA(`[data-player-name]`) as NodeListOf<HTMLElement>
-    // footstep sounds
+    // footstep stuff
+    const footstepSpeed = 400
     const [soundFootstep1, soundFootstep2] = [qS('#sound_footstep_1'), qS('#sound_footstep_2')] as HTMLAudioElement[]
     // match player name
     playerNames.forEach(player => {
@@ -560,7 +561,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             }
             // player can move
             moving()
-        }, 500);
+        }, footstepSpeed);
 
         async function moving() {
             // count step

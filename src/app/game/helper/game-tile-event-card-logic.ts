@@ -432,7 +432,7 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     if(movePlaceTimer < 0) {
                         clearInterval(movePlaceInterval)
                         notifTimer.textContent = ''
-                        // highlight choosen button (only single effect)
+                        // highlight choosen button (only card \w single + random effect)
                         if(!separator) chosenButton.classList.add('bg-green-600')
                         // set player dice
                         const chosenSquare = +chosenButton.dataset.destination
