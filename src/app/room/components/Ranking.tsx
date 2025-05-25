@@ -8,7 +8,7 @@ export default function Ranking() {
     const gameState = useGame()
 
     return (
-        <div id="ranking_modal" className={`relative z-20 bg-darkblue-3 border-8bit-modal px-2 w-[45vw] lg:w-[35vw]
+        <div id="ranking_modal" className={`relative z-20 bg-darkblue-3 border-8bit-modal px-2 w-[50vw] lg:w-[40vw]
         ${miscState.showModal == 'ranking' ? 'block' : 'hidden'} 
         ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'}`}>
             {/* modal head */}
@@ -17,13 +17,13 @@ export default function Ranking() {
                 <span id="last_updated_ranking"></span>
             </div>
             {/* modal body */}
-            <div className="flex flex-col gap-2 lg:gap-4">
+            <div className="flex flex-col gap-2 lg:gap-4 h-[45vh] overflow-y-scroll">
                 {/* ranking head */}
                 <div className="grid grid-cols-6">
                     <span> No. </span>
                     <div className="col-span-5 grid grid-cols-2">
-                        <span> Player </span>
-                        <span> Worst Lose </span>
+                        <span> {translateUI({lang: miscState.language, text: 'players'})} </span>
+                        <span> {translateUI({lang: miscState.language, text: 'worst lost'})} </span>
                     </div>
                 </div>
                 {/* ranking body */}
@@ -44,7 +44,7 @@ export default function Ranking() {
             {/* modal footer */}
             <div className="flex justify-around mt-2 border-t-2">
                 <button type="button" className="text-green-300 p-1 active:opacity-75 hover:animate-jump" onClick={() => viewRanking(gameState, true)}>
-                    Refresh
+                    {translateUI({lang: miscState.language, text: 'Refresh'})}
                 </button>
                 <button type="button" className="text-red-300 p-1 active:opacity-75 hover:animate-jump" onClick={() => { 
                     // set false to give zoom-out animate class

@@ -15,6 +15,7 @@ import { getRoomList, viewRanking } from "./helper/functions";
 import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
 import Ranking from "./components/Ranking";
+import Shop from "./components/Shop";
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -167,7 +168,14 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     </div>
                     {/* shop button */}
                     <div data-tooltip="shop (soon)" className="w-8 my-auto">
-                        <button type="button" className="invert active:opacity-75">
+                        <button type="button" className="invert active:opacity-75" onClick={() => {
+                            // close join modal
+                            miscState.setShowJoinModal(null)
+                            // to give zoom-in animate class
+                            miscState.setAnimation(true); 
+                            // show the modal
+                            miscState.setShowModal('shop') 
+                        }}>
                             <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" draggable={false} />
                         </button>
                     </div>
@@ -176,7 +184,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
                     </div>
                     {/* create room button */}
-                    <div className="text-right w-2/5">
+                    <div className="text-right w-[30vw]">
                         <button type="button" className="border-8bit-primary bg-primary active:opacity-75 hover:animate-pulse hover:animate-duration-500"
                         onClick={() => {
                             // close join modal
@@ -189,7 +197,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             {translateUI({lang: miscState.language, text: 'Create Room'})}
                         </button>
                     </div>
-                    {/* create room & ranking modal */}
+                    {/* create room, ranking, shop modal */}
                     <div className={`absolute z-20 bg-black/50
                     ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
                     h-[calc(100vh-4.25rem)] w-[calc(65vw+1rem)] lg:w-[calc(65vw+2.5rem)]`}>
@@ -197,6 +205,8 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <CreateRoom />
                         {/* ranking */}
                         <Ranking />
+                        {/* shop */}
+                        <Shop />
                     </div>
                 </div>
                 {/* room list cards 
