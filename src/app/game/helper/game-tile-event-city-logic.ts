@@ -4,6 +4,7 @@ import { EventDataType, IGameContext, IMiscContext, IResponse, UpdateCityListTyp
 import { rollDiceGameRoom } from "./game-prepare-playing-logic"
 import { useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff } from "./game-tile-event-buff-debuff-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 // ========== # NORMAL & SPECIAL CITY EVENT ==========
 // ========== # NORMAL & SPECIAL CITY EVENT ==========
@@ -31,6 +32,8 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         const isCitySpecialOrFullUpgrade = (tileInfo == 'city' && buyCityProperty == 'realestate') || 
                                         (tileInfo == 'special' && buyCityProperty == '1house')
         if(isCitySpecialOrFullUpgrade) {
+            // only play sound if get money
+            playGameSounds('city_money', miscState)
             // notif message 
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Special City'})
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'You get xxx when visiting your grandma'})
@@ -43,19 +46,13 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
                 money: +buyCityPrice * cityQuake
             })
         }
-        // if you own the city and its property is maxed, stop
-        if(tileInfo == 'city' && buyCityProperty == 'realestate') {
-            return resolve({
-                event: 'buy_city',
-                status: false,
-                money: 0
-            })
-        }
         // check buff 
         const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
             {type: 'buff', effect: 'reduce price', price: +buyCityPrice},
             findPlayer, miscState, gameState
         ) as [string, number];
+        // only play sound if buy/upgrade
+        playGameSounds('city_buy', miscState)
         // set buy city price
         const buyCityPriceFixed = buffDebuff ? +buyCityPrice - buffDebuffEffect : +buyCityPrice
         // set event text for notif
@@ -192,6 +189,8 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
             // set tax price
             const taxPrice = specialCard?.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
+            // only play sound if pay tax
+            if(taxPrice > 0) playGameSounds('city_tax', miscState)
             // set event data (for history)
             const eventData: EventDataType = {
                 event: 'pay_tax', 

@@ -7,6 +7,7 @@ import { stopByParking } from "./game-tile-event-parking-logic"
 import { stopByCursedCity } from "./game-tile-event-cursed-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff, stopByBuffDebuff, updateBuffDebuffList } from "./game-tile-event-buff-debuff-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 /*
     TABLE OF CONTENTS
@@ -912,6 +913,8 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
     if(gameMode.match(/survive/i)) {
         // if only 1 left, game over
         if(alivePlayers.length === 1) {
+            // play sound
+            playGameSounds('game_over', miscState)
             // set game stage
             gameState.setGameStages('over')
             // show notif
@@ -935,6 +938,8 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
         const highestMoneyPlayer = playersData.map(v => `${v.money},${v.display_name}`).sort().reverse()
         for(let pd of playersData) {
             if(pd.lap >= lapsLimit || alivePlayers.length === 1) {
+                // play sound
+                playGameSounds('game_over', miscState)
                 // set game stage
                 gameState.setGameStages('over')
                 // show notif

@@ -5,6 +5,7 @@ import community_cards_list from "../config/community-cards.json"
 import { playerMoving } from "./game-prepare-playing-logic"
 import { useBuffDebuff } from "./game-tile-event-buff-debuff-logic"
 import { stopByCity, updateCityList } from "./game-tile-event-city-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 // ========== # CARD EVENT ==========
 // ========== # CARD EVENT ==========
@@ -49,6 +50,8 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                 const eventData = await cardEffects(cardData, findPlayer, rng, miscState, gameState)
                 // add buff/debuff to event data
                 if(buffDebuff) (eventData as any).buff = buffDebuff
+                // play sound
+                playGameSounds(card, miscState)
                 // resolve event data
                 return resolve(eventData)
             }

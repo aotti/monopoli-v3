@@ -3,6 +3,7 @@ import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } fr
 import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 import { attackCityAnimation } from "./game-tile-event-attack-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -77,8 +78,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = decidePlayersRank.join('\n')
         // change game stage
         gameState.setGameStages(getMessage.gameStage)
-        // show notif if game stage == play
+        // if game stage == play
         if(getMessage.gameStage == 'play') {
+            // play sound
+            playGameSounds('game_ready', miscState)
+            // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})

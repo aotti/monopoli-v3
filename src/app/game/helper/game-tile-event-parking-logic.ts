@@ -1,6 +1,7 @@
 import { qS, qSA } from "../../../helper/helper"
 import { EventDataType, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
 import { playerMoving } from "./game-prepare-playing-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 import { useSpecialCard } from "./game-tile-event-special-card-logic"
 
 // ========== # PARKING EVENT ==========
@@ -17,6 +18,8 @@ export function stopByParking(findPlayer: number, rng: string[], miscState: IMis
         const [specialCard, specialEffect] = await useSpecialCard(
             {type: 'parking'}, findPlayer, miscState, gameState
         ) as [string, string]
+        // play sound
+        playGameSounds('parking', miscState)
         // notif message
         notifTitle.textContent = 'Free Parking'
         notifMessage.textContent = 'select tile number'
