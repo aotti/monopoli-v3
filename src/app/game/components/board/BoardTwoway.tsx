@@ -239,7 +239,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
-                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized={false} />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''}
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

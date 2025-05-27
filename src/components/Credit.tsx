@@ -3,12 +3,30 @@ import { useState } from "react"
 export default function Credit() {
     // credit state
     const [showCredit, setShowCredit] = useState(false)
-    // game sounds credit
-    const gameSoundCreditsID = [
-        'vernalta'
+    // game icon & image
+    const gameIconImageCredits = [
+        'vecteezy.com - rakibs',
+        'icons8.com'
     ]
-    const gameSoundCreditsEN = [
-        'cooper2723'
+    // game sfx
+    const gameSFXCredits = [
+        'mixkit.co',
+        'pixabay.com',
+        'pond5.com',
+    ]
+    // game meme credit
+    const gameMemeCreditsID = [
+        'vernalta (yt)',
+        'ghost panic team (yt)',
+        'mamang garox',
+        'bryan furran (yt)',
+        'adit sopo jarwo (yt)',
+    ]
+    const gameMemeCreditsEN = [
+        'cooper2723 (yt)',
+        'mully (yt)',
+        'bigbagofpotatoes (titkok)',
+        'half-life cat'
     ]
 
     return (
@@ -27,7 +45,7 @@ export default function Credit() {
                         <span> credit </span>
                     </div>
                     {/* body */}
-                    <div className="flex flex-col gap-2 text-center text-green-400 w-72 lg:w-96 h-40 lg:h-52 overflow-y-scroll">
+                    <div className="flex flex-col gap-2 text-center text-green-400 w-[50vw] lg:w-[40vw] h-48 lg:h-64 overflow-y-scroll">
                         {/* people */}
                         <div className="">
                             <p className="text-orange-400"> programming </p>
@@ -41,11 +59,29 @@ export default function Credit() {
                             <p className="text-orange-400"> tester </p>
                             <p> Acan </p>
                         </div>
-                        {/* game sounds */}
+                        {/* game icons */}
                         <div className="flex flex-col gap-2">
-                            <p className="text-orange-400"> game sounds </p>
+                            <p className="text-orange-400"> game icons </p>
+                            {gameIconImageCredits.map((v, i) => 
+                                <div key={i}>
+                                    <span> {v} </span>
+                                </div>
+                            )}
+                        </div>
+                        {/* game sfx */}
+                        <div className="flex flex-col gap-2">
+                            <p className="text-orange-400"> game sfx </p>
+                            {gameSFXCredits.map((v, i) => 
+                                <div key={i}>
+                                    <span> {v} </span>
+                                </div>
+                            )}
+                        </div>
+                        {/* game meme sounds */}
+                        <div className="flex flex-col gap-2">
+                            <p className="text-orange-400"> game meme sfx </p>
                             {/* indonesia */}
-                            {gameSoundCreditsID.map((v, i) => 
+                            {gameMemeCreditsID.map((v, i) => 
                                 <div key={i} className="flex justify-between">
                                     <span> {v} </span>
                                     <span className="grow mx-1 mb-1 border-b-4 border-dotted border-green-400"></span>
@@ -53,7 +89,7 @@ export default function Credit() {
                                 </div>
                             )}
                             {/* english */}
-                            {gameSoundCreditsEN.map((v, i) => 
+                            {gameMemeCreditsEN.map((v, i) => 
                                 <div key={i} className="flex justify-between">
                                     <span> {v} </span>
                                     <span className="grow mx-1 mb-1 border-b-4 border-dotted border-green-400"></span>

@@ -26,6 +26,7 @@ export default function Shop() {
             {/* modal head */}
             <div className="flex justify-between border-b-2 mb-2">
                 <span> {translateUI({lang: miscState.language, text: 'Shop'})} </span>
+                <span className="text-green-300"> my coin: 0 </span>
             </div>
             {/* modal body */}
             <div className="flex flex-col gap-2 lg:gap-4 h-[50vh] overflow-y-scroll">

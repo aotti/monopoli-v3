@@ -93,5 +93,31 @@
             "[8%] Tax multiply by 30%",
             "[7%] Reduce incoming money 50%"
         ]
+    },
+    "game_sounds": {
+        "indonesia": [
+            "prison;;ghost panic team;;https://www.youtube.com/watch?v=3gUI2CRJDNo",
+            "parking;;bryan furran;;https://www.youtube.com/watch?v=Qg6U2nTQmpM",
+            "city_buy;;mamang garox;;null",
+            "city_tax;;random;;https://www.facebook.com/watch/?v=505668703629645",
+            "city_money;;random;;https://www.facebook.com/watch/?v=505668703629645",
+            "cursed;;adit sopo jarwo;;https://www.youtube.com/watch?v=SA0PEXKSOSI",
+            "community;;vernalta;;https://www.youtube.com/watch?v=B9enf0gGfPo",
+            "chance;;vernalta;;null",
+            "game_ready;;random;;https://www.youtube.com/shorts/6XaeNlSyHkA",
+            "game_over;;random;;https://www.youtube.com/watch?v=ceyO-ZQ9i3I"
+        ],
+        "english": [
+            "prison;;cooper2723;;https://www.youtube.com/watch?v=AzW6u3H2lQM",
+            "parking;;Mullyy;;https://youtu.be/5Z4jUu9LQ3I?si=NHGOWj8KdN8himhC&t=250",
+            "city_buy;;random;;https://www.youtube.com/watch?v=pcvw8y_q7bs",
+            "city_tax;;null;;null",
+            "city_money;;random;;https://www.youtube.com/watch?v=W-etaun8Teo",
+            "cursed;;cat;;https://www.youtube.com/watch?v=EkW-SWuHLPU",
+            "community;;random;;https://www.youtube.com/watch?v=EkW-SWuHLPU",
+            "chance;;bigbagofpotatoes;;https://www.youtube.com/watch?v=ZiuuFjCbB-A",
+            "game_ready;;null;;null",
+            "game_over;;random;;https://www.youtube.com/shorts/8iOZb9LfBPs"
+        ]
     }
 }
