@@ -368,6 +368,7 @@
         "city_tax": "pajak_kota",
         "city_money": "uang_kota",
         "game_ready": "mainan_siap",
-        "game_over": "mainan_selesai"
+        "game_over": "mainan_selesai",
+        "you will open new tab, proceed?": "anda akan membuka tab baru, yakin?"
     }
 }

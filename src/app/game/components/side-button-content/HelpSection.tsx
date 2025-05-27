@@ -97,6 +97,8 @@ function getRarityBgColor(key: string) {
 }
 
 function GameSoundsList({ tabLanguage, textValue }: {tabLanguage: string, textValue: string[]}) {
+    const miscState = useMisc()
+
     const [name, credit, source] = textValue
     const sfxLanguage = tabLanguage == 'english' ? 'en' : 'id'
     const isSourceNull = source == 'null'
@@ -116,7 +118,7 @@ function GameSoundsList({ tabLanguage, textValue }: {tabLanguage: string, textVa
                 <button type="button" onClick={() => (qS(`#sound_${sfxLanguage}_${name}`) as HTMLAudioElement)?.play()}>
                     <img src="https://img.icons8.com/?id=80556&format=png" alt="play" className="!w-4 !h-4 lg:!w-6 lg:!h-6" />
                 </button>
-                <a href={anchorHref} target="_blank" rel="noreferrer noopener" className={`${anchorClass} underline`}>
+                <a href={anchorHref} target="_blank" rel="noreferrer noopener" className={`${anchorClass} underline`} onClick={ev => confirm(translateUI({lang: miscState.language, text: 'you will open new tab, proceed?'})) ? null : ev.preventDefault()}>
                     {anchorText}
                 </a>
             </div>
