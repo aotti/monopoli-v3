@@ -310,7 +310,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            20, 
+            Math.floor(Math.random() * 101), 
             branchRNG[0]
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -644,9 +644,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             stopByCards(tileInfo, findPlayer, playerRNG, miscState, gameState)
                             // only match type "move" if the card is a single effect
                             .then(eventData => {
-                                console.log(tileInfo, eventData);
-                                
-                                (eventData as any)?.type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData)
+                                eventData && (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData)
                             })
                             .catch(err => console.log(err))
                             break
@@ -695,6 +693,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         async function turnEnd(eventData: EventDataType) {
             playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn ending..'})
                                         .replace('ppp', playerTurn)
+            // make dismissable notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif(eventData?.event == 'get_card' ? 'card' : 'normal')
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
             // check sub player dice

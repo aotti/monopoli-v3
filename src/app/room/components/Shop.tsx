@@ -16,6 +16,9 @@ export default function Shop() {
     ]
     const buffItems = [
         {name: 'reduce price', price: 20},
+        {name: 'dice odd', price: 20},
+        {name: 'dice even', price: 20},
+        {name: 'the void', price: 20},
         {name: 'start 2 laps', price: 30},
     ]
 

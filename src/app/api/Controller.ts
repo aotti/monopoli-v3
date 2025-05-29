@@ -37,7 +37,7 @@ export default class Controller {
         // this.redisReset('decidePlayers_33')
         // this.redisReset('gameHistory_33')
         // this.redisReset('playerTurns_162')
-        // this.redisSet('playerTurns_162', ['suwanto', 'gandesblood'])
+        // this.redisSet('playerTurns_219', ['suwanto', 'tester123'])
         // this.redisSet('playerTurns_162', ['gandesblood', 'suwanto'])
         // this.redisSet('disabledCharacters_32', [
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'

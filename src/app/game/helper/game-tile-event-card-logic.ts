@@ -31,8 +31,7 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                                 : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
             if(pickRarityRNG) {
-                // const cardRNG = +rng[0] % cards.data.length
-                const cardRNG = 0
+                const cardRNG = +rng[0] % cards.data.length
                 // notif content
                 notifTitle.textContent = card == 'chance' 
                                         ? translateUI({lang: miscState.language, text: 'Chance Card'})
@@ -411,8 +410,6 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // get tile data (tile number)
                 const getTileList = getMovePlaceTiles(effect, separator)
-                console.log({getTileList});
-                
                 // if tile data empty, just resolve
                 if(getTileList.length === 0) {
                     return setTimeout(() => {

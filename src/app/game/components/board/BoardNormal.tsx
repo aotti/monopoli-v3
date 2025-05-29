@@ -178,7 +178,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
 
     return (
         <div className="relative">
-            <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
+            <div className="absolute z-20" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
@@ -234,7 +234,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
 
     return (
         <div className="relative">
-            <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
+            <div className="absolute z-20" data-player-path={square} data-tile-info={tileInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">

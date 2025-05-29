@@ -360,12 +360,57 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        // get player turns
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        // update game history (buy city, get cards, etc)
+        const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+        // check payload.history, if contain get_card with multiple effects (one of them is move type)
+        // dont end player turn, except only 1 effect
+        if(payload.history.match('get_card')) {
+            const getCardType = payload.history.match(/(?<=get_card: ).*,.*(?=\s)/)
+            const splitCardType = getCardType ? getCardType[0].split(',') : []
+            // card with multiple effects & check if move type exist
+            if(splitCardType.length === 2 && getCardType && getCardType[0].match(/move/)) {
+                // save card event money to redis (temporary)
+                // to prevent early turn end, cuz player still moving
+                await this.redisSet(`tempEventMoney_${payload.display_name}_${roomId}`, [payload.event_money])
+                // update game history
+                // game history container
+                const tempGameHistory: IGameContext['gameHistory'] = []
+                // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
+                for(let ph of payload.history.split(';')) {
+                    const tempHistory = {
+                        room_id: +roomId, 
+                        display_name: payload.display_name, 
+                        history: ph
+                    }
+                    // push to game history
+                    tempGameHistory.push(tempHistory)
+                }
+                // save game history to redis
+                await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...tempGameHistory])
+                // set result
+                const resultData = {
+                    token: token,
+                    playerTurns: getPlayerTurns
+                }
+                result = this.respond(200, `${action} success`, [resultData])
+                return result
+            }
+        }
+        // get temp event money
+        const getTempEventMoney = await this.redisGet(`tempEventMoney_${payload.display_name}_${roomId}`)
+        let tempEventMoney: number = 0
+        if(getTempEventMoney.length > 0) {
+            tempEventMoney = +getTempEventMoney[0]
+            await this.redisReset(`tempEventMoney_${payload.display_name}_${roomId}`)
+        }
         // check taxes
         const isTaxes = payload.tax_owner && payload.tax_visitor
         const taxes = isTaxes ? {
             owner: payload.tax_owner, 
             visitor: payload.tax_visitor, 
-            money: +payload.event_money
+            money: +payload.event_money + tempEventMoney
         } : null
         // transfer money
         const isTakeMoney = payload.take_money ? payload.take_money.split(';') : null
@@ -382,7 +427,7 @@ export default class GameController extends Controller {
                 tmp_display_name: payload.display_name,
                 tmp_pos: payload.pos,
                 tmp_lap: +payload.lap,
-                tmp_event_money: +payload.event_money,
+                tmp_event_money: +payload.event_money + tempEventMoney,
                 tmp_city: payload.city,
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
                 tmp_card: payload.card,
@@ -404,9 +449,7 @@ export default class GameController extends Controller {
                 character: (data[0] as any).player_character
             }
             delete (newPlayerTurnEndData as any).player_character
-            // update game history (buy city, get cards, etc)
-            const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
-            // fill game history
+            // game history container
             const gameHistory: IGameContext['gameHistory'] = []
             // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
             for(let ph of payload.history.split(';')) {
@@ -421,7 +464,6 @@ export default class GameController extends Controller {
             // save game history to redis
             await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
             // push end turn player to playerTurns
-            const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
             // check if turn end player is playing in this game
             const getDecidePlayers = await this.redisGet(`decidePlayers_${roomId}`)
             const isTurnEndPlayerInGame = getDecidePlayers.map(v => v.display_name).indexOf(payload.display_name)

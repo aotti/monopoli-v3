@@ -25,7 +25,7 @@ export default function PlayerSettingGameHistory() {
                     // check card content
                     const checkHistoryContent1 = historyContent.match(/lose money,move place|get money,more money|special card|more money|get money|lose money|take money|move place|move forward|move backward|take card|destroy property|upgrade city|sell city/) || ''
                     // check if its buy city, chance, community history
-                    const checkHistoryContent2 = historyContent.match(/land|1house|2house|chance|community/) || ''
+                    const checkHistoryContent2 = historyContent.match(/land|1house|2house|chance|community|none/) || ''
                     // translate history
                     const translateHistoryTitle = translateUI({lang: miscState.language, text: historyTitle as any}) || historyTitle
                     const translateHistoryContent = historyContent.replace(checkHistoryContent1[0], 

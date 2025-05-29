@@ -101,7 +101,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurn)
         const tempCurrentSpecialCard = gameState.gamePlayerInfo[findPlayer].card
         // player have no special card, delete it
-        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard))
+        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard?.split('-')[1]))
             rollDiceData.playerSpecialCard = null
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
@@ -215,8 +215,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
             soundPlayerTurn.play()
         }
-        // set notif to normal, so player can close it
-        gameState.setShowGameNotif('normal')
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
         // update player
