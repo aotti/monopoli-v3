@@ -7,6 +7,7 @@ import { stopByParking } from "./game-tile-event-parking-logic"
 import { stopByCursedCity } from "./game-tile-event-cursed-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff, stopByBuffDebuff, updateBuffDebuffList } from "./game-tile-event-buff-debuff-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 /*
     TABLE OF CONTENTS
@@ -309,7 +310,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         rolled_dice: specialCard ? '0' : null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
-            20, 
+            Math.floor(Math.random() * 101), 
             branchRNG[0]
         ].toString(),
         special_card: specialCard ? specialCard : null
@@ -499,7 +500,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
     const playerPaths = qSA(`[data-player-path]`) as NodeListOf<HTMLElement>
     // get players
     const playerNames = qSA(`[data-player-name]`) as NodeListOf<HTMLElement>
-    // footstep sounds
+    // footstep stuff
+    const footstepSpeed = 400
     const [soundFootstep1, soundFootstep2] = [qS('#sound_footstep_1'), qS('#sound_footstep_2')] as HTMLAudioElement[]
     // match player name
     playerNames.forEach(player => {
@@ -560,7 +562,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             }
             // player can move
             moving()
-        }, 500);
+        }, footstepSpeed);
 
         async function moving() {
             // count step
@@ -642,9 +644,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             stopByCards(tileInfo, findPlayer, playerRNG, miscState, gameState)
                             // only match type "move" if the card is a single effect
                             .then(eventData => {
-                                console.log(tileInfo, eventData);
-                                
-                                (eventData as any)?.type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData)
+                                eventData && (eventData as any).type?.match(/(?<!.*,)^[move]+(?!.*,)/) ? null : resolve(eventData)
                             })
                             .catch(err => console.log(err))
                             break
@@ -693,6 +693,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         async function turnEnd(eventData: EventDataType) {
             playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn ending..'})
                                         .replace('ppp', playerTurn)
+            // make dismissable notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif(eventData?.event == 'get_card' ? 'card' : 'normal')
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
             // check sub player dice
@@ -911,6 +914,8 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
     if(gameMode.match(/survive/i)) {
         // if only 1 left, game over
         if(alivePlayers.length === 1) {
+            // play sound
+            playGameSounds('game_over', miscState)
             // set game stage
             gameState.setGameStages('over')
             // show notif
@@ -934,6 +939,8 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
         const highestMoneyPlayer = playersData.map(v => `${v.money},${v.display_name}`).sort().reverse()
         for(let pd of playersData) {
             if(pd.lap >= lapsLimit || alivePlayers.length === 1) {
+                // play sound
+                playGameSounds('game_over', miscState)
                 // set game stage
                 gameState.setGameStages('over')
                 // show notif

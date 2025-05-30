@@ -11,9 +11,11 @@ import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
 import GameSounds from "../../components/GameSounds";
-import { getRoomList } from "./helper/functions";
+import { getRoomList, viewRanking } from "./helper/functions";
 import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
+import Ranking from "./components/Ranking";
+import Shop from "./components/Shop";
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -149,9 +151,31 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" draggable={false} />
                         </button>
                     </div>
-                    {/* tutorial button */}
+                    {/* ranking button */}
+                    <div data-tooltip="ranking" className="w-8 my-auto">
+                        <button type="button" className="invert active:opacity-75" onClick={() => {
+                            // close join modal
+                            miscState.setShowJoinModal(null)
+                            // to give zoom-in animate class
+                            miscState.setAnimation(true); 
+                            // show the modal
+                            miscState.setShowModal('ranking') 
+                            // get ranking
+                            viewRanking(gameState)
+                        }}>
+                            <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!h-8" draggable={false} />
+                        </button>
+                    </div>
+                    {/* shop button */}
                     <div data-tooltip="shop (soon)" className="w-8 my-auto">
-                        <button type="button" className="invert active:opacity-75">
+                        <button type="button" className="invert active:opacity-75" onClick={() => {
+                            // close join modal
+                            miscState.setShowJoinModal(null)
+                            // to give zoom-in animate class
+                            miscState.setAnimation(true); 
+                            // show the modal
+                            miscState.setShowModal('shop') 
+                        }}>
                             <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" draggable={false} />
                         </button>
                     </div>
@@ -160,7 +184,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
                     </div>
                     {/* create room button */}
-                    <div className="text-right w-2/5">
+                    <div className="text-right w-[30vw]">
                         <button type="button" className="border-8bit-primary bg-primary active:opacity-75 hover:animate-pulse hover:animate-duration-500"
                         onClick={() => {
                             // close join modal
@@ -173,11 +197,16 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             {translateUI({lang: miscState.language, text: 'Create Room'})}
                         </button>
                     </div>
-                    {/* create room modal */}
+                    {/* create room, ranking, shop modal */}
                     <div className={`absolute z-20 bg-black/50
                     ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
                     h-[calc(100vh-4.25rem)] w-[calc(65vw+1rem)] lg:w-[calc(65vw+2.5rem)]`}>
+                        {/* create room */}
                         <CreateRoom />
+                        {/* ranking */}
+                        <Ranking />
+                        {/* shop */}
+                        <Shop />
                     </div>
                 </div>
                 {/* room list cards 
@@ -201,7 +230,6 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
             absolute mt-1.5 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
                 <TutorialRoomList />
             </div>
-
             {/* game sounds */}
             <GameSounds />
         </div>

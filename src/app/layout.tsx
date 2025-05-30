@@ -4,6 +4,7 @@ import './globals.css'
 import { Viewport } from 'next'
 import { Press_Start_2P } from 'next/font/google'
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const viewport: Viewport = {
   initialScale: 1,
@@ -29,6 +30,7 @@ export default function RootLayout({
           <body className={`${retroFont.className}`}>
             {children}
             <Analytics />
+            <SpeedInsights />
           </body>
         </GameProvider>
       </MiscProvider>

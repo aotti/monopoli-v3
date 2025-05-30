@@ -5,6 +5,7 @@ import community_cards_list from "../config/community-cards.json"
 import { playerMoving } from "./game-prepare-playing-logic"
 import { useBuffDebuff } from "./game-tile-event-buff-debuff-logic"
 import { stopByCity, updateCityList } from "./game-tile-event-city-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 // ========== # CARD EVENT ==========
 // ========== # CARD EVENT ==========
@@ -30,8 +31,7 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                                 : +rng[0] >= minRange && +rng[0] <= maxRange
             // match rng
             if(pickRarityRNG) {
-                // const cardRNG = +rng[0] % cards.data.length
-                const cardRNG = 0
+                const cardRNG = +rng[0] % cards.data.length
                 // notif content
                 notifTitle.textContent = card == 'chance' 
                                         ? translateUI({lang: miscState.language, text: 'Chance Card'})
@@ -49,6 +49,8 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                 const eventData = await cardEffects(cardData, findPlayer, rng, miscState, gameState)
                 // add buff/debuff to event data
                 if(buffDebuff) (eventData as any).buff = buffDebuff
+                // play sound
+                playGameSounds(card, miscState)
                 // resolve event data
                 return resolve(eventData)
             }
@@ -408,8 +410,6 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     localStorage.setItem('subEventData', `get_card: ${type} (${tileName} ${rank})`)
                 // get tile data (tile number)
                 const getTileList = getMovePlaceTiles(effect, separator)
-                console.log({getTileList});
-                
                 // if tile data empty, just resolve
                 if(getTileList.length === 0) {
                     return setTimeout(() => {
@@ -432,7 +432,7 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                     if(movePlaceTimer < 0) {
                         clearInterval(movePlaceInterval)
                         notifTimer.textContent = ''
-                        // highlight choosen button (only single effect)
+                        // highlight choosen button (only card \w single + random effect)
                         if(!separator) chosenButton.classList.add('bg-green-600')
                         // set player dice
                         const chosenSquare = +chosenButton.dataset.destination

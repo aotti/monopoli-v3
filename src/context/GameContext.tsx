@@ -21,6 +21,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
     const [spectator, setSpectator] = useState(false)
+    const [rankingInfo, setRankingInfo] = useState<IGameContext['rankingInfo']>([])
     // room
     const [roomList, setRoomList] = useState([])
     const [roomError, setRoomError] = useState<string>(null)
@@ -56,14 +57,11 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     }
 
     const playerStates = {
-        myPlayerInfo: myPlayerInfo,
-        setMyPlayerInfo: setMyPlayerInfo,
-        otherPlayerInfo: otherPlayerInfo,
-        setOtherPlayerInfo: setOtherPlayerInfo,
-        onlinePlayers: onlinePlayers,
-        setOnlinePlayers: setOnlinePlayers,
-        spectator: spectator,
-        setSpectator: setSpectator,
+        myPlayerInfo, setMyPlayerInfo,
+        otherPlayerInfo, setOtherPlayerInfo,
+        onlinePlayers, setOnlinePlayers,
+        spectator, setSpectator,
+        rankingInfo, setRankingInfo
     }
 
     const roomStates = {

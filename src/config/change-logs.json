@@ -1,6 +1,17 @@
 {
     "updates": [
         {
+            "version": "v3.06",
+            "date": "25 May 2025",
+            "changes": [
+                "add ranking feature",
+                "add preview for shop",
+                "add game sounds",
+                "update credits",
+                "fix some bugs"
+            ]
+        },
+        {
             "version": "v3.05",
             "date": "14 May 2025",
             "changes": [

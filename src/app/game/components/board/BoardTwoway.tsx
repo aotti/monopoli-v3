@@ -178,7 +178,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
 
     return (
         <div className="relative">
-            <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
+            <div className="absolute z-20" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">
@@ -234,12 +234,12 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
 
     return (
         <div className="relative">
-            <div className="absolute z-10" data-player-path={square} data-tile-info={tileInfo}>
+            <div className="absolute z-20" data-player-path={square} data-tile-info={tileInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
-                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized={false} />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''}
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

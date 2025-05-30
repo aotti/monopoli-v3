@@ -34,6 +34,9 @@
         "playing": "bermain",
         "away": "pergi",
         "Room List": "Daftar Ruang",
+        "Ranking": "Peringkat",
+        "Refresh": "Perbarui",
+        "Shop": "Toko",
         "Create Room": "Buat Ruang",
         "optional": "opsional",
         "survive: until 1 player left;laps: 1st player get 5/7 laps, will end the game": "bertahan: main sampai tersisa 1 pemain;putaran: jika pemain dapat 5/7 putaran, permainan selesai",
@@ -189,8 +192,8 @@
         "Gaming Dice = get money 10k * dice number": "Dadu Gaming = mendapat uang 10k x jumlah dadu",
         "Nerf Parking = your tile selection on stepping free parking is 40% less": "Nerf Parkir = jumlah petak di bebas parkir berkurang 40%",
         "Fortune Block = when passing start line, only get 5000": "Penghambat Rezeki = saat lewat start hanya mendapat uang 5000",
-        "The Striker = can attack other player city (coming soon)": "Sang Penyerang = bisa menyerang kota pemain lain (aing males)",
-        "City Upgrade = can upgrade your city without getting there, but random": "Upgrade Kota = bisa beli rumah tanpa harus mampir ke kotanya (tapi random h3h3)",
+        "Attack City = can attack other player city": "Serang Kota = bisa menyerang kota pemain lain",
+        "Upgrade City = can upgrade your city without getting there, but random": "Upgrade Kota = bisa beli rumah tanpa harus mampir ke kotanya (tapi random h3h3)",
         "Curse Reverser = make cursed city effect to be reversed, everyone lose money (30% price) except card owner": "Pembalik Kutukan = membuat efek kota terkutuk jadi terbalik, semua pemain kehilangan uang (30% harga kota) kecuali pemilik kartu",
 
         "__AREA BUFF/DEBUFF__": "__AREA BUFF/DEBUFF__",
@@ -356,6 +359,16 @@
         "none": "tidak ada",
         "land": "tanah",
         "1house": "1rumah",
-        "2house": "2rumah"
+        "2house": "2rumah",
+        
+        "__GAME SFX TRANSLATE__": "__GAME SFX TRANSLATE__",
+        "Game Sounds": "Suara Permainan",
+        "prison": "penjara",
+        "city_buy": "beli_kota",
+        "city_tax": "pajak_kota",
+        "city_money": "uang_kota",
+        "game_ready": "mainan_siap",
+        "game_over": "mainan_selesai",
+        "you will open new tab, proceed?": "anda akan membuka tab baru, yakin?"
     }
 }

@@ -3,6 +3,7 @@ import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } fr
 import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 import { attackCityAnimation } from "./game-tile-event-attack-logic"
+import { playGameSounds } from "./game-tile-event-sounds"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -77,8 +78,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = decidePlayersRank.join('\n')
         // change game stage
         gameState.setGameStages(getMessage.gameStage)
-        // show notif if game stage == play
+        // if game stage == play
         if(getMessage.gameStage == 'play') {
+            // play sound
+            playGameSounds('game_ready', miscState)
+            // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Start'})
@@ -97,7 +101,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurn)
         const tempCurrentSpecialCard = gameState.gamePlayerInfo[findPlayer].card
         // player have no special card, delete it
-        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard))
+        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard?.split('-')[1]))
             rollDiceData.playerSpecialCard = null
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
@@ -211,8 +215,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
             soundPlayerTurn.play()
         }
-        // set notif to normal, so player can close it
-        gameState.setShowGameNotif('normal')
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
         // update player
