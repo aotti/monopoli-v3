@@ -693,9 +693,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         async function turnEnd(eventData: EventDataType) {
             playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn ending..'})
                                         .replace('ppp', playerTurn)
-            // make dismissable notif
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif(eventData?.event == 'get_card' ? 'card' : 'normal')
+            // close notif after 2 secs
+            setTimeout(() => {
+                miscState.setAnimation(false)
+                gameState.setShowGameNotif(null)
+            }, 2000);
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
             // check sub player dice
