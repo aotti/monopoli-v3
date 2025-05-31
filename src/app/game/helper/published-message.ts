@@ -55,6 +55,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                     .replace('ppp', getMessage.readyPlayers.length.toString())
         // if > 2 players ready, set notif
         if(getMessage.readyPlayers.length >= 2) {
+            // play sound
+            playGameSounds('game_ready', miscState)
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
@@ -80,8 +82,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setGameStages(getMessage.gameStage)
         // if game stage == play
         if(getMessage.gameStage == 'play') {
-            // play sound
-            playGameSounds('game_ready', miscState)
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
