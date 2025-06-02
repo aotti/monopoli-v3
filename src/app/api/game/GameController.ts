@@ -403,6 +403,7 @@ export default class GameController extends Controller {
         let tempEventMoney: number = 0
         if(getTempEventMoney.length > 0) {
             tempEventMoney = +getTempEventMoney[0]
+            // remove after used
             await this.redisReset(`tempEventMoney_${payload.display_name}_${roomId}`)
         }
         // check taxes

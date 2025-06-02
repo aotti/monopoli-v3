@@ -121,8 +121,11 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
                 if(input.nodeName == 'INPUT') input.value = ''
             }
             return
-        // error
         default: 
+            // submit button normal
+            registerButton.textContent = tempButtonText
+            registerButton.removeAttribute('disabled')
+            // error
             resultMessage.classList.add('text-red-300')
             resultMessage.textContent = `❌ ${registerResponse.status}: ${registerResponse.message}`
             return

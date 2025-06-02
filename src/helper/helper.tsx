@@ -145,7 +145,12 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('playerData')
     localStorage.removeItem('cityOwnedList')
     // remove player info
-    gameState.setMyPlayerInfo(null)
+    gameState.setMyPlayerInfo({
+        display_name: 'guest',
+        game_played: 0,
+        worst_money_lost: 0,
+        avatar: null
+    })
     gameState.setOnlinePlayers([])
     // remove room list
     gameState.setRoomList([])
@@ -363,6 +368,13 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 localStorage.setItem('onlinePlayers', JSON.stringify(renewResponse.data[0].onlinePlayers))
                 break
             default: 
+                // set dummy myPlayerInfo
+                gameState.setMyPlayerInfo({
+                    display_name: 'guest',
+                    game_played: 0,
+                    worst_money_lost: 0,
+                    avatar: null
+                })
                 // remove local storages
                 localStorage.removeItem('accessToken')
                 localStorage.removeItem('onlinePlayers')
@@ -373,7 +385,7 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
     // auto login access token
     else {
         // check local storage
-        // set updated my player info if access token not expired
+        // set my player info if local storage exist
         const getPlayerData = localStorage.getItem('playerData')
         if(getPlayerData) {
             gameState.setMyPlayerInfo(JSON.parse(getPlayerData))

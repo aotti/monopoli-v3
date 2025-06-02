@@ -290,8 +290,6 @@ export async function avatarUpdate(display_name: string, avatar_url: string, gam
 export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
 
-    // home button
-    const gotoHome = qS('#gotoHome') as HTMLAnchorElement
     // submit button
     const logoutButton = qS('#logout_button') as HTMLInputElement
     logoutButton.textContent = '.'
@@ -318,7 +316,8 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
             resetAllData(gameState)
             // set modal to null
             miscState.setShowModal(null)
-            // go to home
+            // home button
+            const gotoHome = qS('#gotoHome') as HTMLAnchorElement
             gotoHome.click()
             return
         default: 

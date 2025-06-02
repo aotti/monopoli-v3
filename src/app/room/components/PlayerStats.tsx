@@ -1,6 +1,6 @@
 import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { useMisc } from "../../../context/MiscContext";
-import { moneyFormat, translateUI } from "../../../helper/helper";
+import { moneyFormat, qS, translateUI } from "../../../helper/helper";
 import { ILoggedUsers, IPlayer } from "../../../helper/types";
 import { useGame } from "../../../context/GameContext";
 import Link from "next/link";
@@ -49,12 +49,15 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                         }}
                     </CldUploadWidget>
                     {/* logout */}
-                    {playerData.display_name == gameState.myPlayerInfo.display_name
+                    {playerData.display_name == gameState.myPlayerInfo.display_name && playerData.display_name != 'guest'
                         ? <form className="text-center mt-2" onSubmit={ev => userLogout(ev, miscState, gameState)}>
                             <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75"> {translateUI({lang: miscState.language, text: 'Logout'})} </button>
-                            <Link id="gotoHome" href={location.origin}></Link>
                         </form>
-                        : null
+                        : <div className="text-center mt-2">
+                            <button type="button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => (qS('#gotoHome') as HTMLAnchorElement).click()}>
+                                {translateUI({lang: miscState.language, text: 'Back'})}
+                            </button>
+                        </div>
                     }
                 </div>
                 {/* stats */}

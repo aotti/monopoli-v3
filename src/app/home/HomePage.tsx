@@ -10,7 +10,7 @@ import { useEffect } from "react"
 import { checkAccessToken, qS, resetAllData } from "../../helper/helper"
 import Link from "next/link"
 
-export default function HomePage() {
+export default function HomePage({ isRefreshTokenExist }) {
     const miscState = useMisc()
     const gameState = useGame()
 
@@ -25,11 +25,11 @@ export default function HomePage() {
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
         // navigate to room list
-        if(gameState.myPlayerInfo && gameState.onlinePlayers) {
+        if(isRefreshTokenExist) {
             const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
             gotoRoom.click()
         }
-    }, [miscState.secret, gameState.onlinePlayers])
+    }, [miscState.secret])
 
     return (
         <div className="text-white text-xs lg:text-sm">
@@ -41,8 +41,6 @@ export default function HomePage() {
     
                 <main>
                     {miscState.isLoading 
-                    ? <LoadingPage />
-                    : gameState.myPlayerInfo && gameState.onlinePlayers
                         ? <LoadingPage />
                         : <HomeContent />}
                 </main>

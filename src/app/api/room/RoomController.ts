@@ -57,10 +57,9 @@ export default class RoomController extends Controller {
 
         // get token payload
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
-        if(tokenPayload.status !== 200) return tokenPayload
         // token payload data
         delete payload.token
-        const { tpayload, token } = tokenPayload.data[0]
+        const { tpayload, token } = tokenPayload.data.length > 0 ? tokenPayload.data[0] : {tpayload: null, token: null}
 
         // no need filter, no payload
         // set payload for db query
@@ -118,11 +117,13 @@ export default class RoomController extends Controller {
             }
             // get joined room from cookie
             const getJoinedRoom = cookies().get('joinedRoom')?.value
+            // dummy tpayload
+            const tempTPayload = tpayload || {display_name: 'guest'}
             // check if player has joined room
             let isMyGameExist: number = null
             if(!getJoinedRoom) {
                 // find in player list
-                isMyGameExist = data.map((v, i) => v.player_list.match(tpayload.display_name) ? i : null).filter(i => i !== null)[0]
+                isMyGameExist = data.map((v, i) => v.player_list.match(tempTPayload.display_name) ? i : null).filter(i => i !== null)[0]
                 if(typeof isMyGameExist == 'number' && isMyGameExist !== -1) 
                     cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
                         path: '/',
@@ -138,7 +139,6 @@ export default class RoomController extends Controller {
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
                 roomListInfo: roomListInfo,
                 roomList: data,
-                token: token
             }
             result = this.respond(200, `${action} success`, [resultData])
         }

@@ -1,6 +1,6 @@
 import Login from "./components/Login";
 import Register from "./components/Register";
-import { translateUI } from "../../helper/helper";
+import { qS, translateUI } from "../../helper/helper";
 import { useMisc } from "../../context/MiscContext";
 
 export default function HomeContent() {
@@ -38,6 +38,13 @@ export default function HomeContent() {
                             miscState.setShowModal('register') 
                         }}> {translateUI({lang: miscState.language, text: 'Register'})} </button>
                     </div>
+                </div>
+                {/* view as guest */}
+                <div className="flex flex-col gap-2 mt-4">
+                    <span> {translateUI({lang: miscState.language, text: 'or view as'})} </span>
+                    <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75 hover:animate-jump" onClick={() => (qS('#gotoRoom') as HTMLAnchorElement).click()}> 
+                        {translateUI({lang: miscState.language, text: 'Guest'})} 
+                    </button>
                 </div>
             </div> 
             {/* register and login modal */}

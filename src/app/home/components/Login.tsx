@@ -88,6 +88,8 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
         case 200: 
             resultMessage.classList.add('text-green-400')
             resultMessage.textContent = `✅ moving to room list..`
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom.click()
             // save access token
             localStorage.setItem('accessToken', loginResponse.data[0].token)
             delete loginResponse.data[0].token
