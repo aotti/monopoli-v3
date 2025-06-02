@@ -17,7 +17,12 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [showGameHistory, setShowGameHistory] = useState(false)
     const [expandGameHistory, setExpandGameHistory] = useState(false)
     // player
-    const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
+    const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>({
+        display_name: 'guest',
+        game_played: 0,
+        worst_money_lost: 0,
+        avatar: null
+    })
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
     const [guestMode, setGuestMode] = useState(false)
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
