@@ -338,7 +338,8 @@ export default class Controller {
         // access token expired / not exist
         if(!payload.token || error) {
             // get refresh token
-            const refreshToken = cookies().get('refreshToken').value
+            const refreshToken = cookies().get('refreshToken')?.value
+            if(!refreshToken) return this.respond(403, `forbidden`, [])
             // verify token & renew access token
             const isVerified = await this.renewAccessToken(refreshToken)
             // token expired / not exist

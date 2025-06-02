@@ -40,7 +40,7 @@ export default function RoomPage({ pubnubSetting }) {
             </div>
             {/* orientation portrait warning */}
             <ScreenPortraitWarning />
-            <Link id="gotoHome" href={'/'} hidden={true}></Link>
+            <Link id="gotoHome" href="/" hidden={true}></Link>
         </div>
     )
 }

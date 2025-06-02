@@ -172,6 +172,8 @@ export interface IGameContext {
     setMyPlayerInfo: Dispatch<SetStateAction<IPlayer>>,
     otherPlayerInfo: IPlayer,
     setOtherPlayerInfo: Dispatch<SetStateAction<IPlayer>>,
+    guestMode: boolean,
+    setGuestMode: Dispatch<SetStateAction<boolean>>,
     onlinePlayers: ILoggedUsers[],
     setOnlinePlayers: Dispatch<SetStateAction<ILoggedUsers[]>>,
     spectator: boolean,

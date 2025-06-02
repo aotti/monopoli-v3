@@ -161,7 +161,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             // show the modal
                             miscState.setShowModal('ranking') 
                             // get ranking
-                            viewRanking(gameState)
+                            viewRanking(miscState, gameState)
                         }}>
                             <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!h-8" draggable={false} />
                         </button>
@@ -179,12 +179,18 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" draggable={false} />
                         </button>
                     </div>
+                    {/* calendar button */}
+                    <div data-tooltip="daily (soon)" className="w-8 my-auto">
+                        <button type="button" className="invert active:opacity-75">
+                            <img src="https://img.icons8.com/?id=23&format=png" alt="📅" draggable={false} />
+                        </button>
+                    </div>
                     {/* title */}
                     <div className="flex items-center justify-end mr-10 w-3/5">
                         <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
                     </div>
                     {/* create room button */}
-                    <div className="text-right w-[30vw]">
+                    <div className={`${gameState.guestMode ? 'invisible' : ''} text-right w-[30vw]`}>
                         <button type="button" className="border-8bit-primary bg-primary active:opacity-75 hover:animate-pulse hover:animate-duration-500"
                         onClick={() => {
                             // close join modal
@@ -207,6 +213,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <Ranking />
                         {/* shop */}
                         <Shop />
+                        {/* calendar */}
                     </div>
                 </div>
                 {/* room list cards 

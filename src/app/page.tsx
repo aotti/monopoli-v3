@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import HomePage from "./home/HomePage";
 import { Metadata } from "next";
 
@@ -15,7 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
-export default function Page() {
+export default async function Page() {
+    const isRefreshTokenExist = typeof cookies().get('refreshToken')?.value == 'string'
 
-    return <HomePage />
+    return <HomePage isRefreshTokenExist={isRefreshTokenExist} />
 }
