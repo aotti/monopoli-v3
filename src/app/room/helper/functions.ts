@@ -191,7 +191,7 @@ export async function viewPlayerStats(ev: FormEvent<HTMLFormElement>, gameState:
     }
 }
 
-export async function viewRanking(gameState: IGameContext, refresh?: boolean) {
+export async function viewRanking(miscState: IMiscContext, gameState: IGameContext, refresh?: boolean) {
     // result message
     const resultMessageRanking = qS('#result_message_ranking')
     const rankingLastUpdated = qS('#last_updated_ranking')
@@ -234,7 +234,8 @@ export async function viewRanking(gameState: IGameContext, refresh?: boolean) {
             gameState.setRankingInfo(sortRankingInfo)
             return
         default:
-            resultMessageRanking.textContent = `❌ ${getRankingResponse.status}: ${getRankingResponse.message}`
+            const guestModeError = gameState.guestMode ? `❌ ${getRankingResponse.status}: ${translateUI({lang: miscState.language, text: 'login required'})}` : null
+            resultMessageRanking.textContent = guestModeError ||`❌ ${getRankingResponse.status}: ${getRankingResponse.message}`
             return
     }
 }

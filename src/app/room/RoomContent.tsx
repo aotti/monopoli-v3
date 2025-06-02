@@ -161,7 +161,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             // show the modal
                             miscState.setShowModal('ranking') 
                             // get ranking
-                            viewRanking(gameState)
+                            viewRanking(miscState, gameState)
                         }}>
                             <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!h-8" draggable={false} />
                         </button>
@@ -190,7 +190,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
                     </div>
                     {/* create room button */}
-                    <div className="text-right w-[30vw]">
+                    <div className={`${gameState.guestMode ? 'invisible' : ''} text-right w-[30vw]`}>
                         <button type="button" className="border-8bit-primary bg-primary active:opacity-75 hover:animate-pulse hover:animate-duration-500"
                         onClick={() => {
                             // close join modal

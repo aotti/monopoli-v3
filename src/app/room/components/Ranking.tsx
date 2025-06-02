@@ -43,7 +43,7 @@ export default function Ranking() {
             </div>
             {/* modal footer */}
             <div className="flex justify-around mt-2 border-t-2">
-                <button type="button" className="text-green-300 p-1 active:opacity-75 hover:animate-jump" onClick={() => viewRanking(gameState, true)}>
+                <button type="button" className="text-green-300 p-1 active:opacity-75 hover:animate-jump" onClick={() => viewRanking(miscState, gameState, true)}>
                     {translateUI({lang: miscState.language, text: 'Refresh'})}
                 </button>
                 <button type="button" className="text-red-300 p-1 active:opacity-75 hover:animate-jump" onClick={() => { 

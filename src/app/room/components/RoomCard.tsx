@@ -103,7 +103,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
                     <input type="text" id="creator" className="bg-transparent text-white w-3/5 border-b border-b-white" 
                     value={roomCreator} readOnly />
                 </div>
-                <div className="flex text-right p-2 lg:mt-2">
+                <div className={` ${gameState.guestMode ? 'hidden' : 'flex'} text-right p-2 lg:mt-2`}>
                     {/* join button */}
                     <JoinRoomButton isRoomLocked={isRoomLocked} roomId={roomId} setShowInputPassword={setShowInputPassword} />
                     {/* spectate button */}

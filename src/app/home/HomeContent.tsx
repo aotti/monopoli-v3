@@ -2,9 +2,11 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import { qS, translateUI } from "../../helper/helper";
 import { useMisc } from "../../context/MiscContext";
+import { useGame } from "../../context/GameContext";
 
 export default function HomeContent() {
     const miscState = useMisc()
+    const gameState = useGame()
 
     return (
         // h-[calc()] used to fill the empty (height) space 
@@ -42,7 +44,12 @@ export default function HomeContent() {
                 {/* view as guest */}
                 <div className="flex flex-col gap-2 mt-4">
                     <span> {translateUI({lang: miscState.language, text: 'or view as'})} </span>
-                    <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75 hover:animate-jump" onClick={() => (qS('#gotoRoom') as HTMLAnchorElement).click()}> 
+                    <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75 hover:animate-jump" onClick={() => {
+                        // set guest mode
+                        gameState.setGuestMode(true);
+                        // go to room list
+                        (qS('#gotoRoom') as HTMLAnchorElement).click()
+                    }}> 
                         {translateUI({lang: miscState.language, text: 'Guest'})} 
                     </button>
                 </div>

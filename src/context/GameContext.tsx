@@ -19,6 +19,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // player
     const [myPlayerInfo, setMyPlayerInfo] = useState<IPlayer>(null)
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
+    const [guestMode, setGuestMode] = useState(false)
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
     const [spectator, setSpectator] = useState(false)
     const [rankingInfo, setRankingInfo] = useState<IGameContext['rankingInfo']>([])
@@ -59,6 +60,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const playerStates = {
         myPlayerInfo, setMyPlayerInfo,
         otherPlayerInfo, setOtherPlayerInfo,
+        guestMode, setGuestMode,
         onlinePlayers, setOnlinePlayers,
         spectator, setSpectator,
         rankingInfo, setRankingInfo

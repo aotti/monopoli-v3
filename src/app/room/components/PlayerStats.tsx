@@ -54,7 +54,12 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             <button type="submit" id="logout_button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75"> {translateUI({lang: miscState.language, text: 'Logout'})} </button>
                         </form>
                         : <div className="text-center mt-2">
-                            <button type="button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => (qS('#gotoHome') as HTMLAnchorElement).click()}>
+                            <button type="button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => {
+                                // remove guest mode
+                                gameState.setGuestMode(false);
+                                // back to home
+                                (qS('#gotoHome') as HTMLAnchorElement).click()
+                            }}>
                                 {translateUI({lang: miscState.language, text: 'Back'})}
                             </button>
                         </div>
