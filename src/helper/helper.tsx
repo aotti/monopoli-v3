@@ -151,6 +151,9 @@ export function resetAllData(gameState: IGameContext) {
         worst_money_lost: 0,
         avatar: null
     })
+    // add guest mode
+    gameState.setGuestMode(true)
+    // reset online players
     gameState.setOnlinePlayers([])
     // remove room list
     gameState.setRoomList([])
@@ -360,6 +363,8 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 delete renewResponse.data[0].token
                 // set my player data
                 gameState.setMyPlayerInfo(renewResponse.data[0].player)
+                // remove guest mode
+                gameState.setGuestMode(false)
                 // save player data to localStorage to make sure its updated
                 // cuz data from jwt is not (game_played & worst_money)
                 localStorage.setItem('playerData', JSON.stringify(renewResponse.data[0].player))
@@ -399,6 +404,8 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 avatar: data.avatar
             })
         }
+        // remove guest mode
+        gameState.setGuestMode(false)
         // set online players
         gameState.setOnlinePlayers(JSON.parse(onlinePlayers))
         miscState.setIsLoading(false)

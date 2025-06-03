@@ -15,11 +15,6 @@ export default function RoomPage({ pubnubSetting }) {
     const gameState = useGame()
     
     useEffect(() => {
-        // back to home
-        if(!gameState.myPlayerInfo || !gameState.onlinePlayers) {
-            const gotoHome = qS('#gotoHome') as HTMLAnchorElement
-            gotoHome.click()
-        }
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
     }, [miscState.secret])
@@ -33,9 +28,9 @@ export default function RoomPage({ pubnubSetting }) {
                 </header>
     
                 <main>
-                    {gameState.myPlayerInfo && gameState.onlinePlayers
-                        ? <RoomContent pubnubSetting={pubnubSetting} />
-                        : <LoadingPage />}
+                    {miscState.isLoading
+                        ? <LoadingPage />
+                        : <RoomContent pubnubSetting={pubnubSetting} />}
                 </main>
             </div>
             {/* orientation portrait warning */}

@@ -203,7 +203,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             {translateUI({lang: miscState.language, text: 'Create Room'})}
                         </button>
                     </div>
-                    {/* create room, ranking, shop modal */}
+                    {/* create room, ranking, shop, calendar modal */}
                     <div className={`absolute z-20 bg-black/50
                     ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
                     h-[calc(100vh-4.25rem)] w-[calc(65vw+1rem)] lg:w-[calc(65vw+2.5rem)]`}>
@@ -226,7 +226,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         ? gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)
                         : <div className="m-auto">
                             <span id="result_message"> there is no game </span>
-                            <img src="https://img.icons8.com/?id=-70EdELqFxwn&format=png&color=000000" className="inline w-10" loading="lazy" />
+                            <img src="https://img.icons8.com/?id=-70EdELqFxwn&format=png" className="inline !w-10 !h-10" loading="lazy" />
                         </div>
                     }
                 </div>
