@@ -44,7 +44,7 @@ function GameNotifWithImage() {
 
     return (
         <div className={`${showImage} lg:w-44 lg:h-40`}>
-            <img id="card_image" src="" alt="card-image" draggable={false} />
+            <img id="card_image" src="" alt="card-image" loading="eager" draggable={false} />
         </div>
     )
 }

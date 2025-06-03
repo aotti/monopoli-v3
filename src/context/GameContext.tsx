@@ -24,7 +24,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         avatar: null
     })
     const [otherPlayerInfo, setOtherPlayerInfo] = useState<IPlayer>(null)
-    const [guestMode, setGuestMode] = useState(false)
+    const [guestMode, setGuestMode] = useState(true)
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
     const [spectator, setSpectator] = useState(false)
     const [rankingInfo, setRankingInfo] = useState<IGameContext['rankingInfo']>([])

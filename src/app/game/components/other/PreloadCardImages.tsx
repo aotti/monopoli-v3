@@ -18,7 +18,7 @@ export default function PreloadCardImages() {
     return (
         <div id="preloadCardImages">
             {cardImageList.map((v, i) => 
-                <Image key={i} src={v.url} alt={v.name} width={75} height={100} className="!hidden" priority={true} />
+                <Image key={i} src={v.url} alt={v.name} width={75} height={100} className="!hidden" loading="lazy" priority={true} />
             )}
         </div>
     )
