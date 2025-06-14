@@ -7,7 +7,7 @@ import LoadingPage from "../../components/LoadingPage";
 import { useGame } from "../../context/GameContext";
 import { useEffect } from "react";
 import { useMisc } from "../../context/MiscContext";
-import { checkAccessToken, qS } from "../../helper/helper";
+import { checkAccessToken, generateIdentifier } from "../../helper/helper";
 import Link from "next/link";
 
 export default function RoomPage({ pubnubSetting }) {
@@ -15,6 +15,8 @@ export default function RoomPage({ pubnubSetting }) {
     const gameState = useGame()
     
     useEffect(() => {
+        // create identifier
+        generateIdentifier()
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
     }, [miscState.secret])

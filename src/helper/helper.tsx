@@ -1,7 +1,7 @@
 import { PointerEvent } from "react";
 import { FetchOptionsReturnType, FetchOptionsType, IGameContext, IMiscContext, InputIDType, IPlayer, IResponse, ITranslate, IVerifyTokenOnly, IVerifyTokenPayload, VerifyTokenReturn, VerifyTokenType } from "./types";
 import translateUI_data from '../config/translate-ui.json'
-import { createHash } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import { JWTPayload, jwtVerify } from "jose";
 
 export function translateUI(params: ITranslate) {
@@ -106,6 +106,8 @@ export function fetcherOptions(args: FetchOptionsType) {
     const { method, credentials, noCache } = args
     // get access token
     const accessToken = localStorage.getItem('accessToken')
+    // get identifier
+    const getIdentifier = localStorage.getItem('identifier')
     // headers
     const headers = credentials 
                     // auth
@@ -115,8 +117,9 @@ export function fetcherOptions(args: FetchOptionsType) {
                         // POST, PUT, DELETE with auth
                         : { 'content-type': 'application/json',
                             'authorization': `Bearer ${accessToken}` }
-                    // POST, PUT, DELETE register/login
-                    : { 'content-type': 'application/json' }
+                    // POST register/login
+                    : { 'content-type': 'application/json',
+                        'X-IDENTIFIER': getIdentifier }
     // cache
     const cache = noCache ? { cache: 'no-store' } : null
     // method
@@ -191,12 +194,27 @@ export function shuffle(array: any[]) {
     return array;
 }
 
+/**
+ * @description generate id to replace browser tabId, 
+ * only re-generate on logout
+ */
+export function generateIdentifier(isLogout?: boolean) {
+    const getIdentifier = localStorage.getItem('identifier')
+    // identifier not exist, generate new one
+    if(!getIdentifier || isLogout) {
+        const randomId = randomBytes(8).toString('hex')
+        localStorage.setItem('identifier', randomId)
+    }
+}
+
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
 /* LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS == LONG FUNCTIONS */
 
 export function filterInput(input: InputIDType, value: string) {
     // username = 4~10 | password = 8~16 | display_name = 4~12
     switch(input) {
+        case 'identifier':
+            return value ? value.match(/^[a-zA-Z0-9]+$/) : null
         // ====== PLAYER TYPE ======
         // filter uuid
         case 'uuid': 

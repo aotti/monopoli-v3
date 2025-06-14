@@ -11,15 +11,19 @@ export async function GET(req: NextRequest) {
     const payload: any = {
         room_id: req.nextUrl.searchParams.get('id')
     }
-    // check authorization
     const controller = new Controller()
+    // check header x-identifier
+    const checkXID = controller.checkXIdentifier(req)
+    if(checkXID.status !== 200) 
+        return NextResponse.json(checkXID, {status: checkXID.status})
+    // check authorization
     const isAuth = controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
     // add user agent to payload
-    payload.user_agent = userAgent(req).ua
+    payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
     // process
     const gameController = new GameController()
     const result = await gameController.getPlayers(action, payload)
@@ -29,19 +33,24 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     const payload = await req.json()
+    const controller = new Controller()
+    // check header x-identifier
+    const checkXID = controller.checkXIdentifier(req)
+    if(checkXID.status !== 200) 
+        return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const gameController = new GameController()
-    const isAuth = gameController.checkAuthorization(req)
+    const isAuth = controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
     // add user agent to payload
-    payload.user_agent = userAgent(req).ua
+    payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
     // get action
     const action = payload.action
     delete payload.action
     // process
+    const gameController = new GameController()
     let result: IResponse = null
     switch(action) {
         case 'game ready player': result = await gameController.readyPlayer(action, payload); break
@@ -59,20 +68,25 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
     const payload = await req.json()
+    const controller = new Controller()
+    // check header x-identifier
+    const checkXID = controller.checkXIdentifier(req)
+    if(checkXID.status !== 200) 
+        return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const roomController = new RoomController()
-    const gameController = new GameController()
-    const isAuth = gameController.checkAuthorization(req)
+    const isAuth = controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
     // add user agent to payload
-    payload.user_agent = userAgent(req).ua
+    payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
     // get action
     const action = payload.action
     delete payload.action
     // process
+    const roomController = new RoomController()
+    const gameController = new GameController()
     let result: IResponse = null
     switch(action) {
         case 'game turn end': result = await gameController.turnEnd(action, payload); break

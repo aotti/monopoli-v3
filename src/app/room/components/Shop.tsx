@@ -7,17 +7,16 @@ export default function Shop() {
     const gameState = useGame()
 
     const specialCardItems = [
-        {name: 'nerf tax', price: 20},
-        {name: 'anti prison', price: 20},
+        {name: 'nerf tax', price: 10},
+        {name: 'anti prison', price: 10},
         {name: 'gaming dice', price: 20},
+        {name: 'dice controller', price: 20},
         {name: 'attack city', price: 30},
         {name: 'upgrade city', price: 30},
         {name: 'curse reverser', price: 40},
     ]
     const buffItems = [
-        {name: 'reduce price', price: 20},
-        {name: 'dice odd', price: 20},
-        {name: 'dice even', price: 20},
+        {name: 'reduce price', price: 10},
         {name: 'the void', price: 20},
         {name: 'start 2 laps', price: 30},
     ]
@@ -44,7 +43,7 @@ export default function Shop() {
                     {/* items */}
                     <div className="grid grid-cols-6 lg:gap-2 text-center">
                         {specialCardItems.map((v,i) => 
-                            <div key={i} className="col-span-2 flex flex-col items-center text-orange-300 hover:bg-darkblue-2 hover:cursor-pointer">
+                            <div key={i} className="col-span-2 flex flex-col items-center text-orange-300 hover:bg-darkblue-2 hover:cursor-pointer active:bg-darkblue-2">
                                 <div className="flex gap-2 items-center text-green-300">
                                     <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="card" className="!w-10 !h-10" />
                                     <span> {v.price} </span>
@@ -63,7 +62,7 @@ export default function Shop() {
                     {/* items */}
                     <div className="grid grid-cols-6 lg:gap-2 text-center">
                         {buffItems.map((v,i) => 
-                            <div key={i} className="col-span-2 flex flex-col items-center text-orange-300 hover:bg-darkblue-2 hover:cursor-pointer">
+                            <div key={i} className="col-span-2 flex flex-col items-center text-orange-300 hover:bg-darkblue-2 hover:cursor-pointer active:bg-darkblue-2">
                                 <div className="flex gap-2 items-center text-green-300">
                                     <img src="https://img.icons8.com/?id=OMMKdOvcwXo0&format=png&color=FFFFFF" alt="buff" className="inline !w-8 !h-8" />
                                     <span> {v.price} </span>

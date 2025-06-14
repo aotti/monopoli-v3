@@ -122,11 +122,11 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
                             {/* emote button */}
                             <button ref={chatEmotesRef} type="button" className="relative w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
-                                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
+                                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" width={100} height={100} draggable={false} />
                             </button>
                             {/* submit chat */}
                             <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
-                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
+                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" width={100} height={100} draggable={false} />
                             </button>
                         </form>
                     </div>
@@ -138,70 +138,39 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     <PlayerStats playerData={playerData} onlinePlayers={gameState.onlinePlayers} />
                 </div>
             </div>
+
             {/* room list */}
             {/* tutorial: relative z-10 */}
             <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'relative z-10' : ''}
             flex flex-col w-[calc(100vw-30vw)]`}>
                 {/* room list header
                     1rem gap, 3.5rem title, 0.5rem margin bot */}
-                <div className="flex gap-4 w-full h-fit text-center p-2">
+                <div className="flex justify-between gap-4 w-full h-fit text-center p-2">
                     {/* tutorial button */}
                     <div data-tooltip="tutorial" className="w-8 my-auto">
-                        <button type="button" className="active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
-                            <img src="https://img.icons8.com/?id=3656&format=png&color=FFFFFF" alt="📖" draggable={false} />
-                        </button>
-                    </div>
-                    {/* ranking button */}
-                    <div data-tooltip="ranking" className="w-8 my-auto">
-                        <button type="button" className="invert active:opacity-75" onClick={() => {
-                            // close join modal
-                            miscState.setShowJoinModal(null)
-                            // to give zoom-in animate class
-                            miscState.setAnimation(true); 
-                            // show the modal
-                            miscState.setShowModal('ranking') 
-                            // get ranking
-                            viewRanking(miscState, gameState)
-                        }}>
-                            <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!h-8" draggable={false} />
-                        </button>
-                    </div>
-                    {/* shop button */}
-                    <div data-tooltip="shop (soon)" className="w-8 my-auto">
-                        <button type="button" className="invert active:opacity-75" onClick={() => {
-                            // close join modal
-                            miscState.setShowJoinModal(null)
-                            // to give zoom-in animate class
-                            miscState.setAnimation(true); 
-                            // show the modal
-                            miscState.setShowModal('shop') 
-                        }}>
-                            <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" draggable={false} />
-                        </button>
-                    </div>
-                    {/* calendar button */}
-                    <div data-tooltip="daily (soon)" className="w-8 my-auto">
-                        <button type="button" className="invert active:opacity-75">
-                            <img src="https://img.icons8.com/?id=23&format=png" alt="📅" draggable={false} />
+                        <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
+                            <img src="https://img.icons8.com/?id=3656&format=png" alt="📖" width={100} height={100} draggable={false} />
                         </button>
                     </div>
                     {/* title */}
-                    <div className="flex items-center justify-end mr-10 w-3/5">
+                    <div className="flex items-center justify-center w-3/5">
                         <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
                     </div>
-                    {/* create room button */}
-                    <div className={`${gameState.guestMode ? 'invisible' : ''} text-right w-[30vw]`}>
-                        <button type="button" className="border-8bit-primary bg-primary active:opacity-75 hover:animate-pulse hover:animate-duration-500"
-                        onClick={() => {
-                            // close join modal
-                            miscState.setShowJoinModal(null)
-                            // to give zoom-in animate class
-                            miscState.setAnimation(true); 
-                            // show the modal
-                            miscState.setShowModal('create room') 
-                        }}> 
-                            {translateUI({lang: miscState.language, text: 'Create Room'})}
-                        </button>
+                    {/* menu & create room button */}
+                    <div className="flex gap-2">
+                        {/* create room button */}
+                        <CreateRoomButton />
+                        {/* menu button */}
+                        <MenuButton />
+                        {/* menu item */}
+                        <div className={`${miscState.showRoomListMenu ? 'flex' : 'hidden'} flex-col gap-2 absolute z-10 right-16 border-8bit-text bg-darkblue-1 w-max`}>
+                            {/* ranking button */}
+                            <RankingButton />
+                            {/* shop button */}
+                            <ShopButton />
+                            {/* daily button */}
+                            <DailyButton />
+                        </div>
                     </div>
                     {/* create room, ranking, shop, calendar modal */}
                     <div className={`absolute z-20 bg-black/50
@@ -237,8 +206,106 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
             absolute mt-1.5 bg-black/75 h-[calc(100vh-4rem)] w-[calc(100vw-1rem)] leading-6 lg:leading-8`}>
                 <TutorialRoomList />
             </div>
+            
             {/* game sounds */}
             <GameSounds />
+        </div>
+    )
+}
+
+function MenuButton() {
+    const miscState = useMisc()
+
+    return (
+        <div data-tooltip="menu" className="w-8 my-auto text-right">
+            <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowRoomListMenu(true)}>
+                <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
+            </button>
+        </div>
+    )
+}
+
+function RankingButton() {
+    const miscState = useMisc()
+    const gameState = useGame()
+    
+    return (
+        <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
+            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+                // close join modal
+                miscState.setShowJoinModal(null)
+                // close room list menu
+                miscState.setShowRoomListMenu(false)
+                // to give zoom-in animate class
+                miscState.setAnimation(true); 
+                // show the modal
+                miscState.setShowModal('ranking') 
+                // get ranking
+                viewRanking(miscState, gameState)
+            }}>
+                <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!w-8 !h-8" width={100} height={100} draggable={false} />
+                <span className="invert"> ranking </span>
+            </button>
+        </div>
+    )
+}
+
+function ShopButton() {
+    const miscState = useMisc()
+
+    return (
+        <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
+            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+                // close join modal
+                miscState.setShowJoinModal(null)
+                // close room list menu
+                miscState.setShowRoomListMenu(false)
+                // to give zoom-in animate class
+                miscState.setAnimation(true); 
+                // show the modal
+                miscState.setShowModal('shop') 
+            }}>
+                <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
+                <span className="invert"> shop (soon) </span>
+            </button>
+        </div>
+    )
+}
+
+function DailyButton() {
+    const miscState = useMisc()
+
+    return (
+        <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
+            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+                // close room list menu
+                miscState.setShowRoomListMenu(false)
+            }}>
+                <img src="https://img.icons8.com/?id=23&format=png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
+                <span className="invert"> daily (soon) </span>
+            </button>
+        </div>
+    )
+}
+
+function CreateRoomButton() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div data-tooltip={translateUI({lang: miscState.language, text: 'Create Room'})} 
+        className={`${gameState.guestMode ? 'invisible' : ''} w-8 my-auto text-right`}>
+            <button type="button" className="invert active:opacity-75"
+            onClick={() => {
+                // close join modal
+                miscState.setShowJoinModal(null)
+                // to give zoom-in animate class
+                miscState.setAnimation(true); 
+                // show the modal
+                miscState.setShowModal('create room') 
+            }}> 
+                <img src="https://img.icons8.com/?id=113116&format=png" alt="🚪" width={100} height={100} draggable={false} />
+            </button>
         </div>
     )
 }

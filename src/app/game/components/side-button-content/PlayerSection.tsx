@@ -81,7 +81,7 @@ function PlayerSettingButton() {
         <div className="absolute z-10 top-0 right-1 w-6 lg:w-8">
             {/* setting button */}
             <button type="button" onClick={() => gameState.setOpenPlayerSetting(b => !b)}>
-                <img src="https://img.icons8.com/?size=100&id=95245&format=png&color=FFFFFF" alt="setting" />
+                <img src="https://img.icons8.com/?id=95245&format=png&color=FFFFFF" alt="setting" width={100} height={100} draggable={false} />
             </button>
             {/* setting menu */}
             <div ref={playerSettingRef} className={`${gameState.openPlayerSetting ? 'block' : 'hidden'}

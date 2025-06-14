@@ -116,6 +116,8 @@ export interface IMiscContext {
     setDisableButtons: Dispatch<SetStateAction<'roomlist'|'gameroom'>>,
     showEmotes: boolean, 
     setShowEmotes: Dispatch<SetStateAction<boolean>>,
+    showRoomListMenu: boolean, 
+    setShowRoomListMenu: Dispatch<SetStateAction<boolean>>,
 }
 
 interface IGameRoomInfo {
@@ -302,6 +304,7 @@ export interface IResponse<T = any> {
 }
 
 // input ID
+type IdentifierType = 'identifier'
 type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
 type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
@@ -313,7 +316,7 @@ type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
-export type InputIDType = PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|'user_agent'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|'user_agent'
 
 // user
 export interface ILoggedUsers {

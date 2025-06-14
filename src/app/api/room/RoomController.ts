@@ -1,6 +1,14 @@
 import { cookies } from "next/headers";
 import { ICreateRoom, IGameContext, IShiftRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse, IGamePlay } from "../../../helper/types";
 import Controller from "../Controller";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const rateLimitJoinRoom = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(3, '10m'),
+    prefix: '@upstash/ratelimit',
+})
 
 export default class RoomController extends Controller {
     
@@ -286,6 +294,12 @@ export default class RoomController extends Controller {
         const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
         const isCharacterDisabled = getDisabledCharacters.indexOf(payload.select_character)
         if(isCharacterDisabled !== -1) return this.respond(400, 'someone has chosen this character', [])
+        // check register rate limit
+        const rateLimitID = `${payload.display_name}_${payload.user_agent}`
+        const rateLimitResult = await rateLimitJoinRoom.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
         // set payload for db query
         const queryObject: Partial<IQueryInsert> = {
             table: 'games',
