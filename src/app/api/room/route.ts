@@ -25,15 +25,19 @@ export async function POST(req: NextRequest) {
     const action = 'room create'
     // client payload
     const payload = await req.json()
-    // check authorization
     const controller = new Controller()
+    // check header x-identifier
+    const checkXID = controller.checkXIdentifier(req)
+    if(checkXID.status !== 200) 
+        return NextResponse.json(checkXID, {status: checkXID.status})
+    // check authorization
     const isAuth = controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
     // add user agent
-    payload.user_agent = userAgent(req).ua
+    payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
     // process
     const roomController = new RoomController()
     const result = await roomController.create(action, payload)
@@ -44,15 +48,19 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
     // client payload
     const payload = await req.json()
-    // check authorization
     const controller = new Controller()
+    // check header x-identifier
+    const checkXID = controller.checkXIdentifier(req)
+    if(checkXID.status !== 200) 
+        return NextResponse.json(checkXID, {status: checkXID.status})
+    // check authorization
     const isAuth = controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
     // add user agent
-    payload.user_agent = userAgent(req).ua
+    payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
     // get action
     const action = payload.action
     delete payload.action
@@ -60,7 +68,7 @@ export async function PUT(req: NextRequest) {
     const roomController = new RoomController()
     const result = action == 'room join' 
                 ? await roomController.joinRoom(action, payload)
-                : {status: 404, message: 'request failed', data: []} as IResponse
+                : {status: 400, message: 'request failed', data: []} as IResponse
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }
@@ -68,15 +76,19 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
     // client payload
     const payload = await req.json()
-    // check authorization
     const controller = new Controller()
+    // check header x-identifier
+    const checkXID = controller.checkXIdentifier(req)
+    if(checkXID.status !== 200) 
+        return NextResponse.json(checkXID, {status: checkXID.status})
+    // check authorization
     const isAuth = controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
     payload.token = isAuth.data[0].accessToken
     // add user agent
-    payload.user_agent = userAgent(req).ua
+    payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
     // get action
     const action = payload.action
     delete payload.action
@@ -86,7 +98,7 @@ export async function DELETE(req: NextRequest) {
                 ? await roomController.leaveRoom(action, payload)
                 : action == 'room hard delete' 
                     ? await roomController.hardDelete(action, payload)
-                    : {status: 404, message: 'request failed', data: []} as IResponse
+                    : {status: 400, message: 'request failed', data: []} as IResponse
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

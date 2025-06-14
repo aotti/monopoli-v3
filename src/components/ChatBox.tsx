@@ -6,6 +6,7 @@ import { IChat, IGameContext, IMiscContext, IResponse } from "../helper/types"
 import emotes from "../config/emotes.json"
 import { clickInsideElement } from "../helper/click-inside"
 import PubNub, { Listener } from "pubnub"
+import Image from "next/image"
 
 interface IChatBox {
     page: 'room'|'game', 
@@ -176,7 +177,7 @@ export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
     return (
         <div className={`absolute ${emoteListPos} top z-40 grid grid-cols-5 gap-2 bg-darkblue-1 border-8bit-text w-40`}>
             {emoteList.map((v, i) => {
-                return <img key={i} src={v.url} alt={v.alias} title={v.name} className="!h-min my-auto hover:bg-darkblue-3" onClick={handleChosenEmote} />
+                return <Image key={i} src={v.url} alt={v.alias} title={v.name} className="!h-min my-auto hover:bg-darkblue-3" priority={true} unoptimized onClick={handleChosenEmote} />
             })}
         </div>
     )

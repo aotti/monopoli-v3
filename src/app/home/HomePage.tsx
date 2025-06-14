@@ -7,7 +7,7 @@ import { useMisc } from "../../context/MiscContext"
 import LoadingPage from "../../components/LoadingPage"
 import { useGame } from "../../context/GameContext"
 import { useEffect } from "react"
-import { checkAccessToken, qS, resetAllData } from "../../helper/helper"
+import { checkAccessToken, generateIdentifier, qS, resetAllData } from "../../helper/helper"
 import Link from "next/link"
 
 export default function HomePage({ isRefreshTokenExist }) {
@@ -22,6 +22,8 @@ export default function HomePage({ isRefreshTokenExist }) {
             history.pushState({}, null, '/')
             resetAllData(gameState)
         }
+        // create identifier
+        generateIdentifier()
         // check token for auto login
         if(miscState.secret) checkAccessToken(miscState, gameState)
         // navigate to room list

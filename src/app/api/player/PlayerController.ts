@@ -1,5 +1,13 @@
-import { IChat, ILoggedUsers, IPlayer, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
+import { IChat, IPlayer, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const rateLimitAvatar = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(1, '10m'),
+    prefix: '@upstash/ratelimit',
+})
 
 export default class PlayerController extends Controller {
 
@@ -95,6 +103,12 @@ export default class PlayerController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+        // check register rate limit
+        const rateLimitID = `${payload.display_name}_${payload.user_agent}`
+        const rateLimitResult = await rateLimitAvatar.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
         // set payload for db query
         const queryObject: IQueryUpdate = {
             table: 'players',

@@ -3,6 +3,7 @@ import { clickInsideElement } from "../../../../helper/click-inside"
 import { useMisc } from "../../../../context/MiscContext"
 import { useGame } from "../../../../context/GameContext"
 import { translateUI } from "../../../../helper/helper"
+import Image from "next/image"
 
 export default function GameNotif() {
     const miscState = useMisc()
@@ -44,7 +45,7 @@ function GameNotifWithImage() {
 
     return (
         <div className={`${showImage} lg:w-44 lg:h-40`}>
-            <img id="card_image" src="" alt="card-image" loading="eager" draggable={false} />
+            <Image id="card_image" src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="card-image" width={100} height={100} loading="eager" unoptimized draggable={false} />
         </div>
     )
 }

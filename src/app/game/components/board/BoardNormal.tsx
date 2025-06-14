@@ -190,7 +190,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 <video id={`video_city_meteor_hotel_${name}`} src={attackAnimation.meteor.hotel} className="absolute z-10 hidden" />
                 {/* tile image */}
                 <div className="relative">
-                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
+                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
                     {/* tile image crack */}
                     {cityQuake
                         ? <Image src={crackImage} alt="crack" width={100} height={100} className={`absolute z-10 top-0 saturate-0 w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
@@ -239,7 +239,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
-                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized={false} />
+                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''}
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

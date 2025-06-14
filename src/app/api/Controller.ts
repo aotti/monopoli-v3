@@ -271,6 +271,24 @@ export default class Controller {
         }
         return this.respond(200, 'token ok', [{accessToken: accessToken}])
     }
+
+    checkXIdentifier(req: NextRequest) {
+        const xid = req.headers.get('X-IDENTIFIER')
+        // identifier length must be 16
+        if(!xid || xid.length !== 16) {
+            // identifier not found, return
+            return {
+                status: 400, 
+                message: 'request failed', 
+                data: null
+            }
+        }
+        return {
+            status: 200, 
+            message: 'request failed', 
+            data: xid
+        }
+    }
     
     protected generateToken<T extends IToken>(args: T): Promise<string>
     protected async generateToken<T extends IToken>(args: T) {

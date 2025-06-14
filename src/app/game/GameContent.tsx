@@ -24,7 +24,7 @@ import { clickOutsideElement } from "../../helper/click-outside"
 export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
     const gameState = useGame()
-    
+
     // click outside element
     const gameSideButtonRef = useRef()
     clickOutsideElement(gameSideButtonRef, () => gameState.setGameSideButton(null))

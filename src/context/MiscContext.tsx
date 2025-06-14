@@ -35,6 +35,8 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
     })
     // emotes
     const [showEmotes, setShowEmotes] = useState(false)
+    // room list menu
+    const [showRoomListMenu, setShowRoomListMenu] = useState(false)
 
     useEffect(() => {
         const displayOrientation = () => {
@@ -74,7 +76,8 @@ export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
         screenType, setScreenType,
         showJoinModal, setShowJoinModal,
         disableButtons, setDisableButtons,
-        showEmotes, setShowEmotes
+        showEmotes, setShowEmotes,
+        showRoomListMenu, setShowRoomListMenu,
     }
 
     return (
