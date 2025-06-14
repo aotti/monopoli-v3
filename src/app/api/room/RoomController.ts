@@ -6,7 +6,7 @@ import { Redis } from "@upstash/redis";
 
 const rateLimitJoinRoom = new Ratelimit({
     redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(3, '10m'),
+    limiter: Ratelimit.slidingWindow(5, '10m'),
     prefix: '@upstash/ratelimit',
 })
 

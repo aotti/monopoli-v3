@@ -113,10 +113,12 @@ export function fetcherOptions(args: FetchOptionsType) {
                     // auth
                     ? method == 'GET'
                         // GET will only have authorization
-                        ? { 'authorization': `Bearer ${accessToken}` }
+                        ? { 'authorization': `Bearer ${accessToken}`,
+                            'X-IDENTIFIER': getIdentifier }
                         // POST, PUT, DELETE with auth
                         : { 'content-type': 'application/json',
-                            'authorization': `Bearer ${accessToken}` }
+                            'authorization': `Bearer ${accessToken}`,
+                            'X-IDENTIFIER': getIdentifier }
                     // POST register/login
                     : { 'content-type': 'application/json',
                         'X-IDENTIFIER': getIdentifier }
