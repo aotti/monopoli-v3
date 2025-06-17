@@ -156,7 +156,7 @@ export function useSpecialCard(data: SpecialCardEventType, findPlayer: number, m
             const specialCard = splitSpecialCard?.map(v => v.match(/curse reverser/i)).flat().filter(i=>i) || []
             if(specialCard[0]) {
                 setSpecialCardHistory(specialCard[0])
-                const newMoney = price * .30
+                const newMoney = price * .50
                 return resolve([`used-${specialCard[0]}`, newMoney])
             }
             return resolve([null, null])

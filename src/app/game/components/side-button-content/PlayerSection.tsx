@@ -9,8 +9,10 @@ import { clickOutsideElement } from "../../../../helper/click-outside"
 export default function PlayerSection() {
     const miscState = useMisc()
     const gameState = useGame()
+
     // player turns
     const [playerTurns, setPlayerTurns] = useState<string[]>(null)
+
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
@@ -37,6 +39,8 @@ export default function PlayerSection() {
             {/* player list */}
             <div className="flex flex-col gap-1">
                 {gameState.gamePlayerInfo.map((player, i) => {
+                    // special card text
+                    const translateSpecialCard = player.card?.split(';').map(v => translateUI({lang: miscState.language, text: v as any})).join(';')
                     // buff/debuff text
                     const buffText = player.buff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
                     const debuffText = player.debuff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
@@ -52,7 +56,7 @@ export default function PlayerSection() {
                                 <span className="w-full"> {moneyFormat(player.money)} </span>
                             </div>
                             <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
-                            data-tooltip={player.card?.replaceAll(';', '\n')}>
+                            data-tooltip={translateSpecialCard?.replaceAll(';', '\n')}>
                                 <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
                             </div>
                         </div>

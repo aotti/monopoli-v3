@@ -636,6 +636,11 @@ interface IBuffDebuffPickRarity {
     type: 'buff',
     effect: 'pick rarity',
 }
+interface IBuffDebuffTheVoid {
+    type: 'buff',
+    effect: 'the void',
+    money: number,
+}
 interface IBuffDebuffSkipTurn {
     type: 'debuff',
     effect: 'skip turn',
@@ -650,7 +655,7 @@ interface IBuffDebuffReduceMoney {
     effect: 'reduce money',
     money: number,
 }
-export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
+export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffTheVoid | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
 
 // attack city
 export interface IAttackCityList {

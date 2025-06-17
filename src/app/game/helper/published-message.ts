@@ -248,6 +248,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
+        // show notif after 2 sec
+        setTimeout(() => {
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+        }, 2000);
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player == gameState.myPlayerInfo.display_name) {

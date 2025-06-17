@@ -1,0 +1,56 @@
+{
+    "special_card_list": [
+        {
+            "name": "nerf tax",
+            "description": "pay tax 35% less",
+            "price": 10
+        },
+        {
+            "name": "anti prison",
+            "description": "when you step on prison tile, you can avoid imprisoned effect",
+            "price": 10
+        },
+        {
+            "name": "gaming dice",
+            "description": "get money 10.000 * dice number",
+            "price": 20
+        },
+        {
+            "name": "dice controller",
+            "description": "control dice number to odd/even",
+            "price": 20
+        },
+        {
+            "name": "attack city",
+            "description": "can attack other player city",
+            "price": 30
+        },
+        {
+            "name": "upgrade city",
+            "description": "can upgrade your city without getting there, but random",
+            "price": 30
+        },
+        {
+            "name": "curse reverser",
+            "description": "make cursed city effect to be reversed, everyone lose money (30% price) except card owner",
+            "price": 40
+        }
+    ],
+    "buff_list": [
+        {
+            "name": "reduce price",
+            "description": "Reduce buy/upgrade city price by 30%",
+            "price": 10
+        },
+        {
+            "name": "the void",
+            "description": "Reset money to 0 when you gonna lose",
+            "price": 20
+        },
+        {
+            "name": "the twond",
+            "description": "Start game with 2 laps",
+            "price": 30
+        }
+    ]
+}
