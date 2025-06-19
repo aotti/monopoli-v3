@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { MouseEvent, useEffect, useRef, useState } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
@@ -97,6 +97,7 @@ function PlayerSettingButton() {
                     ? <>
                         <SellUpgradeCityOption />
                         <AttackCityOption />
+                        <DiceControlOption />
                         <GameHistoryOption />
                     </>
                     // button for spectator
@@ -141,6 +142,36 @@ function AttackCityOption() {
     )
 }
 
+function DiceControlOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    const diceModeHandler = (ev: MouseEvent<HTMLButtonElement>) => {
+        const currentMode = ev.currentTarget.textContent
+        switch(currentMode) {
+            case 'off':
+                gameState.setDiceMode('odd'); break
+            case 'odd':
+                gameState.setDiceMode('even'); break
+            case 'even':
+                gameState.setDiceMode('off'); break
+            default:
+                ev.currentTarget.textContent = 'off'
+        }
+    }
+
+    return (
+        <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
+            <label htmlFor="dice_control" className="w-full">
+                {translateUI({lang: miscState.language, text: 'Dice Control'})}
+            </label>
+            <button type="button" id="dice_control" className="px-1 border-2" onClick={diceModeHandler}>
+                {gameState.diceMode}
+            </button>
+        </div>
+    )
+}
+
 function GameHistoryOption() {
     const miscState = useMisc()
     const gameState = useGame()
@@ -153,7 +184,7 @@ function GameHistoryOption() {
             <input type="checkbox" id="game_history" onChange={ev => {
                 ev.currentTarget.checked
                     ? gameState.setShowGameHistory(true)
-                    : gameState.setDisplaySettingItem(null)
+                    : gameState.setShowGameHistory(false)
             }} />
         </div>
     )

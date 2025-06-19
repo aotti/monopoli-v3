@@ -13,17 +13,17 @@ export default function RollNumber({ roomId }: {roomId: number}) {
     // roll animation
     useEffect(() => {
         if(!gameState.rollNumber) return
-        const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-        startAnimation(diceNumber, miscState, gameState)
+        const diceNumber = gameState.rollNumber == 'turn' ? [1,2,3,4,5,6,7,8,9,0] : [1,2,3,4,5,6]
+        startAnimation(diceNumber, gameState.gameRoomInfo[getGameRoomInfo], miscState, gameState)
         // hidden the roll after end
         setTimeout(() => gameState.setRollNumber(null), 3500);
         
         // ### KALO MODE DEVELOPMENT, PAKE CARA RETURN ARROW FUNCTION
         // return () => {
-            // const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-            // startAnimation(diceNumber, miscState, gameState)
-            // // hidden the roll after end
-            // setTimeout(() => gameState.setRollNumber(null), 3500);
+        //     const diceNumber = gameState.rollNumber == 'turn' ? [1,2,3,4,5,6,7,8,9,0] : [1,2,3,4,5,6]
+        //     startAnimation(diceNumber, miscState, gameState)
+        //     // hidden the roll after end
+        //     setTimeout(() => gameState.setRollNumber(null), 3500);
         // }
     }, [gameState.rollNumber])
 
@@ -88,6 +88,28 @@ function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function diceController(dice: number, number: number[]) {
+    if(dice === 1) {
+        const num = getRandomInt(0, number.length-1)
+        const diceOdd = `${num}`.match(/1|3|5/) ? num-1 : num
+        const diceEven = `${num}`.match(/0|2|4/) ? num+1 : num
+        return [diceOdd, diceEven]
+    }
+    else if(dice === 2) {
+        const diceRNG = getRandomInt(0, 1)
+        const [numOne, numTwo] = [getRandomInt(0, number.length-1), getRandomInt(0, number.length-1)]
+        const diceOdd = numOne%2 === 0 && numTwo%2 === 0 // are both even
+                        ? numOne === 0 // yes, is it 0
+                            ? numOne+1 // its 0 (dice 1), then +1 (dice 2)
+                            : diceRNG ? numOne+1 : numOne-1 // its 2/4 (dice 3/5), then use rng to set +/-
+                        : `${numOne}`.match(/1|3|5/) && `${numTwo}`.match(/1|3|5/) // are both odd
+                            ? numOne-1 // both odd
+                            : numOne // odd + even
+        const diceEven = numTwo
+        return [diceOdd, diceEven]
+    }
+}
+
 function removeAllChildNodes(parent: HTMLElement) {
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
@@ -98,8 +120,10 @@ function removeAllChildNodes(parent: HTMLElement) {
 const totalDuplicates = 4
 
 // Clear slots and recreate random list of images
-const buildItemLists = (number: number[]) => {  
+const buildItemLists = (number: number[], gameRoomInfo: IGameContext['gameRoomInfo'][0], gameState: IGameContext) => {  
     const slots = document.getElementsByClassName('slot');
+    // set static dice
+    const [diceOdd, diceEven] = diceController(gameRoomInfo.dice, number)
     // Iterate through the slot html elements
     Array.prototype.forEach.call(slots, (slot, s) => {
         let prizeBlocks = document.createElement('div');
@@ -114,7 +138,19 @@ const buildItemLists = (number: number[]) => {
         })
     
         // Get a random item from the prizes array
-        const resultItem = getRandomInt(0, number.length-1);
+        let resultItem = getRandomInt(0, number.length-1);
+        // check dice mode
+        switch(gameState.diceMode) {
+            case 'odd':
+                // index 0 = set even, index 1 = set odd
+                s == 0 
+                    ? resultItem = diceOdd
+                    : resultItem = diceEven
+                break
+            case 'even':
+                resultItem = diceEven
+                break
+        }
         // Adds the result to the last row
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')
@@ -128,13 +164,13 @@ const buildItemLists = (number: number[]) => {
 }
 
 // Determine whether the player won and start the spinning animation
-const startAnimation = (number: number[], miscState: IMiscContext, gameState: IGameContext) => {
+const startAnimation = (number: number[], gameRoomInfo: IGameContext['gameRoomInfo'][0], miscState: IMiscContext, gameState: IGameContext) => {
     // less than 1024 for mobile, more than 1024 for desktop
     const windowWidth = window.innerWidth
     const defaultSize = windowWidth < 1024 ? 24 : 32
     
     // Rebuild the items list with the result
-    buildItemLists(number);
+    buildItemLists(number, gameRoomInfo, gameState);
     
     // Determine the total height to be animated  
     const totalHeight = number.length * totalDuplicates * defaultSize;

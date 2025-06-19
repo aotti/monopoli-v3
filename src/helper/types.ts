@@ -204,6 +204,8 @@ export interface IGameContext {
     setGamePlayerTurns: Dispatch<SetStateAction<IGameContext['gamePlayerTurns']>>,
     gameQuakeCity: string[], 
     setGameQuakeCity: Dispatch<SetStateAction<IGameContext['gameQuakeCity']>>,
+    diceMode: 'off'|'odd'|'even', 
+    setDiceMode: Dispatch<SetStateAction<IGameContext['diceMode']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
 }
