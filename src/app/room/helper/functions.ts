@@ -546,6 +546,15 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
     // response
     switch(buyItemResponse.status) {
         case 200:
+            const {token, coinsLeft, ownedItems} = buyItemResponse.data[0]
+            // save access token
+            if(token) localStorage.setItem('accessToken', token)
+            // update my coins
+            localStorage.setItem('playerCoins', JSON.stringify(coinsLeft))
+            gameState.setMyCoins(coinsLeft)
+            // update my shop items
+            localStorage.setItem('playerShopItems', JSON.stringify(ownedItems))
+            gameState.setMyShopItems(ownedItems)
             return
         default:
             return

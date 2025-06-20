@@ -86,7 +86,7 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
     // response
     switch(loginResponse.status) {
         case 200: 
-            const {token, player, onlinePlayers, playerCoins} = loginResponse.data[0]
+            const {token, player, onlinePlayers, playerCoins, playerShopItems} = loginResponse.data[0]
             // save access token
             localStorage.setItem('accessToken', token)
             // set my player data
@@ -96,6 +96,10 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             localStorage.setItem('onlinePlayers', JSON.stringify(onlinePlayers))
             // set player coins
             localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
+            gameState.setMyCoins(playerCoins)
+            // update my shop items
+            localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+            gameState.setMyShopItems(playerShopItems)
             // submit button normal
             loginButton.textContent = tempButtonText
             loginButton.removeAttribute('disabled')

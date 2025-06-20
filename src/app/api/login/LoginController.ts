@@ -31,6 +31,8 @@ export default class LoginController extends Controller {
         else if(data) {
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
+            // get player shop items
+            const getPlayerShopItems = await this.redisGet(`${data[0].display_name}_shopItems`)
             // if empty, create it
             if(getPlayerCoins.length === 0) 
                 await this.redisSet(`${data[0].display_name}_coins`, [0])
@@ -57,6 +59,7 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: data[0],
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
+                playerShopItems: getPlayerShopItems,
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers.data
@@ -94,6 +97,8 @@ export default class LoginController extends Controller {
         else {
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
+            // get player shop items
+            const getPlayerShopItems = await this.redisGet(`${data[0].display_name}_shopItems`)
             // if empty, create it
             if(getPlayerCoins.length === 0) 
                 await this.redisSet(`${data[0].display_name}_coins`, [0])
@@ -116,6 +121,7 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: newRenewData,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
+                playerShopItems: getPlayerShopItems,
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers.data

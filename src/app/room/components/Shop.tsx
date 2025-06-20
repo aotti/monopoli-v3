@@ -93,9 +93,29 @@ function ShopItem({ type, data }) {
     const itemImageSrc = type == 'buff' 
                     ? 'https://img.icons8.com/?id=OMMKdOvcwXo0&format=png&color=FFFFFF'
                     : 'https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF'
+    // check owned items
+    const isItemOwned = gameState.myShopItems?.map(v => {
+        const specialCardItems = v.special_card || []
+        const buffItems = v.buff || []
+        
+        const checkSpecialCard = specialCardItems.indexOf(itemData.name)
+        const checkBuff = buffItems.indexOf(itemData.name)
+        
+        if(checkSpecialCard !== -1) return true
+        else if(checkBuff !== -1) return true
+    }).filter(i=>i)
 
-    return (
-        <form onSubmit={ev => buyShopitem(ev, itemData, miscState, gameState)} className="col-span-2 flex flex-col items-center text-orange-300">
+    return isItemOwned && isItemOwned[0]
+        ? <div onClick={() => alert(itemData.description)} className="col-span-2 flex flex-col items-center text-orange-300 saturate-0">
+            <button type="submit" className="w-full h-full hover:bg-darkblue-2 hover:cursor-pointer active:bg-darkblue-2">
+                <div className="flex gap-2 items-center justify-center text-green-300">
+                    <img src={itemImageSrc} alt="buff" className="inline !w-8 !h-8" />
+                    <span> {itemData.price} </span>
+                </div>
+                <span> {itemData.name} </span>
+            </button>
+        </div>
+        : <form onSubmit={ev => buyShopitem(ev, itemData, miscState, gameState)} className="col-span-2 flex flex-col items-center text-orange-300">
             <button type="submit" className="w-full h-full hover:bg-darkblue-2 hover:cursor-pointer active:bg-darkblue-2">
                 <div className="flex gap-2 items-center justify-center text-green-300">
                     <img src={itemImageSrc} alt="buff" className="inline !w-8 !h-8" />
@@ -104,5 +124,4 @@ function ShopItem({ type, data }) {
                 <span> {itemData.name} </span>
             </button>
         </form>
-    )
 }

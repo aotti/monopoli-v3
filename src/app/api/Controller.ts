@@ -47,8 +47,8 @@ export default class Controller {
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/square-GcUfnpybETUDXjwbOxSTxdC6fkp4xb.png'
         // ])
         // this.redisSet('gameQuakeCity_207', ['Palembang', 'Special-4'])
-        // this.redisSet('tester123_shopitems', ['the twond'])
-        this.redisReset('tester123_shopitems')
+        // this.redisReset('tester123_shopItems')
+        // this.redisSet(`tester123_coins`, [50])
     }
 
     protected chattingPublish(channel: string, data: any) {

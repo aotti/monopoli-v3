@@ -43,7 +43,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [diceMode, setDiceMode] = useState<IGameContext['diceMode']>('off')
     const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
     // shop
-    const [myCoins, setMyCoins] = useState(20)
+    const [myCoins, setMyCoins] = useState(0)
     const [myShopItems, setMyShopItems] = useState<IGameContext['myShopItems']>(null)
 
     useEffect(() => {
@@ -53,6 +53,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         // set my coins if exist
         const getPlayerCoins = localStorage.getItem('playerCoins')
         if(getPlayerCoins) setMyCoins(+getPlayerCoins)
+        // set my shop items if exist
+        const getPlayerShopItems = localStorage.getItem('playerShopItems')
+        if(getPlayerShopItems) setMyShopItems(JSON.parse(getPlayerShopItems))
     }, [])
 
     const boardStates = {

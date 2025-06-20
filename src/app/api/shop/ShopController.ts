@@ -49,7 +49,8 @@ export default class ShopController extends Controller {
         const {displayName, playerCoins} = buyingData
         const {itemName, itemPrice} = areAllBuyCondsMetData as {itemName: string, itemPrice: number}
         // update player coins
-        await this.redisSet(`${displayName}_coins`, [playerCoins - itemPrice])
+        const coinsLeft = playerCoins - itemPrice
+        await this.redisSet(`${displayName}_coins`, [coinsLeft])
         // set player shop items
         const getPlayerShopItems = await this.redisGet(`${displayName}_shopItems`)
         const setPlayerShopItems = [...getPlayerShopItems] 
@@ -69,7 +70,7 @@ export default class ShopController extends Controller {
         await this.redisSet(`${displayName}_shopItems`, setPlayerShopItems)
         // return item data
         return {
-            coinsLeft: playerCoins - itemPrice,
+            coinsLeft: coinsLeft,
             ownedItems: setPlayerShopItems 
         }
     }
@@ -100,7 +101,7 @@ export default class ShopController extends Controller {
             // condition not met, return
             if(areAllBuyCondsMet.status !== 200) return areAllBuyCondsMet
             // condition met
-            const buyResult = await this.buyingShopItem(payload.item_type, buyingData, areAllBuyCondsMet)
+            const buyResult = await this.buyingShopItem('special_card', buyingData, areAllBuyCondsMet.data[0])
             // set result
             const resultData = {
                 ...buyResult,
@@ -113,7 +114,7 @@ export default class ShopController extends Controller {
             // condition not met, return
             if(areAllBuyCondsMet.status !== 200) return areAllBuyCondsMet
             // condition met
-            const buyResult = await this.buyingShopItem(payload.item_type, buyingData, areAllBuyCondsMet.data[0])
+            const buyResult = await this.buyingShopItem('buff', buyingData, areAllBuyCondsMet.data[0])
             // set result
             const resultData = {
                 ...buyResult,

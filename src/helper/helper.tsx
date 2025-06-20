@@ -149,6 +149,8 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('onlinePlayers')
     localStorage.removeItem('playerData')
     localStorage.removeItem('cityOwnedList')
+    localStorage.removeItem('playerCoins')
+    localStorage.removeItem('playerShopItems')
     // remove player info
     gameState.setMyPlayerInfo({
         display_name: 'guest',
@@ -164,6 +166,10 @@ export function resetAllData(gameState: IGameContext) {
     gameState.setRoomList([])
     // remove game stage
     gameState.setGameStages('prepare')
+    // remove player coins
+    gameState.setMyCoins(0)
+    // remove player shop items
+    gameState.setMyShopItems(null)
 }
 /**
  * @returns [null, data] or [error]
@@ -383,7 +389,7 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
         // response
         switch(renewResponse.status) {
             case 200: 
-                const {token, player, onlinePlayers, playerCoins} = renewResponse.data[0]
+                const {token, player, onlinePlayers, playerCoins, playerShopItems} = renewResponse.data[0]
                 // save access token
                 localStorage.setItem('accessToken', token)
                 // set my player data
@@ -396,6 +402,10 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 localStorage.setItem('onlinePlayers', JSON.stringify(onlinePlayers))
                 // set player coins
                 localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
+                gameState.setMyCoins(playerCoins)
+                // update my shop items
+                localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+                gameState.setMyShopItems(playerShopItems)
                 // remove guest mode
                 gameState.setGuestMode(false)
                 break

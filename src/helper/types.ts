@@ -189,6 +189,8 @@ export interface IGameContext {
     setRankingInfo: Dispatch<SetStateAction<IGameContext['rankingInfo']>>,
     myCoins: number,
     setMyCoins: Dispatch<SetStateAction<number>>,
+    myShopItems: IMyShopItems[], 
+    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
     // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
@@ -215,9 +217,6 @@ export interface IGameContext {
     setDiceMode: Dispatch<SetStateAction<IGameContext['diceMode']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
-    // shop
-    myShopItems: IMyShopItems, 
-    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
