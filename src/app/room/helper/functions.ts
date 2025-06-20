@@ -525,3 +525,29 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
             return
     }
 }
+
+export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+
+    interface IItemData {name: string, type: string, description: string, price: number}
+    const {name, type, description, price} = itemData as IItemData
+    // buy item data
+    const buyItemData = {
+        display_name: gameState.myPlayerInfo.display_name,
+        item_type: type,
+        item_name: name,
+    }
+    // warning
+    const buyItemWarning = `"${description}"\nare you sure wanna buy this item?`
+    if(!confirm(buyItemWarning)) return
+    // fetch
+    const buyItemFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(buyItemData)})
+    const buyItemResponse: IResponse = await (await fetcher('/shop', buyItemFetchOptions)).json()
+    // response
+    switch(buyItemResponse.status) {
+        case 200:
+            return
+        default:
+            return
+    }
+}

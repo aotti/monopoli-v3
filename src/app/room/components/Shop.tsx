@@ -2,11 +2,13 @@ import { useGame } from "../../../context/GameContext"
 import { useMisc } from "../../../context/MiscContext"
 import { translateUI } from "../../../helper/helper"
 import shop_items from "../config/shop-items.json"
+import { buyShopitem } from "../helper/functions"
 
 export default function Shop() {
     const miscState = useMisc()
     const gameState = useGame()
 
+    // shop items
     const specialCardItems = shop_items.special_card_list
     const buffItems = shop_items.buff_list
 
@@ -18,8 +20,8 @@ export default function Shop() {
             <div className="flex justify-between border-b-2 mb-2">
                 <span> {translateUI({lang: miscState.language, text: 'Shop'})} </span>
                 <span className="text-green-300">
-                    {translateUI({lang: miscState.language, text: 'my coin'})}
-                    : 0
+                    {translateUI({lang: miscState.language, text: 'my coins'})}
+                    : {gameState.myCoins}
                 </span>
             </div>
             {/* modal body */}
@@ -79,19 +81,27 @@ export default function Shop() {
 }
 
 function ShopItem({ type, data }) {
-    const {name, description, price} = data
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    const itemData = {
+        name: data.name,
+        type: type,
+        description: data.description,
+        price: data.price,
+    }
     const itemImageSrc = type == 'buff' 
                     ? 'https://img.icons8.com/?id=OMMKdOvcwXo0&format=png&color=FFFFFF'
                     : 'https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF'
 
     return (
-        <form className="col-span-2 flex flex-col items-center text-orange-300" onSubmit={ev => {ev.preventDefault();alert(description)}}>
+        <form onSubmit={ev => buyShopitem(ev, itemData, miscState, gameState)} className="col-span-2 flex flex-col items-center text-orange-300">
             <button type="submit" className="w-full h-full hover:bg-darkblue-2 hover:cursor-pointer active:bg-darkblue-2">
                 <div className="flex gap-2 items-center justify-center text-green-300">
                     <img src={itemImageSrc} alt="buff" className="inline !w-8 !h-8" />
-                    <span> {price} </span>
+                    <span> {itemData.price} </span>
                 </div>
-                <span> {name} </span>
+                <span> {itemData.name} </span>
             </button>
         </form>
     )

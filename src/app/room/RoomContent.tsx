@@ -218,7 +218,11 @@ function MenuButton() {
 
     return (
         <div data-tooltip="menu" className="w-8 my-auto text-right">
-            <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowRoomListMenu(true)}>
+            <button type="button" className="invert active:opacity-75" onClick={() => {
+                miscState.setShowRoomListMenu(true)
+                // auto close menu after 10s
+                setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
+            }}>
                 <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
             </button>
         </div>
@@ -266,7 +270,7 @@ function ShopButton() {
                 miscState.setShowModal('shop') 
             }}>
                 <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> shop (soon) </span>
+                <span className="invert"> shop </span>
             </button>
         </div>
     )

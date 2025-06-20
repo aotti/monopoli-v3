@@ -29,6 +29,11 @@ export default class LoginController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else if(data) {
+            // get player coins
+            const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
+            // if empty, create it
+            if(getPlayerCoins.length === 0) 
+                await this.redisSet(`${data[0].display_name}_coins`, [0])
             // log user
             const onlinePlayers = await this.getOnlinePlayers(data[0], payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
@@ -51,6 +56,7 @@ export default class LoginController extends Controller {
             const accessToken = await this.generateToken({type: 'access', payload: data[0], expire: '10min'})
             const resultData = {
                 player: data[0],
+                playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers.data
@@ -86,6 +92,11 @@ export default class LoginController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            // get player coins
+            const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
+            // if empty, create it
+            if(getPlayerCoins.length === 0) 
+                await this.redisSet(`${data[0].display_name}_coins`, [0])
             // new renew data
             const newRenewData: IPlayer = {
                 ...renewData,
@@ -104,6 +115,7 @@ export default class LoginController extends Controller {
             // set result
             const resultData = {
                 player: newRenewData,
+                playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers.data

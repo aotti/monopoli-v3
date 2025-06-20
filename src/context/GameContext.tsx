@@ -42,11 +42,17 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gameQuakeCity, setGameQuakeCity] = useState<string[]>([])
     const [diceMode, setDiceMode] = useState<IGameContext['diceMode']>('off')
     const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
+    // shop
+    const [myCoins, setMyCoins] = useState(20)
+    const [myShopItems, setMyShopItems] = useState<IGameContext['myShopItems']>(null)
 
     useEffect(() => {
         // set online players if exist
         const getOnlinePlayers = localStorage.getItem('onlinePlayers')
         if(getOnlinePlayers) setOnlinePlayers(JSON.parse(getOnlinePlayers))
+        // set my coins if exist
+        const getPlayerCoins = localStorage.getItem('playerCoins')
+        if(getPlayerCoins) setMyCoins(+getPlayerCoins)
     }, [])
 
     const boardStates = {
@@ -69,7 +75,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         guestMode, setGuestMode,
         onlinePlayers, setOnlinePlayers,
         spectator, setSpectator,
-        rankingInfo, setRankingInfo
+        rankingInfo, setRankingInfo,
+        myCoins, setMyCoins,
+        myShopItems, setMyShopItems,
     }
 
     const roomStates = {

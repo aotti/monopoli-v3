@@ -126,8 +126,8 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, miscState: IMiscConte
             const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
             // loading button
             const tempRollDiceText = rollDiceButton.textContent
-            // rollDiceButton.textContent = 'Loading'
-            // rollDiceButton.disabled = true
+            rollDiceButton.textContent = 'Loading'
+            rollDiceButton.disabled = true
             setTimeout(() => rollDiceGameRoom(formInputs, tempRollDiceText, miscState, gameState), 2500); break
     }
 }

@@ -38,10 +38,14 @@ export default function RollNumber({ roomId }: {roomId: number}) {
 
 function RollDice({ amount }: {amount: number}) {
     const miscState = useMisc()
+    const gameState = useGame()
 
     return (
         <div className="relative z-10 top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
             <p> {translateUI({lang: miscState.language, text: 'roll dice'})} </p>
+            {gameState.diceMode !== 'off' 
+                ? <p> {`"${translateUI({lang: miscState.language, text: 'dice controller'})}"`} </p> 
+                : null}
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">
                 {// set dice amount

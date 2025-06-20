@@ -2,7 +2,7 @@ import { ICreateRoom, IGameContext, IGamePlay, IQuerySelect, IQueryUpdate, IResp
 import Controller from "../Controller";
 
 export default class GameController extends Controller {
-    async filters(action: string, payload: any) {
+    private async filters(action: string, payload: any) {
         let filterResult: IResponse = null
         // get token payload
         const tokenPayload = await this.getTokenPayload({ token: payload.token })

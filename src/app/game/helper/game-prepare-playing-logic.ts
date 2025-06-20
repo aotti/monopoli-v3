@@ -332,7 +332,6 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
             }
         }
     }
-    return
     // set state to disable "back to room & surrender" buttons
     miscState.setDisableButtons('gameroom')
     // fetch

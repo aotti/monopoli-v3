@@ -146,6 +146,14 @@ function DiceControlOption() {
     const miscState = useMisc()
     const gameState = useGame()
 
+    const diceController = []
+    gameState.gamePlayerInfo.map(v => {
+        if(v.display_name === gameState.myPlayerInfo.display_name) {
+            diceController.push(v.card?.match(/dice controller/i))
+        }
+    })
+    const isDiceControllerExist = diceController.flat().filter(i=>i).length === 1
+
     const diceModeHandler = (ev: MouseEvent<HTMLButtonElement>) => {
         const currentMode = ev.currentTarget.textContent
         switch(currentMode) {
@@ -161,13 +169,18 @@ function DiceControlOption() {
     }
 
     return (
-        <div className="flex items-center gap-2 p-1 hover:bg-darkblue-2">
+        <div className={`flex items-center gap-2 p-1 hover:bg-darkblue-2 ${isDiceControllerExist ? '' : 'saturate-0'}`}>
             <label htmlFor="dice_control" className="w-full">
                 {translateUI({lang: miscState.language, text: 'Dice Control'})}
             </label>
-            <button type="button" id="dice_control" className="px-1 border-2" onClick={diceModeHandler}>
-                {gameState.diceMode}
-            </button>
+            {isDiceControllerExist
+                ? <button type="button" id="dice_control" className="px-1 border-2" onClick={diceModeHandler}>
+                    {gameState.diceMode}
+                </button>
+                : <button type="button" id="dice_control" className="px-1 border-2">
+                    {gameState.diceMode}
+                </button>}
+            
         </div>
     )
 }

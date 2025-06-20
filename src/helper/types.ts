@@ -150,6 +150,11 @@ interface IGameHistory {
     history: string,
 }
 
+interface IMyShopItems {
+    special_card: string[],
+    buff: string[],
+}
+
 export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
@@ -182,6 +187,8 @@ export interface IGameContext {
     setSpectator: Dispatch<SetStateAction<boolean>>,
     rankingInfo: {display_name: string, worst_money_lost: number}[],
     setRankingInfo: Dispatch<SetStateAction<IGameContext['rankingInfo']>>,
+    myCoins: number,
+    setMyCoins: Dispatch<SetStateAction<number>>,
     // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
@@ -208,6 +215,9 @@ export interface IGameContext {
     setDiceMode: Dispatch<SetStateAction<IGameContext['diceMode']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
+    // shop
+    myShopItems: IMyShopItems, 
+    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -318,7 +328,8 @@ type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|'user_agent'
+type ShopType = 'item_type'|'item_name'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -672,6 +683,23 @@ export interface IAttackAnimationData {
     targetCity: string, 
     targetCityProperty: string,
 }
+
+// shop
+export interface IShop {
+    buy_item: {
+        display_name: string,
+        item_type: 'buff'|'special card',
+        item_name: string,
+    } & ITokenPayload,
+    buying_data: {
+        action: string, 
+        displayName: string,
+        itemName: string, 
+        playerCoins: number,
+    }
+}
+
+// export interface I
 
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:

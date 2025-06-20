@@ -306,19 +306,6 @@ export default class RoomController extends Controller {
             special_card: [],
             buff: [],
         }
-        // order shop item by type
-        if(getShopItems.length > 0) {
-            const specialCardListRegex = /nerf tax|anti prison|gaming dice|dice controller|attack city|upgrade city|curse reverser/
-            const buffListRegex = /reduce price|the void|the twond/
-            for(let item of getShopItems) {
-                // special card items
-                if(item.match(specialCardListRegex)) 
-                    shopItemList.special_card.push(item)
-                // buff items
-                else if(item.match(buffListRegex)) 
-                    shopItemList.buff.push(item)
-            }
-        }
         // set payload for db query
         const queryObject: Partial<IQueryInsert> = {
             table: 'games',
