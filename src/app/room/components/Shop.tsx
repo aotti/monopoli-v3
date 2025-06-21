@@ -25,9 +25,9 @@ export default function Shop() {
                 </span>
             </div>
             {/* modal body */}
-            <div className="flex flex-col gap-2 lg:gap-4 h-[50vh] overflow-y-scroll">
+            <div className="flex flex-col gap-2 lg:gap-4 w-full h-[50vh] border-2 overflow-y-scroll">
                 {/* special card */}
-                <div className="flex flex-col gap-2 lg:gap-4">
+                <div className="relative z-10 flex flex-col gap-2 lg:gap-4">
                     {/* head */}
                     <div>
                         <span className="underline">
@@ -47,7 +47,7 @@ export default function Shop() {
                     </div>
                 </div>
                 {/* buff */}
-                <div className="flex flex-col gap-2 lg:gap-4">
+                <div className="relative z-10 flex flex-col gap-2 lg:gap-4">
                     {/* head */}
                     <div>
                         <span className="underline"> buff </span>
@@ -62,6 +62,12 @@ export default function Shop() {
                             }
                             return <ShopItem key={i} type={'buff'} data={buffItemData} />
                         })}
+                    </div>
+                </div>
+                {/* notif */}
+                <div className="absolute w-[calc(50vw-1rem)] h-[calc(50vh-1rem)]">
+                    <div className="flex items-center justify-center h-full">
+                        <p id="result_shop" className="hidden relative z-10 border-8bit-text bg-darkblue-1 text-center p-1"></p>
                     </div>
                 </div>
             </div>

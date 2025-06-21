@@ -529,6 +529,9 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
 export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
 
+    // result message
+    const resultMessage = qS('#result_shop')
+
     interface IItemData {name: string, type: string, description: string, price: number}
     const {name, type, description, price} = itemData as IItemData
     // buy item data
@@ -555,8 +558,18 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
             // update my shop items
             localStorage.setItem('playerShopItems', JSON.stringify(ownedItems))
             gameState.setMyShopItems(ownedItems)
+            // result message
+            resultMessage.textContent = `item bought`
+            // display notif
+            resultMessage.classList.remove('hidden')
+            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
             return
         default:
+            // result message
+            resultMessage.textContent = `${buyItemResponse.status}: ${buyItemResponse.message}`
+            // display notif
+            resultMessage.classList.remove('hidden')
+            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
             return
     }
 }
