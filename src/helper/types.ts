@@ -691,7 +691,7 @@ export interface IAttackAnimationData {
 export interface IShop {
     buy_item: {
         display_name: string,
-        item_type: 'buff'|'special card',
+        item_type: 'buff'|'special_card',
         item_name: string,
     } & ITokenPayload,
     buying_data: {

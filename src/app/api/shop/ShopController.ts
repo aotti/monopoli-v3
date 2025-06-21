@@ -1,4 +1,4 @@
-import { IResponse, IShop } from "../../../helper/types";
+import { IGameContext, IResponse, IShop } from "../../../helper/types";
 import Controller from "../Controller";
 import shop_items from "../../room/config/shop-items.json"
 
@@ -24,16 +24,36 @@ export default class ShopController extends Controller {
         }
     }
 
-    private checkStuffBeforeBuy(buyingData: IShop['buying_data'], itemList: any[]) {
+    private async checkStuffBeforeBuy(itemType: string, buyingData: IShop['buying_data'], itemList: any[]) {
         const {action, displayName, itemName, playerCoins} = buyingData
         const isItemExist = itemList.map(v => v.name).indexOf(itemName)
-        // item not exist
+
+        // item not exist in game
         if(isItemExist === -1) 
             return {status: 400, message: `${action} failed`, data: []} as IResponse
-        const shopItem = itemList[isItemExist]
+
         // is player coins enough
+        const shopItem = itemList[isItemExist]
         if(playerCoins < shopItem.price) 
             return {status: 400, message: `coins not enough`, data: []} as IResponse
+
+        // is player already have the item
+        const getPlayerShopItems: IGameContext['myShopItems'] = await this.redisGet(`${displayName}_shopItems`)
+        // check item list
+        const findItemKey = Object.keys(getPlayerShopItems).indexOf(itemType)
+        // found item type
+        if(findItemKey !== -1) {
+            const isItemOwned = getPlayerShopItems[findItemKey][itemType].indexOf(itemName)
+            // item is owned, return error
+            if(isItemOwned !== -1) 
+                return {status: 400, message: `already have this item`, data: []} as IResponse
+
+            // is player already have 2 items per type
+            const isItemPerTypeOnLimit = getPlayerShopItems[findItemKey][itemType].length === 2
+            if(isItemPerTypeOnLimit)
+                return {status: 400, message: `only allowed to have 2 items per type`, data: []} as IResponse
+        }
+
         // all conds met
         return {
             status: 200, 
@@ -96,12 +116,12 @@ export default class ShopController extends Controller {
             playerCoins: getPlayerCoins[0],
         }
         // check item type
-        if(payload.item_type == 'special card') {
-            const areAllBuyCondsMet = this.checkStuffBeforeBuy(buyingData, specialCardItems)
+        if(payload.item_type == 'special_card') {
+            const areAllBuyCondsMet = await this.checkStuffBeforeBuy(payload.item_type, buyingData, specialCardItems)
             // condition not met, return
             if(areAllBuyCondsMet.status !== 200) return areAllBuyCondsMet
             // condition met
-            const buyResult = await this.buyingShopItem('special_card', buyingData, areAllBuyCondsMet.data[0])
+            const buyResult = await this.buyingShopItem(payload.item_type, buyingData, areAllBuyCondsMet.data[0])
             // set result
             const resultData = {
                 ...buyResult,
@@ -110,11 +130,11 @@ export default class ShopController extends Controller {
             result = this.respond(200, `${action} success`, [resultData])
         }
         else if(payload.item_type == 'buff') {
-            const areAllBuyCondsMet = this.checkStuffBeforeBuy(buyingData, buffItems)
+            const areAllBuyCondsMet = await this.checkStuffBeforeBuy(payload.item_type, buyingData, buffItems)
             // condition not met, return
             if(areAllBuyCondsMet.status !== 200) return areAllBuyCondsMet
             // condition met
-            const buyResult = await this.buyingShopItem('buff', buyingData, areAllBuyCondsMet.data[0])
+            const buyResult = await this.buyingShopItem(payload.item_type, buyingData, areAllBuyCondsMet.data[0])
             // set result
             const resultData = {
                 ...buyResult,
