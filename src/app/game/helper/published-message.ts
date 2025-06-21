@@ -255,7 +255,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         }, 2000);
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
-            if(v.player == gameState.myPlayerInfo.display_name) {
+            if(v.player_name == gameState.myPlayerInfo.display_name) {
                 // set temp player info
                 const newPlayerInfo = gameState.myPlayerInfo
                 newPlayerInfo.game_played += 1
@@ -264,6 +264,9 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                                 : v.worst_money
                 // save to local storage
                 localStorage.setItem('playerData', JSON.stringify(newPlayerInfo))
+                // update player coins
+                localStorage.setItem('playerCoins', `${v.player_coins}`)
+                gameState.setMyCoins(v.player_coins)
             }
         })
     }

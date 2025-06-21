@@ -54,7 +54,11 @@ export type GameRoomListener = {
     playerTurns: string[],
     surrendPlayer: string,
     playerTurnEnd: IGamePlayerInfo,
-    gameOverPlayers: {player: string, worst_money: number}[],
+    gameOverPlayers: {
+        player_name: string, 
+        worst_money: number,
+        player_coins: number,
+    }[],
     taxes: {
         owner: string,
         visitor: string,

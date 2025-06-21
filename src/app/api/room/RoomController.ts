@@ -301,11 +301,21 @@ export default class RoomController extends Controller {
             return this.respond(429, 'too many request', [])
         }
         // check shop items
-        const getShopItems: string[] = await this.redisGet(`${payload.display_name}_shopitems`)
+        const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
         const shopItemList = {
             special_card: [],
             buff: [],
         }
+        // fill shop item list
+        const shopItemKeys = Object.keys(shopItemList)
+        for(let key of shopItemKeys) {
+            const isKeyExist = getShopItems.map(v => Object.keys(v)).flat().indexOf(key)
+            // shop item exist, set value
+            if(isKeyExist !== -1) 
+                shopItemList[key] = getShopItems[isKeyExist][key]
+        }
+        console.log(shopItemList);
+        
         // set payload for db query
         const queryObject: Partial<IQueryInsert> = {
             table: 'games',
@@ -316,6 +326,7 @@ export default class RoomController extends Controller {
                 tmp_display_name: payload.display_name,
                 tmp_money_start: +payload.money_start,
                 tmp_character: payload.select_character,
+                tmp_special_card: shopItemList.special_card.length > 0 ? shopItemList.special_card.join(';') : null,
                 tmp_buff: shopItemList.buff.length > 0 ? shopItemList.buff.join(';') : null,
             }
         }
@@ -570,17 +581,30 @@ export default class RoomController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            // delete all redis data linked with the game
             await this.deleteRoomData(payload)
-            const gameOverPlayers = payload.all_player_stats.split(';').map(v => {
-                const splitStats = v.split(',')
-                const [player, worst_money] = [splitStats[0], +splitStats[1]]
-                return {player, worst_money}
-            })
+            // all game over player data
+            const playerData = payload.all_player_stats.split(';')
+            // game over player data
+            const gameOverPlayers = []
+            // add coins for each player
+            for(let pd of playerData) {
+                // split player data
+                const splitStats = pd.split(',')
+                // set player name to string, worst money to number
+                const [player_name, worst_money] = [splitStats[0], +splitStats[1]]
+                // get current coins
+                const getPlayerCoins = await this.redisGet(`${player_name}_coins`)
+                // add coins
+                const gainCoins = getPlayerCoins[0] + 10
+                await this.redisSet(`${player_name}_coins`, [gainCoins])
+                // push to gameOverPlayers
+                gameOverPlayers.push({player_name, worst_money, player_coins: gainCoins})
+            }
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
                 roomOverId: data[0].room_id,
-                gameOverPlayers,
                 onlinePlayers: JSON.stringify(onlinePlayers.data)
             }
             const isPublished = await this.monopoliPublish(roomlistChannel, publishData)
