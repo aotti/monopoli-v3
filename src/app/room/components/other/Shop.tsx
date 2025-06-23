@@ -1,8 +1,8 @@
-import { useGame } from "../../../context/GameContext"
-import { useMisc } from "../../../context/MiscContext"
-import { translateUI } from "../../../helper/helper"
-import shop_items from "../config/shop-items.json"
-import { buyShopitem } from "../helper/functions"
+import { useGame } from "../../../../context/GameContext"
+import { useMisc } from "../../../../context/MiscContext"
+import { translateUI } from "../../../../helper/helper"
+import shop_items from "../../config/shop-items.json"
+import { buyShopitem } from "../../helper/functions"
 
 export default function Shop() {
     const miscState = useMisc()
@@ -25,7 +25,7 @@ export default function Shop() {
                 </span>
             </div>
             {/* modal body */}
-            <div className="flex flex-col gap-2 lg:gap-4 w-full h-[50vh] border-2 overflow-y-scroll">
+            <div className="flex flex-col gap-2 lg:gap-4 w-full h-[50vh] overflow-y-scroll">
                 {/* special card */}
                 <div className="relative z-10 flex flex-col gap-2 lg:gap-4">
                     {/* head */}

@@ -100,7 +100,7 @@ export interface IMiscContext {
     setScreenType: Dispatch<SetStateAction<IMiscContext['screenType']>>,
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
-    showModal: 'login'|'register'|'create room'|'join room'|'ranking'|'shop',
+    showModal: 'login'|'register'|'create room'|'join room'|'ranking'|'shop'|'daily',
     setShowModal: Dispatch<SetStateAction<IMiscContext['showModal']>>,
     showJoinModal: string, 
     setShowJoinModal: Dispatch<SetStateAction<IMiscContext['showJoinModal']>>,

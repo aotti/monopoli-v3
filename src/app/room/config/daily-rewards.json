@@ -1,0 +1,86 @@
+{
+    "data": [
+        {
+            "week": 1,
+            "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "list": [
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "pack",
+                    "name": "special card pack",
+                    "items": ["nerf tax", "anti prison", "gaming dice"]
+                },
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "pack",
+                    "name": "buff pack",
+                    "items": ["reduce price", "the void", "the twond"]
+                },
+                {
+                    "type": "pack",
+                    "name": "lemao pack",
+                    "items": ["curse reverser", "attack city", "upgrade city", "the void", "the twond"]
+                }
+            ]
+        },
+        {
+            "week": 2,
+            "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "list": [
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "pack",
+                    "name": "special card pack",
+                    "items": ["dice controller", "attack city", "upgrade city"]
+                },
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "coin",
+                    "name": "10 coins",
+                    "items": [10]
+                },
+                {
+                    "type": "pack",
+                    "name": "buff pack",
+                    "items": ["reduce price", "the void", "the twond"]
+                },
+                {
+                    "type": "pack",
+                    "name": "lemao pack",
+                    "items": ["curse reverser", "attack city", "upgrade city", "the void", "the twond"]
+                }
+            ]
+        }
+    ]
+}

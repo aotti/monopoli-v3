@@ -1,12 +1,12 @@
 import { useMisc } from "../../context/MiscContext";
 import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { ChatEmotes, sendChat } from "../../components/ChatBox";
-import CreateRoom from "./components/CreateRoom";
-import PlayerList from "./components/PlayerList";
-import PlayerStats from "./components/PlayerStats";
-import RoomCard from "./components/RoomCard";
+import CreateRoom from "./components/room-list/CreateRoom";
+import PlayerList from "./components/other/PlayerList";
+import PlayerStats from "./components/other/PlayerStats";
+import RoomCard from "./components/room-list/RoomCard";
 import { useEffect, useRef } from "react";
-import TutorialRoomList from "./components/TutorialRoomList";
+import TutorialRoomList from "./components/other/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
@@ -14,8 +14,9 @@ import GameSounds from "../../components/GameSounds";
 import { getRoomList, viewRanking } from "./helper/functions";
 import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
-import Ranking from "./components/Ranking";
-import Shop from "./components/Shop";
+import Ranking from "./components/other/Ranking";
+import Shop from "./components/other/Shop";
+import Daily from "./components/other/Daily";
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -173,16 +174,17 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         </div>
                     </div>
                     {/* create room, ranking, shop, calendar modal */}
-                    <div className={`absolute z-20 bg-black/50
+                    <div className={`absolute z-20 -ml-2 bg-black/50
                     ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
-                    h-[calc(100vh-4.25rem)] w-[calc(65vw+1rem)] lg:w-[calc(65vw+2.5rem)]`}>
+                    h-[calc(100vh-4rem)] lg:h-[calc(100vh-4.25rem)] w-[calc(65vw+1.5rem)] lg:w-[calc(65vw+3rem)]`}>
                         {/* create room */}
                         <CreateRoom />
                         {/* ranking */}
                         <Ranking />
                         {/* shop */}
                         <Shop />
-                        {/* calendar */}
+                        {/* daily */}
+                        <Daily />
                     </div>
                 </div>
                 {/* room list cards 
@@ -282,8 +284,14 @@ function DailyButton() {
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
             <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+                // close join modal
+                miscState.setShowJoinModal(null)
                 // close room list menu
                 miscState.setShowRoomListMenu(false)
+                // to give zoom-in animate class
+                miscState.setAnimation(true); 
+                // show the modal
+                miscState.setShowModal('daily') 
             }}>
                 <img src="https://img.icons8.com/?id=23&format=png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
                 <span className="invert"> daily (soon) </span>
