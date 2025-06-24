@@ -14,17 +14,9 @@ export default function RollNumber({ roomId }: {roomId: number}) {
     useEffect(() => {
         if(!gameState.rollNumber) return
         const diceNumber = gameState.rollNumber == 'turn' ? [1,2,3,4,5,6,7,8,9,0] : [1,2,3,4,5,6]
-        startAnimation(diceNumber, gameState.gameRoomInfo[getGameRoomInfo], miscState, gameState)
+        startAnimation(diceNumber, miscState, gameState, gameState.gameRoomInfo[getGameRoomInfo])
         // hidden the roll after end
         setTimeout(() => gameState.setRollNumber(null), 3500);
-        
-        // ### KALO MODE DEVELOPMENT, PAKE CARA RETURN ARROW FUNCTION
-        // return () => {
-        //     const diceNumber = gameState.rollNumber == 'turn' ? [1,2,3,4,5,6,7,8,9,0] : [1,2,3,4,5,6]
-        //     startAnimation(diceNumber, miscState, gameState)
-        //     // hidden the roll after end
-        //     setTimeout(() => gameState.setRollNumber(null), 3500);
-        // }
     }, [gameState.rollNumber])
 
     return (
@@ -124,17 +116,17 @@ function removeAllChildNodes(parent: HTMLElement) {
 const totalDuplicates = 4
 
 // Clear slots and recreate random list of images
-const buildItemLists = (number: number[], gameRoomInfo: IGameContext['gameRoomInfo'][0], gameState: IGameContext) => {  
+const buildItemLists = (itemList: any[], gameState: IGameContext, gameRoomInfo?: IGameContext['gameRoomInfo'][0]) => {  
     const slots = document.getElementsByClassName('slot');
     // set static dice
-    const [diceOdd, diceEven] = diceController(gameRoomInfo.dice, number)
+    const [diceOdd, diceEven] = gameRoomInfo ? diceController(gameRoomInfo.dice, itemList) : [null, null]
     // Iterate through the slot html elements
     Array.prototype.forEach.call(slots, (slot, s) => {
         let prizeBlocks = document.createElement('div');
         prizeBlocks.classList.add('slot-machine__prizes');
         
         // Multiply and shuffle prize images for visual purposes
-        const randomPrizes = shuffle(number.flatMap(i => Array(totalDuplicates).fill(i)));
+        const randomPrizes = shuffle(itemList.flatMap(i => Array(totalDuplicates).fill(i)));
         randomPrizes.forEach((prize) => {
             const prizeElement = document.createElement('p');
             prizeElement.textContent = prize
@@ -142,8 +134,8 @@ const buildItemLists = (number: number[], gameRoomInfo: IGameContext['gameRoomIn
         })
     
         // Get a random item from the prizes array
-        let resultItem = getRandomInt(0, number.length-1);
-        // check dice mode
+        let resultItem = getRandomInt(0, itemList.length-1);
+        // modify resultItem by dice mode
         switch(gameState.diceMode) {
             case 'odd':
                 // index 0 = set even, index 1 = set odd
@@ -158,7 +150,7 @@ const buildItemLists = (number: number[], gameRoomInfo: IGameContext['gameRoomIn
         // Adds the result to the last row
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')
-        resultElement.textContent = number[resultItem].toString()
+        resultElement.textContent = itemList[resultItem].toString()
         prizeBlocks.appendChild(resultElement);
     
         // Clear the slots and add the new ones
@@ -168,16 +160,19 @@ const buildItemLists = (number: number[], gameRoomInfo: IGameContext['gameRoomIn
 }
 
 // Determine whether the player won and start the spinning animation
-const startAnimation = (number: number[], gameRoomInfo: IGameContext['gameRoomInfo'][0], miscState: IMiscContext, gameState: IGameContext) => {
+export const startAnimation = (itemList: any[], miscState: IMiscContext, gameState: IGameContext, gameRoomInfo?: IGameContext['gameRoomInfo'][0]) => {
     // less than 1024 for mobile, more than 1024 for desktop
     const windowWidth = window.innerWidth
     const defaultSize = windowWidth < 1024 ? 24 : 32
     
     // Rebuild the items list with the result
-    buildItemLists(number, gameRoomInfo, gameState);
+    gameRoomInfo 
+        ? buildItemLists(itemList, gameState, gameRoomInfo)
+        : buildItemLists([...itemList, ...itemList], gameState)
+    
     
     // Determine the total height to be animated  
-    const totalHeight = number.length * totalDuplicates * defaultSize;
+    const totalHeight = itemList.length * totalDuplicates * defaultSize;
     
     // Animate each one of the slots
     const soundRollNumber = qS('#sound_roll_number') as HTMLAudioElement
@@ -190,11 +185,13 @@ const startAnimation = (number: number[], gameRoomInfo: IGameContext['gameRoomIn
             { transform: `translateY(-${totalHeight}px)` } // to
         ], {
             // roll dice = 1.5 sec | roll turn = 2 sec
-            duration: gameState.rollNumber == 'dice' 
-                    ? items.length === 1
-                        ? 2000 // single dice
-                        : 1000 + (++s * 500) // double dice
-                    : 1000 + (s * 500),
+            duration: gameRoomInfo ?
+                        gameState.rollNumber == 'dice' 
+                            ? items.length === 1
+                                ? 2000 // single dice
+                                : 1000 + (++s * 500) // double dice
+                            : 1000 + (s * 500) // roll turn
+                        : 2000, // roll daily reward
             fill: "forwards",
             easing: 'ease-in-out'
         });
