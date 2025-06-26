@@ -7,7 +7,7 @@
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "pack",
@@ -17,17 +17,17 @@
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "pack",
@@ -48,7 +48,7 @@
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "pack",
@@ -58,17 +58,17 @@
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "coin",
                     "name": "10 coins",
-                    "items": [10]
+                    "items": ["coin"]
                 },
                 {
                     "type": "pack",

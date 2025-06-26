@@ -29,6 +29,17 @@ export default class LoginController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else if(data) {
+            // get player daily status
+            const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
+            const today = new Date().toLocaleString([], {weekday: 'long'})
+            const isDailyReset = getPlayerDaily.length > 0
+                                // is daily status == today 
+                                ? getPlayerDaily[0] === today
+                                    // daily claimed
+                                    ? 'claimed'
+                                    // daily unclaim
+                                    : 'unclaim'
+                                : 'unclaim'
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
             // get player shop items
@@ -58,6 +69,7 @@ export default class LoginController extends Controller {
             const accessToken = await this.generateToken({type: 'access', payload: data[0], expire: '10min'})
             const resultData = {
                 player: data[0],
+                dailyStatus: isDailyReset,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 playerShopItems: getPlayerShopItems,
                 token: accessToken,
@@ -95,6 +107,17 @@ export default class LoginController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            // get player daily status
+            const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
+            const today = new Date().toLocaleString([], {weekday: 'long'})
+            const isDailyReset = getPlayerDaily.length > 0
+                                // is daily status == today 
+                                ? getPlayerDaily[0] === today
+                                    // daily claimed
+                                    ? 'claimed'
+                                    // daily unclaim
+                                    : 'unclaim'
+                                : 'unclaim'
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
             // get player shop items
@@ -120,6 +143,7 @@ export default class LoginController extends Controller {
             // set result
             const resultData = {
                 player: newRenewData,
+                dailyStatus: isDailyReset,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 playerShopItems: getPlayerShopItems,
                 token: accessToken,

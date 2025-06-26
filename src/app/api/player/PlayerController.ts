@@ -1,7 +1,8 @@
-import { IChat, IPlayer, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
+import { IChat, IDaily, IGameContext, IPlayer, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import daily_rewards from "../../room/config/daily-rewards.json"
 
 const rateLimitAvatar = new Ratelimit({
     redis: Redis.fromEnv(),
@@ -97,12 +98,14 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
+
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+        
         // check register rate limit
         const rateLimitID = `${payload.display_name}_${payload.user_agent}`
         const rateLimitResult = await rateLimitAvatar.limit(rateLimitID);
@@ -152,12 +155,14 @@ export default class PlayerController extends Controller {
         // token payload data
         delete payload.token
         const { tpayload, token } = tokenPayload.data[0]
+
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+
         // publish chat
         const publishData = {
             ...payload, 
@@ -174,5 +179,157 @@ export default class PlayerController extends Controller {
         result = this.respond(200, `${action} success`, [resultData])
         // return result
         return result
+    }
+
+    async claimDaily(action: string, payload: IDaily) {
+        let result: IResponse
+
+        // get token payload
+        const tokenPayload = await this.getTokenPayload({ token: payload.token })
+        if(tokenPayload.status !== 200) return tokenPayload
+        // token payload data
+        delete payload.token
+        const { tpayload, token } = tokenPayload.data[0]
+
+        // renew log online player
+        const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
+        if(onlinePlayers.status !== 200) return onlinePlayers
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+
+        // get player daily status
+        const today = new Date().toLocaleString([], {weekday: 'long'})
+        const getPlayerDaily = await this.redisGet(`${payload.display_name}_dailyStatus`)
+        // have user claimed today reward
+        if(getPlayerDaily.length === 0 || (getPlayerDaily.length > 0 && getPlayerDaily[0] !== today)) {
+            // player havent claim reward
+            // get daily rewards data
+            const dailyRewards = daily_rewards.data
+            const getPlayerCoins = await this.redisGet(`${payload.display_name}_coins`)
+            // item is coin
+            if(payload.item_name === 'coin') {
+                // update player coins
+                const gainCoins = getPlayerCoins[0] + 10
+                await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
+                // update player daily status
+                await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                // set result data
+                const resultData = {
+                    token: token,
+                    dailyStatus: 'claimed',
+                    playerCoins: gainCoins,
+                }
+                result = this.respond(200, `${action} success`, [resultData])
+            }
+            // else update player shop items
+            else {
+                const findWeek = dailyRewards.map(v => v.week).indexOf(payload.week)
+                // match prize of week
+                if(findWeek !== -1 && dailyRewards[findWeek].week === payload.week) {
+                    const dr = dailyRewards[findWeek]
+                    // loop reward data
+                    for(let data of dr.list) {
+                        // is item exist in json data
+                        const isItemDataExist = data.items.indexOf(payload.item_name)
+                        if(isItemDataExist !== -1) {
+                            // get player shop items
+                            const getPlayerShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
+                            // shop items has value
+                            if(getPlayerShopItems.length > 0) {
+                                // is item exist in player shop items
+                                const isItemShopExist = getPlayerShopItems.map(v => {
+                                    if(v.buff.indexOf(payload.item_name) !== -1) return true
+                                    else if(v.special_card.indexOf(payload.item_name) !== -1) return true
+                                }).filter(i => i)[0]
+
+                                // item exist, replace with coins
+                                if(isItemShopExist && isItemShopExist[0]) {
+                                    // update player coins
+                                    const gainCoins = getPlayerCoins[0] + 10
+                                    await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
+                                    // update player daily status
+                                    await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                                    // set result data
+                                    const resultData = {
+                                        token: token,
+                                        dailyStatus: 'claimed',
+                                        playerCoins: gainCoins
+                                    }
+                                    result = this.respond(200, `${action} success`, [resultData])
+                                }
+
+                                // item not exist but shop items has value
+                                else {
+                                    const ownedItems = await this.storeShopItems(getPlayerShopItems, {
+                                        displayName: payload.display_name, 
+                                        itemType: data.type, 
+                                        itemName: data.items[isItemDataExist]
+                                    })
+                                    // update player daily status
+                                    await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                                    // set result data
+                                    const resultData = {
+                                        token: token,
+                                        dailyStatus: 'claimed',
+                                        playerShopItems: ownedItems
+                                    }
+                                    result = this.respond(200, `${action} success`, [resultData])
+                                }
+                            }
+                            // shop items empty
+                            else {
+                                const ownedItems = await this.storeShopItems(getPlayerShopItems, {
+                                    displayName: payload.display_name, 
+                                    itemType: data.type, 
+                                    itemName: data.items[isItemDataExist]
+                                })
+                                // update player daily status
+                                await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                                // set result data
+                                const resultData = {
+                                    token: token,
+                                    dailyStatus: 'claimed',
+                                    playerShopItems: ownedItems
+                                }
+                                result = this.respond(200, `${action} success`, [resultData])
+                            }
+                        }
+                        else {
+                            // item not exist in json data
+                            return this.respond(400, 'puella magi madocka madicka', [])
+                        }
+                    }
+                }
+            }
+            
+            return result
+        }
+        else {
+            // player has claimed reward
+            return this.respond(400, 'you have claimed today reward', [])
+        }
+    }
+
+    private async storeShopItems(playerShopItems: any[], storeData: Record<'displayName'|'itemType'|'itemName', string>) {
+        const {displayName, itemType, itemName} = storeData
+        // set player shop items
+        const setPlayerShopItems = [...playerShopItems] 
+        // get shop item types
+        const shopItemTypes = setPlayerShopItems.map(v => Object.keys(v)).flat()
+        const isItemTypeExist = shopItemTypes.indexOf(itemType)
+        // item type not exist
+        if(isItemTypeExist === -1) {
+            setPlayerShopItems.push({[itemType]: [itemName]})
+        }
+        // item type exist
+        else {
+            const itemList = setPlayerShopItems[isItemTypeExist][itemType]
+            setPlayerShopItems[isItemTypeExist][itemType] = [...itemList, itemName]
+        }
+        // update player shop items
+        await this.redisSet(`${displayName}_shopItems`, setPlayerShopItems)
+
+        return setPlayerShopItems
     }
 }

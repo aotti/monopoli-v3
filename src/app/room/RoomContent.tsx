@@ -217,14 +217,20 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
 function MenuButton() {
     const miscState = useMisc()
+    useEffect(() => {
+        let menuTimeout = null
+        if(miscState.showRoomListMenu) {
+            // auto close menu after 10s
+            menuTimeout = setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
+        }
+        else {
+            clearInterval(menuTimeout)
+        }
+    }, [miscState.showRoomListMenu])
 
     return (
         <div data-tooltip="menu" className="w-8 my-auto text-right">
-            <button type="button" className="invert active:opacity-75" onClick={() => {
-                miscState.setShowRoomListMenu(true)
-                // auto close menu after 10s
-                setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
-            }}>
+            <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowRoomListMenu(true)}>
                 <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
             </button>
         </div>

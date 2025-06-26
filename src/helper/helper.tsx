@@ -364,7 +364,10 @@ export function filterInput(input: InputIDType, value: string) {
         case 'item_type':
             return value ? value.match(/buff$|special_card$/) : null
         case 'item_name':
-            return value ? value.match(/nerf tax$|anti prison$|gaming dice$|dice controller$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
+            return value ? value.match(/coin$|nerf tax$|anti prison$|gaming dice$|dice controller$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
+        // ====== DAILY TYPE ======
+        case 'week':
+            return value ? value.match(/1$|2$/) : null
         // ====== MISC TYPE ======
         case 'user_agent': 
             return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null
@@ -389,7 +392,7 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
         // response
         switch(renewResponse.status) {
             case 200: 
-                const {token, player, onlinePlayers, playerCoins, playerShopItems} = renewResponse.data[0]
+                const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus} = renewResponse.data[0]
                 // save access token
                 localStorage.setItem('accessToken', token)
                 // set my player data
@@ -400,6 +403,9 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 // set online players
                 gameState.setOnlinePlayers(onlinePlayers)
                 localStorage.setItem('onlinePlayers', JSON.stringify(onlinePlayers))
+                // update daily status
+                localStorage.setItem('dailyStatus', dailyStatus)
+                gameState.setDailyStatus(dailyStatus)
                 // set player coins
                 localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
                 gameState.setMyCoins(playerCoins)

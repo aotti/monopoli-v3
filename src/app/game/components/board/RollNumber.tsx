@@ -147,7 +147,7 @@ const buildItemLists = (itemList: any[], gameState: IGameContext, gameRoomInfo?:
                 resultItem = diceEven
                 break
         }
-        // Adds the result to the last row
+        // Adds the result to slots
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')
         resultElement.textContent = itemList[resultItem].toString()

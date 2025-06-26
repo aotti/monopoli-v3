@@ -103,7 +103,8 @@ export default class Controller {
             case 'user avatar update': 
             case 'user get stats': 
             case 'user get ranking': 
-            case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'user send chat': 
+            case 'user daily claim': [filterStatus, filterMessage] = loopKeyValue(); break
             // room
             case 'room create': 
             case 'room hard delete': 

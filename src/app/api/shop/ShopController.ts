@@ -91,7 +91,7 @@ export default class ShopController extends Controller {
         // return item data
         return {
             coinsLeft: coinsLeft,
-            ownedItems: setPlayerShopItems 
+            playerShopItems: setPlayerShopItems 
         }
     }
 
