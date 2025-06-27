@@ -193,6 +193,8 @@ export interface IGameContext {
     setRankingInfo: Dispatch<SetStateAction<IGameContext['rankingInfo']>>,
     dailyStatus: 'claimed'|'unclaim',
     setDailyStatus: Dispatch<SetStateAction<IGameContext['dailyStatus']>>,
+    lastDailyStatus: string,
+    setLastDailyStatus: Dispatch<SetStateAction<string>>,
     myCoins: number,
     setMyCoins: Dispatch<SetStateAction<number>>,
     myShopItems: IMyShopItems[], 
@@ -375,7 +377,7 @@ export interface IChat extends ITokenPayload {
 
 export interface IDaily extends ITokenPayload {
     display_name: string,
-    week: number,
+    week: string,
     item_name: string,
 }
 

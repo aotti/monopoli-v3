@@ -392,7 +392,7 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
         // response
         switch(renewResponse.status) {
             case 200: 
-                const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus} = renewResponse.data[0]
+                const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus} = renewResponse.data[0]
                 // save access token
                 localStorage.setItem('accessToken', token)
                 // set my player data
@@ -406,6 +406,8 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 // update daily status
                 localStorage.setItem('dailyStatus', dailyStatus)
                 gameState.setDailyStatus(dailyStatus)
+                // set last daily status
+                gameState.setLastDailyStatus(lastDailyStatus)
                 // set player coins
                 localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
                 gameState.setMyCoins(playerCoins)

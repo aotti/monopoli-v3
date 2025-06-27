@@ -127,6 +127,8 @@ export default class RoomController extends Controller {
             const getJoinedRoom = cookies().get('joinedRoom')?.value
             // dummy tpayload
             const tempTPayload = tpayload || {display_name: 'guest'}
+            // get player daily status
+            const getPlayerDaily = await this.redisGet(`${tempTPayload.display_name}_dailyStatus`)
             // check if player has joined room
             let isMyGameExist: number = null
             if(!getJoinedRoom) {
@@ -144,6 +146,7 @@ export default class RoomController extends Controller {
             const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
             // set result
             const resultData = {
+                lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
                 roomListInfo: roomListInfo,
                 roomList: data,

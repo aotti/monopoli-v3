@@ -198,22 +198,40 @@ export default class PlayerController extends Controller {
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
 
+        const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+        const currentDay = todayDate.split(', ')[0]
+        const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
         // get player daily status
-        const today = new Date().toLocaleString([], {weekday: 'long'})
         const getPlayerDaily = await this.redisGet(`${payload.display_name}_dailyStatus`)
-        // have user claimed today reward
-        if(getPlayerDaily.length === 0 || (getPlayerDaily.length > 0 && getPlayerDaily[0] !== today)) {
+        const playerDailyUnix = getPlayerDaily.length > 0 
+                                ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
+                                : 0
+        // have user claimed today's reward
+        if(getPlayerDaily.length === 0 || (getPlayerDaily.length > 0 && currentDayUnix > playerDailyUnix)) {
             // player havent claim reward
             // get daily rewards data
             const dailyRewards = daily_rewards.data
             const getPlayerCoins = await this.redisGet(`${payload.display_name}_coins`)
-            // item is coin
+            // set day number
+            // ### KIRIM DATA lastDailyStatus SETIAP GET ROOM LIST
+            // ### DATA TSB TIDAK BOLEH DISIMPAN DI localStorage
+            const dayOfWeek = {
+                week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
+                week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
+            }
+            const getWeekValues: string[] = dayOfWeek[`week_${payload.week}`]
+            const dayNumber = getWeekValues 
+                            ? getWeekValues.map(v => v.match(currentDay) ? v.split('-')[1] : null).filter(i => i)[0]
+                            : 0
+            // claim date (Monday, 6/22/2029; 1-1)
+            const claimDate = `${todayDate}; ${dayNumber}-${payload.week}`
+            // reward item is coin
             if(payload.item_name === 'coin') {
                 // update player coins
                 const gainCoins = getPlayerCoins[0] + 10
                 await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
                 // update player daily status
-                await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
                 // set result data
                 const resultData = {
                     token: token,
@@ -222,11 +240,11 @@ export default class PlayerController extends Controller {
                 }
                 result = this.respond(200, `${action} success`, [resultData])
             }
-            // else update player shop items
+            // reward item is shop items
             else {
-                const findWeek = dailyRewards.map(v => v.week).indexOf(payload.week)
+                const findWeek = dailyRewards.map(v => v.week).indexOf(+payload.week)
                 // match prize of week
-                if(findWeek !== -1 && dailyRewards[findWeek].week === payload.week) {
+                if(findWeek !== -1) {
                     const dr = dailyRewards[findWeek]
                     // loop reward data
                     for(let data of dr.list) {
@@ -249,7 +267,7 @@ export default class PlayerController extends Controller {
                                     const gainCoins = getPlayerCoins[0] + 10
                                     await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
                                     // update player daily status
-                                    await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                                    await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
                                     // set result data
                                     const resultData = {
                                         token: token,
@@ -267,7 +285,7 @@ export default class PlayerController extends Controller {
                                         itemName: data.items[isItemDataExist]
                                     })
                                     // update player daily status
-                                    await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                                    await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
                                     // set result data
                                     const resultData = {
                                         token: token,
@@ -285,7 +303,7 @@ export default class PlayerController extends Controller {
                                     itemName: data.items[isItemDataExist]
                                 })
                                 // update player daily status
-                                await this.redisSet(`${payload.display_name}_dailyStatus`, [today])
+                                await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
                                 // set result data
                                 const resultData = {
                                     token: token,
@@ -300,6 +318,10 @@ export default class PlayerController extends Controller {
                             return this.respond(400, 'puella magi madocka madicka', [])
                         }
                     }
+                }
+                else {
+                    // prize of week not found
+                    return this.respond(400, 'puella magi madocka madicka', [])
                 }
             }
             

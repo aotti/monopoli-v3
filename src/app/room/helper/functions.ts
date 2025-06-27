@@ -1,6 +1,8 @@
-import { FormEvent } from "react"
-import { errorCreateRoom, fetcher, fetcherOptions, qS, resetAllData, setInputValue, translateUI } from "../../../helper/helper"
-import { ICreateRoom, IGameContext, IMiscContext, IPlayer, IResponse, IShiftRoom } from "../../../helper/types"
+import { FormEvent, FunctionComponent } from "react"
+import { errorCreateRoom, fetcher, fetcherOptions, qS, qSA, resetAllData, setInputValue, translateUI } from "../../../helper/helper"
+import { IAnimate, ICreateRoom, IGameContext, IMiscContext, IPlayer, IResponse, IShiftRoom } from "../../../helper/types"
+import { startAnimation } from "../../game/components/board/RollNumber"
+import anime from "animejs"
 
 export async function getRoomList(gameState: IGameContext) {
     // result message
@@ -573,3 +575,120 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
             return
     }
 }
+    
+export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+    
+    const {type, items, week} = rewardData
+    // result message
+    const resultMessage = qS('#result_daily')
+    // claim button
+    const claimButton = qS('#daily_claim_button') as HTMLButtonElement
+    // if reward has claimed, only play animation
+    if(gameState.dailyStatus === 'claimed') {
+        // start animation
+        return await claimAnimation()
+    }
+    // if type is pack, start roll animation
+    if(type == 'pack') {
+        const rollPack = qS('#roll_pack')
+        rollPack.classList.toggle('flex')
+        rollPack.classList.toggle('hidden')
+        startAnimation(items, miscState, gameState)
+        setTimeout(() => {
+            rollPack.classList.toggle('flex')
+            rollPack.classList.toggle('hidden')
+        }, 5000);
+    }
+
+    // claim data
+    const claimValue = {
+        display_name: gameState.myPlayerInfo.display_name,
+        week: week.toString(),
+        item_name: type === 'coin' ? 'coin' : qSA('.roll-result'),
+    }
+
+    // loading claim button
+    let loadingIncrement = 3
+    const loadingClaimInterval = setInterval(() => {
+        if(loadingIncrement === 3) {
+            claimButton.textContent = '.'
+            loadingIncrement = 0
+        }
+        else if(loadingIncrement < 3) {
+            claimButton.textContent += '.'
+            loadingIncrement++
+        }
+    }, 1000);
+
+    // fetch
+    const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(claimValue)})
+    const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
+    // response
+    switch(claimDailyResponse.status) {
+        case 200: 
+            // stop loading claim
+            clearInterval(loadingClaimInterval)
+            // destruct data
+            const {token, dailyStatus, playerCoins, playerShopItems} = claimDailyResponse.data[0]
+            // save access token
+            if(token) localStorage.setItem('accessToken', token)
+            // update daily status
+            localStorage.setItem('dailyStatus', dailyStatus)
+            gameState.setDailyStatus(dailyStatus)
+            // update player coins if exist
+            if(playerCoins) {
+                // set player coins
+                localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
+                gameState.setMyCoins(playerCoins)
+            }
+            // update my shop items
+            if(playerShopItems) {
+                // update my shop items
+                localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+                gameState.setMyShopItems(playerShopItems)
+            }
+            // start animation
+            await claimAnimation()
+            return
+        default: 
+            // stop loading claim
+            clearInterval(loadingClaimInterval)
+            claimButton.textContent = 'claim'
+            // result message
+            resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
+            // display notif
+            resultMessage.classList.remove('hidden')
+            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            return
+    }
+}
+
+export function claimAnimation() {
+    return new Promise(resolve => {
+        const animate: FunctionComponent<IAnimate> = anime
+        const today = new Date().toLocaleString([], {weekday: 'long'})
+        const rewardImg = qS(`#reward_${today}`) as HTMLImageElement
+        const rotateValue = rewardImg.style.transform.match('360deg') ? 0 : 360
+
+        animate({
+            targets: rewardImg,
+            // Properti yang dianimasikan
+            translateY: [
+                { value: -10, duration: 300, easing: 'easeOutQuad' }, // Lompat ke atas (y negatif)
+                { value: 0, duration: 600, easing: 'easeOutBounce', delay: 100 } // Jatuh kembali (y nol)
+            ],
+            // spin animation
+            rotate: [
+                {value: rotateValue, duration: 500, easing: 'linear'},
+            ],
+            // Animasi tambahan untuk efek squish (optional, tapi membuat lebih hidup)
+            scaleY: [
+                { value: 0.6, duration: 100, easing: 'easeOutQuad' }, // Sedikit memendek sebelum melompat
+                { value: 1.2, duration: 200, easing: 'easeOutQuad' }, // Sedikit memanjang saat di udara
+                { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
+            ]
+        })
+        setTimeout(() => resolve(true), 1000);
+    })
+} 

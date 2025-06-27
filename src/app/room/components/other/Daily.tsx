@@ -1,18 +1,32 @@
-import { FormEvent, FunctionComponent, MouseEvent, MutableRefObject, useEffect, useRef } from "react"
+import { MouseEvent, useEffect, useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { applyTooltipEvent, fetcher, fetcherOptions, qS, qSA, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, translateUI } from "../../../../helper/helper"
 import daily_rewards from "../../config/daily-rewards.json"
-import anime from "animejs"
-import { startAnimation } from "../../../game/components/board/RollNumber"
-import { IAnimate, IResponse } from "../../../../helper/types"
+import { claimDaily } from "../../helper/functions"
 
 export default function Daily() {
     const miscState = useMisc()
     const gameState = useGame()
 
-    const currentWeek = 1
     const dailyRewards = daily_rewards.data
+    // ### JIKA lastDailyStatus = 1-1 (Monday-1) LALU PLAYER LOGIN LAGI Monday
+    // ### MAKA DIANGGAP Monday-8 (week 2)
+    // ### TAPI, JIKA PLAYER LOGIN Tuesday WALAUPUN SUDAH MASUK week 2
+    // ### AKAN DIANGGAP Tuesday-2 (week 1)
+    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const dayOfWeek = {
+        week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
+        week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
+    }
+    const [lastDayNumber, lastWeekNumber] = gameState.lastDailyStatus 
+                                        ? gameState.lastDailyStatus.split('-')
+                                        : ['1', '1']
+    // get day number
+    const currentDayNumber = dayOfWeek.week_1.map(v => v.match(today) ? v.split('-')[1] : null).filter(i => i)[0]
+    // if today > last day, then continue last week reward
+    // else assume its week 2 reward
+    const currentWeek = +lastDayNumber < +currentDayNumber ? +lastWeekNumber : 2
 
     // drag scroll
     const dailyRewardsBody = useRef<HTMLDivElement>()
@@ -99,139 +113,26 @@ function RewardItem({ rewardData }) {
     const rewardImg = `https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=${today == day ? '000000' : 'FFFFFF'}`
     const itemsTooltip = type == 'pack' ? items.join('\n') : null
 
-    // button ref
+    // element refs
     const claimButtonRef = useRef<HTMLButtonElement>()
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
     }, [])
-    // claim animation
-    const rewardImgRef = useRef<HTMLImageElement>(null)
-    const claimAnimation = () => {
-        return new Promise(resolve => {
-            const animate: FunctionComponent<IAnimate> = anime
-            const rotateValue = rewardImgRef.current.style.transform.match('360deg') ? 0 : 360
-
-            animate({
-                targets: rewardImgRef.current,
-                // Properti yang dianimasikan
-                translateY: [
-                    { value: -10, duration: 300, easing: 'easeOutQuad' }, // Lompat ke atas (y negatif)
-                    { value: 0, duration: 600, easing: 'easeOutBounce', delay: 100 } // Jatuh kembali (y nol)
-                ],
-                // spin animation
-                rotate: [
-                    {value: rotateValue, duration: 500, easing: 'linear'},
-                ],
-                // Animasi tambahan untuk efek squish (optional, tapi membuat lebih hidup)
-                scaleY: [
-                    { value: 0.6, duration: 100, easing: 'easeOutQuad' }, // Sedikit memendek sebelum melompat
-                    { value: 1.2, duration: 200, easing: 'easeOutQuad' }, // Sedikit memanjang saat di udara
-                    { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
-                ]
-            })
-            setTimeout(() => resolve(true), 1000);
-        })
-    } 
-    
-    // daily event handler
-    const claimDaily = async (ev: FormEvent<HTMLFormElement>) => {
-        ev.preventDefault()
-        
-        // result message
-        const resultMessage = qS('#result_daily')
-        // if type is pack, start roll animation
-        if(type == 'pack') {
-            const rollPack = qS('#roll_pack')
-            rollPack.classList.toggle('flex')
-            rollPack.classList.toggle('hidden')
-            startAnimation(items, miscState, gameState)
-            setTimeout(() => {
-                rollPack.classList.toggle('flex')
-                rollPack.classList.toggle('hidden')
-            }, 5000);
-        }
-        if(gameState.dailyStatus === 'claimed') {
-            // start animation
-            return await claimAnimation()
-        }
-
-        // claim data
-        const claimValue = {
-            display_name: gameState.myPlayerInfo.display_name,
-            week: week.toString(),
-            item_name: type === 'coin' ? 'coin' : qSA('.roll-result'),
-        }
-
-        // loading claim button
-        let loadingIncrement = 3
-        const loadingClaimInterval = setInterval(() => {
-            if(loadingIncrement === 3) {
-                claimButtonRef.current.textContent = '.'
-                loadingIncrement = 0
-            }
-            else if(loadingIncrement < 3) {
-                claimButtonRef.current.textContent += '.'
-                loadingIncrement++
-            }
-        }, 1000);
-
-        // fetch
-        const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(claimValue)})
-        const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
-        // response
-        switch(claimDailyResponse.status) {
-            case 200: 
-                // stop loading claim
-                clearInterval(loadingClaimInterval)
-                // destruct data
-                const {token, dailyStatus, playerCoins, playerShopItems} = claimDailyResponse.data[0]
-                // save access token
-                if(token) localStorage.setItem('accessToken', token)
-                // update daily status
-                localStorage.setItem('dailyStatus', dailyStatus)
-                gameState.setDailyStatus(dailyStatus)
-                // update player coins if exist
-                if(playerCoins) {
-                    // set player coins
-                    localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
-                    gameState.setMyCoins(playerCoins)
-                }
-                // update my shop items
-                if(playerShopItems) {
-                    // update my shop items
-                    localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
-                    gameState.setMyShopItems(playerShopItems)
-                }
-                // start animation
-                await claimAnimation()
-                return
-            default: 
-                // stop loading claim
-                clearInterval(loadingClaimInterval)
-                claimButtonRef.current.textContent = 'claim'
-                // result message
-                resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
-                // display notif
-                resultMessage.classList.remove('hidden')
-                setTimeout(() => resultMessage.classList.add('hidden'), 3000);
-                return
-        }
-    }
 
     return (
-        <form className="relative z-10 flex flex-col gap-2" onSubmit={ev => claimDaily(ev)}>
+        <form className="relative z-10 flex flex-col gap-2" onSubmit={ev => claimDaily(ev, rewardData, miscState, gameState)}>
             {/* reward item */}
             <div data-tooltip={itemsTooltip} className={`flex flex-col items-center w-20 h-20 rounded-lg p-1 
             ${today === day ?  'bg-success' : 'bg-darkblue-2'} cursor-pointer hover:bg-opacity-75`} 
             onClick={() => claimButtonRef.current.click()}>
                 <span className={today === day ?  'text-black' : ''}> {day} </span>
-                <img ref={rewardImgRef} id={`reward_${day}`} src={rewardImg} alt={name} className="inline !w-8 !h-8" draggable={false} />
+                <img id={`reward_${day}`} src={rewardImg} alt={name} className="inline !w-8 !h-8" draggable={false} />
                 <span className={today === day ?  'text-black' : ''}> {name} </span>
             </div>
             {/* claim button */}
-            <div className={`${today === day ?  'text-green-300' : ''} text-[10px] w-20`}>
-                <button ref={claimButtonRef} type="submit" className="w-full">
+            <div className={`${today === day && gameState.dailyStatus == 'unclaim' ?  'text-green-300' : 'invisible'} text-[10px] w-20`}>
+                <button ref={claimButtonRef} id="daily_claim_button" type="submit" className="w-full">
                     {today === day ?  'claim' : ''}
                 </button>
             </div>

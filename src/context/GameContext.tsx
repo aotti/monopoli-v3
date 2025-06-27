@@ -29,6 +29,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [spectator, setSpectator] = useState(false)
     const [rankingInfo, setRankingInfo] = useState<IGameContext['rankingInfo']>([])
     const [dailyStatus, setDailyStatus] = useState<'claimed'|'unclaim'>(null)
+    const [lastDailyStatus, setLastDailyStatus] = useState<string>(null)
     // room
     const [roomList, setRoomList] = useState([])
     const [roomError, setRoomError] = useState<string>(null)
@@ -83,6 +84,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         myCoins, setMyCoins,
         myShopItems, setMyShopItems,
         dailyStatus, setDailyStatus,
+        lastDailyStatus, setLastDailyStatus,
     }
 
     const roomStates = {

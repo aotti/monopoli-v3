@@ -49,6 +49,7 @@ export default class Controller {
         // this.redisSet('gameQuakeCity_207', ['Palembang', 'Special-4'])
         // this.redisReset('tester123_shopItems')
         // this.redisSet(`tester123_coins`, [50])
+        // this.redisReset(`tester123_dailyStatus`)
     }
 
     protected chattingPublish(channel: string, data: any) {

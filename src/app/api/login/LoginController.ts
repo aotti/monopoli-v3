@@ -29,16 +29,20 @@ export default class LoginController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else if(data) {
+            const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+            const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
             // get player daily status
             const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
-            const today = new Date().toLocaleString([], {weekday: 'long'})
+            const playerDailyUnix = getPlayerDaily.length > 0 
+                                ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
+                                : 0
             const isDailyReset = getPlayerDaily.length > 0
-                                // is daily status == today 
-                                ? getPlayerDaily[0] === today
-                                    // daily claimed
-                                    ? 'claimed'
+                                // is current day > daily status
+                                ? currentDayUnix > playerDailyUnix
                                     // daily unclaim
-                                    : 'unclaim'
+                                    ? 'unclaim'
+                                    // daily claimed
+                                    : 'claimed'
                                 : 'unclaim'
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
@@ -70,6 +74,7 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: data[0],
                 dailyStatus: isDailyReset,
+                lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 playerShopItems: getPlayerShopItems,
                 token: accessToken,
@@ -107,16 +112,20 @@ export default class LoginController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+            const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
             // get player daily status
             const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
-            const today = new Date().toLocaleString([], {weekday: 'long'})
+            const playerDailyUnix = getPlayerDaily.length > 0 
+                                ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
+                                : 0
             const isDailyReset = getPlayerDaily.length > 0
-                                // is daily status == today 
-                                ? getPlayerDaily[0] === today
-                                    // daily claimed
-                                    ? 'claimed'
+                                // is current day > daily status
+                                ? currentDayUnix > playerDailyUnix
                                     // daily unclaim
-                                    : 'unclaim'
+                                    ? 'unclaim'
+                                    // daily claimed
+                                    : 'claimed'
                                 : 'unclaim'
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
@@ -144,6 +153,7 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: newRenewData,
                 dailyStatus: isDailyReset,
+                lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 playerShopItems: getPlayerShopItems,
                 token: accessToken,
