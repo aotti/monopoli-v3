@@ -30,6 +30,8 @@ export async function getRoomList(gameState: IGameContext) {
             gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
             // set game room info
             gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
+            // set last daily status
+            gameState.setLastDailyStatus(getRoomResponse.data[0].lastDailyStatus)
             return
         default: 
             resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
