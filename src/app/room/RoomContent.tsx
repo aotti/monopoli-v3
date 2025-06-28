@@ -142,11 +142,11 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
             {/* room list */}
             {/* tutorial: relative z-10 */}
-            <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'relative z-10' : ''}
-            flex flex-col w-[calc(100vw-30vw)]`}>
+            <div className={`flex flex-col w-[calc(100vw-30vw)]`}>
                 {/* room list header
                     1rem gap, 3.5rem title, 0.5rem margin bot */}
-                <div className="flex justify-between gap-4 w-full h-fit text-center p-2">
+                <div className={`${miscState.showTutorial == 'tutorial_roomlist_4' ? 'relative z-10' : ''} 
+                flex justify-between gap-4 w-full h-fit text-center p-2`}>
                     {/* tutorial button */}
                     <div data-tooltip="tutorial" className="w-8 my-auto">
                         <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
@@ -189,9 +189,10 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 </div>
                 {/* room list cards 
                     100vh - 3.75rem (header) - 5rem (room list title) */}
-                <div className="flex flex-wrap gap-2 justify-between 
-                    text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
-                    overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
+                <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'relative z-10' : ''} 
+                flex flex-wrap gap-2 justify-between 
+                text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
+                overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text`}>
                     {/* card */}
                     {gameState.roomList.length > 0
                         ? gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)

@@ -14,10 +14,15 @@ export default function TutorialRoomList() {
             `"worst lost" mean the worst money you have when losing a game since you install titkok, um..i mean created ur account.`
         ],
         part_3: [
-            `icon on the right is tutorial button`,
-            `to play the game, click on "create room", fill the form and it'll show in the room list.`,
+            `to play the game click on "join", or "spectate" to watch others gameplay.`,
             `the rules: ??? text is a tooltip. on phone, just swipe + hold on the text as in this .gif:`,
             `delete button only show if the creator is you`,
+        ],
+        part_4: [
+            `icon on the left is tutorial button`,
+            `icons on the right are "create room" and "menu", but guest cannot create room`,
+            `menu button have "ranking", "shop" and "daily" options`,
+            `"ranking" to see top 10 worst lose,\n "shop" for buying any special card or buff (can have max 2 items for each type),\n "daily" to get free daily reward`,
         ]
     }
 
@@ -59,7 +64,7 @@ export default function TutorialRoomList() {
             </div>
             {/* room list */}
             <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'block' : 'hidden'}
-            absolute mt-2 w-[30%] text-right text-2xs lg:text-sm lg:!leading-6`}>
+            absolute mt-10 w-[30%] text-right text-2xs lg:text-sm lg:!leading-6`}>
                 <p className="text-balance">
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[0] as any})}
                 </p>
@@ -73,8 +78,28 @@ export default function TutorialRoomList() {
                     <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/tooltip-jMhpG5ZcuTWhHKb4VxPirbhBl2YZ9Y.gif" alt="tap + swipe.gif" className="mx-auto w-[95%] !h-20 lg:!h-44" loading="lazy" />
                 </p>
                 <hr className="my-1" />
+                <button type="button" className="text-green-400 p-1 animate-pulse animate-infinite" 
+                onClick={() => miscState.setShowTutorial('tutorial_roomlist_4')}> 
+                    {translateUI({lang: miscState.language, text: 'click here to continue'})}
+                </button>
+            </div>
+            {/* room list buttons */}
+            <div className={`${miscState.showTutorial == 'tutorial_roomlist_4' ? 'block' : 'hidden'}
+            absolute right-0 mt-14 mr-4 w-2/3 text-2xs lg:text-sm lg:!leading-6`}>
                 <p className="text-balance">
-                    {translateUI({lang: miscState.language, text: tutorialText.part_3[3] as any})}
+                    {translateUI({lang: miscState.language, text: tutorialText.part_4[0] as any})}
+                </p>
+                <hr className="my-1" />
+                <p className="text-balance text-right">
+                    {translateUI({lang: miscState.language, text: tutorialText.part_4[1] as any})}
+                </p>
+                <hr className="my-1" />
+                <p className="text-balance text-right">
+                    {translateUI({lang: miscState.language, text: tutorialText.part_4[2] as any})}
+                </p>
+                <hr className="my-1" />
+                <p className="text-balance whitespace-pre-line">
+                    {translateUI({lang: miscState.language, text: tutorialText.part_4[3] as any})}
                 </p>
                 <hr className="my-1" />
                 <button type="button" className="text-green-400 p-1 animate-pulse animate-infinite" onClick={() => miscState.setShowTutorial(null)}> 

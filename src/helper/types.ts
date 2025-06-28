@@ -93,7 +93,7 @@ export interface IMiscProvider {
     children: React.ReactNode
 }
 
-type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
+type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'|'tutorial_roomlist_4'
 type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
     screenType: 'landscape'|'portrait',

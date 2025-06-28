@@ -265,10 +265,15 @@
         "\"worst lost\" mean the worst money you have when losing a game since you install titkok, um..i mean created ur account.":"terburuk artinya uang paling kecil yg kau punya waktu kalah main sejak kau donlod tiktok, ee..mangsudnya sejak kau buat akun.",
         
         "__ROOM PART 3__":"__ROOM PART 3__",
-        "icon on the right is tutorial button":"ikon di kanan itu tombol tutorial",
-        "to play the game, click on \"create room\", fill the form and it'll show in the room list.":"untuk main, klik \"buat ruang\", isi form dan ruang game akan muncul di daftar ruang.",
+        "to play the game click on \"join\", or \"spectate\" to watch others gameplay.":"untuk main klik \"gabung\", atau \"nonton\" untuk lihat orang lain bermain.",
         "the rules: ??? text is a tooltip. on phone, just swipe + hold on the text as in this .gif:":"aturan: ??? isinya keterangan. di hp, tinggal swipe + tahan teksnya seperti di gambar:",
         "delete button only show if the creator is you":"tombol hapus cuma muncul kalo kau pembuatnya",
+        
+        "__ROOM PART 4__":"__ROOM PART 4__",
+        "icon on the left is tutorial button":"ikon di kiri itu tombol tutorial",
+        "icons on the right are \"create room\" and \"menu\", but guest cannot create room":"ikon di kanan adalah \"buat ruang\" dan \"menu\", tapi tamu tidak bisa buat ruang",
+        "menu button have \"ranking\", \"shop\" and \"daily\" options":"tombol menu ada pilihan \"ranking\", \"toko\" dan \"harian\"",
+        "\"ranking\" to see top 10 worst lose,\n \"shop\" for buying any special card or buff (can have max 2 items for each type),\n \"daily\" to get free daily reward":"\"ranking\" untuk melihat top 10 uang terburuk,\n \"toko\" untuk membeli kartu spesial atau buff (hanya boleh punya 2 barang per tipe),\n \"harian\" untuk mendapat hadiah harian secara gratis",
 
         "__GAME ROOM TUTORIAL__": "__GAME ROOM TUTORIAL__",
 
