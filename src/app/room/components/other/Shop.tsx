@@ -56,7 +56,7 @@ export default function Shop() {
                     <div className="grid grid-cols-6 gap-1 lg:gap-2 text-center">
                         {buffItems.map((v,i) => {
                             const buffItemData = {
-                                name: translateUI({lang: miscState.language, text: v.name as any}),
+                                name: v.name,
                                 description: translateUI({lang: miscState.language, text: v.description as any}),
                                 price: v.price
                             }
@@ -118,7 +118,7 @@ function ShopItem({ type, data }) {
                     <img src={itemImageSrc} alt="buff" className="inline !w-8 !h-8" />
                     <span> {itemData.price} </span>
                 </div>
-                <span> {itemData.name} </span>
+                <span> {translateUI({lang: miscState.language, text: itemData.name as any})} </span>
             </button>
         </div>
         : <form onSubmit={ev => buyShopitem(ev, itemData, miscState, gameState)} className="col-span-2 flex flex-col items-center text-orange-300">
@@ -127,7 +127,7 @@ function ShopItem({ type, data }) {
                     <img src={itemImageSrc} alt="buff" className="inline !w-8 !h-8" />
                     <span> {itemData.price} </span>
                 </div>
-                <span> {itemData.name} </span>
+                <span> {translateUI({lang: miscState.language, text: itemData.name as any})} </span>
             </button>
         </form>
 }
