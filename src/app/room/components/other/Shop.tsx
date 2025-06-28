@@ -42,7 +42,7 @@ export default function Shop() {
                                 description: translateUI({lang: miscState.language, text: v.description as any}),
                                 price: v.price
                             }
-                            return <ShopItem key={i} type={'special card'} data={specialCardItemData} />
+                            return <ShopItem key={i} type={'special_card'} data={specialCardItemData} />
                         })}
                     </div>
                 </div>

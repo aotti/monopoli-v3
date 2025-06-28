@@ -127,7 +127,7 @@ export default class RoomController extends Controller {
             const getJoinedRoom = cookies().get('joinedRoom')?.value
             // dummy tpayload
             const tempTPayload = tpayload || {display_name: 'guest'}
-            // get player daily status
+            // always get player daily status for lastDailyStatus state (cant save it in localStorage)
             const getPlayerDaily = await this.redisGet(`${tempTPayload.display_name}_dailyStatus`)
             // check if player has joined room
             let isMyGameExist: number = null

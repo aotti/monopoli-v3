@@ -251,14 +251,16 @@ export default class PlayerController extends Controller {
                         // is item exist in json data
                         const isItemDataExist = data.items.indexOf(payload.item_name)
                         if(isItemDataExist !== -1) {
+                            const specialCardRegex = /nerf tax$|anti prison$|gaming dice$|dice controller$|attack city$|upgrade city$|curse reverser$/
+                            const buffRegex = /reduce price$|the void$|the twond$/
                             // get player shop items
                             const getPlayerShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
                             // shop items has value
                             if(getPlayerShopItems.length > 0) {
                                 // is item exist in player shop items
                                 const isItemShopExist = getPlayerShopItems.map(v => {
-                                    if(v.buff.indexOf(payload.item_name) !== -1) return true
-                                    else if(v.special_card.indexOf(payload.item_name) !== -1) return true
+                                    if(v.buff?.indexOf(payload.item_name) !== -1) return true
+                                    else if(v.special_card?.indexOf(payload.item_name) !== -1) return true
                                 }).filter(i => i)[0]
 
                                 // item exist, replace with coins
@@ -275,13 +277,22 @@ export default class PlayerController extends Controller {
                                         playerCoins: gainCoins
                                     }
                                     result = this.respond(200, `${action} success`, [resultData])
+                                    // stop loop after found the item
+                                    break
                                 }
 
                                 // item not exist but shop items has value
                                 else {
+                                    // check item
+                                    let itemType = null
+                                    if(data.items[isItemDataExist].match(specialCardRegex)) itemType = 'special_card'
+                                    else if(data.items[isItemDataExist].match(buffRegex)) itemType = 'buff'
+                                    // wtf this card not exist
+                                    else return this.respond(400, 'puella magi madocka madicka 2', [])
+                                    // store stop items
                                     const ownedItems = await this.storeShopItems(getPlayerShopItems, {
                                         displayName: payload.display_name, 
-                                        itemType: data.type, 
+                                        itemType: itemType, 
                                         itemName: data.items[isItemDataExist]
                                     })
                                     // update player daily status
@@ -293,13 +304,22 @@ export default class PlayerController extends Controller {
                                         playerShopItems: ownedItems
                                     }
                                     result = this.respond(200, `${action} success`, [resultData])
+                                    // stop loop after found the item
+                                    break
                                 }
                             }
                             // shop items empty
                             else {
+                                // check item
+                                let itemType = null
+                                if(data.items[isItemDataExist].match(specialCardRegex)) itemType = 'special_card'
+                                else if(data.items[isItemDataExist].match(buffRegex)) itemType = 'buff'
+                                // wtf this card not exist
+                                else return this.respond(400, 'puella magi madocka madicka 2', [])
+                                // store stop items
                                 const ownedItems = await this.storeShopItems(getPlayerShopItems, {
                                     displayName: payload.display_name, 
-                                    itemType: data.type, 
+                                    itemType: itemType, 
                                     itemName: data.items[isItemDataExist]
                                 })
                                 // update player daily status
@@ -311,17 +331,19 @@ export default class PlayerController extends Controller {
                                     playerShopItems: ownedItems
                                 }
                                 result = this.respond(200, `${action} success`, [resultData])
+                                // stop loop after found the item
+                                break
                             }
                         }
                         else {
                             // item not exist in json data
-                            return this.respond(400, 'puella magi madocka madicka', [])
+                            result = this.respond(400, 'puella magi madocka madicka 2', [])
                         }
                     }
                 }
                 else {
                     // prize of week not found
-                    return this.respond(400, 'puella magi madocka madicka', [])
+                    result = this.respond(400, 'puella magi madocka madicka 1', [])
                 }
             }
             

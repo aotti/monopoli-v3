@@ -217,6 +217,8 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
 function MenuButton() {
     const miscState = useMisc()
+    const gameState = useGame()
+
     useEffect(() => {
         let menuTimeout = null
         if(miscState.showRoomListMenu) {
@@ -229,8 +231,8 @@ function MenuButton() {
     }, [miscState.showRoomListMenu])
 
     return (
-        <div data-tooltip="menu" className="w-8 my-auto text-right">
-            <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowRoomListMenu(true)}>
+        <div data-tooltip="menu" className={`w-8 my-auto text-right`}>
+            <button type="button" className={`invert active:opacity-75 ${gameState.dailyStatus == 'unclaim' ? "after:absolute after:-top-1 after:invert after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full" : ''}`} onClick={() => miscState.setShowRoomListMenu(true)}>
                 <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
             </button>
         </div>
@@ -286,11 +288,12 @@ function ShopButton() {
 
 function DailyButton() {
     const miscState = useMisc()
+    const gameState = useGame()
 
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
-                // close join modal
+            <button type="button" className={`flex items-center gap-2 w-full invert ${gameState.dailyStatus == 'unclaim' ? "after:invert after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full" : ''}`} onClick={() => {
+                // close join modal 
                 miscState.setShowJoinModal(null)
                 // close room list menu
                 miscState.setShowRoomListMenu(false)
@@ -300,7 +303,7 @@ function DailyButton() {
                 miscState.setShowModal('daily') 
             }}>
                 <img src="https://img.icons8.com/?id=23&format=png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> daily (soon) </span>
+                <span className="invert"> daily </span>
             </button>
         </div>
     )

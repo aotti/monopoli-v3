@@ -1,5 +1,5 @@
 import { FormEvent, FunctionComponent } from "react"
-import { errorCreateRoom, fetcher, fetcherOptions, qS, qSA, resetAllData, setInputValue, translateUI } from "../../../helper/helper"
+import { errorCreateRoom, fetcher, fetcherOptions, qS, resetAllData, setInputValue, translateUI } from "../../../helper/helper"
 import { IAnimate, ICreateRoom, IGameContext, IMiscContext, IPlayer, IResponse, IShiftRoom } from "../../../helper/types"
 import { startAnimation } from "../../game/components/board/RollNumber"
 import anime from "animejs"
@@ -581,13 +581,14 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
 export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     
-    const {type, items, week} = rewardData
+    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const {week, day, name, type, items} = rewardData
     // result message
     const resultMessage = qS('#result_daily')
     // claim button
     const claimButton = qS('#daily_claim_button') as HTMLButtonElement
-    // if reward has claimed, only play animation
-    if(gameState.dailyStatus === 'claimed') {
+    // if player click other day reward OR the reward has been claimed, only play animation
+    if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
         return await claimAnimation()
     }
@@ -607,9 +608,8 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, mis
     const claimValue = {
         display_name: gameState.myPlayerInfo.display_name,
         week: week.toString(),
-        item_name: type === 'coin' ? 'coin' : qSA('.roll-result'),
+        item_name: type === 'coin' ? 'coin' : qS('.roll-result').textContent,
     }
-
     // loading claim button
     let loadingIncrement = 3
     const loadingClaimInterval = setInterval(() => {
