@@ -145,7 +145,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
             <div className={`flex flex-col w-[calc(100vw-30vw)]`}>
                 {/* room list header
                     1rem gap, 3.5rem title, 0.5rem margin bot */}
-                <div className={`${miscState.showTutorial == 'tutorial_roomlist_4' ? 'relative z-10' : ''} 
+                <div className={`${miscState.showTutorial == 'tutorial_roomlist_4' ? 'relative z-10 bg-darkblue-2' : ''} 
                 flex justify-between gap-4 w-full h-fit text-center p-2`}>
                     {/* tutorial button */}
                     <div data-tooltip="tutorial" className="w-8 my-auto">

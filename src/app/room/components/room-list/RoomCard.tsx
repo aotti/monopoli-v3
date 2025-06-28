@@ -255,10 +255,17 @@ function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, miscS
 
     switch(submitterId) {
         // join room function
-        case `join_button_${roomId}`: joinRoom(formInputs, roomId, miscState, gameState); break
+        case `join_button_${roomId}`: 
+            // set loading screen
+            miscState.setIsLoading(true)
+            joinRoom(formInputs, roomId, miscState, gameState); break
         // spectate room function
-        case `spectate_button_${roomId}`: spectateRoom(roomId, miscState, gameState); break
+        case `spectate_button_${roomId}`: 
+            // set loading screen
+            miscState.setIsLoading(true)
+            spectateRoom(roomId, miscState, gameState); break
         // delete room function
-        case `delete_button_${roomId}`: deleteRoom(formInputs, roomId, miscState, gameState); break
+        case `delete_button_${roomId}`: 
+            deleteRoom(formInputs, roomId, miscState, gameState); break
     }
 }

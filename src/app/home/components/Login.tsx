@@ -117,6 +117,8 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             miscState.setAnimation(false); 
             // timeout to wait the animation zoom-out
             miscState.setShowModal(null)
+            // set loading screen
+            miscState.setIsLoading(true)
             // moving to room list
             resultMessage.classList.add('text-green-400')
             resultMessage.textContent = `✅ moving to room list..`
