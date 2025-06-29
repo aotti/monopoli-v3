@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { translateUI } from "../../../helper/helper"
-import { useMisc } from "../../../context/MiscContext"
+import { translateUI } from "../../../../helper/helper"
+import { useMisc } from "../../../../context/MiscContext"
 
 export default function SelectCharacter({ disabledCharacters }: {disabledCharacters: string[]}) {
     const miscState = useMisc()

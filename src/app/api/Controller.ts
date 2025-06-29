@@ -47,6 +47,13 @@ export default class Controller {
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/square-GcUfnpybETUDXjwbOxSTxdC6fkp4xb.png'
         // ])
         // this.redisSet('gameQuakeCity_207', ['Palembang', 'Special-4'])
+        // this.redisReset('tester123_shopItems')
+        // this.redisSet(`tester123_coins`, [50])
+        // this.redisReset(`tester123_dailyStatus`)
+        // this.redisSet('acanama_dailyHistory', [
+        //     {reward_type: 'coin', reward_item: '10', reward_date: 'Friday, 6/27/2025'},
+        //     {reward_type: 'pack', reward_item: 'yoga lupa', reward_date: 'Saturday, 6/28/2025'},
+        // ])
     }
 
     protected chattingPublish(channel: string, data: any) {
@@ -101,7 +108,8 @@ export default class Controller {
             case 'user avatar update': 
             case 'user get stats': 
             case 'user get ranking': 
-            case 'user send chat': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'user send chat': 
+            case 'user daily claim': [filterStatus, filterMessage] = loopKeyValue(); break
             // room
             case 'room create': 
             case 'room hard delete': 
@@ -119,6 +127,8 @@ export default class Controller {
             case 'game turn end': 
             case 'game fix player turns': 
             case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
+            // shop
+            case 'shop buy': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])

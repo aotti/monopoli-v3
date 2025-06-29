@@ -47,6 +47,8 @@ export default function HomeContent() {
                     <button type="button" className="bg-blue-500 border-8bit-primary px-2 py-1 w-36 active:opacity-75 hover:animate-jump" onClick={() => {
                         // set guest mode
                         gameState.setGuestMode(true);
+                        // set loading screen
+                        miscState.setIsLoading(true);
                         // go to room list
                         (qS('#gotoRoom') as HTMLAnchorElement).click()
                     }}> 

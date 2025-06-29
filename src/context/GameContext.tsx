@@ -28,6 +28,9 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [onlinePlayers, setOnlinePlayers] = useState<ILoggedUsers[]>([])
     const [spectator, setSpectator] = useState(false)
     const [rankingInfo, setRankingInfo] = useState<IGameContext['rankingInfo']>([])
+    const [dailyStatus, setDailyStatus] = useState<'claimed'|'unclaim'>(null)
+    const [lastDailyStatus, setLastDailyStatus] = useState<string>(null)
+    const [dailyHistory, setDailyHistory] = useState<IGameContext['dailyHistory']>(null)
     // room
     const [roomList, setRoomList] = useState([])
     const [roomError, setRoomError] = useState<string>(null)
@@ -40,12 +43,27 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [gameStages, setGameStages] = useState<IGameContext['gameStages']>('prepare')
     const [gamePlayerTurns, setGamePlayerTurns] = useState<string[]>([])
     const [gameQuakeCity, setGameQuakeCity] = useState<string[]>([])
+    const [diceMode, setDiceMode] = useState<IGameContext['diceMode']>('off')
     const [gameHistory, setGameHistory] = useState<IGameContext['gameHistory']>([])
+    // shop
+    const [myCoins, setMyCoins] = useState(0)
+    const [myShopItems, setMyShopItems] = useState<IGameContext['myShopItems']>(null)
 
     useEffect(() => {
         // set online players if exist
         const getOnlinePlayers = localStorage.getItem('onlinePlayers')
         if(getOnlinePlayers) setOnlinePlayers(JSON.parse(getOnlinePlayers))
+        // set my coins if exist
+        const getPlayerCoins = localStorage.getItem('playerCoins')
+        if(getPlayerCoins) setMyCoins(+getPlayerCoins)
+        // set my shop items if exist
+        const getPlayerShopItems = localStorage.getItem('playerShopItems')
+        if(getPlayerShopItems) setMyShopItems(JSON.parse(getPlayerShopItems))
+        // set daily states
+        const getPlayerDailyStatus = localStorage.getItem('dailyStatus')
+        if(getPlayerDailyStatus) setDailyStatus(getPlayerDailyStatus as any)
+        const getPlayerDailyHistory = localStorage.getItem('dailyHistory')
+        if(getPlayerDailyHistory) setDailyHistory(JSON.parse(getPlayerDailyHistory))
     }, [])
 
     const boardStates = {
@@ -68,7 +86,12 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         guestMode, setGuestMode,
         onlinePlayers, setOnlinePlayers,
         spectator, setSpectator,
-        rankingInfo, setRankingInfo
+        rankingInfo, setRankingInfo,
+        myCoins, setMyCoins,
+        myShopItems, setMyShopItems,
+        dailyStatus, setDailyStatus,
+        lastDailyStatus, setLastDailyStatus,
+        dailyHistory, setDailyHistory,
     }
 
     const roomStates = {
@@ -85,7 +108,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         gameStages, setGameStages,
         gamePlayerTurns, setGamePlayerTurns,
         gameQuakeCity, setGameQuakeCity,
-        gameHistory, setGameHistory
+        diceMode, setDiceMode,
+        gameHistory, setGameHistory,
     }
 
     const states: IGameContext = {

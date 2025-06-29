@@ -29,6 +29,30 @@ export default class LoginController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else if(data) {
+            const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+            const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
+            // get player daily status
+            const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
+            const playerDailyUnix = getPlayerDaily.length > 0 
+                                ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
+                                : 0
+            const isDailyReset = getPlayerDaily.length > 0
+                                // is current day > daily status
+                                ? currentDayUnix > playerDailyUnix
+                                    // daily unclaim
+                                    ? 'unclaim'
+                                    // daily claimed
+                                    : 'claimed'
+                                : 'unclaim'
+            // get player daily history
+            const getPlayerDailyHistory = await this.redisGet(`${data[0].display_name}_dailyHistory`)
+            // get player coins
+            const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
+            // get player shop items
+            const getPlayerShopItems = await this.redisGet(`${data[0].display_name}_shopItems`)
+            // if empty, create it
+            if(getPlayerCoins.length === 0) 
+                await this.redisSet(`${data[0].display_name}_coins`, [0])
             // log user
             const onlinePlayers = await this.getOnlinePlayers(data[0], payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
@@ -51,6 +75,11 @@ export default class LoginController extends Controller {
             const accessToken = await this.generateToken({type: 'access', payload: data[0], expire: '10min'})
             const resultData = {
                 player: data[0],
+                dailyStatus: isDailyReset,
+                lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
+                dailyHistory: getPlayerDailyHistory.length > 0 ? getPlayerDailyHistory : null,
+                playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
+                playerShopItems: getPlayerShopItems,
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers.data
@@ -86,6 +115,30 @@ export default class LoginController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+            const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
+            // get player daily status
+            const getPlayerDaily = await this.redisGet(`${renewData.display_name}_dailyStatus`)
+            const playerDailyUnix = getPlayerDaily.length > 0 
+                                ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
+                                : 0
+            const isDailyReset = getPlayerDaily.length > 0
+                                // is current day > daily status
+                                ? currentDayUnix > playerDailyUnix
+                                    // daily unclaim
+                                    ? 'unclaim'
+                                    // daily claimed
+                                    : 'claimed'
+                                : 'unclaim'
+            // get player daily history
+            const getPlayerDailyHistory = await this.redisGet(`${renewData.display_name}_dailyHistory`)
+            // get player coins
+            const getPlayerCoins = await this.redisGet(`${renewData.display_name}_coins`)
+            // get player shop items
+            const getPlayerShopItems = await this.redisGet(`${renewData.display_name}_shopItems`)
+            // if empty, create it
+            if(getPlayerCoins.length === 0) 
+                await this.redisSet(`${renewData.display_name}_coins`, [0])
             // new renew data
             const newRenewData: IPlayer = {
                 ...renewData,
@@ -104,6 +157,11 @@ export default class LoginController extends Controller {
             // set result
             const resultData = {
                 player: newRenewData,
+                dailyStatus: isDailyReset,
+                lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
+                dailyHistory: getPlayerDailyHistory.length > 0 ? getPlayerDailyHistory : null,
+                playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
+                playerShopItems: getPlayerShopItems,
                 token: accessToken,
                 // in case client-side not subscribe yet cuz still loading
                 onlinePlayers: onlinePlayers.data

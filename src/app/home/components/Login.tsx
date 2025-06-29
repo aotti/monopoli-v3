@@ -86,18 +86,28 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
     // response
     switch(loginResponse.status) {
         case 200: 
-            resultMessage.classList.add('text-green-400')
-            resultMessage.textContent = `✅ moving to room list..`
-            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
-            gotoRoom.click()
+            const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus, dailyHistory} = loginResponse.data[0]
             // save access token
-            localStorage.setItem('accessToken', loginResponse.data[0].token)
-            delete loginResponse.data[0].token
+            localStorage.setItem('accessToken', token)
             // set my player data
-            gameState.setMyPlayerInfo(loginResponse.data[0].player)
+            gameState.setMyPlayerInfo(player)
             // set online players
-            gameState.setOnlinePlayers(loginResponse.data[0].onlinePlayers)
-            localStorage.setItem('onlinePlayers', JSON.stringify(loginResponse.data[0].onlinePlayers))
+            gameState.setOnlinePlayers(onlinePlayers)
+            localStorage.setItem('onlinePlayers', JSON.stringify(onlinePlayers))
+            // update daily status
+            localStorage.setItem('dailyStatus', dailyStatus)
+            gameState.setDailyStatus(dailyStatus)
+            // set last daily status
+            gameState.setLastDailyStatus(lastDailyStatus)
+            // update daily history
+            localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
+            gameState.setDailyHistory(dailyHistory)
+            // set player coins
+            localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
+            gameState.setMyCoins(playerCoins)
+            // update my shop items
+            localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+            gameState.setMyShopItems(playerShopItems)
             // submit button normal
             loginButton.textContent = tempButtonText
             loginButton.removeAttribute('disabled')
@@ -110,6 +120,13 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             miscState.setAnimation(false); 
             // timeout to wait the animation zoom-out
             miscState.setShowModal(null)
+            // set loading screen
+            miscState.setIsLoading(true)
+            // moving to room list
+            resultMessage.classList.add('text-green-400')
+            resultMessage.textContent = `✅ moving to room list..`
+            const gotoRoom = qS('#gotoRoom') as HTMLAnchorElement
+            gotoRoom.click()
             return
         // error
         default: 

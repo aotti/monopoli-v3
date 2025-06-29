@@ -54,7 +54,11 @@ export type GameRoomListener = {
     playerTurns: string[],
     surrendPlayer: string,
     playerTurnEnd: IGamePlayerInfo,
-    gameOverPlayers: {player: string, worst_money: number}[],
+    gameOverPlayers: {
+        player_name: string, 
+        worst_money: number,
+        player_coins: number,
+    }[],
     taxes: {
         owner: string,
         visitor: string,
@@ -89,14 +93,14 @@ export interface IMiscProvider {
     children: React.ReactNode
 }
 
-type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'
+type TutorialRoomList = 'tutorial_roomlist_1'|'tutorial_roomlist_2'|'tutorial_roomlist_3'|'tutorial_roomlist_4'
 type TutorialGameRoom = 'tutorial_gameroom_1'|'tutorial_gameroom_2'|'tutorial_gameroom_3'
 export interface IMiscContext {
     screenType: 'landscape'|'portrait',
     setScreenType: Dispatch<SetStateAction<IMiscContext['screenType']>>,
     language: ITranslate['lang'],
     setLanguage: Dispatch<SetStateAction<ITranslate['lang']>>,
-    showModal: 'login'|'register'|'create room'|'join room'|'ranking'|'shop',
+    showModal: 'login'|'register'|'create room'|'join room'|'ranking'|'shop'|'daily',
     setShowModal: Dispatch<SetStateAction<IMiscContext['showModal']>>,
     showJoinModal: string, 
     setShowJoinModal: Dispatch<SetStateAction<IMiscContext['showJoinModal']>>,
@@ -150,6 +154,11 @@ interface IGameHistory {
     history: string,
 }
 
+interface IMyShopItems {
+    special_card: string[],
+    buff: string[],
+}
+
 export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
@@ -182,6 +191,16 @@ export interface IGameContext {
     setSpectator: Dispatch<SetStateAction<boolean>>,
     rankingInfo: {display_name: string, worst_money_lost: number}[],
     setRankingInfo: Dispatch<SetStateAction<IGameContext['rankingInfo']>>,
+    dailyStatus: 'claimed'|'unclaim',
+    setDailyStatus: Dispatch<SetStateAction<IGameContext['dailyStatus']>>,
+    lastDailyStatus: string,
+    setLastDailyStatus: Dispatch<SetStateAction<string>>,
+    dailyHistory: Record<'reward_type'|'reward_item'|'reward_date', string>[],
+    setDailyHistory: Dispatch<SetStateAction<IGameContext['dailyHistory']>>,
+    myCoins: number,
+    setMyCoins: Dispatch<SetStateAction<number>>,
+    myShopItems: IMyShopItems[], 
+    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
     // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
@@ -204,6 +223,8 @@ export interface IGameContext {
     setGamePlayerTurns: Dispatch<SetStateAction<IGameContext['gamePlayerTurns']>>,
     gameQuakeCity: string[], 
     setGameQuakeCity: Dispatch<SetStateAction<IGameContext['gameQuakeCity']>>,
+    diceMode: 'off'|'odd'|'even', 
+    setDiceMode: Dispatch<SetStateAction<IGameContext['diceMode']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
 }
@@ -316,7 +337,9 @@ type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|'user_agent'
+type ShopType = 'item_type'|'item_name'
+type DailyType = 'week'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -352,6 +375,12 @@ export interface IChat extends ITokenPayload {
     display_name: string,
     message_text: string,
     message_time: string
+}
+
+export interface IDaily extends ITokenPayload {
+    display_name: string,
+    week: string,
+    item_name: string,
 }
 
 // room
@@ -636,6 +665,11 @@ interface IBuffDebuffPickRarity {
     type: 'buff',
     effect: 'pick rarity',
 }
+interface IBuffDebuffTheVoid {
+    type: 'buff',
+    effect: 'the void',
+    money: number,
+}
 interface IBuffDebuffSkipTurn {
     type: 'debuff',
     effect: 'skip turn',
@@ -650,7 +684,7 @@ interface IBuffDebuffReduceMoney {
     effect: 'reduce money',
     money: number,
 }
-export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
+export type BuffDebuffEventType = IBuffDebuffReducePrice | IBuffDebuffPickRarity | IBuffDebuffTheVoid | IBuffDebuffSkipTurn | IBuffDebuffTaxMore | IBuffDebuffReduceMoney
 
 // attack city
 export interface IAttackCityList {
@@ -666,9 +700,40 @@ export interface IAttackAnimationData {
     targetCityProperty: string,
 }
 
+// shop
+export interface IShop {
+    buy_item: {
+        display_name: string,
+        item_type: 'buff'|'special_card',
+        item_name: string,
+    } & ITokenPayload,
+    buying_data: {
+        action: string, 
+        displayName: string,
+        itemName: string, 
+        playerCoins: number,
+    }
+}
+
 // helper
 type RequiredKeys<T> = { [K in keyof T]-?:
     ({} extends { [P in K]: T[K] } ? never : K)
 }[keyof T]
 
 type ExcludeOptionalKeys<T> = Pick<T, RequiredKeys<T>>
+
+export interface IAnimate {
+    targets: string | Element,
+    translateX?: number | any[],
+    translateY?: number | any[],
+    scaleX?: number | any[],
+    scaleY?: number | any[],
+    opacity?: number[],
+    backgroundColor?: string,
+    rotate?: string | any[],
+    duration?: number,
+    easing?: 'easeInOutSine'|'linear',
+    direction?: 'normal'|'reverse'|'alternate',
+    delay?: number,
+    loop?: boolean,
+}

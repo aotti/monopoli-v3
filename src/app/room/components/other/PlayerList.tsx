@@ -1,8 +1,8 @@
-import { useMisc } from "../../../context/MiscContext";
-import { translateUI } from "../../../helper/helper";
-import { ILoggedUsers } from "../../../helper/types";
-import { useGame } from "../../../context/GameContext";
-import { viewPlayerStats } from "../helper/functions";
+import { useMisc } from "../../../../context/MiscContext";
+import { translateUI } from "../../../../helper/helper";
+import { ILoggedUsers } from "../../../../helper/types";
+import { useGame } from "../../../../context/GameContext";
+import { viewPlayerStats } from "../../helper/functions";
 
 export default function PlayerList({ onlinePlayers }: {onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()

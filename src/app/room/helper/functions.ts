@@ -1,6 +1,8 @@
-import { FormEvent } from "react"
+import { FormEvent, FunctionComponent } from "react"
 import { errorCreateRoom, fetcher, fetcherOptions, qS, resetAllData, setInputValue, translateUI } from "../../../helper/helper"
-import { ICreateRoom, IGameContext, IMiscContext, IPlayer, IResponse, IShiftRoom } from "../../../helper/types"
+import { IAnimate, ICreateRoom, IGameContext, IMiscContext, IPlayer, IResponse, IShiftRoom } from "../../../helper/types"
+import { startAnimation } from "../../game/components/board/RollNumber"
+import anime from "animejs"
 
 export async function getRoomList(gameState: IGameContext) {
     // result message
@@ -28,6 +30,8 @@ export async function getRoomList(gameState: IGameContext) {
             gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
             // set game room info
             gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
+            // set last daily status
+            gameState.setLastDailyStatus(getRoomResponse.data[0].lastDailyStatus)
             return
         default: 
             resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
@@ -525,3 +529,171 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
             return
     }
 }
+
+export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+
+    // result message
+    const resultMessage = qS('#result_shop')
+
+    interface IItemData {name: string, type: string, description: string, price: number}
+    const {name, type, description, price} = itemData as IItemData
+    // buy item data
+    const buyItemData = {
+        display_name: gameState.myPlayerInfo.display_name,
+        item_type: type,
+        item_name: name,
+    }
+    // warning
+    const buyItemWarning = `"${description}"\nare you sure wanna buy this item?`
+    if(!confirm(buyItemWarning)) return
+    // fetch
+    const buyItemFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(buyItemData)})
+    const buyItemResponse: IResponse = await (await fetcher('/shop', buyItemFetchOptions)).json()
+    // response
+    switch(buyItemResponse.status) {
+        case 200:
+            const {token, coinsLeft, playerShopItems} = buyItemResponse.data[0]
+            // save access token
+            if(token) localStorage.setItem('accessToken', token)
+            // update my coins
+            localStorage.setItem('playerCoins', JSON.stringify(coinsLeft))
+            gameState.setMyCoins(coinsLeft)
+            // update my shop items
+            localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+            gameState.setMyShopItems(playerShopItems)
+            // result message
+            resultMessage.textContent = `item bought`
+            // display notif
+            resultMessage.classList.remove('hidden')
+            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            return
+        default:
+            // result message
+            resultMessage.textContent = `${buyItemResponse.status}: ${buyItemResponse.message}`
+            // display notif
+            resultMessage.classList.remove('hidden')
+            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            return
+    }
+}
+    
+export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+    
+    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const {week, day, name, type, items} = rewardData
+    // result message
+    const resultMessage = qS('#result_daily')
+    // claim button
+    const claimButton = qS('#daily_claim_button') as HTMLButtonElement
+    // if player click other day reward OR the reward has been claimed, only play animation
+    if(day !== today || gameState.dailyStatus === 'claimed') {
+        // start animation
+        return await claimAnimation()
+    }
+    // if type is pack, start roll animation
+    if(type == 'pack') {
+        const rollPack = qS('#roll_pack')
+        rollPack.classList.toggle('flex')
+        rollPack.classList.toggle('hidden')
+        startAnimation(items, miscState, gameState)
+        setTimeout(() => {
+            rollPack.classList.toggle('flex')
+            rollPack.classList.toggle('hidden')
+        }, 5000);
+    }
+
+    // claim data
+    const claimValue = {
+        display_name: gameState.myPlayerInfo.display_name,
+        week: week.toString(),
+        item_name: type === 'coin' ? 'coin' : qS('.roll-result').textContent,
+    }
+    // loading claim button
+    let loadingIncrement = 3
+    const loadingClaimInterval = setInterval(() => {
+        if(loadingIncrement === 3) {
+            claimButton.textContent = '.'
+            loadingIncrement = 0
+        }
+        else if(loadingIncrement < 3) {
+            claimButton.textContent += '.'
+            loadingIncrement++
+        }
+    }, 1000);
+
+    // fetch
+    const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(claimValue)})
+    const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
+    // response
+    switch(claimDailyResponse.status) {
+        case 200: 
+            // stop loading claim
+            clearInterval(loadingClaimInterval)
+            // destruct data
+            const {token, dailyStatus, dailyHistory, playerCoins, playerShopItems} = claimDailyResponse.data[0]
+            // save access token
+            if(token) localStorage.setItem('accessToken', token)
+            // update daily status
+            localStorage.setItem('dailyStatus', dailyStatus)
+            gameState.setDailyStatus(dailyStatus)
+            // update daily history
+            localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
+            gameState.setDailyHistory(dailyHistory)
+            // update player coins if exist
+            if(playerCoins) {
+                // set player coins
+                localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
+                gameState.setMyCoins(playerCoins)
+            }
+            // update my shop items
+            if(playerShopItems) {
+                // update my shop items
+                localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+                gameState.setMyShopItems(playerShopItems)
+            }
+            // start animation
+            await claimAnimation()
+            return
+        default: 
+            // stop loading claim
+            clearInterval(loadingClaimInterval)
+            claimButton.textContent = 'claim'
+            // result message
+            resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
+            // display notif
+            resultMessage.classList.remove('hidden')
+            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            return
+    }
+}
+
+export function claimAnimation() {
+    return new Promise(resolve => {
+        const animate: FunctionComponent<IAnimate> = anime
+        const today = new Date().toLocaleString([], {weekday: 'long'})
+        const rewardImg = qS(`#reward_${today}`) as HTMLImageElement
+        const rotateValue = rewardImg.style.transform.match('360deg') ? 0 : 360
+
+        animate({
+            targets: rewardImg,
+            // Properti yang dianimasikan
+            translateY: [
+                { value: -10, duration: 300, easing: 'easeOutQuad' }, // Lompat ke atas (y negatif)
+                { value: 0, duration: 600, easing: 'easeOutBounce', delay: 100 } // Jatuh kembali (y nol)
+            ],
+            // spin animation
+            rotate: [
+                {value: rotateValue, duration: 500, easing: 'linear'},
+            ],
+            // Animasi tambahan untuk efek squish (optional, tapi membuat lebih hidup)
+            scaleY: [
+                { value: 0.6, duration: 100, easing: 'easeOutQuad' }, // Sedikit memendek sebelum melompat
+                { value: 1.2, duration: 200, easing: 'easeOutQuad' }, // Sedikit memanjang saat di udara
+                { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
+            ]
+        })
+        setTimeout(() => resolve(true), 1000);
+    })
+} 

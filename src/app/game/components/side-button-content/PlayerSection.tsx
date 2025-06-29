@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { MouseEvent, useEffect, useRef, useState } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
@@ -9,8 +9,10 @@ import { clickOutsideElement } from "../../../../helper/click-outside"
 export default function PlayerSection() {
     const miscState = useMisc()
     const gameState = useGame()
+
     // player turns
     const [playerTurns, setPlayerTurns] = useState<string[]>(null)
+
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
@@ -37,6 +39,8 @@ export default function PlayerSection() {
             {/* player list */}
             <div className="flex flex-col gap-1">
                 {gameState.gamePlayerInfo.map((player, i) => {
+                    // special card text
+                    const translateSpecialCard = player.card?.split(';').map(v => translateUI({lang: miscState.language, text: v as any})).join(';')
                     // buff/debuff text
                     const buffText = player.buff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
                     const debuffText = player.debuff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
@@ -52,7 +56,7 @@ export default function PlayerSection() {
                                 <span className="w-full"> {moneyFormat(player.money)} </span>
                             </div>
                             <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
-                            data-tooltip={player.card?.replaceAll(';', '\n')}>
+                            data-tooltip={translateSpecialCard?.replaceAll(';', '\n')}>
                                 <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
                             </div>
                         </div>
@@ -93,6 +97,7 @@ function PlayerSettingButton() {
                     ? <>
                         <SellUpgradeCityOption />
                         <AttackCityOption />
+                        <DiceControlOption />
                         <GameHistoryOption />
                     </>
                     // button for spectator
@@ -137,6 +142,49 @@ function AttackCityOption() {
     )
 }
 
+function DiceControlOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    const diceController = []
+    gameState.gamePlayerInfo.map(v => {
+        if(v.display_name === gameState.myPlayerInfo.display_name) {
+            diceController.push(v.card?.match(/dice controller/i))
+        }
+    })
+    const isDiceControllerExist = diceController.flat().filter(i=>i).length === 1
+
+    const diceModeHandler = (ev: MouseEvent<HTMLButtonElement>) => {
+        const currentMode = ev.currentTarget.textContent
+        switch(currentMode) {
+            case 'off':
+                gameState.setDiceMode('odd'); break
+            case 'odd':
+                gameState.setDiceMode('even'); break
+            case 'even':
+                gameState.setDiceMode('off'); break
+            default:
+                ev.currentTarget.textContent = 'off'
+        }
+    }
+
+    return (
+        <div className={`flex items-center gap-2 p-1 hover:bg-darkblue-2 ${isDiceControllerExist ? '' : 'saturate-0'}`}>
+            <label htmlFor="dice_control" className="w-full">
+                {translateUI({lang: miscState.language, text: 'Dice Control'})}
+            </label>
+            {isDiceControllerExist
+                ? <button type="button" id="dice_control" className="px-1 border-2" onClick={diceModeHandler}>
+                    {gameState.diceMode}
+                </button>
+                : <button type="button" id="dice_control" className="px-1 border-2">
+                    {gameState.diceMode}
+                </button>}
+            
+        </div>
+    )
+}
+
 function GameHistoryOption() {
     const miscState = useMisc()
     const gameState = useGame()
@@ -149,7 +197,7 @@ function GameHistoryOption() {
             <input type="checkbox" id="game_history" onChange={ev => {
                 ev.currentTarget.checked
                     ? gameState.setShowGameHistory(true)
-                    : gameState.setDisplaySettingItem(null)
+                    : gameState.setShowGameHistory(false)
             }} />
         </div>
     )

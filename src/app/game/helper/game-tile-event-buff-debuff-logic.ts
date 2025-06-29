@@ -460,11 +460,11 @@ export function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, mis
         // buff exist
         if(effect == 'reduce price') {
             // get buff
-            const debuff = splitBuff.map(v => v.match(/reduce price/i)).flat().filter(i=>i)
-            if(debuff[0]) {
+            const buff = splitBuff.map(v => v.match(/reduce price/i)).flat().filter(i=>i)
+            if(buff[0]) {
                 setBuffDebuffHistory('get_buff', effect)
                 const newPrice = data.price * .3
-                return [`used-${debuff[0]}`, newPrice]
+                return [`used-${buff[0]}`, newPrice]
             }
         }
         else if(effect == 'pick rarity') {
@@ -474,6 +474,15 @@ export function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, mis
                 setBuffDebuffHistory('get_buff', effect)
                 const [buffName, buffEffect] = buff[0].split('_')
                 return [`used-${buffName}`, +buffEffect]
+            }
+        }
+        else if(effect == 'the void') {
+            // get buff
+            const buff = splitBuff.map(v => v.match(/the void/i)).flat().filter(i=>i)
+            if(buff[0]) {
+                setBuffDebuffHistory('get_buff', effect)
+                const newMoney = Math.abs(data.money)
+                return [`used-${buff[0]}`, newMoney]
             }
         }
     }

@@ -149,6 +149,10 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('onlinePlayers')
     localStorage.removeItem('playerData')
     localStorage.removeItem('cityOwnedList')
+    localStorage.removeItem('playerCoins')
+    localStorage.removeItem('playerShopItems')
+    localStorage.removeItem('dailyStatus')
+    localStorage.removeItem('dailyHistory')
     // remove player info
     gameState.setMyPlayerInfo({
         display_name: 'guest',
@@ -164,6 +168,14 @@ export function resetAllData(gameState: IGameContext) {
     gameState.setRoomList([])
     // remove game stage
     gameState.setGameStages('prepare')
+    // remove player coins
+    gameState.setMyCoins(0)
+    // remove player shop items
+    gameState.setMyShopItems(null)
+    // remove daily states
+    gameState.setDailyStatus(null)
+    gameState.setLastDailyStatus(null)
+    gameState.setDailyHistory(null)
 }
 /**
  * @returns [null, data] or [error]
@@ -354,6 +366,14 @@ export function filterInput(input: InputIDType, value: string) {
             for(let sv of splitValue)
                 if(!sv.match(/\w+,\d+|\w+,-\d+/)) return null
             return value 
+        // ====== SHOP TYPE ======
+        case 'item_type':
+            return value ? value.match(/buff$|special_card$/) : null
+        case 'item_name':
+            return value ? value.match(/coin$|nerf tax$|anti prison$|gaming dice$|dice controller$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
+        // ====== DAILY TYPE ======
+        case 'week':
+            return value ? value.match(/1$|2$/) : null
         // ====== MISC TYPE ======
         case 'user_agent': 
             return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null
@@ -378,19 +398,33 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
         // response
         switch(renewResponse.status) {
             case 200: 
+                const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus, dailyHistory} = renewResponse.data[0]
                 // save access token
-                localStorage.setItem('accessToken', renewResponse.data[0].token)
-                delete renewResponse.data[0].token
+                localStorage.setItem('accessToken', token)
                 // set my player data
-                gameState.setMyPlayerInfo(renewResponse.data[0].player)
-                // remove guest mode
-                gameState.setGuestMode(false)
+                gameState.setMyPlayerInfo(player)
                 // save player data to localStorage to make sure its updated
                 // cuz data from jwt is not (game_played & worst_money)
-                localStorage.setItem('playerData', JSON.stringify(renewResponse.data[0].player))
+                localStorage.setItem('playerData', JSON.stringify(player))
                 // set online players
-                gameState.setOnlinePlayers(renewResponse.data[0].onlinePlayers)
-                localStorage.setItem('onlinePlayers', JSON.stringify(renewResponse.data[0].onlinePlayers))
+                gameState.setOnlinePlayers(onlinePlayers)
+                localStorage.setItem('onlinePlayers', JSON.stringify(onlinePlayers))
+                // update daily status
+                localStorage.setItem('dailyStatus', dailyStatus)
+                gameState.setDailyStatus(dailyStatus)
+                // set last daily status
+                gameState.setLastDailyStatus(lastDailyStatus)
+                // update daily history
+                localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
+                gameState.setDailyHistory(dailyHistory)
+                // set player coins
+                localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
+                gameState.setMyCoins(playerCoins)
+                // update my shop items
+                localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
+                gameState.setMyShopItems(playerShopItems)
+                // remove guest mode
+                gameState.setGuestMode(false)
                 break
             default: 
                 // set dummy myPlayerInfo
@@ -424,10 +458,10 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 avatar: data.avatar
             })
         }
-        // remove guest mode
-        gameState.setGuestMode(false)
         // set online players
         gameState.setOnlinePlayers(JSON.parse(onlinePlayers))
+        // remove guest mode
+        gameState.setGuestMode(false)
         miscState.setIsLoading(false)
     }
 }

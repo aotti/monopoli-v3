@@ -2,7 +2,7 @@ import { ICreateRoom, IGameContext, IGamePlay, IQuerySelect, IQueryUpdate, IResp
 import Controller from "../Controller";
 
 export default class GameController extends Controller {
-    async filters(action: string, payload: any) {
+    private async filters(action: string, payload: any) {
         let filterResult: IResponse = null
         // get token payload
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
@@ -23,15 +23,7 @@ export default class GameController extends Controller {
         }
     }
 
-    async getLogs(action: string, payload: IGamePlay['get_players']) {
-        const getGameLog = await this.redisGet(`gameLog_${payload.room_id}`)
-        return {
-            status: 200,
-            message: `${action} for room ${payload.room_id}`,
-            data: getGameLog
-        }
-    }
-
+    // main method
     async getPlayers(action: string, payload: IGamePlay['get_players']) {
         let result: IResponse
         
@@ -99,7 +91,6 @@ export default class GameController extends Controller {
         return result
     }
     
-    // main method
     async readyPlayer(action: string, payload: IGamePlay['ready_player']) {
         let result: IResponse
         
@@ -116,6 +107,8 @@ export default class GameController extends Controller {
         if(checkReadyPlayer !== -1) return this.respond(403, 'fight me ni-', [])
         // set new ready player
         await this.redisSet(`readyPlayers_${roomId}`, [...getReadyPlayers, payload.display_name])
+        // reset player shop items
+        await this.redisReset(`${payload.display_name}_shopItems`)
         // publish online players
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
@@ -653,6 +646,16 @@ export default class GameController extends Controller {
         }
         // return result
         return result
+    }
+
+    // other method
+    async getLogs(action: string, payload: IGamePlay['get_players']) {
+        const getGameLog = await this.redisGet(`gameLog_${payload.room_id}`)
+        return {
+            status: 200,
+            message: `${action} for room ${payload.room_id}`,
+            data: getGameLog
+        }
     }
 
     async fixPlayerTurns(action: string, payload: IGamePlay['fix_player_turns']) {

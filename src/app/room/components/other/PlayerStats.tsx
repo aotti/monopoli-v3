@@ -1,9 +1,9 @@
 import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
-import { useMisc } from "../../../context/MiscContext";
-import { moneyFormat, qS, translateUI } from "../../../helper/helper";
-import { ILoggedUsers, IPlayer } from "../../../helper/types";
-import { useGame } from "../../../context/GameContext";
-import { avatarUpdate, userLogout } from "../helper/functions";
+import { useMisc } from "../../../../context/MiscContext";
+import { moneyFormat, qS, translateUI } from "../../../../helper/helper";
+import { ILoggedUsers, IPlayer } from "../../../../helper/types";
+import { useGame } from "../../../../context/GameContext";
+import { avatarUpdate, userLogout } from "../../helper/functions";
 
 export default function PlayerStats({ playerData, onlinePlayers }: {playerData: IPlayer, onlinePlayers: ILoggedUsers[]}) {
     const miscState = useMisc()
@@ -37,6 +37,8 @@ export default function PlayerStats({ playerData, onlinePlayers }: {playerData: 
                             <button type="button" className="min-w-8 bg-darkblue-1 border-8bit-text active:opacity-75" onClick={() => {
                                 // remove guest mode
                                 gameState.setGuestMode(false);
+                                // set modal to null
+                                miscState.setShowModal(null);
                                 // back to home
                                 (qS('#gotoHome') as HTMLAnchorElement).click()
                             }}>

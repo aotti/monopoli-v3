@@ -13,18 +13,10 @@ export default function RollNumber({ roomId }: {roomId: number}) {
     // roll animation
     useEffect(() => {
         if(!gameState.rollNumber) return
-        const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-        startAnimation(diceNumber, miscState, gameState)
+        const diceNumber = gameState.rollNumber == 'turn' ? [1,2,3,4,5,6,7,8,9,0] : [1,2,3,4,5,6]
+        startAnimation(diceNumber, miscState, gameState, gameState.gameRoomInfo[getGameRoomInfo])
         // hidden the roll after end
         setTimeout(() => gameState.setRollNumber(null), 3500);
-        
-        // ### KALO MODE DEVELOPMENT, PAKE CARA RETURN ARROW FUNCTION
-        // return () => {
-            // const diceNumber = gameState.rollNumber == 'dice' ? [1,2,3,4,5,6] : [1,2,3,4,5,6,7,8,9,0]
-            // startAnimation(diceNumber, miscState, gameState)
-            // // hidden the roll after end
-            // setTimeout(() => gameState.setRollNumber(null), 3500);
-        // }
     }, [gameState.rollNumber])
 
     return (
@@ -38,10 +30,14 @@ export default function RollNumber({ roomId }: {roomId: number}) {
 
 function RollDice({ amount }: {amount: number}) {
     const miscState = useMisc()
+    const gameState = useGame()
 
     return (
         <div className="relative z-10 top-1/3 bg-darkblue-1 border-8bit-text w-2/5">
             <p> {translateUI({lang: miscState.language, text: 'roll dice'})} </p>
+            {gameState.diceMode !== 'off' 
+                ? <p> {`"${translateUI({lang: miscState.language, text: 'dice controller'})}"`} </p> 
+                : null}
             {/* spinner */}
             <div className="flex justify-center text-base lg:text-2xl py-2">
                 {// set dice amount
@@ -88,6 +84,28 @@ function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function diceController(dice: number, number: number[]) {
+    if(dice === 1) {
+        const num = getRandomInt(0, number.length-1)
+        const diceOdd = `${num}`.match(/1|3|5/) ? num-1 : num
+        const diceEven = `${num}`.match(/0|2|4/) ? num+1 : num
+        return [diceOdd, diceEven]
+    }
+    else if(dice === 2) {
+        const diceRNG = getRandomInt(0, 1)
+        const [numOne, numTwo] = [getRandomInt(0, number.length-1), getRandomInt(0, number.length-1)]
+        const diceOdd = numOne%2 === 0 && numTwo%2 === 0 // are both even
+                        ? numOne === 0 // yes, is it 0
+                            ? numOne+1 // its 0 (dice 1), then +1 (dice 2)
+                            : diceRNG ? numOne+1 : numOne-1 // its 2/4 (dice 3/5), then use rng to set +/-
+                        : `${numOne}`.match(/1|3|5/) && `${numTwo}`.match(/1|3|5/) // are both odd
+                            ? numOne-1 // both odd
+                            : numOne // odd + even
+        const diceEven = numTwo
+        return [diceOdd, diceEven]
+    }
+}
+
 function removeAllChildNodes(parent: HTMLElement) {
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
@@ -98,15 +116,17 @@ function removeAllChildNodes(parent: HTMLElement) {
 const totalDuplicates = 4
 
 // Clear slots and recreate random list of images
-const buildItemLists = (number: number[]) => {  
+const buildItemLists = (itemList: any[], gameState: IGameContext, gameRoomInfo?: IGameContext['gameRoomInfo'][0]) => {  
     const slots = document.getElementsByClassName('slot');
+    // set static dice
+    const [diceOdd, diceEven] = gameRoomInfo ? diceController(gameRoomInfo.dice, itemList) : [null, null]
     // Iterate through the slot html elements
     Array.prototype.forEach.call(slots, (slot, s) => {
         let prizeBlocks = document.createElement('div');
         prizeBlocks.classList.add('slot-machine__prizes');
         
         // Multiply and shuffle prize images for visual purposes
-        const randomPrizes = shuffle(number.flatMap(i => Array(totalDuplicates).fill(i)));
+        const randomPrizes = shuffle(itemList.flatMap(i => Array(totalDuplicates).fill(i)));
         randomPrizes.forEach((prize) => {
             const prizeElement = document.createElement('p');
             prizeElement.textContent = prize
@@ -114,11 +134,23 @@ const buildItemLists = (number: number[]) => {
         })
     
         // Get a random item from the prizes array
-        const resultItem = getRandomInt(0, number.length-1);
-        // Adds the result to the last row
+        let resultItem = getRandomInt(0, itemList.length-1);
+        // modify resultItem by dice mode
+        switch(gameState.diceMode) {
+            case 'odd':
+                // index 0 = set even, index 1 = set odd
+                s == 0 
+                    ? resultItem = diceOdd
+                    : resultItem = diceEven
+                break
+            case 'even':
+                resultItem = diceEven
+                break
+        }
+        // Adds the result to slots
         const resultElement = document.createElement('p')
         resultElement.classList.add('roll-result')
-        resultElement.textContent = number[resultItem].toString()
+        resultElement.textContent = itemList[resultItem].toString()
         prizeBlocks.appendChild(resultElement);
     
         // Clear the slots and add the new ones
@@ -128,16 +160,19 @@ const buildItemLists = (number: number[]) => {
 }
 
 // Determine whether the player won and start the spinning animation
-const startAnimation = (number: number[], miscState: IMiscContext, gameState: IGameContext) => {
+export const startAnimation = (itemList: any[], miscState: IMiscContext, gameState: IGameContext, gameRoomInfo?: IGameContext['gameRoomInfo'][0]) => {
     // less than 1024 for mobile, more than 1024 for desktop
     const windowWidth = window.innerWidth
     const defaultSize = windowWidth < 1024 ? 24 : 32
     
     // Rebuild the items list with the result
-    buildItemLists(number);
+    gameRoomInfo 
+        ? buildItemLists(itemList, gameState, gameRoomInfo)
+        : buildItemLists([...itemList, ...itemList], gameState)
+    
     
     // Determine the total height to be animated  
-    const totalHeight = number.length * totalDuplicates * defaultSize;
+    const totalHeight = itemList.length * totalDuplicates * defaultSize;
     
     // Animate each one of the slots
     const soundRollNumber = qS('#sound_roll_number') as HTMLAudioElement
@@ -150,11 +185,13 @@ const startAnimation = (number: number[], miscState: IMiscContext, gameState: IG
             { transform: `translateY(-${totalHeight}px)` } // to
         ], {
             // roll dice = 1.5 sec | roll turn = 2 sec
-            duration: gameState.rollNumber == 'dice' 
-                    ? items.length === 1
-                        ? 2000 // single dice
-                        : 1000 + (++s * 500) // double dice
-                    : 1000 + (s * 500),
+            duration: gameRoomInfo ?
+                        gameState.rollNumber == 'dice' 
+                            ? items.length === 1
+                                ? 2000 // single dice
+                                : 1000 + (++s * 500) // double dice
+                            : 1000 + (s * 500) // roll turn
+                        : 2000, // roll daily reward
             fill: "forwards",
             easing: 'ease-in-out'
         });

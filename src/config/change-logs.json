@@ -1,6 +1,16 @@
 {
     "updates": [
         {
+            "version": "v3.07",
+            "date": "29 June 2025",
+            "changes": [
+                "add shop feature",
+                "add daily login feature",
+                "modify UI on room list",
+                "fix some bugs"
+            ]
+        },
+        {
             "version": "v3.06",
             "date": "25 May 2025",
             "changes": [

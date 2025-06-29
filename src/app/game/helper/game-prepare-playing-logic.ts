@@ -693,10 +693,10 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         async function turnEnd(eventData: EventDataType) {
             playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn ending..'})
                                         .replace('ppp', playerTurn)
-            // set notif to normal after 2 secs
+            // close notif after 2 secs
             setTimeout(() => {
-                miscState.setAnimation(true)
-                gameState.setShowGameNotif('normal')
+                miscState.setAnimation(false)
+                gameState.setShowGameNotif(null)
             }, 2000);
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
@@ -718,19 +718,17 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             ? Math.round((eventData?.money || 0) + specialCardMoney + throughStart) 
                             : Math.round((eventData?.money || 0) + specialCardMoney)
             // check debuff reduce money (only if player get money)
-            const [buffDebuff, buffDebuffEffect] = eventMoney > 0 ? useBuffDebuff(
+            // [0] = buff/debuff name, [1] = buff/debuff effect
+            const reduceMoneyDebuff = eventMoney > 0 ? useBuffDebuff(
                 {type: 'debuff', effect: 'reduce money', money: eventMoney},
                 findPlayer, miscState, gameState
-            ) as [string, number] : [null, null];
+            ) as [string, number] : [null, null] as [string, number];
             // add debuff reduce money & set notif message
-            debuffCollection.push(buffDebuff)
-            notifMessage.textContent += buffDebuff ? `\n${translateUI({lang: miscState.language, text: '"debuff reduce money"'})}` : ''
+            debuffCollection.push(reduceMoneyDebuff[0])
+            notifMessage.textContent += reduceMoneyDebuff[0] ? `\n${translateUI({lang: miscState.language, text: '"debuff reduce money"'})}` : ''
             // get buff/debuff event data
             if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
             if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
-            // update buff/debuff list
-            const buffLeft = updateBuffDebuffList(buffCollection, playerTurnData.buff)
-            const debuffLeft = updateBuffDebuffList(debuffCollection, playerTurnData.debuff)
             // get prison accumulate number
             const prisonNumber = playerTurnData.prison
             // check if player is just step on prison / already arrested
@@ -747,8 +745,19 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
             const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
             // check if player is losing
-            const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (buffDebuffEffect || 0)))
+            const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (reduceMoneyDebuff[1] || 0)))
             const playerTurnEndLose = playerTurnEndMoney < loseCondition
+            // the void buff
+            const playerVoidMoney = playerTurnEndLose ? useBuffDebuff(
+                {type: 'buff', effect: 'the void', money: playerTurnData.money + (eventMoney - (reduceMoneyDebuff[1] || 0))},
+                findPlayer, miscState, gameState
+            ) as [string, number] : [null, null] as [string, number];
+            // add buff the void & set notif message
+            buffCollection.push(playerVoidMoney[0])
+            notifMessage.textContent += playerVoidMoney[0] ? `\n${translateUI({lang: miscState.language, text: '"buff the void"'})}` : ''
+            // update buff/debuff list
+            const buffLeft = updateBuffDebuffList(buffCollection, playerTurnData.buff)
+            const debuffLeft = updateBuffDebuffList(debuffCollection, playerTurnData.debuff)
             // input values container
             const inputValues: IGamePlay['turn_end'] & {action: string} = {
                 action: 'game turn end',
@@ -760,7 +769,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     : destinatedPos,
                 lap: numberLaps.toString(),
                 // money from event that occured
-                event_money: (eventMoney - (buffDebuffEffect || 0)).toString(),
+                event_money: (playerVoidMoney[1] || eventMoney - (reduceMoneyDebuff[1] || 0)).toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
                 // Math.abs to prevent move backward event cuz dice number gonna be minus
                 history: setEventHistory(`rolled_dice: ${subPlayerDice || Math.abs(playerDice)}`, eventData),
@@ -920,9 +929,6 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
             playGameSounds('game_over', miscState)
             // set game stage
             gameState.setGameStages('over')
-            // show notif
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('normal')
             // winner message
             notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Over'})
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'ppp has won the game!\nback to room list in 15 seconds'}).replace('ppp', alivePlayers[0])
@@ -945,9 +951,6 @@ export function checkGameProgress(playersData: IGameContext['gamePlayerInfo'], m
                 playGameSounds('game_over', miscState)
                 // set game stage
                 gameState.setGameStages('over')
-                // show notif
-                miscState.setAnimation(true)
-                gameState.setShowGameNotif('normal')
                 // winner message
                 notifTitle.textContent = translateUI({lang: miscState.language, text: 'Game Over'})
                 notifMessage.textContent = translateUI({lang: miscState.language, text: 'ppp has won the game!\nback to room list in 15 seconds'}).replace('ppp', highestMoneyPlayer[0].split(',')[1])

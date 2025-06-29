@@ -1,12 +1,12 @@
 import { useMisc } from "../../context/MiscContext";
 import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { ChatEmotes, sendChat } from "../../components/ChatBox";
-import CreateRoom from "./components/CreateRoom";
-import PlayerList from "./components/PlayerList";
-import PlayerStats from "./components/PlayerStats";
-import RoomCard from "./components/RoomCard";
+import CreateRoom from "./components/room-list/CreateRoom";
+import PlayerList from "./components/other/PlayerList";
+import PlayerStats from "./components/other/PlayerStats";
+import RoomCard from "./components/room-list/RoomCard";
 import { useEffect, useRef } from "react";
-import TutorialRoomList from "./components/TutorialRoomList";
+import TutorialRoomList from "./components/other/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
@@ -14,8 +14,9 @@ import GameSounds from "../../components/GameSounds";
 import { getRoomList, viewRanking } from "./helper/functions";
 import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
-import Ranking from "./components/Ranking";
-import Shop from "./components/Shop";
+import Ranking from "./components/other/Ranking";
+import Shop from "./components/other/Shop";
+import Daily from "./components/other/Daily";
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -141,11 +142,11 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
             {/* room list */}
             {/* tutorial: relative z-10 */}
-            <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'relative z-10' : ''}
-            flex flex-col w-[calc(100vw-30vw)]`}>
+            <div className={`flex flex-col w-[calc(100vw-30vw)]`}>
                 {/* room list header
                     1rem gap, 3.5rem title, 0.5rem margin bot */}
-                <div className="flex justify-between gap-4 w-full h-fit text-center p-2">
+                <div className={`${miscState.showTutorial == 'tutorial_roomlist_4' ? 'relative z-10 bg-darkblue-2' : ''} 
+                flex justify-between gap-4 w-full h-fit text-center p-2`}>
                     {/* tutorial button */}
                     <div data-tooltip="tutorial" className="w-8 my-auto">
                         <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
@@ -173,23 +174,25 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         </div>
                     </div>
                     {/* create room, ranking, shop, calendar modal */}
-                    <div className={`absolute z-20 bg-black/50
+                    <div className={`absolute z-20 -ml-2 bg-black/50
                     ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
-                    h-[calc(100vh-4.25rem)] w-[calc(65vw+1rem)] lg:w-[calc(65vw+2.5rem)]`}>
+                    h-[calc(100vh-4rem)] lg:h-[calc(100vh-4.25rem)] w-[calc(65vw+1.5rem)] lg:w-[calc(65vw+3rem)]`}>
                         {/* create room */}
                         <CreateRoom />
                         {/* ranking */}
                         <Ranking />
                         {/* shop */}
                         <Shop />
-                        {/* calendar */}
+                        {/* daily */}
+                        <Daily />
                     </div>
                 </div>
                 {/* room list cards 
                     100vh - 3.75rem (header) - 5rem (room list title) */}
-                <div className="flex flex-wrap gap-2 justify-between 
-                    text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
-                    overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text">
+                <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'relative z-10' : ''} 
+                flex flex-wrap gap-2 justify-between 
+                text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
+                overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text`}>
                     {/* card */}
                     {gameState.roomList.length > 0
                         ? gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)
@@ -215,10 +218,22 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
 function MenuButton() {
     const miscState = useMisc()
+    const gameState = useGame()
+
+    useEffect(() => {
+        let menuTimeout = null
+        if(miscState.showRoomListMenu) {
+            // auto close menu after 10s
+            menuTimeout = setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
+        }
+        else {
+            clearInterval(menuTimeout)
+        }
+    }, [miscState.showRoomListMenu])
 
     return (
-        <div data-tooltip="menu" className="w-8 my-auto text-right">
-            <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowRoomListMenu(true)}>
+        <div data-tooltip="menu" className={`w-8 my-auto text-right`}>
+            <button type="button" className={`invert active:opacity-75 ${gameState.dailyStatus == 'unclaim' ? "after:absolute after:-top-1 after:invert after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full" : ''}`} onClick={() => miscState.setShowRoomListMenu(true)}>
                 <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
             </button>
         </div>
@@ -266,7 +281,7 @@ function ShopButton() {
                 miscState.setShowModal('shop') 
             }}>
                 <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> shop (soon) </span>
+                <span className="invert"> shop </span>
             </button>
         </div>
     )
@@ -274,15 +289,22 @@ function ShopButton() {
 
 function DailyButton() {
     const miscState = useMisc()
+    const gameState = useGame()
 
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+            <button type="button" className={`flex items-center gap-2 w-full invert ${gameState.dailyStatus == 'unclaim' ? "after:invert after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full" : ''}`} onClick={() => {
+                // close join modal 
+                miscState.setShowJoinModal(null)
                 // close room list menu
                 miscState.setShowRoomListMenu(false)
+                // to give zoom-in animate class
+                miscState.setAnimation(true); 
+                // show the modal
+                miscState.setShowModal('daily') 
             }}>
                 <img src="https://img.icons8.com/?id=23&format=png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> daily (soon) </span>
+                <span className="invert"> daily </span>
             </button>
         </div>
     )

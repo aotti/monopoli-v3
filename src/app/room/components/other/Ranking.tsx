@@ -1,7 +1,7 @@
-import { useGame } from "../../../context/GameContext"
-import { useMisc } from "../../../context/MiscContext"
-import { moneyFormat, translateUI } from "../../../helper/helper"
-import { viewRanking } from "../helper/functions"
+import { useGame } from "../../../../context/GameContext"
+import { useMisc } from "../../../../context/MiscContext"
+import { moneyFormat, translateUI } from "../../../../helper/helper"
+import { viewRanking } from "../../helper/functions"
 
 export default function Ranking() {
     const miscState = useMisc()
