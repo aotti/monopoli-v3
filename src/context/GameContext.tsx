@@ -30,6 +30,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [rankingInfo, setRankingInfo] = useState<IGameContext['rankingInfo']>([])
     const [dailyStatus, setDailyStatus] = useState<'claimed'|'unclaim'>(null)
     const [lastDailyStatus, setLastDailyStatus] = useState<string>(null)
+    const [dailyHistory, setDailyHistory] = useState<IGameContext['dailyHistory']>(null)
     // room
     const [roomList, setRoomList] = useState([])
     const [roomError, setRoomError] = useState<string>(null)
@@ -58,6 +59,11 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         // set my shop items if exist
         const getPlayerShopItems = localStorage.getItem('playerShopItems')
         if(getPlayerShopItems) setMyShopItems(JSON.parse(getPlayerShopItems))
+        // set daily states
+        const getPlayerDailyStatus = localStorage.getItem('dailyStatus')
+        if(getPlayerDailyStatus) setDailyStatus(getPlayerDailyStatus as any)
+        const getPlayerDailyHistory = localStorage.getItem('dailyHistory')
+        if(getPlayerDailyHistory) setDailyHistory(JSON.parse(getPlayerDailyHistory))
     }, [])
 
     const boardStates = {
@@ -85,6 +91,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         myShopItems, setMyShopItems,
         dailyStatus, setDailyStatus,
         lastDailyStatus, setLastDailyStatus,
+        dailyHistory, setDailyHistory,
     }
 
     const roomStates = {

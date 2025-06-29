@@ -44,6 +44,8 @@ export default class LoginController extends Controller {
                                     // daily claimed
                                     : 'claimed'
                                 : 'unclaim'
+            // get player daily history
+            const getPlayerDailyHistory = await this.redisGet(`${data[0].display_name}_dailyHistory`)
             // get player coins
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
             // get player shop items
@@ -75,6 +77,7 @@ export default class LoginController extends Controller {
                 player: data[0],
                 dailyStatus: isDailyReset,
                 lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
+                dailyHistory: getPlayerDailyHistory.length > 0 ? getPlayerDailyHistory : null,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 playerShopItems: getPlayerShopItems,
                 token: accessToken,
@@ -115,7 +118,7 @@ export default class LoginController extends Controller {
             const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
             const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
             // get player daily status
-            const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
+            const getPlayerDaily = await this.redisGet(`${renewData.display_name}_dailyStatus`)
             const playerDailyUnix = getPlayerDaily.length > 0 
                                 ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
                                 : 0
@@ -127,13 +130,15 @@ export default class LoginController extends Controller {
                                     // daily claimed
                                     : 'claimed'
                                 : 'unclaim'
+            // get player daily history
+            const getPlayerDailyHistory = await this.redisGet(`${renewData.display_name}_dailyHistory`)
             // get player coins
-            const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
+            const getPlayerCoins = await this.redisGet(`${renewData.display_name}_coins`)
             // get player shop items
-            const getPlayerShopItems = await this.redisGet(`${data[0].display_name}_shopItems`)
+            const getPlayerShopItems = await this.redisGet(`${renewData.display_name}_shopItems`)
             // if empty, create it
             if(getPlayerCoins.length === 0) 
-                await this.redisSet(`${data[0].display_name}_coins`, [0])
+                await this.redisSet(`${renewData.display_name}_coins`, [0])
             // new renew data
             const newRenewData: IPlayer = {
                 ...renewData,
@@ -154,6 +159,7 @@ export default class LoginController extends Controller {
                 player: newRenewData,
                 dailyStatus: isDailyReset,
                 lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
+                dailyHistory: getPlayerDailyHistory.length > 0 ? getPlayerDailyHistory : null,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
                 playerShopItems: getPlayerShopItems,
                 token: accessToken,

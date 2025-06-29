@@ -195,6 +195,8 @@ export interface IGameContext {
     setDailyStatus: Dispatch<SetStateAction<IGameContext['dailyStatus']>>,
     lastDailyStatus: string,
     setLastDailyStatus: Dispatch<SetStateAction<string>>,
+    dailyHistory: Record<'reward_type'|'reward_item'|'reward_date', string>[],
+    setDailyHistory: Dispatch<SetStateAction<IGameContext['dailyHistory']>>,
     myCoins: number,
     setMyCoins: Dispatch<SetStateAction<number>>,
     myShopItems: IMyShopItems[], 

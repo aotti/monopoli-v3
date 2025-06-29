@@ -50,6 +50,10 @@ export default class Controller {
         // this.redisReset('tester123_shopItems')
         // this.redisSet(`tester123_coins`, [50])
         // this.redisReset(`tester123_dailyStatus`)
+        // this.redisSet('acanama_dailyHistory', [
+        //     {reward_type: 'coin', reward_item: '10', reward_date: 'Friday, 6/27/2025'},
+        //     {reward_type: 'pack', reward_item: 'yoga lupa', reward_date: 'Saturday, 6/28/2025'},
+        // ])
     }
 
     protected chattingPublish(channel: string, data: any) {

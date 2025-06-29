@@ -206,6 +206,7 @@ export default class PlayerController extends Controller {
         const playerDailyUnix = getPlayerDaily.length > 0 
                                 ? Math.floor(new Date(getPlayerDaily[0].split('; ')[0]).getTime() / 1000)
                                 : 0
+        const getPlayerDailyHistory = await this.redisGet(`${payload.display_name}_dailyHistory`)
         // have user claimed today's reward
         if(getPlayerDaily.length === 0 || (getPlayerDaily.length > 0 && currentDayUnix > playerDailyUnix)) {
             // player havent claim reward
@@ -232,10 +233,20 @@ export default class PlayerController extends Controller {
                 await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
                 // update player daily status
                 await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
+                // update player daily history
+                const newRewardHistory = {
+                    reward_type: `coin`, 
+                    reward_item: `${payload.item_name}`, 
+                    reward_date: todayDate
+                }
+                await this.redisSet(`${payload.display_name}_dailyHistory`, [
+                    ...getPlayerDailyHistory, newRewardHistory
+                ])
                 // set result data
                 const resultData = {
                     token: token,
                     dailyStatus: 'claimed',
+                    dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
                     playerCoins: gainCoins,
                 }
                 result = this.respond(200, `${action} success`, [resultData])
@@ -270,10 +281,20 @@ export default class PlayerController extends Controller {
                                     await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
                                     // update player daily status
                                     await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
+                                    // update player daily history
+                                    const newRewardHistory = {
+                                        reward_type: `${data.type} (convert)`, 
+                                        reward_item: `${data.items[isItemDataExist]} (10 coins)`, 
+                                        reward_date: todayDate
+                                    }
+                                    await this.redisSet(`${payload.display_name}_dailyHistory`, [
+                                        ...getPlayerDailyHistory, newRewardHistory
+                                    ])
                                     // set result data
                                     const resultData = {
                                         token: token,
                                         dailyStatus: 'claimed',
+                                        dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
                                         playerCoins: gainCoins
                                     }
                                     result = this.respond(200, `${action} success`, [resultData])
@@ -288,7 +309,7 @@ export default class PlayerController extends Controller {
                                     if(data.items[isItemDataExist].match(specialCardRegex)) itemType = 'special_card'
                                     else if(data.items[isItemDataExist].match(buffRegex)) itemType = 'buff'
                                     // wtf this card not exist
-                                    else return this.respond(400, 'puella magi madocka madicka 2', [])
+                                    else return this.respond(400, 'puella magi madocka madicka 3', [])
                                     // store stop items
                                     const ownedItems = await this.storeShopItems(getPlayerShopItems, {
                                         displayName: payload.display_name, 
@@ -297,10 +318,20 @@ export default class PlayerController extends Controller {
                                     })
                                     // update player daily status
                                     await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
+                                    // update player daily history
+                                    const newRewardHistory = {
+                                        reward_type: `${data.type}`, 
+                                        reward_item: `${data.items[isItemDataExist]}`, 
+                                        reward_date: todayDate
+                                    }
+                                    await this.redisSet(`${payload.display_name}_dailyHistory`, [
+                                        ...getPlayerDailyHistory, newRewardHistory
+                                    ])
                                     // set result data
                                     const resultData = {
                                         token: token,
                                         dailyStatus: 'claimed',
+                                        dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
                                         playerShopItems: ownedItems
                                     }
                                     result = this.respond(200, `${action} success`, [resultData])
@@ -315,7 +346,7 @@ export default class PlayerController extends Controller {
                                 if(data.items[isItemDataExist].match(specialCardRegex)) itemType = 'special_card'
                                 else if(data.items[isItemDataExist].match(buffRegex)) itemType = 'buff'
                                 // wtf this card not exist
-                                else return this.respond(400, 'puella magi madocka madicka 2', [])
+                                else return this.respond(400, 'puella magi madocka madicka 3', [])
                                 // store stop items
                                 const ownedItems = await this.storeShopItems(getPlayerShopItems, {
                                     displayName: payload.display_name, 
@@ -324,10 +355,20 @@ export default class PlayerController extends Controller {
                                 })
                                 // update player daily status
                                 await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
+                                // update player daily history
+                                const newRewardHistory = {
+                                    reward_type: `${data.type}`, 
+                                    reward_item: `${data.items[isItemDataExist]}`, 
+                                    reward_date: todayDate
+                                }
+                                await this.redisSet(`${payload.display_name}_dailyHistory`, [
+                                    ...getPlayerDailyHistory, newRewardHistory
+                                ])
                                 // set result data
                                 const resultData = {
                                     token: token,
                                     dailyStatus: 'claimed',
+                                    dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
                                     playerShopItems: ownedItems
                                 }
                                 result = this.respond(200, `${action} success`, [resultData])

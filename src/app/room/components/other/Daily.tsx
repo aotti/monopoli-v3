@@ -27,6 +27,12 @@ export default function Daily() {
     // if today > last day, then continue last week reward
     // else assume its week 2 reward
     const currentWeek = +lastDayNumber < +currentDayNumber ? +lastWeekNumber : 2
+    
+    const convertDate = (rewardDate: string) => {
+        const [day, date] = rewardDate.split(', ')
+        const newDate = new Date(date).toLocaleString('id', {day: 'numeric', month: 'numeric', year: 'numeric'})
+        return `${day}, ${newDate}`
+    }
 
     // drag scroll
     const dailyRewardsBody = useRef<HTMLDivElement>()
@@ -57,7 +63,7 @@ export default function Daily() {
             <div className="flex justify-center border-b-2">
                 <span> daily rewards </span>
             </div>
-            {/* body */}
+            {/* body rewards */}
             <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-hidden select-none"
             onMouseDown={startDragging} onMouseMove={move} onMouseUp={stopDragging} onMouseLeave={stopDragging}>
                 {dailyRewards.map(v => {
@@ -73,7 +79,7 @@ export default function Daily() {
 
                             return <RewardItem key={i} rewardData={rewardData} />
                         })
-                    : null
+                        : null
                 })}
                 {/* notif */}
                 <div className="absolute w-[calc(60vw-1rem)] lg:w-[calc(50vw-1rem)] h-20">
@@ -86,6 +92,30 @@ export default function Daily() {
                     <div className="flex flex-col gap-1 border-8bit-text bg-darkblue-1 text-center p-1">
                         <span> roll pack </span>
                         <div className="slot relative z-10 text-[10px] lg:text-xs p-1 w-48 lg:w-48 h-6 lg:h-6 bg-darkblue-2 overflow-y-hidden border-2"></div>
+                    </div>
+                </div>
+            </div>
+            {/* body history */}
+            <div className="flex flex-col">
+                <p className="text-center"> history </p>
+                <div className="grid grid-cols-4 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll border-2">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-orange-300 border-b"> type </span>
+                        {gameState.dailyHistory 
+                            ? gameState.dailyHistory.map((v,i) => <span key={i}> {v.reward_type} </span>)
+                            : null}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <span className="text-orange-300 border-b"> item </span>
+                        {gameState.dailyHistory 
+                            ? gameState.dailyHistory.map((v,i) => <span key={i}> {v.reward_item} </span>)
+                            : null}
+                    </div>
+                    <div className="col-span-2 flex flex-col gap-2">
+                        <span className="text-orange-300 border-b"> date </span>
+                        {gameState.dailyHistory 
+                            ? gameState.dailyHistory.map((v,i) => <span key={i}> {convertDate(v.reward_date)} </span>)
+                            : null}
                     </div>
                 </div>
             </div>

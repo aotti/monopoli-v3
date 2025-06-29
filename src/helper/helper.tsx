@@ -151,6 +151,8 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('cityOwnedList')
     localStorage.removeItem('playerCoins')
     localStorage.removeItem('playerShopItems')
+    localStorage.removeItem('dailyStatus')
+    localStorage.removeItem('dailyHistory')
     // remove player info
     gameState.setMyPlayerInfo({
         display_name: 'guest',
@@ -170,6 +172,10 @@ export function resetAllData(gameState: IGameContext) {
     gameState.setMyCoins(0)
     // remove player shop items
     gameState.setMyShopItems(null)
+    // remove daily states
+    gameState.setDailyStatus(null)
+    gameState.setLastDailyStatus(null)
+    gameState.setDailyHistory(null)
 }
 /**
  * @returns [null, data] or [error]
@@ -392,7 +398,7 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
         // response
         switch(renewResponse.status) {
             case 200: 
-                const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus} = renewResponse.data[0]
+                const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus, dailyHistory} = renewResponse.data[0]
                 // save access token
                 localStorage.setItem('accessToken', token)
                 // set my player data
@@ -408,6 +414,9 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 gameState.setDailyStatus(dailyStatus)
                 // set last daily status
                 gameState.setLastDailyStatus(lastDailyStatus)
+                // update daily history
+                localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
+                gameState.setDailyHistory(dailyHistory)
                 // set player coins
                 localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
                 gameState.setMyCoins(playerCoins)

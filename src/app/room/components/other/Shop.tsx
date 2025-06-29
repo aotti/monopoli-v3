@@ -38,7 +38,7 @@ export default function Shop() {
                     <div className="grid grid-cols-6 gap-1 lg:gap-2 text-center">
                         {specialCardItems.map((v,i) => {
                             const specialCardItemData = {
-                                name: translateUI({lang: miscState.language, text: v.name as any}),
+                                name: v.name,
                                 description: translateUI({lang: miscState.language, text: v.description as any}),
                                 price: v.price
                             }

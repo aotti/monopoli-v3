@@ -86,7 +86,7 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
     // response
     switch(loginResponse.status) {
         case 200: 
-            const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus} = loginResponse.data[0]
+            const {token, player, onlinePlayers, playerCoins, playerShopItems, dailyStatus, lastDailyStatus, dailyHistory} = loginResponse.data[0]
             // save access token
             localStorage.setItem('accessToken', token)
             // set my player data
@@ -99,6 +99,9 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             gameState.setDailyStatus(dailyStatus)
             // set last daily status
             gameState.setLastDailyStatus(lastDailyStatus)
+            // update daily history
+            localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
+            gameState.setDailyHistory(dailyHistory)
             // set player coins
             localStorage.setItem('playerCoins', JSON.stringify(playerCoins))
             gameState.setMyCoins(playerCoins)

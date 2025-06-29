@@ -632,12 +632,15 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, mis
             // stop loading claim
             clearInterval(loadingClaimInterval)
             // destruct data
-            const {token, dailyStatus, playerCoins, playerShopItems} = claimDailyResponse.data[0]
+            const {token, dailyStatus, dailyHistory, playerCoins, playerShopItems} = claimDailyResponse.data[0]
             // save access token
             if(token) localStorage.setItem('accessToken', token)
             // update daily status
             localStorage.setItem('dailyStatus', dailyStatus)
             gameState.setDailyStatus(dailyStatus)
+            // update daily history
+            localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
+            gameState.setDailyHistory(dailyHistory)
             // update player coins if exist
             if(playerCoins) {
                 // set player coins
