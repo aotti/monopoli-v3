@@ -98,7 +98,7 @@ export default function Daily() {
             {/* body history */}
             <div className="flex flex-col">
                 <p className="text-center"> history </p>
-                <div className="grid grid-cols-4 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll border-2">
+                <div className="grid grid-cols-4 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll">
                     <div className="flex flex-col gap-2">
                         <span className="text-orange-300 border-b"> type </span>
                         {gameState.dailyHistory 
