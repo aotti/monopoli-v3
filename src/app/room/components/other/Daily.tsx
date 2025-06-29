@@ -64,7 +64,7 @@ export default function Daily() {
                 <span> daily rewards </span>
             </div>
             {/* body rewards */}
-            <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-hidden select-none"
+            <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-scroll lg:overflow-x-hidden select-none"
             onMouseDown={startDragging} onMouseMove={move} onMouseUp={stopDragging} onMouseLeave={stopDragging}>
                 {dailyRewards.map(v => {
                     return v.week === currentWeek
