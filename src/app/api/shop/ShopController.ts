@@ -49,7 +49,7 @@ export default class ShopController extends Controller {
                 return {status: 400, message: `already have this item`, data: []} as IResponse
 
             // is player already have 2 items per type
-            const isItemPerTypeOnLimit = getPlayerShopItems[findItemKey][itemType].length === 2
+            const isItemPerTypeOnLimit = getPlayerShopItems[findItemKey][itemType].length >= 2
             if(isItemPerTypeOnLimit)
                 return {status: 400, message: `only allowed to have 2 items per type`, data: []} as IResponse
         }
