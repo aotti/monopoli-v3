@@ -40,7 +40,7 @@ export default class ShopController extends Controller {
         // is player already have the item
         const getPlayerShopItems: IGameContext['myShopItems'] = await this.redisGet(`${displayName}_shopItems`)
         // check item list
-        const findItemKey = Object.keys(getPlayerShopItems).indexOf(itemType)
+        const findItemKey = getPlayerShopItems.map(v => Object.keys(v)).flat().indexOf(itemType)
         // found item type
         if(findItemKey !== -1) {
             const isItemOwned = getPlayerShopItems[findItemKey][itemType].indexOf(itemName)

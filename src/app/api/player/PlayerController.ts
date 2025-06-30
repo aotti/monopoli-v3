@@ -236,7 +236,7 @@ export default class PlayerController extends Controller {
                 // update player daily history
                 const newRewardHistory = {
                     reward_type: `coin`, 
-                    reward_item: `${payload.item_name}`, 
+                    reward_item: `10`, 
                     reward_date: todayDate
                 }
                 await this.redisSet(`${payload.display_name}_dailyHistory`, [
