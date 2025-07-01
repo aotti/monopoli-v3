@@ -12,7 +12,7 @@
                 {
                     "type": "pack",
                     "name": "special card pack",
-                    "items": ["nerf tax", "anti prison", "gaming dice"]
+                    "items": ["nerf tax", "gaming dice", "attack city"]
                 },
                 {
                     "type": "coin",
@@ -53,7 +53,7 @@
                 {
                     "type": "pack",
                     "name": "special card pack",
-                    "items": ["dice controller", "attack city", "upgrade city"]
+                    "items": ["anti prison", "dice controller", "upgrade city"]
                 },
                 {
                     "type": "coin",

@@ -62,6 +62,7 @@ export default function Daily() {
             {/* head */}
             <div className="flex justify-center border-b-2">
                 <span> daily rewards </span>
+                <span className="absolute right-0"> {today?.slice(0,3)} </span>
             </div>
             {/* body rewards */}
             <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-scroll lg:overflow-x-hidden select-none"
