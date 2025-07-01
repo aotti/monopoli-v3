@@ -156,7 +156,7 @@ function RewardItem({ rewardData }) {
             {/* reward item */}
             <div data-tooltip={itemsTooltip} className={`flex flex-col items-center w-20 h-20 rounded-lg p-1 
             ${today === day ?  'bg-success' : 'bg-darkblue-2'} cursor-pointer hover:bg-opacity-75`} 
-            onClick={() => claimButtonRef.current.click()}>
+            onClick={() => claimButtonRef.current.click()} onTouchStart={() => claimButtonRef.current.click()}>
                 <span className={today === day ?  'text-black' : ''}> {day} </span>
                 <img id={`reward_${day}`} src={rewardImg} alt={name} className="inline !w-8 !h-8" draggable={false} />
                 <span className={today === day ?  'text-black' : ''}> {name} </span>
