@@ -37,7 +37,7 @@
                 {
                     "type": "pack",
                     "name": "lemao pack",
-                    "items": ["curse reverser", "attack city", "upgrade city", "the void", "the twond"]
+                    "items": ["curse reverser", "upgrade city", "the void", "the twond"]
                 }
             ]
         },
@@ -78,7 +78,7 @@
                 {
                     "type": "pack",
                     "name": "lemao pack",
-                    "items": ["curse reverser", "attack city", "upgrade city", "the void", "the twond"]
+                    "items": ["curse reverser", "attack city", "the void", "the twond"]
                 }
             ]
         }

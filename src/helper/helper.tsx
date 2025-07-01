@@ -513,6 +513,18 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
         // ### LALU CEK X AXIS, LALU CEK JUMLAH ROWS
         // ### JIKA ROWS <= 2, MAKA PILIH KANAN/KIRI, SELAIN ITU ATAS/BAWAH 
         switch(true) {
+            case elementPos.bottom >= 190:
+                // place left / right if rows == 2
+                if(elementPos.right >= 190 && rows == 2)
+                    ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                else if(elementPos.left >= 190 && rows == 2) 
+                    ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                // place bottom if rows > 2
+                else {
+                    // bottom | bottom-lg
+                    ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
+                }
+                return
             case elementPos.top >= 190:
                 // place left / right if rows == 2
                 if(elementPos.right >= 190 && rows == 2)
@@ -526,18 +538,6 @@ export function applyTooltip(ev: PointerEvent<HTMLElement>) {
                     if(rows === 4) ['tooltip-top-50', 'tooltip-top-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                     if(rows === 6) ['tooltip-top-75', 'tooltip-top-75-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                     if(rows === 8) ['tooltip-top-100', 'tooltip-top-100-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                }
-                return
-            case elementPos.bottom >= 190:
-                // place left / right if rows == 2
-                if(elementPos.right >= 190 && rows == 2)
-                    ['tooltip-right-50', 'tooltip-right-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                else if(elementPos.left >= 190 && rows == 2) 
-                    ['tooltip-left-50', 'tooltip-left-50-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
-                // place bottom if rows > 2
-                else {
-                    // bottom | bottom-lg
-                    ['tooltip-bottom', 'tooltip-bottom-lg'].map(cls => ev.currentTarget.classList.toggle(cls))
                 }
                 return
             default: 
