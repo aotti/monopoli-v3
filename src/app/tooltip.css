@@ -16,7 +16,7 @@
             margin-top: 3rem;
             margin-left: -7rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     
         /* top 25/50/75/100 = adjust margin top */
@@ -34,7 +34,7 @@
             margin-top: -3.5rem;
             margin-left: -7rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     
         .tooltip-top-50-lg[data-tooltip]::after {
@@ -51,7 +51,7 @@
             margin-top: -6rem;
             margin-left: -7rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     
         .tooltip-top-75-lg[data-tooltip]::after {
@@ -68,7 +68,7 @@
             margin-top: -8.5rem;
             margin-left: -7rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     
         .tooltip-top-100-lg[data-tooltip]::after {
@@ -85,7 +85,7 @@
             margin-top: -11rem;
             margin-left: -7rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     
         /* right 50 / 100 = adjust margin top */
@@ -103,7 +103,7 @@
             margin-top: 0;
             margin-left: 1rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     
         .tooltip-right-100-lg[data-tooltip]::after {
@@ -120,7 +120,7 @@
             margin-top: -3rem;
             margin-left: 1rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
         
         /* left 50 / 100 = adjust margin top */
@@ -138,7 +138,7 @@
             margin-top: 0;
             margin-left: -14rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
         
         .tooltip-left-100-lg[data-tooltip]::after {
@@ -155,7 +155,7 @@
             margin-top: -3rem;
             margin-left: -14rem;
             width: 10rem;
-            font-size: smaller;
+            font-size: 98%;
         }
     }
     

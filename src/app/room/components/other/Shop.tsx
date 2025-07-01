@@ -65,9 +65,9 @@ export default function Shop() {
                     </div>
                 </div>
                 {/* notif */}
-                <div className="absolute w-[calc(50vw-1rem)] h-[calc(50vh-1rem)]">
+                <div className="absolute w-[calc(100%-1rem)] h-[calc(50vh-1rem)]">
                     <div className="flex items-center justify-center h-full">
-                        <p id="result_shop" className="hidden relative z-10 border-8bit-text bg-darkblue-1 text-center p-1"></p>
+                        <p id="result_shop" className="hidden relative z-10 w-56 border-8bit-text bg-darkblue-1 text-center p-1"></p>
                     </div>
                 </div>
             </div>

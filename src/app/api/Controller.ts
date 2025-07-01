@@ -48,7 +48,7 @@ export default class Controller {
         // ])
         // this.redisSet('gameQuakeCity_207', ['Palembang', 'Special-4'])
         // this.redisReset('tester123_shopItems')
-        // this.redisSet(`tester123_coins`, [50])
+        // this.redisSet(`tester123_coins`, [100])
         // this.redisReset(`tester123_dailyStatus`)
         // this.redisSet('acanama_dailyHistory', [
         //     {reward_type: 'coin', reward_item: '10', reward_date: 'Friday, 6/27/2025'},

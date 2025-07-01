@@ -14,7 +14,7 @@ export default function Daily() {
     // ### MAKA DIANGGAP Monday-8 (week 2)
     // ### TAPI, JIKA PLAYER LOGIN Tuesday WALAUPUN SUDAH MASUK week 2
     // ### AKAN DIANGGAP Tuesday-2 (week 1)
-    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const today = new Date().toLocaleString('en', {weekday: 'long'})
     const dayOfWeek = {
         week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
         week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
@@ -62,6 +62,7 @@ export default function Daily() {
             {/* head */}
             <div className="flex justify-center border-b-2">
                 <span> daily rewards </span>
+                <span className="absolute right-0"> {today?.slice(0,3)} </span>
             </div>
             {/* body rewards */}
             <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-scroll lg:overflow-x-hidden select-none"
@@ -139,7 +140,7 @@ function RewardItem({ rewardData }) {
     const gameState = useGame()
 
     const {week, day, name, type, items} = rewardData
-    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const today = new Date().toLocaleString('en', {weekday: 'long'})
     const rewardImg = `https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=${today == day ? '000000' : 'FFFFFF'}`
     const itemsTooltip = type == 'pack' ? items.join('\n') : null
 
@@ -162,7 +163,7 @@ function RewardItem({ rewardData }) {
             </div>
             {/* claim button */}
             <div className={`${today === day && gameState.dailyStatus == 'unclaim' ?  'text-green-300' : 'invisible'} text-[10px] w-20`}>
-                <button ref={claimButtonRef} id="daily_claim_button" type="submit" className="w-full">
+                <button ref={claimButtonRef} id="daily_claim_button" type="submit" className="w-full hover:animate-jump">
                     {today === day ?  'claim' : ''}
                 </button>
             </div>
