@@ -198,7 +198,7 @@ export default class PlayerController extends Controller {
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
 
-        const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+        const todayDate = new Date().toLocaleString('en', {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
         const currentDay = todayDate.split(', ')[0]
         const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
         // get player daily status

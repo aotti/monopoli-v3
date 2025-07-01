@@ -29,7 +29,7 @@ export default class LoginController extends Controller {
             else result = this.respond(500, error.message, [])
         }
         else if(data) {
-            const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+            const todayDate = new Date().toLocaleString('en', {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
             const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
             // get player daily status
             const getPlayerDaily = await this.redisGet(`${data[0].display_name}_dailyStatus`)
@@ -115,7 +115,7 @@ export default class LoginController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            const todayDate = new Date().toLocaleString([], {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
+            const todayDate = new Date().toLocaleString('en', {day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'})
             const currentDayUnix = Math.floor(new Date(todayDate).getTime() / 1000)
             // get player daily status
             const getPlayerDaily = await this.redisGet(`${renewData.display_name}_dailyStatus`)
