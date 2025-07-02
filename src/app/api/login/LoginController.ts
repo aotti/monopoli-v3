@@ -76,6 +76,8 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: data[0],
                 dailyStatus: isDailyReset,
+                // lastDailyStatus for setting daily rewards, 
+                // if it saved in cookie/localStorage, players can modify the rewards
                 lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
                 dailyHistory: getPlayerDailyHistory.length > 0 ? getPlayerDailyHistory : null,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
@@ -158,6 +160,8 @@ export default class LoginController extends Controller {
             const resultData = {
                 player: newRenewData,
                 dailyStatus: isDailyReset,
+                // lastDailyStatus for setting daily rewards, 
+                // if it saved in cookie/localStorage, players can modify the rewards
                 lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
                 dailyHistory: getPlayerDailyHistory.length > 0 ? getPlayerDailyHistory : null,
                 playerCoins: getPlayerCoins.length > 0 ?  getPlayerCoins[0] : 0,
