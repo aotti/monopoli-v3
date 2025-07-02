@@ -31,7 +31,7 @@ export default function Daily() {
     const convertDate = (rewardDate: string) => {
         const [day, date] = rewardDate.split(', ')
         const newDate = new Date(date).toLocaleString('id', {day: 'numeric', month: 'numeric', year: 'numeric'})
-        return `${day}, ${newDate}`
+        return `${translateUI({lang: miscState.language, text: day as any})}, ${newDate}`
     }
 
     // drag scroll
@@ -61,8 +61,10 @@ export default function Daily() {
         ${miscState.animation ? 'animate-zoom-in' : 'animate-zoom-out'}`}>
             {/* head */}
             <div className="flex justify-center border-b-2">
-                <span> daily rewards </span>
-                <span className="absolute right-0"> {today?.slice(0,3)} </span>
+                <span> {translateUI({lang: miscState.language, text: 'daily rewards'})} </span>
+                <span className="absolute right-0">
+                    {translateUI({lang: miscState.language, text: today as any})?.slice(0,3)}
+                </span>
             </div>
             {/* body rewards */}
             <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-scroll lg:overflow-x-hidden select-none"
@@ -91,29 +93,43 @@ export default function Daily() {
                 {/* roll prize */}
                 <div id="roll_pack" className="hidden absolute z-10 items-center justify-center w-[calc(60vw-.5rem)] lg:w-[calc(50vw-.5rem)] h-32 bg-black/50">
                     <div className="flex flex-col gap-1 border-8bit-text bg-darkblue-1 text-center p-1">
-                        <span> roll pack </span>
+                        <span> {translateUI({lang: miscState.language, text: 'roll pack'})} </span>
                         <div className="slot relative z-10 text-[10px] lg:text-xs p-1 w-48 lg:w-48 h-6 lg:h-6 bg-darkblue-2 overflow-y-hidden border-2"></div>
                     </div>
                 </div>
             </div>
             {/* body history */}
             <div className="flex flex-col">
-                <p className="text-center"> history </p>
+                <div className="flex gap-2 justify-center">
+                    <span className="w-full h-0 my-auto border"></span>
+                    <span> {translateUI({lang: miscState.language, text: 'history'})} </span>
+                    <span className="w-full h-0 my-auto border"></span>
+                </div>
                 <div className="grid grid-cols-5 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll">
                     <div className="flex flex-col gap-2">
-                        <span className="text-orange-300 border-b"> type </span>
+                        <span className="text-orange-300 border-b"> 
+                            {translateUI({lang: miscState.language, text: 'type'})} 
+                        </span>
                         {gameState.dailyHistory 
-                            ? gameState.dailyHistory.map((v,i) => <span key={i}> {v.reward_type} </span>)
+                            ? gameState.dailyHistory.map((v,i) => <span key={i}>
+                                {translateUI({lang: miscState.language, text: v.reward_type as any})}
+                            </span>)
                             : null}
                     </div>
                     <div className="col-span-2 flex flex-col gap-2">
-                        <span className="text-orange-300 border-b"> item </span>
+                        <span className="text-orange-300 border-b"> 
+                            {translateUI({lang: miscState.language, text: 'item'})} 
+                        </span>
                         {gameState.dailyHistory 
-                            ? gameState.dailyHistory.map((v,i) => <span key={i}> {v.reward_item} </span>)
+                            ? gameState.dailyHistory.map((v,i) => <span key={i}>
+                                {translateUI({lang: miscState.language, text: v.reward_item as any}) || v.reward_item}
+                            </span>)
                             : null}
                     </div>
                     <div className="col-span-2 flex flex-col gap-2">
-                        <span className="text-orange-300 border-b"> date </span>
+                        <span className="text-orange-300 border-b">
+                            {translateUI({lang: miscState.language, text: 'date'})}
+                        </span>
                         {gameState.dailyHistory 
                             ? gameState.dailyHistory.map((v,i) => <span key={i}> {convertDate(v.reward_date)} </span>)
                             : null}
@@ -157,14 +173,18 @@ function RewardItem({ rewardData }) {
             <div data-tooltip={itemsTooltip} className={`flex flex-col items-center w-20 h-20 rounded-lg p-1 
             ${today === day ?  'bg-success' : 'bg-darkblue-2'} cursor-pointer hover:bg-opacity-75`} 
             onClick={() => claimButtonRef.current.click()}>
-                <span className={today === day ?  'text-black' : ''}> {day} </span>
+                <span className={today === day ?  'text-black' : ''}>
+                    {translateUI({lang: miscState.language, text: day as any})}
+                </span>
                 <img id={`reward_${day}`} src={rewardImg} alt={name} className="inline !w-8 !h-8" draggable={false} />
-                <span className={today === day ?  'text-black' : ''}> {name} </span>
+                <span className={today === day ?  'text-black' : ''}>
+                    {translateUI({lang: miscState.language, text: name as any})}
+                </span>
             </div>
             {/* claim button */}
             <div className={`${today === day && gameState.dailyStatus == 'unclaim' ?  'text-green-300' : 'invisible'} text-[10px] w-20`}>
                 <button ref={claimButtonRef} id="daily_claim_button" type="submit" className="w-full hover:animate-jump">
-                    {today === day ?  'claim' : ''}
+                    {today === day ?  translateUI({lang: miscState.language, text: 'claim'}) : ''}
                 </button>
             </div>
         </form>

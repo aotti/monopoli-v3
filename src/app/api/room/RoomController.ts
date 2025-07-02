@@ -146,6 +146,8 @@ export default class RoomController extends Controller {
             const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
             // set result
             const resultData = {
+                // lastDailyStatus for setting daily rewards, 
+                // if it saved in cookie/localStorage, players can modify the rewards
                 lastDailyStatus: getPlayerDaily.length > 0 ? getPlayerDaily[0].split('; ')[0] : null, 
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
                 roomListInfo: roomListInfo,

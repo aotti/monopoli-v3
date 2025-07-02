@@ -214,8 +214,6 @@ export default class PlayerController extends Controller {
             const dailyRewards = daily_rewards.data
             const getPlayerCoins = await this.redisGet(`${payload.display_name}_coins`)
             // set day number
-            // ### KIRIM DATA lastDailyStatus SETIAP GET ROOM LIST
-            // ### DATA TSB TIDAK BOLEH DISIMPAN DI localStorage
             const dayOfWeek = {
                 week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
                 week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
@@ -239,9 +237,11 @@ export default class PlayerController extends Controller {
                     reward_item: `10`, 
                     reward_date: todayDate
                 }
-                await this.redisSet(`${payload.display_name}_dailyHistory`, [
-                    ...getPlayerDailyHistory, newRewardHistory
-                ])
+                // save daily history
+                const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                // if history length > 30, remove 1st index
+                if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                 // set result data
                 const resultData = {
                     token: token,
@@ -287,9 +287,11 @@ export default class PlayerController extends Controller {
                                         reward_item: `${data.items[isItemDataExist]} (10 coins)`, 
                                         reward_date: todayDate
                                     }
-                                    await this.redisSet(`${payload.display_name}_dailyHistory`, [
-                                        ...getPlayerDailyHistory, newRewardHistory
-                                    ])
+                                    // save daily history
+                                    const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                                    // if history length > 30, remove 1st index
+                                    if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                                    await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                                     // set result data
                                     const resultData = {
                                         token: token,
@@ -324,9 +326,11 @@ export default class PlayerController extends Controller {
                                         reward_item: `${data.items[isItemDataExist]}`, 
                                         reward_date: todayDate
                                     }
-                                    await this.redisSet(`${payload.display_name}_dailyHistory`, [
-                                        ...getPlayerDailyHistory, newRewardHistory
-                                    ])
+                                    // save daily history
+                                    const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                                    // if history length > 30, remove 1st index
+                                    if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                                    await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                                     // set result data
                                     const resultData = {
                                         token: token,
@@ -361,9 +365,11 @@ export default class PlayerController extends Controller {
                                     reward_item: `${data.items[isItemDataExist]}`, 
                                     reward_date: todayDate
                                 }
-                                await this.redisSet(`${payload.display_name}_dailyHistory`, [
-                                    ...getPlayerDailyHistory, newRewardHistory
-                                ])
+                                // save daily history
+                                const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                                // if history length > 30, remove 1st index
+                                if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                                await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                                 // set result data
                                 const resultData = {
                                     token: token,
