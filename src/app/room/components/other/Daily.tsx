@@ -183,7 +183,7 @@ function RewardItem({ rewardData }) {
             </div>
             {/* claim button */}
             <div className={`${today === day && gameState.dailyStatus == 'unclaim' ?  'text-green-300' : 'invisible'} text-[10px] w-20`}>
-                <button ref={claimButtonRef} id="daily_claim_button" type="submit" className="w-full hover:animate-jump">
+                <button ref={claimButtonRef} id={`daily_claim_button_${day}`} type="submit" className="w-full hover:animate-jump">
                     {today === day ?  translateUI({lang: miscState.language, text: 'claim'}) : ''}
                 </button>
             </div>

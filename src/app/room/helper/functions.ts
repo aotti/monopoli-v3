@@ -578,7 +578,7 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
     }
 }
     
-export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, miscState: IMiscContext, gameState: IGameContext) {
+export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     
     const today = new Date().toLocaleString([], {weekday: 'long'})
@@ -586,7 +586,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, mis
     // result message
     const resultMessage = qS('#result_daily')
     // claim button
-    const claimButton = qS('#daily_claim_button') as HTMLButtonElement
+    const claimButton = qS(`#daily_claim_button_${day}`) as HTMLButtonElement
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
@@ -612,6 +612,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData, mis
     }
     // loading claim button
     let loadingIncrement = 3
+    claimButton.disabled = true
     const loadingClaimInterval = setInterval(() => {
         if(loadingIncrement === 3) {
             claimButton.textContent = '.'
