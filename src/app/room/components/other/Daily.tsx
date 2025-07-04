@@ -14,7 +14,7 @@ export default function Daily() {
     // ### MAKA DIANGGAP Monday-8 (week 2)
     // ### TAPI, JIKA PLAYER LOGIN Tuesday WALAUPUN SUDAH MASUK week 2
     // ### AKAN DIANGGAP Tuesday-2 (week 1)
-    const today = new Date().toLocaleString('en', {weekday: 'long'})
+    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const dayOfWeek = {
         week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
         week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
@@ -156,7 +156,7 @@ function RewardItem({ rewardData }) {
     const gameState = useGame()
 
     const {week, day, name, type, items} = rewardData
-    const today = new Date().toLocaleString('en', {weekday: 'long'})
+    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const rewardImg = `https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=${today == day ? '000000' : 'FFFFFF'}`
     const itemsTooltip = type == 'pack' ? items.join('\n') : null
 
