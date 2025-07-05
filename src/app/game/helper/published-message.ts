@@ -252,7 +252,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         setTimeout(() => {
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
-        }, 2000);
+        }, 1000);
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player_name == gameState.myPlayerInfo.display_name) {
@@ -260,8 +260,14 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 const newPlayerInfo = gameState.myPlayerInfo
                 newPlayerInfo.game_played += 1
                 newPlayerInfo.worst_money_lost = v.worst_money === -999999 
+                                                // player won
                                                 ? newPlayerInfo.worst_money_lost 
-                                                : v.worst_money
+                                                // player lost, but is lost money < worst money
+                                                : v.worst_money < newPlayerInfo.worst_money_lost
+                                                    // yes, lost money is worst than current
+                                                    ? v.worst_money
+                                                    // nope
+                                                    : newPlayerInfo.worst_money_lost
                 // save to local storage
                 localStorage.setItem('playerData', JSON.stringify(newPlayerInfo))
                 // update player coins

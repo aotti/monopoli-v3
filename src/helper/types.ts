@@ -587,6 +587,7 @@ interface IEventCursed {
     event: 'cursed',
     money: number,
     takeMoney?: string,
+    card?: string,
 }
 
 interface IEventSpecial {

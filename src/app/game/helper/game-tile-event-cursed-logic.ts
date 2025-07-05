@@ -32,7 +32,8 @@ export function stopByCursedCity(findPlayer: number, tileElement: HTMLElement, m
         resolve({
             event: 'cursed',
             money: specialEffect || -cityPrice,
-            takeMoney: specialEffect ? `${specialEffect};${otherPlayerNames}` : null
+            takeMoney: specialEffect ? `${specialEffect};${otherPlayerNames}` : null,
+            card: specialCard
         })
     })
 }

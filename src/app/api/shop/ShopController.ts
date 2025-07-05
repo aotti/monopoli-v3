@@ -84,7 +84,9 @@ export default class ShopController extends Controller {
         // item type exist
         else {
             const itemList = setPlayerShopItems[isItemTypeExist][itemType]
-            setPlayerShopItems[isItemTypeExist][itemType] = [...itemList, itemName]
+            // filter duplicate items
+            const filteredShopItems = [...itemList, itemName].filter((v,i,arr) => arr.indexOf(v) === i)
+            setPlayerShopItems[isItemTypeExist][itemType] = filteredShopItems
         }
         // update player shop items
         await this.redisSet(`${displayName}_shopItems`, setPlayerShopItems)
