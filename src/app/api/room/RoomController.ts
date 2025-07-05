@@ -171,12 +171,29 @@ export default class RoomController extends Controller {
         // renew log online player
         const onlinePlayers = await this.getOnlinePlayers(tpayload, payload.user_agent)
         if(onlinePlayers.status !== 200) return onlinePlayers
+
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
         // filter room name
         const filterRoomList = await this.filterRoomList('check', payload.room_name)
         if(filterRoomList.status !== 200) return filterRoomList
+
+        // check shop items
+        const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.creator}_shopItems`)
+        const shopItemList = {
+            special_card: [],
+            buff: [],
+        }
+        // fill shop item list
+        const shopItemKeys = Object.keys(shopItemList)
+        for(let key of shopItemKeys) {
+            const isKeyExist = getShopItems.map(v => Object.keys(v)).flat().indexOf(key)
+            // shop item exist, set value
+            if(isKeyExist !== -1) 
+                shopItemList[key] = getShopItems[isKeyExist][key]
+        }
+
         // destruct rules props
         const { select_board, select_dice, select_money_start, select_money_lose, 
             select_mode, select_curse, select_max_player, select_character } = payload
@@ -199,7 +216,9 @@ export default class RoomController extends Controller {
                 tmp_password: payloadValues.room_password,
                 tmp_money_start: payloadValues.money_start,
                 tmp_rules: payloadValues.rules,
-                tmp_character: payloadValues.character
+                tmp_character: payloadValues.character,
+                tmp_special_card: shopItemList.special_card.length > 0 ? shopItemList.special_card.join(';') : null,
+                tmp_buff: shopItemList.buff.length > 0 ? shopItemList.buff.join(';') : null,
             }
         }
         // run query
@@ -295,6 +314,7 @@ export default class RoomController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+
         // check disabled characters
         const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
         const isCharacterDisabled = getDisabledCharacters.indexOf(payload.select_character)
@@ -305,6 +325,7 @@ export default class RoomController extends Controller {
         if(!rateLimitResult.success) {
             return this.respond(429, 'too many request', [])
         }
+
         // check shop items
         const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
         const shopItemList = {
@@ -319,7 +340,6 @@ export default class RoomController extends Controller {
             if(isKeyExist !== -1) 
                 shopItemList[key] = getShopItems[isKeyExist][key]
         }
-        console.log(shopItemList);
         
         // set payload for db query
         const queryObject: Partial<IQueryInsert> = {

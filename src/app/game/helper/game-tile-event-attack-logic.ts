@@ -90,7 +90,11 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
         // get attacker city data
         const attackerCurrentCity = attackerData.city
         // add the city to attacker
-        const attackerCity = updateCityList({action: 'buy', currentCity: attackerCurrentCity, cityName: targetCityName, cityProperty: '1house'})
+        const attackerCity = targetCityName.match(/special/i)
+                            // steal special city
+                            ? updateCityList({action: 'buy', currentCity: attackerCurrentCity, cityName: targetCityName, cityProperty: 'land'})
+                            // steal normal city
+                            : updateCityList({action: 'buy', currentCity: attackerCurrentCity, cityName: targetCityName, cityProperty: 'land,1house'})
         inputValues.attacker_city = attackerCity
     }
     // close attack modal & player setting
