@@ -71,11 +71,11 @@ export default function TutorialRoomList() {
                 <hr className="my-1" />
                 <p className="text-balance">
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[1] as any})}
+                    <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/tooltip-jMhpG5ZcuTWhHKb4VxPirbhBl2YZ9Y.gif" alt="tap + swipe.gif" className="mx-auto w-[95%] !h-20 lg:!h-44" loading="lazy" />
                 </p>
                 <hr className="my-1" />
                 <p className="text-balance">
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[2] as any})}
-                    <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/tooltip-jMhpG5ZcuTWhHKb4VxPirbhBl2YZ9Y.gif" alt="tap + swipe.gif" className="mx-auto w-[95%] !h-20 lg:!h-44" loading="lazy" />
                 </p>
                 <hr className="my-1" />
                 <button type="button" className="text-green-400 p-1 animate-pulse animate-infinite" 

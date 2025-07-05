@@ -259,7 +259,9 @@ function RankingButton() {
                 viewRanking(miscState, gameState)
             }}>
                 <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> ranking </span>
+                <span className="invert"> 
+                    {translateUI({lang: miscState.language, text: 'Ranking', lowercase: true})} 
+                </span>
             </button>
         </div>
     )
@@ -281,7 +283,9 @@ function ShopButton() {
                 miscState.setShowModal('shop') 
             }}>
                 <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> shop </span>
+                <span className="invert"> 
+                    {translateUI({lang: miscState.language, text: 'Shop', lowercase: true})} 
+                </span>
             </button>
         </div>
     )
@@ -304,7 +308,9 @@ function DailyButton() {
                 miscState.setShowModal('daily') 
             }}>
                 <img src="https://img.icons8.com/?id=23&format=png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> daily </span>
+                <span className="invert"> 
+                    {translateUI({lang: miscState.language, text: 'Daily', lowercase: true})} 
+                </span>
             </button>
         </div>
     )
