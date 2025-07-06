@@ -75,7 +75,7 @@
             "Fortune Block = when passing start line, only get 5000",
             "Upgrade City = can upgrade your city without getting there, but random",
             "Attack City = can attack other player city",
-            "Curse Reverser = make cursed city effect to be reversed, everyone lose money (30% price) except card owner"
+            "Curse Reverser = make cursed city effect to be reversed, everyone lose money (50% price) except card owner"
         ]
     },
     "area_items": {
