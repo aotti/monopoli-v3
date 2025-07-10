@@ -563,14 +563,15 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
             localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
             gameState.setMyShopItems(playerShopItems)
             // result message
-            resultMessage.textContent = `item bought`
+            resultMessage.textContent = translateUI({lang: miscState.language, text: 'item bought'})
             // display notif
             resultMessage.classList.remove('hidden')
             setTimeout(() => resultMessage.classList.add('hidden'), 3000);
             return
         default:
             // result message
-            resultMessage.textContent = `${buyItemResponse.status}: ${buyItemResponse.message}`
+            const translateError = translateUI({lang: miscState.language, text: buyItemResponse.message as any})
+            resultMessage.textContent = `${buyItemResponse.status}: ${translateError || buyItemResponse.message}`
             // display notif
             resultMessage.classList.remove('hidden')
             setTimeout(() => resultMessage.classList.add('hidden'), 3000);

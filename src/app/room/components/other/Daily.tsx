@@ -1,7 +1,7 @@
 import { MouseEvent, useEffect, useRef } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { applyTooltipEvent, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, qS, translateUI } from "../../../../helper/helper"
 import daily_rewards from "../../config/daily-rewards.json"
 import { claimDaily } from "../../helper/functions"
 
@@ -160,8 +160,6 @@ function RewardItem({ rewardData }) {
     const rewardImg = `https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=${today == day ? '000000' : 'FFFFFF'}`
     const itemsTooltip = type == 'pack' ? items.join('\n') : null
 
-    // element refs
-    const claimButtonRef = useRef<HTMLButtonElement>()
     // tooltip (the element must have position: relative)
     useEffect(() => {
         applyTooltipEvent()
@@ -172,7 +170,7 @@ function RewardItem({ rewardData }) {
             {/* reward item */}
             <div data-tooltip={itemsTooltip} className={`flex flex-col items-center w-20 h-20 rounded-lg p-1 
             ${today === day ?  'bg-success' : 'bg-darkblue-2'} cursor-pointer hover:bg-opacity-75`} 
-            onClick={() => claimButtonRef.current.click()}>
+            onClick={() => (qS(`#daily_claim_button_${day}`) as any).click()}>
                 <span className={today === day ?  'text-black' : ''}>
                     {translateUI({lang: miscState.language, text: day as any})}
                 </span>
@@ -183,7 +181,7 @@ function RewardItem({ rewardData }) {
             </div>
             {/* claim button */}
             <div className={`${today === day && gameState.dailyStatus == 'unclaim' ?  'text-green-300' : 'invisible'} text-[10px] w-20`}>
-                <button ref={claimButtonRef} id={`daily_claim_button_${day}`} type="submit" className="w-full hover:animate-jump">
+                <button id={`daily_claim_button_${day}`} type="submit" className="w-full hover:animate-jump">
                     {today === day ?  translateUI({lang: miscState.language, text: 'claim'}) : ''}
                 </button>
             </div>

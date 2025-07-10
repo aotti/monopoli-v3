@@ -248,7 +248,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
-        // show notif after 2 sec
+        // show notif after 1 sec
         setTimeout(() => {
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')

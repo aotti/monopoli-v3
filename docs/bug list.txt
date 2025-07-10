@@ -189,3 +189,35 @@ fix 5 april 2025
 - ~~saat player kalah, reset smua data city jadi null~~
 - ~~jika main mode **laps**, saat tersisa 1 player, jalankan function gameOver~~
 - ~~kartu more money (community) masih bug~~
+
+fix 1 may 2025
+- ~~account in use tidak berefek jika game dibuka pada browser + device yg sama~~
+- ~~validasi special card (upgrade city) di published-message (game room)~~
+- ~~saat beli rumah, gambar crack ikut muncul~~
+- ~~error saat dapet kartu mundur 2 langkah di cabang, karna destinedPos = 0~~
+- ~~attack city ngebug, kota gk rusak/hancur~~
+- ~~ada kemungkinan player turns (redis) ngebug, buat tombol untuk reset~~ 
+- ~~kartu pindah ke kota orang lain (chance) ngebug~~
+- ~~kartu pindah ke kota sendiri ngebug, player lain bisa pilih jg~~
+- ~~crack gempa tidak muncul~~
+- ~~notif game muncul mulu karna di publish-message set normal tanpa if else~~
+- ~~kartu upgrade city ngebug~~
+- ~~kartu debt collector (community) ngebug, semua kartu multi efek (move type) harus di refaktor~~
+
+fix 20 june 2025
+- ~~serangan steal malah dapet uang~~
+- ~~player bisa beli kartu yg sama 2x kalo trigger API~~
+- ~~limit beli item shop, max = 2 special card + 2 buff~~
+- ~~saat logout remove state yg berhubungan dgn daily~~
+- ~~beli kartu di shop error 400 item type not match~~
+- ~~tambah info di tutorial, kalo dapet item dari daily bisa cek di shop~~
+- ~~validasi limit 2 item per type tidak efek (buy item)~~
+- ~~notif shop untuk desktop kurang bagus~~
+- ~~tooltip daily tidak muncul di desktop fullscreen~~
+- ~~set localeString ke **EN** untuk menghindari device awto detect~~ 
+- ~~attack tipe steal saat menyerang special city **akan memberi 1 kota**, harusnya tidak boleh~~
+- ~~item shop bisa dobel, harus pasang filter di redis **(claimDaily + buyItem)**~~
+- ~~shop item **room creator** tidak masuk ke db~~  
+- ~~kartu curse reverser tidak hilang setelah pakai~~
+- ~~timeout game over terlalu lama~~
+- ~~worst money lost visual bug~~
