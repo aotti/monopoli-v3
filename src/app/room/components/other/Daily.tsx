@@ -15,6 +15,7 @@ export default function Daily() {
     // ### TAPI, JIKA PLAYER LOGIN Tuesday WALAUPUN SUDAH MASUK week 2
     // ### AKAN DIANGGAP Tuesday-2 (week 1)
     const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
+    const serverTime = new Date().toLocaleString('en', {hour: 'numeric', minute: 'numeric', timeZone: 'Asia/Jakarta'})
     const dayOfWeek = {
         week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
         week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
@@ -62,11 +63,9 @@ export default function Daily() {
             {/* head */}
             <div className="flex justify-center border-b-2">
                 <span> {translateUI({lang: miscState.language, text: 'daily rewards'})} </span>
-                <span className="absolute right-0">
-                    {translateUI({lang: miscState.language, text: today as any})?.slice(0,3)}
-                </span>
+                <span className="absolute right-0"> {serverTime} </span>
             </div>
-            {/* body rewards */}
+            {/* rewards */}
             <div ref={dailyRewardsBody} className="grid grid-cols-7 gap-[5.5rem] lg:gap-5 px-1 py-2 text-center text-2xs overflow-x-scroll lg:overflow-x-hidden select-none"
             onMouseDown={startDragging} onMouseMove={move} onMouseUp={stopDragging} onMouseLeave={stopDragging}>
                 {dailyRewards.map(v => {
@@ -98,18 +97,28 @@ export default function Daily() {
                     </div>
                 </div>
             </div>
-            {/* body history */}
+            {/* history */}
             <div className="flex flex-col">
                 <div className="flex gap-2 justify-center">
                     <span className="w-full h-0 my-auto border"></span>
                     <span> {translateUI({lang: miscState.language, text: 'history'})} </span>
                     <span className="w-full h-0 my-auto border"></span>
                 </div>
+                {/* head */}
+                <div className="grid grid-cols-5 p-1 text-2xs lg:text-xs">
+                    <span className="text-orange-300 border-b"> 
+                        {translateUI({lang: miscState.language, text: 'type'})} 
+                    </span>
+                    <span className="col-span-2 text-orange-300 border-b"> 
+                        {translateUI({lang: miscState.language, text: 'item'})} 
+                    </span>
+                    <span className="col-span-2 text-orange-300 border-b">
+                        {translateUI({lang: miscState.language, text: 'date'})}
+                    </span>
+                </div>
+                {/* body */}
                 <div className="grid grid-cols-5 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll">
                     <div className="flex flex-col gap-2">
-                        <span className="text-orange-300 border-b"> 
-                            {translateUI({lang: miscState.language, text: 'type'})} 
-                        </span>
                         {gameState.dailyHistory 
                             ? gameState.dailyHistory.map((v,i) => <span key={i}>
                                 {translateUI({lang: miscState.language, text: v.reward_type as any})}
@@ -117,9 +126,6 @@ export default function Daily() {
                             : null}
                     </div>
                     <div className="col-span-2 flex flex-col gap-2">
-                        <span className="text-orange-300 border-b"> 
-                            {translateUI({lang: miscState.language, text: 'item'})} 
-                        </span>
                         {gameState.dailyHistory 
                             ? gameState.dailyHistory.map((v,i) => <span key={i}>
                                 {translateUI({lang: miscState.language, text: v.reward_item as any}) || v.reward_item}
@@ -127,9 +133,6 @@ export default function Daily() {
                             : null}
                     </div>
                     <div className="col-span-2 flex flex-col gap-2">
-                        <span className="text-orange-300 border-b">
-                            {translateUI({lang: miscState.language, text: 'date'})}
-                        </span>
                         {gameState.dailyHistory 
                             ? gameState.dailyHistory.map((v,i) => <span key={i}> {convertDate(v.reward_date)} </span>)
                             : null}
