@@ -275,7 +275,7 @@ export default class PlayerController extends Controller {
                                 }).filter(i => i)[0]
 
                                 // item exist, replace with coins
-                                if(isItemShopExist && isItemShopExist[0]) {
+                                if(isItemShopExist) {
                                     // update player coins
                                     const gainCoins = getPlayerCoins[0] + 10
                                     await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
@@ -283,8 +283,8 @@ export default class PlayerController extends Controller {
                                     await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
                                     // update player daily history
                                     const newRewardHistory = {
-                                        reward_type: `${data.type} (convert)`, 
-                                        reward_item: `${data.items[isItemDataExist]} (10 coins)`, 
+                                        reward_type: `convert`, 
+                                        reward_item: `10 coins`, 
                                         reward_date: todayDate
                                     }
                                     // save daily history
