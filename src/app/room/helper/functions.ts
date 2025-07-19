@@ -432,6 +432,8 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
             // move to game room
             const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
             link.click()
+            // set loading screen
+            miscState.setIsLoading(true)
             // enable submit buttons
             joinButton.textContent = tempButtonText
             joinButton.removeAttribute('disabled')
@@ -461,6 +463,8 @@ export function spectateRoom(roomId: number, miscState: IMiscContext, gameState:
     // move to game room
     const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
     link.click()
+    // set loading screen
+    miscState.setIsLoading(true)
     // reset disable buttons
     setTimeout(() => miscState.setDisableButtons(null), 1500)
 }

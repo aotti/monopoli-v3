@@ -6,6 +6,7 @@
             "changes": [
                 "add shop feature",
                 "add daily login feature",
+                "add info on loading stuck",
                 "modify UI on room list",
                 "fix some bugs"
             ]

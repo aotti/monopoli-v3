@@ -5,6 +5,7 @@ import { Viewport } from 'next'
 import { Press_Start_2P } from 'next/font/google'
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { cookies } from 'next/headers'
 
 export const viewport: Viewport = {
   initialScale: 1,
@@ -22,10 +23,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const accessSecret = process.env.ACCESS_TOKEN_SECRET
+  const savedLanguage = cookies().get('language')?.value as any
 
   return (
     <html lang="en">
-      <MiscProvider accessSecret={accessSecret}>
+      <MiscProvider accessSecret={accessSecret} savedLanguage={savedLanguage}>
         <GameProvider>
           <body className={`${retroFont.className}`}>
             {children}

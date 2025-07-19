@@ -3,6 +3,7 @@ import Controller from "../Controller";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import daily_rewards from "../../room/config/daily-rewards.json"
+import { cookies } from "next/headers";
 
 const rateLimitAvatar = new Ratelimit({
     redis: Redis.fromEnv(),
@@ -10,7 +11,30 @@ const rateLimitAvatar = new Ratelimit({
     prefix: '@upstash/ratelimit',
 })
 
+const rateLimitLanguage = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(1, '1m'),
+    prefix: '@upstash/ratelimit',
+})
+
 export default class PlayerController extends Controller {
+    async setLanguage(action: string, payload: IPlayer & {language: string}) {
+        // filter payload
+        const filteredPayload = this.filterPayload(action, payload)
+        if(filteredPayload.status !== 200) return filteredPayload
+
+        // check language rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitLanguage.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
+        // save language to cookies
+        cookies().set('language', payload.language)
+
+        return this.respond(200, `${action} success`, [])
+    }
 
     async viewPlayer(action: string, payload: IPlayer) {
         let result: IResponse
@@ -106,7 +130,7 @@ export default class PlayerController extends Controller {
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
         
-        // check register rate limit
+        // check avatar rate limit
         const rateLimitID = `${payload.display_name}_${payload.user_agent}`
         const rateLimitResult = await rateLimitAvatar.limit(rateLimitID);
         if(!rateLimitResult.success) {

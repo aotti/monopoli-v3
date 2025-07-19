@@ -6,13 +6,9 @@ import { translateUI } from "../helper/helper";
 
 const MiscContext = createContext<IMiscContext>(null)
 
-export const MiscProvider = ({ accessSecret, children }: IMiscProvider) => {
+export const MiscProvider = ({ accessSecret, savedLanguage, children }: IMiscProvider) => {
     const [screenType, setScreenType] = useState<'landscape'|'portrait'>(null)
-    const [language, setLanguage] = useState<ITranslate['lang']>(() => {
-        if(typeof window == 'undefined') return 'english'
-        const storedLanguage = localStorage.getItem('language') as ITranslate['lang']
-        return storedLanguage || 'english'
-    })
+    const [language, setLanguage] = useState<ITranslate['lang']>(savedLanguage || 'english')
     const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
     const [showJoinModal, setShowJoinModal] = useState<string>(null)
     const [animation, setAnimation] = useState<boolean>(true)
