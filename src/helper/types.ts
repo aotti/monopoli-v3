@@ -90,6 +90,7 @@ export type GameRoomListener = {
 // context
 export interface IMiscProvider {
     accessSecret: string, 
+    savedLanguage: ITranslate['lang'], 
     children: React.ReactNode
 }
 
@@ -339,7 +340,7 @@ type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|'user_agent'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|'language'|'user_agent'
 
 // user
 export interface ILoggedUsers {

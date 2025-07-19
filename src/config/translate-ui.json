@@ -3,7 +3,9 @@
     "indonesia": {
         "__TRANSLATE BAGIAN HOME__": "__TRANSLATE BAGIAN HOME__",
         "Do you already have an account?": "Apakah anda sudah punya akun?",
+        "takes too long? back to ": "terlalu lama? kembali ke ",
         "or view as": "atau masuk sebagai",
+        "Home": "Beranda",
         "Login": "Masuk",
         "Register": "Daftar",
         "Guest": "Tamu",
@@ -127,6 +129,7 @@
         "date": "tanggal",
         "coin": "koin",
         "pack": "paket",
+        "convert": "tukar",
 
         "__TRANSLATE BAGIAN GAME ROOM__": "__TRANSLATE BAGIAN GAME ROOM__",
         "Back to room": "Kembali",
