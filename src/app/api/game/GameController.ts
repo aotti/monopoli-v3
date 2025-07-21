@@ -587,11 +587,12 @@ export default class GameController extends Controller {
                 tmp_attacker_name: payload.attacker_name,
                 tmp_attacker_city: payload.attacker_city,
                 tmp_attack_type: attackType,
-                tmp_special_card: payload.special_card.split('-')[1], // split 'used-attack city'
+                tmp_special_card: payload.special_card.split('-')[1], // origin 'used-attack city'
+                tmp_card: payload.card,
                 tmp_target_city_owner: payload.target_city_owner,
                 tmp_target_city_left: payload.target_city_left,
+                tmp_target_card: payload.target_card,
                 tmp_event_money: +payload.event_money,
-                tmp_card: payload.card
             }
         }
         // run query
@@ -601,8 +602,6 @@ export default class GameController extends Controller {
         }
         else {
             // update game history
-            // ### add game history special card
-            // ### add game history special card
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
             const gameHistory: IGameContext['gameHistory'] = [{
                 display_name: payload.attacker_name,
@@ -624,6 +623,7 @@ export default class GameController extends Controller {
                 attackType: attackType,
                 targetCity: payload.target_city,
                 targetCityProperty: payload.target_city_property,
+                targetSpecialCard: payload.target_special_card.split('-')[1], // origin 'used-the shifter
                 quakeCity: filteredQuakeCity,
                 playerData: data,
                 gameHistory: [...getGameHistory, ...gameHistory]

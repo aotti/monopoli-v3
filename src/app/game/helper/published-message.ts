@@ -170,6 +170,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                 .replace('ccc', getMessage.targetCity)
                                 .replace('ppp', getMessage.attackerName)
                                 .replace('ttt', translateUI({lang: miscState.language, text: getMessage.attackType as any}))
+                                + (getMessage.targetSpecialCard ? `\n"attack shifted"` : '')
         // attack city animation 
         const attackTimer = getMessage.attackType == 'meteor' ? 5000 : 3000
         attackCityAnimation({

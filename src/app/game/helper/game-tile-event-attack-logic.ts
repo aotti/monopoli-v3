@@ -26,6 +26,7 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     // find attacker
     const findAttacker = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     const attackerData = gameState.gamePlayerInfo[findAttacker]
+
     // get declared city
     const targetCity = (qS('#attack_confirmation_city') as HTMLElement).dataset.cityName
     // get city price for steal attack
@@ -46,19 +47,30 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
         }
         else return null
     })).flat(10).filter(i => i)
-    // submit button
+
+    // find target (check shifter card)
+    const findTarget = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(targetCityOwner)
+    const targetData = gameState.gamePlayerInfo[findTarget]
+    // submit button (attack type)
     const submitButton = (ev.nativeEvent as any).submitter as HTMLInputElement
+    // check the shifter card
+    const getTheShifter = targetData.card.match(/the shifter/i)
+    // set attack type
+    const attackType = getTheShifter ? shiftAttackType(submitButton.id) : submitButton.id
+    
     // input value container
     const inputValues = {
         action: 'game attack city',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         attacker_name: gameState.myPlayerInfo.display_name,
         attacker_city: null,
-        target_city_owner: targetCityOwner, // used for db
+        target_city_owner: targetCityOwner, // used for db validation
         target_city_left: null,
         target_city_property: targetCityProperty,
         target_city: targetCityName,
-        attack_type: submitButton.id,
+        target_special_card: getTheShifter ? 'used-the shifter' : null, // used for notif
+        target_card: getTheShifter ? updateSpecialCardList(['used-the shifter'], targetData.card) : targetData.card,
+        attack_type: attackType,
         event_money: '0',
         special_card: 'used-attack city',
         card: updateSpecialCardList(['used-attack city'], attackerData.card)
@@ -165,4 +177,19 @@ export function attackCityAnimation(attackAnimationData: IAttackAnimationData) {
         // hide broken video
         setTimeout(() => videoCityMeteor.classList.add('hidden'), attackTimer)
     }
+}
+
+/**
+ * @description change attack type with the shifter card
+ */
+function shiftAttackType(attackType: string) {
+    // attack type level
+    // 1. steal
+    // 2. meteor
+    // 3. quake
+
+    // down level the attack type
+    if(attackType.match('steal')) return 'attack_shift_meteor'
+    else if(attackType.match('meteor')) return 'attack_shift_quake'
+    else return 'attack_city_quake'
 }
