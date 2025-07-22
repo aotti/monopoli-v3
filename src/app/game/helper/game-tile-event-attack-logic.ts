@@ -81,16 +81,16 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     const stealWarning = translateUI({lang: miscState.language, text: 'Threaten destined city with military force to sell the city for 30% price (ppp, you must have < 2 cities). Are you sure wanna attack?'})
     
     // confirmation & attack logic
-    if(submitButton.id.match('quake')) {
+    if(attackType.match('quake')) {
         if(!confirm(quakeWarning)) return
     }
-    else if(submitButton.id.match('meteor')) {
+    else if(attackType.match('meteor')) {
         if(!confirm(meteorWarning)) return
         // remove target city from owner with meteor
         const targetCityLeft = updateCityList({action: 'sell', currentCity: targetCurrentCity, cityName: targetCityName})
         inputValues.target_city_left = targetCityLeft
     }
-    else if(submitButton.id.match('steal')) {
+    else if(attackType.match('steal')) {
         // steal price = 20% normal price
         const stealPrice = Math.floor(+targetCityPrice * .3)
         inputValues.event_money = stealPrice.toString()

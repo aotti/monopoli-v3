@@ -1,5 +1,5 @@
 import { useMisc } from "../../../context/MiscContext"
-import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256, translateUI } from "../../../helper/helper"
 import { FormEvent, useEffect, useRef } from "react"
 import { IGameContext, IMiscContext, IResponse, IUser } from "../../../helper/types"
 import { useGame } from "../../../context/GameContext"
@@ -76,6 +76,8 @@ async function userLogin(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext
             }
         }
     }
+    // hash password
+    inputValues.password = sha256(inputValues.password)
     // submit button loading
     const tempButtonText = loginButton.textContent
     loginButton.textContent = 'Loading'

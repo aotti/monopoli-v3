@@ -56,7 +56,7 @@ export default function PlayerSection() {
                                 <span className="w-full"> {moneyFormat(player.money)} </span>
                             </div>
                             <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
-                            data-tooltip={translateSpecialCard?.replaceAll(';', '\n')}>
+                            data-tooltip={`~${translateSpecialCard?.replaceAll(';', '\n~')}`}>
                                 <img src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="📑" className="w-8 lg:w-14" />
                             </div>
                         </div>

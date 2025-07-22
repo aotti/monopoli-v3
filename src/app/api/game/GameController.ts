@@ -601,14 +601,21 @@ export default class GameController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // update game history
+            // set attack history
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
-            const gameHistory: IGameContext['gameHistory'] = [{
+            const attackHistory: IGameContext['gameHistory'] = [{
                 display_name: payload.attacker_name,
                 room_id: +roomId,
                 history: `attack_city: ${payload.target_city} city attacked by ${payload.attacker_name} (${attackType})`
             }]
-            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
+            // set attack shifted history
+            const shiftedHistory: IGameContext['gameHistory'] = !payload.target_special_card ? [] : [{
+                display_name: payload.target_city_owner,
+                room_id: +roomId,
+                history: `special_card: ${payload.target_special_card} 💳`
+            }]
+            // update game history
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...attackHistory, ...shiftedHistory])
             // get quake city data
             const getQuakeCity = await this.redisGet(`gameQuakeCity_${roomId}`)
             let filteredQuakeCity = null
@@ -626,7 +633,7 @@ export default class GameController extends Controller {
                 targetSpecialCard: payload.target_special_card.split('-')[1], // origin 'used-the shifter
                 quakeCity: filteredQuakeCity,
                 playerData: data,
-                gameHistory: [...getGameHistory, ...gameHistory]
+                gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory]
             }
             const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);

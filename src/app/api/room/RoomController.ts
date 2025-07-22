@@ -4,6 +4,12 @@ import Controller from "../Controller";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
+const rateLimitCreateRoom = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(3, '10m'),
+    prefix: '@upstash/ratelimit',
+})
+
 const rateLimitJoinRoom = new Ratelimit({
     redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(5, '10m'),
@@ -179,6 +185,13 @@ export default class RoomController extends Controller {
         const filterRoomList = await this.filterRoomList('check', payload.room_name)
         if(filterRoomList.status !== 200) return filterRoomList
 
+        // check create rate limit
+        const rateLimitID = `${tpayload.display_name}_${payload.user_agent}`
+        const rateLimitResult = await rateLimitCreateRoom.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         // check shop items
         const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.creator}_shopItems`)
         const shopItemList = {
@@ -319,7 +332,8 @@ export default class RoomController extends Controller {
         const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
         const isCharacterDisabled = getDisabledCharacters.indexOf(payload.select_character)
         if(isCharacterDisabled !== -1) return this.respond(400, 'someone has chosen this character', [])
-        // check register rate limit
+
+        // check join rate limit
         const rateLimitID = `${payload.display_name}_${payload.user_agent}`
         const rateLimitResult = await rateLimitJoinRoom.limit(rateLimitID);
         if(!rateLimitResult.success) {

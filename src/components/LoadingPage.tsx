@@ -27,7 +27,7 @@ function BackToHome() {
     useEffect(() => {
         // loading screen more than 2 seconds
         if(miscState.isLoading) {
-            stuckLoadInterval = setTimeout(() => setStuckLoad(true), 2000);
+            stuckLoadInterval = setTimeout(() => setStuckLoad(true), 3000);
         }
         else {
             clearInterval(stuckLoadInterval)
@@ -52,7 +52,7 @@ function BackToRoomList() {
     useEffect(() => {
         // loading screen more than 2 seconds
         if(miscState.isLoading) {
-            stuckLoadInterval = setTimeout(() => setStuckLoad(true), 2000);
+            stuckLoadInterval = setTimeout(() => setStuckLoad(true), 3000);
         }
         else {
             clearInterval(stuckLoadInterval)

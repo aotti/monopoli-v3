@@ -1,4 +1,4 @@
-import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../../../helper/helper"
+import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256, translateUI } from "../../../helper/helper"
 import { useMisc } from "../../../context/MiscContext"
 import { FormEvent, useEffect, useRef } from "react";
 import { IUser, IResponse, IMiscContext } from "../../../helper/types";
@@ -96,6 +96,8 @@ async function userRegister(ev: FormEvent<HTMLFormElement>, miscState: IMiscCont
     }
     // confirm password matched
     delete inputValues.confirm_password
+    // hash password
+    inputValues.password = sha256(inputValues.password)
     // submit button loading
     const tempButtonText = registerButton.textContent
     registerButton.textContent = 'Loading'
