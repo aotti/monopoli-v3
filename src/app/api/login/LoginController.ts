@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
 import Controller from "../Controller";
-import { sha256 } from "../../../helper/helper";
 
 export default class LoginController extends Controller {
 
@@ -17,7 +16,7 @@ export default class LoginController extends Controller {
             function: 'mnp_login',
             function_args: { 
                 tmp_username: payload.username,
-                tmp_password: sha256(payload.password)
+                tmp_password: payload.password
             }
         }
         // run query

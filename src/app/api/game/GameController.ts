@@ -587,11 +587,12 @@ export default class GameController extends Controller {
                 tmp_attacker_name: payload.attacker_name,
                 tmp_attacker_city: payload.attacker_city,
                 tmp_attack_type: attackType,
-                tmp_special_card: payload.special_card.split('-')[1], // split 'used-attack city'
+                tmp_special_card: payload.special_card.split('-')[1], // origin 'used-attack city'
+                tmp_card: payload.card,
                 tmp_target_city_owner: payload.target_city_owner,
                 tmp_target_city_left: payload.target_city_left,
+                tmp_target_card: payload.target_card,
                 tmp_event_money: +payload.event_money,
-                tmp_card: payload.card
             }
         }
         // run query
@@ -600,16 +601,21 @@ export default class GameController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
-            // update game history
-            // ### add game history special card
-            // ### add game history special card
+            // set attack history
             const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
-            const gameHistory: IGameContext['gameHistory'] = [{
+            const attackHistory: IGameContext['gameHistory'] = [{
                 display_name: payload.attacker_name,
                 room_id: +roomId,
                 history: `attack_city: ${payload.target_city} city attacked by ${payload.attacker_name} (${attackType})`
             }]
-            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
+            // set attack shifted history
+            const shiftedHistory: IGameContext['gameHistory'] = !payload.target_special_card ? [] : [{
+                display_name: payload.target_city_owner,
+                room_id: +roomId,
+                history: `special_card: ${payload.target_special_card} 💳`
+            }]
+            // update game history
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...attackHistory, ...shiftedHistory])
             // get quake city data
             const getQuakeCity = await this.redisGet(`gameQuakeCity_${roomId}`)
             let filteredQuakeCity = null
@@ -624,9 +630,10 @@ export default class GameController extends Controller {
                 attackType: attackType,
                 targetCity: payload.target_city,
                 targetCityProperty: payload.target_city_property,
+                targetSpecialCard: payload.target_special_card.split('-')[1], // origin 'used-the shifter
                 quakeCity: filteredQuakeCity,
                 playerData: data,
-                gameHistory: [...getGameHistory, ...gameHistory]
+                gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory]
             }
             const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);

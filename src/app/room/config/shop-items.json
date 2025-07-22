@@ -21,6 +21,11 @@
             "price": 20
         },
         {
+            "name": "the shifter",
+            "description": "change attack type from enemy to prevent huge loss",
+            "price": 20
+        },
+        {
             "name": "attack city",
             "description": "can attack other player city",
             "price": 30

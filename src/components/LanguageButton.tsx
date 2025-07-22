@@ -36,12 +36,12 @@ async function handleSetLanguage(miscState: IMiscContext) {
             miscState.setLanguage(chosenLang)
             // show green on success
             translateButton.classList.add('bg-green-400')
-            setTimeout(() => translateButton.classList.remove('bg-green-400'), 2000);
+            setTimeout(() => translateButton.classList.remove('bg-green-400'), 1500);
             return
         default:
             // show red on error
             translateButton.classList.add('bg-red-400')
-            setTimeout(() => translateButton.classList.remove('bg-red-400'), 2000);
+            setTimeout(() => translateButton.classList.remove('bg-red-400'), 1500);
             return
     }
 }

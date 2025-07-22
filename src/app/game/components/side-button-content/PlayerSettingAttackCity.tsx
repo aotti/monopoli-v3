@@ -102,10 +102,10 @@ function RaidCityButton({isAttackCityCardExist}) {
     const miscState = useMisc()
 
     return isAttackCityCardExist
-        ? <button type="submit" id="sell_city_button" className="bg-primary border-8bit-primary active:opacity-75">
+        ? <button type="submit" id="attack_city_button" className="bg-primary border-8bit-primary active:opacity-75">
             {translateUI({lang: miscState.language, text: 'raid'})}
         </button>
-        : <button type="button" id="sell_city_button" className="saturate-0 bg-primary border-8bit-primary active:opacity-75">
+        : <button type="button" id="attack_city_button" className="saturate-0 bg-primary border-8bit-primary active:opacity-75">
             {translateUI({lang: miscState.language, text: 'raid'})}
         </button>
 }

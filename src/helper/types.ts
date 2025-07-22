@@ -77,6 +77,7 @@ export type GameRoomListener = {
     attackType: string,
     targetCity: string,
     targetCityProperty: string,
+    targetSpecialCard: string,
     quakeCity: string[],
     playerData: {
         display_name: string,
@@ -337,7 +338,7 @@ type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_v
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
-type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'attack_type'|'attacker_name'|'attacker_city'
+type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'target_card'|'target_special_card'|'attack_type'|'attacker_name'|'attacker_city'
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
 export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|'language'|'user_agent'
@@ -489,12 +490,14 @@ export interface IGamePlay {
         attacker_city: null,
         attack_type: string,
         special_card: string,
+        card: string,
         target_city_owner: string,
         target_city_left: string,
         target_city_property: string,
         target_city: string,
+        target_special_card: string,
+        target_card: string,
         event_money: string,
-        card: string,
     } & ITokenPayload,
     turn_end: {
         channel: string,

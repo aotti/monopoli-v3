@@ -1,6 +1,15 @@
 {
     "updates": [
         {
+            "version": "v3.08",
+            "date": "22 July 2025",
+            "changes": [
+                "add the shifter card in shop",
+                "add info on loading stuck",
+                "fix some bugs"
+            ]
+        },
+        {
             "version": "v3.07",
             "date": "29 June 2025",
             "changes": [

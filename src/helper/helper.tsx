@@ -231,6 +231,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[a-zA-Z0-9]+$/) : null
         case 'language':
             return value ? value.match(/english$|indonesia$/) : null
+
         // ====== PLAYER TYPE ======
         // filter uuid
         case 'uuid': 
@@ -242,13 +243,13 @@ export function filterInput(input: InputIDType, value: string) {
         // letter, number, whitespace, symbol (.,#-+@) 
         case 'password': 
         case 'confirm_password':
-            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,16}$/) : null
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+@]{8,72}$/) : null
         // letter, number, whitespace
         case 'creator':
         case 'room_name': // create room 'name'
         case 'display_name': 
             return value ? value.match(/^[a-zA-Z0-9\s]{4,12}$/) : null
-        // must have monopoli-profiles url
+        // img url must have monopoli-profiles
         case 'avatar': 
             return value ? value.match(/monopoli-profiles/) : null
 
@@ -286,31 +287,38 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^2$|^3$|^4$/) : null
         case 'select_character':
             return value ? value.match(/lvu1slpqdkmigp40.public.blob.vercel-storage.com\/characters/) : null
+
         // ====== JOIN ROOM TYPE ======
         case 'rules': 
             return value ? value.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/) : null
+        
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
             return value ? value.match(/^[\d]{3}$/) : null
+
         // ====== ROLL DICE TYPE ======
         case 'rolled_dice': 
             return value ? value.match(/^[\d]{1,2}$/) : null
         case 'rng':
             return value ? value.match(/^[\d]{1,2},[\d]{1,2}$|^100,[\d]{1,2}$|^[\d]{1,2},100$/) : null
         case 'special_card': 
+        case 'target_special_card': 
             const optionalSpecialCard = value === null || value.match(/used\W.*/) ? true : false
             return optionalSpecialCard
+
         // ====== DECLARE ATTACK CITY TYPE ======
         case 'target_city':
         case 'target_city_property':
         case 'target_city_left':
         case 'target_city_owner':
+        case 'target_card':
         case 'attacker_name':
         case 'attacker_city':
             const optionalAttackCity = value === null || value.match(/^[a-zA-Z0-9,;\-*\s]+$/) ? true : false
             return optionalAttackCity
         case 'attack_type':
             return value ? value.match(/^[a-z_]+$/) : null
+
         // ====== TURN END TYPE ======
         case 'pos': 
             return value ? value.match(/^[1-9]$|^[1-2][x]$|^1[0-9]$|^1[2-4][x]$|^2[0-4]$|^24[x]$/) : null
@@ -362,17 +370,20 @@ export function filterInput(input: InputIDType, value: string) {
             return optionalTax
         case 'prison': 
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
+
         // ====== GAME OVER TYPE ======
         case 'all_player_stats': 
             const splitValue = value.split(';')
             for(let sv of splitValue)
                 if(!sv.match(/\w+,\d+|\w+,-\d+/)) return null
             return value 
+            
         // ====== SHOP TYPE ======
         case 'item_type':
             return value ? value.match(/buff$|special_card$/) : null
         case 'item_name':
-            return value ? value.match(/coin$|nerf tax$|anti prison$|gaming dice$|dice controller$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
+            return value ? value.match(/coin$|nerf tax$|anti prison$|gaming dice$|dice controller$|the shifter$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
+        
         // ====== DAILY TYPE ======
         case 'week':
             return value ? value.match(/1$|2$/) : null

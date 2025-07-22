@@ -445,7 +445,7 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                             playerDice: setChosenDice,
                             playerRNG: rng
                         }
-                        // hide notif after data set
+                        // hide notif after dice data set
                         miscState.setAnimation(false)
                         gameState.setShowGameNotif(null)
                         // move to chosen place
