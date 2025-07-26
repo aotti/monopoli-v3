@@ -9,6 +9,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // board
     const [showTileImage, setShowTileImage] = useState<IGameContext['showTileImage']>(null)
     const [showGameNotif, setShowGameNotif] = useState<IGameContext['showGameNotif']>(null)
+    const [showMiniGame, setShowMiniGame] = useState(false)
     const [rollNumber, setRollNumber] = useState<IGameContext['rollNumber']>(null)
     // side buttons
     const [gameSideButton, setGameSideButton] = useState<IGameContext['gameSideButton']>(null)
@@ -69,6 +70,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const boardStates = {
         showTileImage, setShowTileImage,
         showGameNotif, setShowGameNotif,
+        showMiniGame, setShowMiniGame,
         rollNumber, setRollNumber,
     }
     

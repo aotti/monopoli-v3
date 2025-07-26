@@ -8,6 +8,7 @@ import { stopByCursedCity } from "./game-tile-event-cursed-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff, stopByBuffDebuff, updateBuffDebuffList } from "./game-tile-event-buff-debuff-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
+import { stopByMinigame } from "./game-tile-event-minigame"
 
 /*
     TABLE OF CONTENTS
@@ -666,6 +667,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         case 'buff': 
                         case 'debuff': 
                             stopByBuffDebuff(tileInfo, findPlayer, playerRNG, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
+                        case 'start': 
+                            stopByMinigame()
                             .then(eventData => resolve(eventData))
                             .catch(err => console.log(err))
                             break

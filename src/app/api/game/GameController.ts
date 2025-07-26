@@ -35,7 +35,7 @@ export default class GameController extends Controller {
         // set payload for db query
         const queryObject: IQuerySelect = {
             table: 'games',
-            selectColumn: this.dq.columnSelector('games', 3456789) + ',prison,buff,debuff',
+            selectColumn: this.dq.columnSelector('games', 3456789) + ',prison,minigame,buff,debuff',
             whereColumn: 'room_id',
             whereValue: payload.room_id
         }

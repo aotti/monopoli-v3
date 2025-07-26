@@ -20,6 +20,7 @@ import GameSounds from "../../components/GameSounds"
 import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
 import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
+import MiniGame from "./components/board/MiniGame"
 
 export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -165,14 +166,12 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <GameButtons />
                     </div>
                 }
-                {/* game notif + roll number */}
-                <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'hidden'} 
+                {/* game notif + roll number + minigame */}
+                <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'block'} 
                 absolute h-full w-full text-center text-2xs lg:text-xs`}>
-                    {gameState.rollNumber
-                        ? <RollNumber roomId={gameState.gameRoomId} />
-                        : null
-                    }
+                    {gameState.rollNumber ? <RollNumber roomId={gameState.gameRoomId} /> : null}
                     <GameNotif />
+                    <MiniGame />
                 </div>
             </section>
 

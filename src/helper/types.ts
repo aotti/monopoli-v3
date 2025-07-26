@@ -146,6 +146,7 @@ interface IGamePlayerInfo {
     card: string,
     city: string,
     prison: number,
+    minigame: number,
     buff: string,
     debuff: string,
 }
@@ -167,6 +168,8 @@ export interface IGameContext {
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
     showGameNotif: 'normal'|'with_button'|'card'|'card_with_button',
     setShowGameNotif: Dispatch<SetStateAction<IGameContext['showGameNotif']>>,
+    showMiniGame: boolean,
+    setShowMiniGame: Dispatch<SetStateAction<boolean>>,
     rollNumber: 'dice'|'turn',
     setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
     // side buttons
