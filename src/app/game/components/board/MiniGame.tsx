@@ -7,7 +7,7 @@ export default function MiniGame() {
 
     return (
         <div className={`relative z-10 top-[15%] lg:top-[30%] flex-col gap-2 bg-darkblue-1 border-8bit-text w-2/3 lg:w-2/4 leading-relaxed
-        ${gameState.showMiniGame ? 'flex' : 'flex'}
+        ${gameState.showMiniGame ? 'flex' : 'hidden'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p id="minigame_title" className="border-b-2 p-1"> Mini Game - ABC 5 Dasar </p>
             <p id="minigame_category"> Categories: X, Y, Z </p>
