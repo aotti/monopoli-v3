@@ -405,6 +405,7 @@ export default class RoomController extends Controller {
                 card: data[0].card,
                 city: data[0].city,
                 prison: data[0].prison,
+                minigame: data[0].minigame,
                 buff: data[0].buff,
                 debuff: data[0].debuff,
             }
