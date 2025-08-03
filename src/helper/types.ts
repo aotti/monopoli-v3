@@ -271,18 +271,20 @@ export interface IQueryUpdate extends IQueryBuilder {
 }
 
 // fetch
-export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'DELETE'}
+export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'PATCH'|'DELETE'}
 
 interface IFetchWithoutBody {
     method: Extract<RequestInitMod['method'], 'GET'>,
     credentials?: boolean,
     noCache?: boolean,
+    domain?: string,
 }
 interface IFetchWithBody {
     method: Exclude<RequestInitMod['method'], 'GET'>,
     body: RequestInitMod['body'],
     credentials?: boolean,
     noCache?: boolean,
+    domain?: string,
 }
 interface IFetchOptions {
     without: Omit<IFetchWithoutBody, 'credentials'> & {headers?: RequestInitMod['headers']},

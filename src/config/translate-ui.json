@@ -438,6 +438,14 @@
         "city_money": "uang_kota",
         "game_ready": "mainan_siap",
         "game_over": "mainan_selesai",
-        "you will open new tab, proceed?": "anda akan membuka tab baru, yakin?"
+        "you will open new tab, proceed?": "anda akan membuka tab baru, yakin?",
+        
+        "__MINIGAME TRANSLATE__": "__MINIGAME TRANSLATE__",
+        "Scattergories": "ABC 5 Dasar",
+        "answer": "jawaban",
+        "send": "kirim",
+        "answer list": "daftar jawaban",
+        "Categories: category_1, category_2, category_3": "Kategori: category_1, category_2, category_3",
+        "Name an object starting with the letter letter_1, letter_2 or letter_3 based on categories!": "Sebutkan nama benda diawali dengan huruf letter_1, letter_2 atau letter_3 berdasarkan kategori di atas!"
     }
 }

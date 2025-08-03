@@ -103,7 +103,7 @@ export function sha256(text: string) {
 
 export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
 export function fetcherOptions(args: FetchOptionsType) {
-    const { method, credentials, noCache } = args
+    const { method, credentials, noCache, domain } = args
     // get access token
     const accessToken = localStorage.getItem('accessToken')
     // get identifier
@@ -113,8 +113,20 @@ export function fetcherOptions(args: FetchOptionsType) {
                     // auth
                     ? method == 'GET'
                         // GET will only have authorization
-                        ? { 'authorization': `Bearer ${accessToken}`,
-                            'X-IDENTIFIER': getIdentifier }
+                        ? domain 
+                            // domain NOT NULL, Access-Control-Allow-Origin is required
+                            ? { 'authorization': `Bearer ${accessToken}`,
+                                'Access-Control-Allow-Origin': `${domain}`,
+                                'X-IDENTIFIER': getIdentifier }
+                            // domain is NULL
+                            : { 'authorization': `Bearer ${accessToken}`,
+                                'X-IDENTIFIER': getIdentifier }
+                        : method == 'PATCH'
+                            // PATCH must have Access-Control-Allow-Origin
+                            ? { 'content-type': 'application/json',
+                                'Access-Control-Allow-Origin': `${domain}`,
+                                'authorization': `Bearer ${accessToken}`,
+                                'X-IDENTIFIER': getIdentifier }
                         // POST, PUT, DELETE with auth
                         : { 'content-type': 'application/json',
                             'authorization': `Bearer ${accessToken}`,
@@ -127,20 +139,33 @@ export function fetcherOptions(args: FetchOptionsType) {
     // method
     switch(method) {
         case 'GET': 
-            if(credentials) 
-                return { method: method, headers: headers, ...cache }
-            // public
-            return { method: method, ...cache }
-        case 'POST': return { method: method, headers: headers, body: args.body }
-        case 'PUT': return { method: method, headers: headers, body: args.body }
-        case 'DELETE': return { method: method, headers: headers, body: args.body }
+            // private data
+            // fetch data from other source
+            if(credentials && domain) 
+                return { method: method, headers: headers, ...cache, mode: 'cors' } as RequestInit
+            // fetch data from inner source
+            else if(credentials && !domain) 
+                return { method: method, headers: headers, ...cache } as RequestInit
+            // public data
+            return { method: method, ...cache } as RequestInit
+        case 'PATCH': 
+            return { method: method, headers: headers, body: args.body, mode: 'cors' } as RequestInit
+        case 'POST': 
+        case 'PUT': 
+        case 'DELETE': 
+            return { method: method, headers: headers, body: args.body } as RequestInit
     }
 }
 
-export function fetcher(endpoint: string, options: RequestInit) {
+export function fetcher(endpoint: string, options: RequestInit, customEndpoint?: boolean) {
     const host = `${window.location.origin}/api`
     const url = host + endpoint
-    return fetch(url, options)
+
+    return customEndpoint 
+        // fetch with custom endpoint
+        ? fetch(endpoint, options)
+        // normal fetch
+        : fetch(url, options)
 }
 
 export function resetAllData(gameState: IGameContext) {

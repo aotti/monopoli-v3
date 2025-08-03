@@ -671,7 +671,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             .catch(err => console.log(err))
                             break
                         case 'start': 
-                            stopByMinigame()
+                            stopByMinigame(miscState, gameState)
                             .then(eventData => resolve(eventData))
                             .catch(err => console.log(err))
                             break
@@ -706,7 +706,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             }, 2000);
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
-            // check sub player dice
+            // check sub player dice (removed after turn end)
+            // rolled dice number saved here to prevent overwriting by move event from chance/community
             const subPlayerDice = localStorage.getItem('subPlayerDice')
             // get tax data
             const taxData = eventData?.event == 'pay_tax' 
@@ -736,20 +737,12 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
             if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
             // get prison accumulate number
-            const prisonNumber = playerTurnData.prison
-            // check if player is just step on prison / already arrested
-            const isFirstArrested = (eventData as any)?.accumulate === 0
-            const isArrested = prisonNumber < 0 ? null : prisonNumber
-            // accumulate dice number
-            const prisonAccumulate = isFirstArrested 
-                                    ? 0 
-                                    : typeof isArrested == 'number' && isArrested > -1 
-                                        ? (isArrested + playerDice) 
-                                        : -1
-            // check if accumulate dice is enough
-            // 1 dice = 6, 2 dice = 12
-            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
-            const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
+            const isPrisonAccumulatePass = checkPrisonStatus({
+                playerTurnData, 
+                eventData, 
+                playerDice, 
+                diceAmount: gameState.gameRoomInfo[findRoom].dice
+            })
             // check if player is losing
             const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (reduceMoneyDebuff[1] || 0)))
             const playerTurnEndLose = playerTurnEndMoney < loseCondition
@@ -837,6 +830,33 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             }
         }
     })
+}
+
+interface IPrisonData {
+    playerTurnData: IGameContext['gamePlayerInfo'][0], 
+    eventData: EventDataType, 
+    playerDice: number, 
+    diceAmount: number,
+}
+function checkPrisonStatus(data: IPrisonData) {
+    const {playerTurnData, eventData, playerDice, diceAmount} = data
+    // get prison accumulate number
+    const prisonNumber = playerTurnData.prison
+    // check if player is just step on prison / already arrested
+    const isFirstArrested = (eventData as any)?.accumulate === 0
+    const isArrested = prisonNumber < 0 ? null : prisonNumber
+    // accumulate dice number
+    const prisonAccumulate = isFirstArrested 
+                            ? 0 
+                            : typeof isArrested == 'number' && isArrested > -1 
+                                ? (isArrested + playerDice) 
+                                : -1
+    // check if accumulate dice is enough
+    // 1 dice = 6, 2 dice = 12
+    // const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
+    const prisonAccumulateLimit = diceAmount * 6
+    const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
+    return isPrisonAccumulatePass
 }
 
 // ========== # CHECK BRANCH TILES ==========
