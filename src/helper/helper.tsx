@@ -115,7 +115,8 @@ export function fetcherOptions(args: FetchOptionsType) {
                         // GET will only have authorization
                         ? domain 
                             // domain NOT NULL, credentials is required
-                            ? { 'authorization': `Bearer ${accessToken}`,
+                            ? { 'content-type': 'application/json',
+                                'authorization': `Bearer ${accessToken}`,
                                 'credentials': `include`, }
                             // domain is NULL
                             : { 'authorization': `Bearer ${accessToken}`,
