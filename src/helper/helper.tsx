@@ -114,19 +114,17 @@ export function fetcherOptions(args: FetchOptionsType) {
                     ? method == 'GET'
                         // GET will only have authorization
                         ? domain 
-                            // domain NOT NULL, Access-Control-Allow-Origin is required
+                            // domain NOT NULL, credentials is required
                             ? { 'authorization': `Bearer ${accessToken}`,
-                                'Access-Control-Allow-Origin': `${domain}`,
-                                'X-IDENTIFIER': getIdentifier }
+                                'credentials': `include`, }
                             // domain is NULL
                             : { 'authorization': `Bearer ${accessToken}`,
                                 'X-IDENTIFIER': getIdentifier }
                         : method == 'PATCH'
-                            // PATCH must have Access-Control-Allow-Origin
+                            // PATCH must have credentials
                             ? { 'content-type': 'application/json',
-                                'Access-Control-Allow-Origin': `${domain}`,
-                                'authorization': `Bearer ${accessToken}`,
-                                'X-IDENTIFIER': getIdentifier }
+                                'credentials': `include`,
+                                'authorization': `Bearer ${accessToken}` }
                         // POST, PUT, DELETE with auth
                         : { 'content-type': 'application/json',
                             'authorization': `Bearer ${accessToken}`,
@@ -135,25 +133,19 @@ export function fetcherOptions(args: FetchOptionsType) {
                     : { 'content-type': 'application/json',
                         'X-IDENTIFIER': getIdentifier }
     // cache
-    const cache = noCache ? { cache: 'no-store' } : null
+    const cache = noCache ? { cache: 'no-store' } : {}
     // method
     switch(method) {
         case 'GET': 
-            // private data
-            // fetch data from other source
-            if(credentials && domain) 
-                return { method: method, headers: headers, ...cache, mode: 'cors' } as RequestInit
-            // fetch data from inner source
-            else if(credentials && !domain) 
-                return { method: method, headers: headers, ...cache } as RequestInit
-            // public data
-            return { method: method, ...cache } as RequestInit
-        case 'PATCH': 
-            return { method: method, headers: headers, body: args.body, mode: 'cors' } as RequestInit
+            if(credentials) 
+                return { method: method, headers: headers, ...cache }
+            // public
+            return { method: method, ...cache }
         case 'POST': 
         case 'PUT': 
+        case 'PATCH': 
         case 'DELETE': 
-            return { method: method, headers: headers, body: args.body } as RequestInit
+            return { method: method, headers: headers, body: args.body }
     }
 }
 

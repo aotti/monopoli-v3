@@ -5,11 +5,11 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
         const minigameQuestion = qS('#minigame_question')
         // get word categories
-        const miniGameDomain = 'https://abc-5-dasar-api.vercel.app'
-        const categoriesFetchOptions = fetcherOptions({method: 'GET', credentials: true, domain: miniGameDomain})
+        const miniGameAPI = 'https://abc-5-dasar-api.vercel.app/api/word/categories'
+        const categoriesFetchOptions = fetcherOptions({method: 'GET', credentials: true, domain: miniGameAPI})
         console.log(categoriesFetchOptions);
         
-        const categoriesResponse: IResponse = await (await fetcher(`${miniGameDomain}/api/word/categories`, categoriesFetchOptions, true)).json()
+        const categoriesResponse: IResponse = await (await fetcher(miniGameAPI, categoriesFetchOptions, true)).json()
         // response
         switch(categoriesResponse.status) {
             case 200:
