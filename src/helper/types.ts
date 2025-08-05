@@ -8,6 +8,7 @@ export interface ITranslate {
     lang: 'english' | 'indonesia',
     text: keyof typeof translateUI_data['indonesia'],
     lowercase?: boolean,
+    reverse?: boolean,
 }
 
 // tooltip

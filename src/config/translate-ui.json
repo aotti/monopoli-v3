@@ -445,7 +445,20 @@
         "answer": "jawaban",
         "send": "kirim",
         "answer list": "daftar jawaban",
-        "Categories: category_1, category_2, category_3": "Kategori: category_1, category_2, category_3",
-        "Name an object starting with the letter letter_1, letter_2 or letter_3 based on categories!": "Sebutkan nama benda diawali dengan huruf letter_1, letter_2 atau letter_3 berdasarkan kategori di atas!"
+        "Categories: ": "Kategori: ",
+        "Name an object starting with the letter ": "Sebutkan nama benda diawali dengan huruf ",
+        " based on categories!": " berdasarkan kategori di atas!",
+        "sayuran": "vegetables",
+        "buah buahan": "fruits",
+        "barang dapur": "kitchen utensils",
+        "alat elektronik": "electronic devices",
+        "alat tulis": "school stationery",
+        "alat mandi": "bathroom tools",
+        "furnitur": "furniture",
+        "organ tubuh": "human body organs",
+        "negara": "country",
+        "hewan ikan": "pisces",
+        "hewan burung": "aves",
+        "hewan mamalia": "mammals"
     }
 }

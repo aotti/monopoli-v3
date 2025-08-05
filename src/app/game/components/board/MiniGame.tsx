@@ -20,14 +20,18 @@ export default function MiniGame() {
                 Mini Game - {translateUI({lang: miscState.language, text: 'Scattergories'})} 
                 <button className="absolute right-1" onClick={() => stopByMinigame(miscState, gameState)}> test </button>
             </p>
-            <p id="minigame_category"> 
-                {translateUI({lang: miscState.language, text: 'Categories: category_1, category_2, category_3'})}
+            <p> 
+                <span> {translateUI({lang: miscState.language, text: 'Categories: '})} </span>
+                <span className="minigame_category text-green-400"> category_1 </span>
+                <span className="minigame_category text-green-400"> category_2 </span>
+                <span className="minigame_category text-green-400"> category_3 </span>
             </p>
             <p id="minigame_question"> 
-                {translateUI({
-                    lang: miscState.language, 
-                    text: 'Name an object starting with the letter letter_1, letter_2 or letter_3 based on categories!'
-                })}
+                <span> {translateUI({lang: miscState.language, text: 'Name an object starting with the letter '})} </span>
+                <span className="minigame_letter text-green-400"> letter_1 </span>
+                <span className="minigame_letter text-green-400"> letter_2 </span>
+                <span className="minigame_letter text-green-400"> letter_3 </span>
+                <span> {translateUI({lang: miscState.language, text: ' based on categories!'})} </span>
             </p>
 
             <form className="flex items-center justify-center" onSubmit={ev => ev.preventDefault()}>

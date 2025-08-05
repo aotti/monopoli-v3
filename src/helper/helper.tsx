@@ -5,8 +5,16 @@ import { createHash, randomBytes } from "crypto";
 import { JWTPayload, jwtVerify } from "jose";
 
 export function translateUI(params: ITranslate) {
-    const { lang, text, lowercase } = params
-    const translated = lang == 'indonesia' ? translateUI_data[lang][text] : text
+    const { lang, text, lowercase, reverse } = params
+    const translated = lang == 'indonesia' 
+                    // translate text to indonesia
+                    ? translateUI_data[lang][text]
+                    // is reverse true 
+                    : reverse
+                        // translate text to english
+                        ? translateUI_data['indonesia'][text]
+                        // dont translate
+                        : text
     return lowercase ? translated.toLowerCase() : translated
 }
 
