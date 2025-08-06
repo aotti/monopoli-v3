@@ -6,14 +6,18 @@ import { JWTPayload, jwtVerify } from "jose";
 
 export function translateUI(params: ITranslate) {
     const { lang, text, lowercase, reverse } = params
-    const translated = lang == 'indonesia' 
-                    // translate text to indonesia
-                    ? translateUI_data[lang][text]
-                    // is reverse true 
-                    : reverse
+    const translated = reverse
+                    // if reverse translate = true
+                    ? lang == 'indonesia'
+                        // dont translate 
+                        ? text
                         // translate text to english
-                        ? translateUI_data['indonesia'][text]
-                        // dont translate
+                        : translateUI_data['indonesia'][text]
+                    // if reverse translate = false
+                    : lang == 'indonesia'
+                        // translate text to indonesia
+                        ? translateUI_data[lang][text]
+                        // dont translate 
                         : text
     return lowercase ? translated.toLowerCase() : translated
 }
@@ -413,6 +417,9 @@ export function filterInput(input: InputIDType, value: string) {
         // ====== DAILY TYPE ======
         case 'week':
             return value ? value.match(/1$|2$/) : null
+        // ====== MINIGAME TYPE ======
+        case 'minigame_answer':
+            return value ? value.match(/^[a-zA-Z\s]+$/) : null
         // ====== MISC TYPE ======
         case 'user_agent': 
             return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null

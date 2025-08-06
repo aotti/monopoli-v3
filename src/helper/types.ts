@@ -87,6 +87,10 @@ export type GameRoomListener = {
         card: string,
     }[],
     fixPlayerTurns: string[],
+    minigameData: {
+        display_name: string,
+        answer: string,
+    },
 }
 
 // context
@@ -163,6 +167,12 @@ interface IMyShopItems {
     buff: string[],
 }
 
+interface IMinigameAnswerList {
+    display_name: string,
+    answer: string,
+    status: boolean,
+}
+
 export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
@@ -203,10 +213,6 @@ export interface IGameContext {
     setLastDailyStatus: Dispatch<SetStateAction<string>>,
     dailyHistory: Record<'reward_type'|'reward_item'|'reward_date', string>[],
     setDailyHistory: Dispatch<SetStateAction<IGameContext['dailyHistory']>>,
-    myCoins: number,
-    setMyCoins: Dispatch<SetStateAction<number>>,
-    myShopItems: IMyShopItems[], 
-    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
     // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
@@ -233,6 +239,14 @@ export interface IGameContext {
     setDiceMode: Dispatch<SetStateAction<IGameContext['diceMode']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
+    // shop
+    myCoins: number,
+    setMyCoins: Dispatch<SetStateAction<number>>,
+    myShopItems: IMyShopItems[], 
+    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
+    // minigame
+    minigameAnswerList: IMinigameAnswerList[], 
+    setMinigameAnswerList: Dispatch<SetStateAction<IGameContext['minigameAnswerList']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -347,7 +361,8 @@ type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'target_card'|'target_special_card'|'attack_type'|'attacker_name'|'attacker_city'
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|'language'|'user_agent'
+type MinigameType = 'minigame_answer'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'language'|'user_agent'
 
 // user
 export interface ILoggedUsers {

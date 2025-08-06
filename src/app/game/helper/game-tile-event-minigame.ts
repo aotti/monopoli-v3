@@ -1,5 +1,6 @@
-import { catchError, fetcher, fetcherOptions, qS, qSA, translateUI } from "../../../helper/helper";
-import { EventDataType, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
+import { FormEvent } from "react";
+import { catchError, fetcher, fetcherOptions, qS, qSA, setInputValue, translateUI } from "../../../helper/helper";
+import { EventDataType, GameRoomListener, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
 
 export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
@@ -15,8 +16,6 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
                                     .filter(item => item != 'none' && item != 'provinsi indonesia')
         // pick 3-4 categories (random)
         const selectedCategories = pickCategories(categoryList)
-        console.log(selectedCategories);
-        
         // (fetch) get all words for each selected category
         const [getWordsError, getWords] = await catchError(getWordsPerCategory(selectedCategories, miscState, gameState))
         // stop on fetch error
@@ -25,8 +24,19 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
         const alphabets = getWords.map(v => v.slice(0,1)).filter((v,i,arr) => arr.indexOf(v) === i)
         // set game letters (random)
         const selectedLetters = pickLetters(alphabets, gameState)
-        console.log(selectedLetters);
-        
+        // match words with selected letters for matching the player answers
+        const matchedWords: string[] = []
+        // match the splitted words with letters
+        // then use it to match the player answer
+        for(let letter of selectedLetters) {
+            getWords.map(v => {
+                v.startsWith(letter) 
+                    // push to matched words
+                    ? matchedWords.push(v) 
+                    // else do nothing
+                    : null
+            })
+        }
         // set categories and letters
         for(let i=0; i<3; i++) {
             const translateCategory = translateUI({lang: miscState.language, text: selectedCategories[i] as any, reverse: true})
@@ -37,19 +47,25 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
                                             ? `${selectedLetters[i].toUpperCase()}` 
                                             : `${selectedLetters[i].toUpperCase()}, `
         }
+        // set info
+        minigameInfo('success', '')
         // show mini game modal
         miscState.setAnimation(true)
         gameState.setShowMiniGame(true)
     })
 }
 
-export function minigameAnswer() {
-    
+function minigameInfo(type: 'error'|'success', message: string) {
+    const minigameResult = qS('#minigame_result')
+    minigameResult.className = type == 'error' ? 'text-red-400' : 'text-green-400'
+    minigameResult.textContent = message
 }
 
 function getWordCategories(miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: Record<'category', string>[])=>void) => {
         const minigameQuestion = qS('#minigame_question')
+        // set fetching info
+        minigameInfo('success', 'getting categories..')
         // categories api
         const wordCategoriesAPI = 'https://abc-5-dasar-api.vercel.app/api/word/categories'
         // fetching
@@ -91,6 +107,8 @@ function pickCategories(categoryList: string[]) {
 function getWordsPerCategory(categoryList: string[], miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: string[])=>void) => {
         const minigameQuestion = qS('#minigame_question')
+        // set fetching info
+        minigameInfo('success', 'getting words..')
         // get words from database
         const wordsContainer: {id: number; word: string}[] = []
         for(let category of categoryList) {
@@ -103,9 +121,6 @@ function getWordsPerCategory(categoryList: string[], miscState: IMiscContext, ga
                     // push id and word to container
                     // ### id wont be any use
                     wordsResponse.data.map(v => wordsContainer.push({id: v.id, word: v.word}))
-                    // split each word, ex: from [{id: 1, word: 'apple, apel'}] to ['apple', 'apel', 'japan', 'jepang']
-                    const splitEachWord = wordsContainer.map(v => v.word).join(', ').split(', ')
-                    resolve(splitEachWord)
                     break
                 default:
                     // error message, minigame canceled
@@ -120,6 +135,9 @@ function getWordsPerCategory(categoryList: string[], miscState: IMiscContext, ga
                     break
             }
         }
+        // split words, ex: from [{id: 1, word: 'apple, apel'}] to ['apple', 'apel', 'japan', 'jepang']
+        const tempWords = wordsContainer.map(v => v.word).join(', ').split(', ')
+        return resolve(tempWords)
     })
 }
 
@@ -143,4 +161,80 @@ function pickLetters(alphabets: string[], gameState: IGameContext) {
     }
     // return the selected letters
     return selectedLetters
+}
+
+export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+
+    // set info
+    minigameInfo('success', '')
+    // submit button
+    const answerButton = qS('#minigame_answer_submit') as HTMLInputElement
+    // input value container
+    const inputValues = {
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        answer: null,
+    }
+    
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName == 'INPUT') {
+            // filter inputs
+            if(setInputValue('minigame_answer', input)) inputValues.answer = input.value.trim().toLowerCase()
+            else {
+                // set error
+                const translateAnswer = translateUI({lang: miscState.language, text: 'answer'})
+                const translateError = translateUI({lang: miscState.language, text: 'only letters and spaces allowed'})
+                return minigameInfo('error', `${translateAnswer}: ${translateError}`)
+            }
+        }
+    }
+    // if answer empty, show error
+    if(inputValues.answer === '') 
+        return minigameInfo('error', `answer cannot be empty`)
+    // check if player has answered
+    const isAnswered = gameState.minigameAnswerList.map(v => v?.display_name).indexOf(inputValues.display_name)
+    if(isAnswered === -1) 
+        return minigameInfo('error', `you has answered`)
+    // answer button loading
+    answerButton.textContent = '.'
+    let counter = 0
+    const sendingAnswer = setInterval(() => {
+        if(counter === 3) {
+            answerButton.textContent = ''
+            counter = 0
+        }
+        answerButton.textContent += '.'
+        counter++
+    }, 1000);
+    answerButton.disabled = true
+    answerButton.classList.add('saturate-0')
+    // fetching
+    const answerFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const answerResponse: IResponse = await (await fetcher(`/minigame`, answerFetchOptions)).json()
+    // response
+    switch(answerResponse.status) {
+        case 200:
+            // stop interval
+            clearInterval(sendingAnswer)
+            // save access token
+            if(answerResponse.data[0].token) 
+                localStorage.setItem('accessToken', answerResponse.data[0].token)
+            return
+        default:
+            // stop interval
+            clearInterval(sendingAnswer)
+            answerButton.textContent = 'error'
+            // set info
+            minigameInfo('error', `${answerResponse.status}: ${answerResponse.message}`)
+            return
+    }
+}
+
+export function minigameAnswerCorrection(minigameData: GameRoomListener['minigameData'], miscState: IMiscContext, gameState: IGameContext) {
+    // ### data WORDS harus disimpan ke gameState 
+    // agar bisa dipakai untuk koreksi jawaban
 }

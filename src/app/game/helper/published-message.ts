@@ -4,6 +4,7 @@ import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 import { attackCityAnimation } from "./game-tile-event-attack-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
+import { minigameAnswerCorrection } from "./game-tile-event-minigame"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -203,6 +204,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // show notif next player turn
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
                                     .replace('ppp', getMessage.fixPlayerTurns[0])
+    }
+    // minigame
+    if(getMessage.minigameData) {
+        // check the answer
+        minigameAnswerCorrection(getMessage.minigameData, miscState, gameState)
     }
     // end turn
     if(getMessage.playerTurnEnd) {

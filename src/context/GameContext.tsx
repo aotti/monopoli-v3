@@ -49,6 +49,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // shop
     const [myCoins, setMyCoins] = useState(0)
     const [myShopItems, setMyShopItems] = useState<IGameContext['myShopItems']>(null)
+    // minigame
+    const [minigameAnswerList, setMinigameAnswerList] = useState<IGameContext['minigameAnswerList']>([])
 
     useEffect(() => {
         // set online players if exist
@@ -94,6 +96,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         dailyStatus, setDailyStatus,
         lastDailyStatus, setLastDailyStatus,
         dailyHistory, setDailyHistory,
+        minigameAnswerList, setMinigameAnswerList,
     }
 
     const roomStates = {
