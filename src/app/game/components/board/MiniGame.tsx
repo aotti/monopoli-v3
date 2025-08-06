@@ -54,8 +54,8 @@ export default function MiniGame() {
             <div className="flex flex-col justify-center p-1 border-t-2">
                 <p> {translateUI({lang: miscState.language, text: 'answer list'})} </p>
                 <div id="minigame_answer_list">
-                    {answerListDummy.map((v,i) => {
-                        const answerStatusClass = v.status === 'correct' ? 'text-green-400' : 'text-red-400'
+                    {gameState.minigameAnswerList.map((v,i) => {
+                        const answerStatusClass = v.status ? 'text-green-400' : 'text-red-400'
 
                         return (
                             <div key={i} className="grid grid-cols-3">

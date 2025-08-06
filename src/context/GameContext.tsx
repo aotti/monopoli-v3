@@ -50,6 +50,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [myCoins, setMyCoins] = useState(0)
     const [myShopItems, setMyShopItems] = useState<IGameContext['myShopItems']>(null)
     // minigame
+    const [minigameWords, setMinigameWords] = useState<string[]>([])
+    const [minigameMatchedWords, setMinigameMatchedWords] = useState<string[]>([])
     const [minigameAnswerList, setMinigameAnswerList] = useState<IGameContext['minigameAnswerList']>([])
 
     useEffect(() => {
@@ -96,6 +98,8 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         dailyStatus, setDailyStatus,
         lastDailyStatus, setLastDailyStatus,
         dailyHistory, setDailyHistory,
+        minigameWords, setMinigameWords,
+        minigameMatchedWords, setMinigameMatchedWords,
         minigameAnswerList, setMinigameAnswerList,
     }
 

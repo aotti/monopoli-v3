@@ -107,7 +107,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             })
             pubnubClient.removeListener(publishedMessage)
         }
-    }, [gameState.gamePlayerInfo, gameState.showGameNotif])
+    }, [gameState.gamePlayerInfo, gameState.showGameNotif, gameState.minigameWords, gameState.minigameMatchedWords])
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">

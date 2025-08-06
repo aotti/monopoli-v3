@@ -20,14 +20,14 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
         const [getWordsError, getWords] = await catchError(getWordsPerCategory(selectedCategories, miscState, gameState))
         // stop on fetch error
         if(getWordsError) return
+        gameState.setMinigameWords(getWords)
         // get the first letter of each word
         const alphabets = getWords.map(v => v.slice(0,1)).filter((v,i,arr) => arr.indexOf(v) === i)
         // set game letters (random)
         const selectedLetters = pickLetters(alphabets, gameState)
-        // match words with selected letters for matching the player answers
+        // filter words that only match with selected letters
         const matchedWords: string[] = []
         // match the splitted words with letters
-        // then use it to match the player answer
         for(let letter of selectedLetters) {
             getWords.map(v => {
                 v.startsWith(letter) 
@@ -37,6 +37,7 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
                     : null
             })
         }
+        gameState.setMinigameMatchedWords(matchedWords)
         // set categories and letters
         for(let i=0; i<3; i++) {
             const translateCategory = translateUI({lang: miscState.language, text: selectedCategories[i] as any, reverse: true})
@@ -174,7 +175,7 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
     const inputValues = {
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
-        answer: null,
+        minigame_answer: null,
     }
     
     // get input elements
@@ -183,7 +184,7 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName == 'INPUT') {
             // filter inputs
-            if(setInputValue('minigame_answer', input)) inputValues.answer = input.value.trim().toLowerCase()
+            if(setInputValue('minigame_answer', input)) inputValues.minigame_answer = input.value.trim().toLowerCase()
             else {
                 // set error
                 const translateAnswer = translateUI({lang: miscState.language, text: 'answer'})
@@ -193,11 +194,11 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
         }
     }
     // if answer empty, show error
-    if(inputValues.answer === '') 
+    if(inputValues.minigame_answer === '') 
         return minigameInfo('error', `answer cannot be empty`)
     // check if player has answered
     const isAnswered = gameState.minigameAnswerList.map(v => v?.display_name).indexOf(inputValues.display_name)
-    if(isAnswered === -1) 
+    if(isAnswered !== -1) 
         return minigameInfo('error', `you has answered`)
     // answer button loading
     answerButton.textContent = '.'
@@ -235,6 +236,46 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
 }
 
 export function minigameAnswerCorrection(minigameData: GameRoomListener['minigameData'], miscState: IMiscContext, gameState: IGameContext) {
-    // ### data WORDS harus disimpan ke gameState 
-    // agar bisa dipakai untuk koreksi jawaban
+    const {display_name, minigame_answer} = minigameData
+    // match the answer
+    const isCorrect = gameState.minigameMatchedWords?.map(v => {
+        // answer match
+        if(v === minigame_answer) return v
+    }).filter(i=>i)[0]
+    // check if the answer exist
+    const isExist = gameState.minigameWords?.map(v => {
+        // answer match
+        if(v === minigame_answer) return v
+    }).filter(i=>i)[0]
+    // match result
+    const answerData = {display_name, answer: minigame_answer, status: null, event_money: null}
+    if(isCorrect) {
+        console.log('correct answer')
+        // set info
+        minigameInfo('success', 'correct answer')
+        // add to answer list
+        answerData.status = true
+        answerData.event_money = 10_000
+        gameState.setMinigameAnswerList(data => [...data, answerData])
+    }
+    // wrong answer
+    else if(isExist) {
+        console.log('wrong answer')
+        // set info
+        minigameInfo('error', 'wrong answer')
+        // add to answer list
+        answerData.status = false
+        answerData.event_money = 5_000
+        gameState.setMinigameAnswerList(data => [...data, answerData])
+    }
+    // word doesnt exist
+    else {
+        console.log('word unknown')
+        // set info
+        minigameInfo('error', 'word unknown')
+        // add to answer list
+        answerData.status = false
+        answerData.event_money = 5_000
+        gameState.setMinigameAnswerList(data => [...data, answerData])
+    }
 }

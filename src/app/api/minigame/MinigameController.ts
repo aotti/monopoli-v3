@@ -35,7 +35,7 @@ export default class MinigameController extends Controller {
         // publish data
         const publishData = {
             display_name: payload.display_name,
-            minigame_answer: payload.answer,
+            minigame_answer: payload.minigame_answer,
         }
         const isGamePublished = await this.monopoliPublish(payload.channel, {minigameData: publishData})
         console.log(isGamePublished);

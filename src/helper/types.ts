@@ -89,7 +89,9 @@ export type GameRoomListener = {
     fixPlayerTurns: string[],
     minigameData: {
         display_name: string,
-        answer: string,
+        minigame_answer: string,
+        status?: boolean,
+        event_money?: number,
     },
 }
 
@@ -171,6 +173,7 @@ interface IMinigameAnswerList {
     display_name: string,
     answer: string,
     status: boolean,
+    event_money: number,
 }
 
 export interface IGameContext {
@@ -247,6 +250,10 @@ export interface IGameContext {
     // minigame
     minigameAnswerList: IMinigameAnswerList[], 
     setMinigameAnswerList: Dispatch<SetStateAction<IGameContext['minigameAnswerList']>>,
+    minigameWords: string[], 
+    setMinigameWords: Dispatch<SetStateAction<IGameContext['minigameWords']>>,
+    minigameMatchedWords: string[], 
+    setMinigameMatchedWords: Dispatch<SetStateAction<IGameContext['minigameMatchedWords']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
