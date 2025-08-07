@@ -326,8 +326,6 @@ function getAnswerList(gameState: IGameContext) {
                 tempAnswerList.push(answerData)
             }
         }
-        console.log(tempAnswerList, notAnsweredList);
-        
         // not answered player
         notAnsweredList.forEach(v => {
             const answerData: IGameContext['minigameAnswerList'][0] = {
@@ -339,6 +337,8 @@ function getAnswerList(gameState: IGameContext) {
             tempAnswerList.push(answerData)
         })
     }
+    // update answer list state
+    gameState.setMinigameAnswerList(tempAnswerList)
     // return answer list
     return tempAnswerList
 }
