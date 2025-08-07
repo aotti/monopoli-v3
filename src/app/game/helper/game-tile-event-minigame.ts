@@ -4,6 +4,7 @@ import { EventDataType, GameRoomListener, IGameContext, IMiscContext, IResponse 
 
 export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        const minigameTimer = qS('#minigame_timer')
         const minigameQuestion = qS('#minigame_question')
         const minigameCategories = qSA('.minigame_category')
         const minigameLetters = qSA('.minigame_letter')
@@ -53,6 +54,22 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
         // show mini game modal
         miscState.setAnimation(true)
         gameState.setShowMiniGame(true)
+        // set timer
+        const playerAmount = gameState.gamePlayerInfo.length
+        let minigameCounter = playerAmount === 2 ? 20 : 25 // seconds 
+        const minigameInterval = setInterval(() => {
+            if(minigameCounter < 0) {
+                clearInterval(minigameInterval)
+                minigameInfo('success', 'times up, distributing mini game result')
+                // get answer list
+                const answerList = getAnswerList(gameState)
+                console.log({answerList});
+                
+                return
+            }
+            minigameTimer.textContent = `time: ${minigameCounter}`
+            minigameCounter--
+        }, 1000);
     })
 }
 
@@ -196,10 +213,6 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
     // if answer empty, show error
     if(inputValues.minigame_answer === '') 
         return minigameInfo('error', `answer cannot be empty`)
-    // check if player has answered
-    const isAnswered = gameState.minigameAnswerList.map(v => v?.display_name).indexOf(inputValues.display_name)
-    if(isAnswered !== -1) 
-        return minigameInfo('error', `you has answered`)
     // answer button loading
     answerButton.textContent = '.'
     let counter = 0
@@ -237,6 +250,11 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
 
 export function minigameAnswerCorrection(minigameData: GameRoomListener['minigameData'], miscState: IMiscContext, gameState: IGameContext) {
     const {display_name, minigame_answer} = minigameData
+    // check if player has answered
+    const isAnswered = gameState.minigameAnswerList.map(v => v?.display_name).indexOf(display_name)
+    if(isAnswered !== -1) 
+        return minigameInfo('error', `you has answered`)
+    
     // match the answer
     const isCorrect = gameState.minigameMatchedWords?.map(v => {
         // answer match
@@ -247,35 +265,80 @@ export function minigameAnswerCorrection(minigameData: GameRoomListener['minigam
         // answer match
         if(v === minigame_answer) return v
     }).filter(i=>i)[0]
+
     // match result
-    const answerData = {display_name, answer: minigame_answer, status: null, event_money: null}
+    const answerData = {display_name, answer: minigame_answer, status: null, event_money: null} as IGameContext['minigameAnswerList'][0]
     if(isCorrect) {
-        console.log('correct answer')
         // set info
         minigameInfo('success', 'correct answer')
         // add to answer list
-        answerData.status = true
-        answerData.event_money = 10_000
+        answerData.status = 'correct'
+        answerData.event_money = 15_000
         gameState.setMinigameAnswerList(data => [...data, answerData])
     }
     // wrong answer
     else if(isExist) {
-        console.log('wrong answer')
         // set info
         minigameInfo('error', 'wrong answer')
         // add to answer list
-        answerData.status = false
-        answerData.event_money = 5_000
+        answerData.status = 'wrong'
+        answerData.event_money = 7_000
         gameState.setMinigameAnswerList(data => [...data, answerData])
     }
     // word doesnt exist
     else {
-        console.log('word unknown')
         // set info
         minigameInfo('error', 'word unknown')
         // add to answer list
-        answerData.status = false
-        answerData.event_money = 5_000
+        answerData.status = 'unknown'
+        answerData.event_money = 7_000
         gameState.setMinigameAnswerList(data => [...data, answerData])
     }
+}
+
+function getAnswerList(gameState: IGameContext) {
+    // get player amount and answer list
+    const playerInfo = gameState.gamePlayerInfo
+    const tempAnswerList: IGameContext['minigameAnswerList'] = []
+    const answerListElement = qS('#minigame_answer_list') as HTMLElement
+
+    // if answer amount != player amount
+    // auto input player who not answered
+    if(playerInfo.length !== answerListElement.children.length) {
+        // not answered player container
+        let notAnsweredList: string[] = null
+        // find player who not answered
+        for(let element of answerListElement.children) {
+            const answerData = element as HTMLElement
+            const [display_name, answer, status, event_money] = answerData.dataset.answer.split(',')
+
+            // get player data
+            const isAnswered = playerInfo.map(v => v.display_name).indexOf(display_name)
+            notAnsweredList = playerInfo.map(v => v.display_name == display_name ? null : v.display_name).filter(i=>i)
+            // answered player
+            if(isAnswered !== -1) {
+                const answerData: IGameContext['minigameAnswerList'][0] = {
+                    display_name: display_name, 
+                    answer: answer, 
+                    status: status as any, 
+                    event_money: +event_money
+                }
+                tempAnswerList.push(answerData)
+            }
+        }
+        console.log(tempAnswerList, notAnsweredList);
+        
+        // not answered player
+        notAnsweredList.forEach(v => {
+            const answerData: IGameContext['minigameAnswerList'][0] = {
+                display_name: v, 
+                answer: null, 
+                status: null, 
+                event_money: 1_000,
+            }
+            tempAnswerList.push(answerData)
+        })
+    }
+    // return answer list
+    return tempAnswerList
 }

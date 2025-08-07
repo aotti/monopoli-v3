@@ -37,14 +37,17 @@ export default function MiniGame() {
             </p>
 
             {/* answer form */}
-            <form className="flex items-center justify-center" onSubmit={ev => minigameAnswer(ev, miscState, gameState)}>
-                <label htmlFor="minigame_answer">
-                    {translateUI({lang: miscState.language, text: 'answer'})}:
-                </label>
-                <input type="text" id="minigame_answer" className="w-2/4 px-1" minLength={3} placeholder="type your answer" />
-                <button type="submit" id="minigame_answer_submit" className="min-w-8 bg-blue-500 border-8bit-primary !mx-4">
-                    {translateUI({lang: miscState.language, text: 'send'})}
-                </button>
+            <form className="flex flex-col items-center justify-center" onSubmit={ev => minigameAnswer(ev, miscState, gameState)}>
+                <span id="minigame_timer"></span>
+                <div>
+                    <label htmlFor="minigame_answer">
+                        {translateUI({lang: miscState.language, text: 'answer'})}:
+                    </label>
+                    <input type="text" id="minigame_answer" className="w-2/4 px-1" minLength={3} placeholder="type your answer" />
+                    <button type="submit" id="minigame_answer_submit" className="min-w-8 bg-blue-500 border-8bit-primary !mx-4">
+                        {translateUI({lang: miscState.language, text: 'send'})}
+                    </button>
+                </div>
             </form>
 
             {/* result info */}
@@ -55,10 +58,12 @@ export default function MiniGame() {
                 <p> {translateUI({lang: miscState.language, text: 'answer list'})} </p>
                 <div id="minigame_answer_list">
                     {gameState.minigameAnswerList.map((v,i) => {
-                        const answerStatusClass = v.status ? 'text-green-400' : 'text-red-400'
+                        const answerStatusClass = v.status == 'correct' ? 'text-green-400' 
+                                                : v.status == 'wrong' ? 'text-red-400'
+                                                                        : 'text-gray-400'
 
                         return (
-                            <div key={i} className="grid grid-cols-3">
+                            <div key={i} className="grid grid-cols-3" data-answer={`${v.display_name},${v.answer},${v.status},${v.event_money}`}>
                                 <span className={answerStatusClass}> {v.display_name} </span>
                                 <span className={answerStatusClass}> {v.answer} </span>
                                 <span className={answerStatusClass}> +Rp {v.event_money} </span>

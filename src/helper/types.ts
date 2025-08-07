@@ -172,7 +172,7 @@ interface IMyShopItems {
 interface IMinigameAnswerList {
     display_name: string,
     answer: string,
-    status: boolean,
+    status: 'correct'|'wrong'|'unknown',
     event_money: number,
 }
 

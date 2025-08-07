@@ -220,17 +220,24 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(`${square}`)
     // tile info
     const tileInfo = setTileInfo(name)
-    // prison info
+
     const findRoomInfo = gameState.gameRoomInfo.map(v => v.room_id).indexOf(gameState.gameRoomId)
-    const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
     const findPlayer = gameState.gamePlayerInfo?.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    // prison info
+    const prisonAccumulateLimit = gameState.gameRoomInfo[findRoomInfo].dice * 6
     const prisonNumber = gameState.gamePlayerInfo[findPlayer]?.prison
     const isPrisonNumber = typeof prisonNumber == 'number'
                         ? prisonNumber : '?'
+    // minigame info
+    const minigameNumber = gameState.gamePlayerInfo[findPlayer].minigame
     // modify info
     const newInfo = name.match(/arrested/i)
+                    // prison tile info
                     ? translateInfo.replace('xxx', `${isPrisonNumber}`).replace('xxx', `${prisonAccumulateLimit}`)
-                    : translateInfo
+                    // other tile info
+                    : name.match(/start/i)
+                        ? translateInfo.replace('xxx', `${minigameNumber}`)
+                        : translateInfo
 
     return (
         <div className="relative">
