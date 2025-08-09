@@ -419,7 +419,31 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/1$|2$/) : null
         // ====== MINIGAME TYPE ======
         case 'minigame_answer':
-            return value ? value.match(/^[a-zA-Z\s]+$/) : null
+            return value ? value.match(/^[a-z\s]+$/) : null
+        case 'minigame_chance':
+            return value ? value.match(/^[0-9]+$/) : null
+        case 'minigame_data':
+            // is array
+            if(Array.isArray(value)) {
+                // loop array, match element with regex
+                const minigameData = value as string[]
+                for(let data of minigameData) {
+                    // display name, answer, status, money
+                    const [display_name, answer, status, event_money] = data.split(',')
+                    // value not match regex
+                    switch(true) {
+                        case !display_name.match(/^[a-zA-Z0-9\s]{4,12}$/):
+                        case !answer.match(/^[a-z\s]+$/):
+                        case !status.match(/correct$|wrong$|unknown$/):
+                        case !event_money.match(/^[0-9]{4,5}$/):
+                            return null
+                    }
+                }
+                // value match regex
+                return minigameData
+            }
+            // not array
+            return null
         // ====== MISC TYPE ======
         case 'user_agent': 
             return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null

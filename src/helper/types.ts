@@ -368,7 +368,7 @@ type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'target_card'|'target_special_card'|'attack_type'|'attacker_name'|'attacker_city'
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
-type MinigameType = 'minigame_answer'
+type MinigameType = 'minigame_answer'|'minigame_chance'|'minigame_data'
 export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'language'|'user_agent'
 
 // user
@@ -645,7 +645,13 @@ interface IEventDebuff {
     debuff?: string,
 }
 
-export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff
+interface IEventMinigame {
+    event: 'mini_game',
+    data: IMinigameAnswerList[],
+    money: number,
+}
+
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff | IEventMinigame
 
 interface IBuyCity {
     action: 'buy',

@@ -2,10 +2,15 @@ import { FormEvent } from "react";
 import { catchError, fetcher, fetcherOptions, qS, qSA, setInputValue, translateUI } from "../../../helper/helper";
 import { EventDataType, GameRoomListener, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
 
-export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext) {
+export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0], miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
+        // check if player has minigame chance
+        if(playerTurnData.minigame <= 0) {
+            return resolve(null)
+        }
+
+        // html elements
         const minigameTimer = qS('#minigame_timer')
-        const minigameQuestion = qS('#minigame_question')
         const minigameCategories = qSA('.minigame_category')
         const minigameLetters = qSA('.minigame_letter')
         // get word categories
@@ -63,9 +68,11 @@ export function stopByMinigame(miscState: IMiscContext, gameState: IGameContext)
                 minigameInfo('success', 'times up, distributing mini game result')
                 // get answer list
                 const answerList = getAnswerList(gameState)
-                console.log({answerList});
-                
-                return
+                return resolve({
+                    event: 'mini_game',
+                    data: answerList,
+                    money: 0
+                })
             }
             minigameTimer.textContent = `time: ${minigameCounter}`
             minigameCounter--
@@ -269,11 +276,21 @@ export function minigameAnswerCorrection(minigameData: GameRoomListener['minigam
     // match result
     const answerData = {display_name, answer: minigame_answer, status: null, event_money: null} as IGameContext['minigameAnswerList'][0]
     if(isCorrect) {
-        // set info
-        minigameInfo('success', 'correct answer')
-        // add to answer list
-        answerData.status = 'correct'
-        answerData.event_money = 15_000
+        // check if someone have the same answer as prev player
+        const isDupeAnswer = getPrevAnswers().indexOf(minigame_answer)
+        // answer duplicate, set to wrong
+        if(isDupeAnswer !== -1) {
+            // set info
+            minigameInfo('error', 'wrong answer')
+            // add to answer list
+            setAnswerData('wrong', 7_000)
+        }
+        else {
+            // set info
+            minigameInfo('success', 'correct answer')
+            // add to answer list
+            setAnswerData('correct', 15_000)
+        }
         gameState.setMinigameAnswerList(data => [...data, answerData])
     }
     // wrong answer
@@ -281,8 +298,7 @@ export function minigameAnswerCorrection(minigameData: GameRoomListener['minigam
         // set info
         minigameInfo('error', 'wrong answer')
         // add to answer list
-        answerData.status = 'wrong'
-        answerData.event_money = 7_000
+        setAnswerData('wrong', 7_000)
         gameState.setMinigameAnswerList(data => [...data, answerData])
     }
     // word doesnt exist
@@ -290,9 +306,28 @@ export function minigameAnswerCorrection(minigameData: GameRoomListener['minigam
         // set info
         minigameInfo('error', 'word unknown')
         // add to answer list
-        answerData.status = 'unknown'
-        answerData.event_money = 7_000
+        setAnswerData('unknown', 1_000)
         gameState.setMinigameAnswerList(data => [...data, answerData])
+    }
+
+    type AnswerStatusType = IGameContext['minigameAnswerList'][0]['status']
+    function setAnswerData(status: AnswerStatusType, event_money: number) {
+        answerData.status = status
+        answerData.event_money = event_money
+    }
+
+    function getPrevAnswers() {
+        const tempPrevAnswers: string[] = []
+        // get answer list element
+        const answerListElement = qS('#minigame_answer_list') as HTMLElement
+        for(let element of answerListElement.children) {
+            const answerData = element as HTMLElement
+            const [display_name, answer, status, event_money] = answerData.dataset.answer.split(',')
+            // push answer to array
+            tempPrevAnswers.push(answer)
+        }
+        // return answers
+        return tempPrevAnswers
     }
 }
 

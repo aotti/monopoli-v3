@@ -6,19 +6,17 @@ import { minigameAnswer, stopByMinigame } from "../../helper/game-tile-event-min
 export default function MiniGame() {
     const miscState = useMisc()
     const gameState = useGame()
-
-    const answerListDummy = [
-        {display_name: 'wawan', answer: 'apel', status: 'correct', event_money: 10_000},
-        {display_name: 'bang yugo', answer: 'burung', status: 'wrong', event_money: 5_000},
-    ]
+    
+        const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+        const playerTurnData = gameState.gamePlayerInfo[findPlayer]
 
     return (
-        <div className={`relative z-10 top-[15%] lg:top-[30%] flex-col gap-2 bg-darkblue-1 border-8bit-text w-2/3 lg:w-2/4 leading-relaxed
+        <div className={`relative z-10 top-[15%] lg:top-[25%] flex-col gap-2 bg-darkblue-1 border-8bit-text w-2/3 lg:w-2/4 leading-relaxed
         ${gameState.showMiniGame ? 'flex' : 'flex'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p className="border-b-2 p-1"> 
                 Mini Game - {translateUI({lang: miscState.language, text: 'Scattergories'})} 
-                <button className="absolute right-1" onClick={() => stopByMinigame(miscState, gameState)}> test </button>
+                <button className="absolute right-1" onClick={() => stopByMinigame(playerTurnData, miscState, gameState)}> test </button>
             </p>
 
             {/* question */}
@@ -34,21 +32,28 @@ export default function MiniGame() {
                 <span className="minigame_letter text-green-400"> letter_2 </span>
                 <span className="minigame_letter text-green-400"> letter_3 </span>
                 <span> {translateUI({lang: miscState.language, text: ' based on categories!'})} </span>
+                <p id="minigame_timer"></p>
             </p>
 
             {/* answer form */}
-            <form className="flex flex-col items-center justify-center" onSubmit={ev => minigameAnswer(ev, miscState, gameState)}>
-                <span id="minigame_timer"></span>
-                <div>
-                    <label htmlFor="minigame_answer">
-                        {translateUI({lang: miscState.language, text: 'answer'})}:
-                    </label>
-                    <input type="text" id="minigame_answer" className="w-2/4 px-1" minLength={3} placeholder="type your answer" />
-                    <button type="submit" id="minigame_answer_submit" className="min-w-8 bg-blue-500 border-8bit-primary !mx-4">
-                        {translateUI({lang: miscState.language, text: 'send'})}
-                    </button>
-                </div>
-            </form>
+            {gameState.minigameAnswerList
+                .map(v => v.display_name)
+                .indexOf(gameState.myPlayerInfo.display_name) !== -1
+                // remove form after send answer
+                ? null
+                // display form
+                : <form className="flex flex-col items-center justify-center" onSubmit={ev => minigameAnswer(ev, miscState, gameState)}>
+                    <div>
+                        <label htmlFor="minigame_answer">
+                            {translateUI({lang: miscState.language, text: 'answer'})}:
+                        </label>
+                        <input type="text" id="minigame_answer" className="w-2/4 px-1" minLength={3} placeholder="type your answer" />
+                        <button type="submit" id="minigame_answer_submit" className="min-w-8 bg-blue-500 border-8bit-primary !mx-4">
+                            {translateUI({lang: miscState.language, text: 'send'})}
+                        </button>
+                    </div>
+                </form>
+            }
 
             {/* result info */}
             <p id="minigame_result"></p>

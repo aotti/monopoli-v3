@@ -229,7 +229,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const isPrisonNumber = typeof prisonNumber == 'number'
                         ? prisonNumber : '?'
     // minigame info
-    const minigameNumber = gameState.gamePlayerInfo[findPlayer].minigame
+    const minigameNumber = gameState.gamePlayerInfo[findPlayer]?.minigame
     // modify info
     const newInfo = name.match(/arrested/i)
                     // prison tile info
