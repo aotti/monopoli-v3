@@ -1,4 +1,4 @@
-import { IResponse } from "../../../helper/types";
+import { IGamePlay, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 
 export default class MinigameController extends Controller {
@@ -23,7 +23,7 @@ export default class MinigameController extends Controller {
         }
     }
 
-    async answer(action: string, payload) {
+    async answer(action: string, payload: IGamePlay['mini_game']) {
         let result: IResponse
         
         const filtering = await this.filters(action, payload)

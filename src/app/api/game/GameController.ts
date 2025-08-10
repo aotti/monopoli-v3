@@ -353,12 +353,14 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        console.log(payload);
+        
         // get player turns
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
         // update game history (buy city, get cards, etc)
         const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
-        // check payload.history, if contain get_card with multiple effects (one of them is move type)
-        // dont end player turn, except only 1 effect
+        // check payload.history, if it contain get_card with multiple effects (one of them is move type)
+        // dont end player turn, if only 1 effect this part will be skipped
         if(payload.history.match('get_card')) {
             const getCardType = payload.history.match(/(?<=get_card: ).*,.*(?=\s)/)
             const splitCardType = getCardType ? getCardType[0].split(',') : []
@@ -371,11 +373,11 @@ export default class GameController extends Controller {
                 // game history container
                 const tempGameHistory: IGameContext['gameHistory'] = []
                 // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
-                for(let ph of payload.history.split(';')) {
+                for(let history of payload.history.split(';')) {
                     const tempHistory = {
                         room_id: +roomId, 
                         display_name: payload.display_name, 
-                        history: ph
+                        history: history
                     }
                     // push to game history
                     tempGameHistory.push(tempHistory)
@@ -391,6 +393,7 @@ export default class GameController extends Controller {
                 return result
             }
         }
+
         // get temp event money
         const getTempEventMoney = await this.redisGet(`tempEventMoney_${payload.display_name}_${roomId}`)
         let tempEventMoney: number = 0
@@ -413,6 +416,7 @@ export default class GameController extends Controller {
             to: payload.display_name,
             money: +isTakeMoney[0]
         } : null
+
         // set payload for db query
         const queryObject: Partial<IQueryUpdate> = {
             table: 'games',
@@ -446,17 +450,18 @@ export default class GameController extends Controller {
             // game history container
             const gameHistory: IGameContext['gameHistory'] = []
             // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
-            for(let ph of payload.history.split(';')) {
+            for(let history of payload.history.split(';')) {
                 const tempHistory = {
                     room_id: +roomId, 
                     display_name: payload.display_name, 
-                    history: ph
+                    history: history
                 }
                 // push to game history
                 gameHistory.push(tempHistory)
             }
             // save game history to redis
             await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...gameHistory])
+            
             // push end turn player to playerTurns
             // check if turn end player is playing in this game
             const getDecidePlayers = await this.redisGet(`decidePlayers_${roomId}`)

@@ -543,6 +543,8 @@ export interface IGamePlay {
         tax_visitor: string,
         tax_owner: string,
         take_money: string,
+        minigame_chance: string,
+        minigame_data: string[],
     } & ITokenPayload,
     game_over: {
         room_id: string,
@@ -553,6 +555,11 @@ export interface IGamePlay {
         channel: string,
         display_name: string,
     } & ITokenPayload,
+    mini_game: {
+        channel: string,
+        display_name: string,
+        minigame_answer: string,
+    } & ITokenPayload
 }
 
 // stop by event
@@ -647,7 +654,8 @@ interface IEventDebuff {
 
 interface IEventMinigame {
     event: 'mini_game',
-    data: IMinigameAnswerList[],
+    mini_chance: number,
+    mini_data: string[],
     money: number,
 }
 

@@ -38,7 +38,7 @@ function PreparationButtons() {
     const miscState = useMisc()
 
     return (
-        <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
+        <div className="flex justify-around gap-6 mx-auto w-52 lg:w-72">
             <div>
                 <button type="submit" id="ready_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"> {translateUI({lang: miscState.language, text: 'ready'})} </button>
             </div>
@@ -54,7 +54,7 @@ function DecideTurnButtons() {
     const gameState = useGame()
 
     return (
-        <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
+        <div className="flex justify-around gap-6 mx-auto w-52 lg:w-72">
             <div>
                 <button type="button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75 saturate-0" disabled> 
                     {translateUI({lang: miscState.language, text: 'roll dice'})} 
@@ -76,7 +76,7 @@ function RollTurnButtons() {
     const gameState = useGame()
 
     return (
-        <div className="relative z-10 flex justify-around gap-6 mx-auto w-52 lg:w-72">
+        <div className="flex justify-around gap-6 mx-auto w-52 lg:w-72">
             <div>
                 <input type="hidden" id="rolled_dice" />
                 <button type="submit" id="roll_dice_button" className="min-w-20 bg-primary border-8bit-primary active:opacity-75"

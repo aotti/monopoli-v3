@@ -169,7 +169,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     </div>
                 }
                 {/* game notif + roll number + minigame */}
-                <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'block'} 
+                <div className={`${gameState.showGameNotif || gameState.showMiniGame || gameState.rollNumber ? 'block' : 'hidden'} 
                 absolute h-full w-full text-center text-2xs lg:text-xs`}>
                     {gameState.rollNumber ? <RollNumber roomId={gameState.gameRoomId} /> : null}
                     <GameNotif />

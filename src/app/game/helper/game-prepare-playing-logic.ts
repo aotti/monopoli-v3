@@ -524,7 +524,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
 
         // moving params
         let numberStep = 0
-        let [numberLaps, throughStart] = [playerTurnData.lap, 0]
+        let [numberLaps, throughStart, numberMinigame] = [playerTurnData.lap, 0, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
         // check next pos (only for board twoway)
         const tempDestinatedPos = (currentPos + playerDice) === 24 || (currentPos + playerDice) === 0 
@@ -623,6 +623,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         specialCardCollection.cards.push(specialCard)
                         specialCardCollection.effects.push(0)
                         throughStart = +specialEffect || 25_000
+                        // +1 minigame every 3 laps
+                        if(numberLaps % 3 === 0) numberMinigame = 1
                     }
                 }
             })
@@ -703,6 +705,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             setTimeout(() => {
                 miscState.setAnimation(false)
                 gameState.setShowGameNotif(null)
+                // hide mini game + reset answer list
+                gameState.setShowMiniGame(false)
+                gameState.setMinigameAnswerList([])
             }, 2000);
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
@@ -765,6 +770,14 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // update buff/debuff list
             const buffLeft = updateBuffDebuffList(buffCollection, playerTurnData.buff)
             const debuffLeft = updateBuffDebuffList(debuffCollection, playerTurnData.debuff)
+            // mini game data
+            const tempMinigameChance: number = (eventData as any)?.mini_chance
+            const minigameChance = typeof tempMinigameChance == 'number' 
+                                // after play minigame + get minigame chance (lap multiple of 3)
+                                ? tempMinigameChance + numberMinigame 
+                                // default 0/1
+                                : numberMinigame
+            const minigameData = (eventData as any)?.mini_data || []
 
             // input values container
             const inputValues: IGamePlay['turn_end'] & {action: string} = {
@@ -795,8 +808,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // prison accumulate
                 prison: isPrisonAccumulatePass.toString(),
                 // minigame
-                // minigame_chance: null,
-                // minigame_data: null,
+                minigame_chance: minigameChance.toString(),
+                minigame_data: minigameData,
             }
             // remove sub data (event history)
             localStorage.removeItem('subPlayerDice')

@@ -9,6 +9,9 @@ export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0]
             return resolve(null)
         }
 
+        // show mini game modal
+        miscState.setAnimation(true)
+        gameState.setShowMiniGame(true)
         // html elements
         const minigameTimer = qS('#minigame_timer')
         const minigameCategories = qSA('.minigame_category')
@@ -56,9 +59,6 @@ export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0]
         }
         // set info
         minigameInfo('success', '')
-        // show mini game modal
-        miscState.setAnimation(true)
-        gameState.setShowMiniGame(true)
         // set timer
         const playerAmount = gameState.gamePlayerInfo.length
         let minigameCounter = playerAmount === 2 ? 20 : 25 // seconds 
@@ -70,7 +70,8 @@ export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0]
                 const answerList = getAnswerList(gameState)
                 return resolve({
                     event: 'mini_game',
-                    data: answerList,
+                    mini_chance: playerTurnData.minigame - 1,
+                    mini_data: answerList,
                     money: 0
                 })
             }
@@ -78,12 +79,6 @@ export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0]
             minigameCounter--
         }, 1000);
     })
-}
-
-function minigameInfo(type: 'error'|'success', message: string) {
-    const minigameResult = qS('#minigame_result')
-    minigameResult.className = type == 'error' ? 'text-red-400' : 'text-green-400'
-    minigameResult.textContent = message
 }
 
 function getWordCategories(miscState: IMiscContext, gameState: IGameContext) {
@@ -334,7 +329,10 @@ export function minigameAnswerCorrection(minigameData: GameRoomListener['minigam
 function getAnswerList(gameState: IGameContext) {
     // get player amount and answer list
     const playerInfo = gameState.gamePlayerInfo
+    // 2 array container for answer
+    // temp = client-side data | payload = server-side data
     const tempAnswerList: IGameContext['minigameAnswerList'] = []
+    const payloadAnswerList: string[] = []
     const answerListElement = qS('#minigame_answer_list') as HTMLElement
 
     // if answer amount != player amount
@@ -344,8 +342,8 @@ function getAnswerList(gameState: IGameContext) {
         let notAnsweredList: string[] = null
         // find player who not answered
         for(let element of answerListElement.children) {
-            const answerData = element as HTMLElement
-            const [display_name, answer, status, event_money] = answerData.dataset.answer.split(',')
+            const answerElement = element as HTMLElement
+            const [display_name, answer, status, event_money] = answerElement.dataset.answer.split(',')
 
             // get player data
             const isAnswered = playerInfo.map(v => v.display_name).indexOf(display_name)
@@ -359,6 +357,8 @@ function getAnswerList(gameState: IGameContext) {
                     event_money: +event_money
                 }
                 tempAnswerList.push(answerData)
+                // push to payload answer list
+                payloadAnswerList.push(answerElement.dataset.answer)
             }
         }
         // not answered player
@@ -370,10 +370,36 @@ function getAnswerList(gameState: IGameContext) {
                 event_money: 1_000,
             }
             tempAnswerList.push(answerData)
+            // push to payload answer list
+            payloadAnswerList.push(`${v},null,null,1000`)
         })
+    }
+    else {
+        for(let element of answerListElement.children) {
+            const answerElement = element as HTMLElement
+            const [display_name, answer, status, event_money] = answerElement.dataset.answer.split(',')
+            // push to temp answer list
+            const answerData: IGameContext['minigameAnswerList'][0] = {
+                display_name: display_name, 
+                answer: answer, 
+                status: status as any, 
+                event_money: +event_money
+            }
+            tempAnswerList.push(answerData)
+            // push to payload answer list
+            payloadAnswerList.push(answerElement.dataset.answer)
+        }
     }
     // update answer list state
     gameState.setMinigameAnswerList(tempAnswerList)
+    // ### buat answer list dengan format 'string[]'
+    // ### ['wawan,kuda,wrong,7000', 'lelemao,apel,correct,15000']
     // return answer list
-    return tempAnswerList
+    return payloadAnswerList
+}
+
+function minigameInfo(type: 'error'|'success', message: string) {
+    const minigameResult = qS('#minigame_result')
+    minigameResult.className = type == 'error' ? 'text-red-400' : 'text-green-400'
+    minigameResult.textContent = message
 }

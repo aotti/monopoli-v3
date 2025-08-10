@@ -85,12 +85,17 @@ function getRandomInt(min: number, max: number) {
 }
 
 function diceController(dice: number, number: number[]) {
+    // play with 1 dice
     if(dice === 1) {
         const num = getRandomInt(0, number.length-1)
+        // match array index
+        // odd = match odd index then -1 (array 1 = dice 2 then -1 to get odd number)
         const diceOdd = `${num}`.match(/1|3|5/) ? num-1 : num
+        // even = vice versa
         const diceEven = `${num}`.match(/0|2|4/) ? num+1 : num
         return [diceOdd, diceEven]
     }
+    // play with 2 dices
     else if(dice === 2) {
         const diceRNG = getRandomInt(0, 1)
         const [numOne, numTwo] = [getRandomInt(0, number.length-1), getRandomInt(0, number.length-1)]
@@ -120,6 +125,7 @@ const buildItemLists = (itemList: any[], gameState: IGameContext, gameRoomInfo?:
     const slots = document.getElementsByClassName('slot');
     // set static dice
     const [diceOdd, diceEven] = gameRoomInfo ? diceController(gameRoomInfo.dice, itemList) : [null, null]
+
     // Iterate through the slot html elements
     Array.prototype.forEach.call(slots, (slot, s) => {
         let prizeBlocks = document.createElement('div');
@@ -134,7 +140,7 @@ const buildItemLists = (itemList: any[], gameState: IGameContext, gameRoomInfo?:
         })
     
         // Get a random item from the prizes array
-        let resultItem = getRandomInt(0, itemList.length-1);
+        let resultItem = getRandomInt(1, 1);
         // modify resultItem by dice mode
         switch(gameState.diceMode) {
             case 'odd':
