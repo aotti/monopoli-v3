@@ -87,12 +87,22 @@ export type GameRoomListener = {
         card: string,
     }[],
     fixPlayerTurns: string[],
-    minigameData: {
+    minigamePreparedData: {
+        categories: string[],
+        words: string[],
+        letters: string[],
+        matchedWords: string[],
+    },
+    minigameAnswerData: {
         display_name: string,
         minigame_answer: string,
         status?: boolean,
         event_money?: number,
     },
+    minigameResult: {
+        display_name: string,
+        event_money: number,
+    }[],
 }
 
 // context
@@ -269,7 +279,7 @@ interface IQueryBuilder {
     table: 'users'|'players'|'rooms'|'games';
     selectColumn?: string;
     function?: string;
-    function_args?: {[key: string]: string | number | boolean};
+    function_args?: {[key: string]: string | string[] | number | boolean};
     order?: [string, 'asc' | 'desc']
 }
 
@@ -557,8 +567,10 @@ export interface IGamePlay {
     } & ITokenPayload,
     mini_game: {
         channel: string,
+        room_id: string,
         display_name: string,
         minigame_answer: string,
+        player_amount: string,
     } & ITokenPayload
 }
 

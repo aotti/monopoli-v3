@@ -433,6 +433,7 @@ export default class GameController extends Controller {
                 tmp_prison: payload.prison,
                 tmp_buff: payload.buff,
                 tmp_debuff: payload.debuff,
+                tmp_minigame_result: payload.minigame_data,
             }
         }
         // run query
@@ -477,13 +478,15 @@ export default class GameController extends Controller {
                     await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
                 }
             }
+            // set minigame data for others
+
             // publish online players
             const publishData = {
                 playerTurnEnd: newPlayerTurnEndData,
                 taxes: taxes,
                 takeMoney: takeMoney,
                 playerTurns: getPlayerTurns,
-                gameHistory: [...getGameHistory, ...gameHistory]
+                gameHistory: [...getGameHistory, ...gameHistory],
             }
             const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);

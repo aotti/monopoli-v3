@@ -950,6 +950,9 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
         case 'get_debuff':
             historyArray.push(`${eventData.event}: ${eventData.type} 🙏`)
             return historyArray.join(';')
+        case 'mini_game':
+            historyArray.push(`${eventData.event}: Scattergories with oomfs 🥳`)
+            return historyArray.join(';')
         default: 
             return historyArray.join(';')
     }

@@ -117,34 +117,11 @@ export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOption
 export function fetcherOptions(args: FetchOptionsType) {
     const { method, credentials, noCache, domain } = args
     // get access token
-    const accessToken = localStorage.getItem('accessToken')
+    const accessToken = domain ? null : localStorage.getItem('accessToken')
     // get identifier
-    const getIdentifier = localStorage.getItem('identifier')
+    const getIdentifier = domain ? null : localStorage.getItem('identifier')
     // headers
-    const headers = credentials 
-                    // auth
-                    ? method == 'GET'
-                        // GET will only have authorization
-                        ? domain 
-                            // domain NOT NULL, credentials is required
-                            ? { 'content-type': 'application/json',
-                                'authorization': `Bearer ${accessToken}`,
-                                'credentials': `include`, }
-                            // domain is NULL
-                            : { 'authorization': `Bearer ${accessToken}`,
-                                'X-IDENTIFIER': getIdentifier }
-                        : method == 'PATCH'
-                            // PATCH must have credentials
-                            ? { 'content-type': 'application/json',
-                                'credentials': `include`,
-                                'authorization': `Bearer ${accessToken}` }
-                        // POST, PUT, DELETE with auth
-                        : { 'content-type': 'application/json',
-                            'authorization': `Bearer ${accessToken}`,
-                            'X-IDENTIFIER': getIdentifier }
-                    // POST register/login
-                    : { 'content-type': 'application/json',
-                        'X-IDENTIFIER': getIdentifier }
+    const headers = setCustomHeaders()
     // cache
     const cache = noCache ? { cache: 'no-store' } : {}
     // method
@@ -160,17 +137,78 @@ export function fetcherOptions(args: FetchOptionsType) {
         case 'DELETE': 
             return { method: method, headers: headers, body: args.body }
     }
+
+    function setCustomHeaders() {
+        // with authorization header
+        if(credentials) {
+            // is method GET
+            if(method === 'GET') {
+                // fetching custom domain
+                if(domain) {
+                    return { 
+                        'content-type': 'application/json',
+                        'credentials': `include`, 
+                    }
+                }
+                // fetching same origin
+                else {
+                    return { 
+                        'authorization': `Bearer ${accessToken}`,
+                        'X-IDENTIFIER': getIdentifier 
+                    }
+                }
+            }
+            // is method POST
+            else if(method === 'POST') {
+                // fetching custom domain
+                if(domain) {
+                    return { 
+                        'content-type': 'application/json',
+                        'authorization': process.env.MINIGAME_AUTH_TOKEN,
+                        'user-id': process.env.MINIGAME_USER_ID,
+                        'credentials': `include`, 
+                    }
+                }
+                // fetching same origin
+                else {
+                    return { 
+                        'authorization': `Bearer ${accessToken}`,
+                        'X-IDENTIFIER': getIdentifier 
+                    }
+                }
+            }
+            // method PUT, DELETE
+            else {
+                return { 
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${accessToken}`,
+                    'X-IDENTIFIER': getIdentifier 
+                }
+            }
+        }
+        // without authorization header
+        else {
+            // for POST register/login
+            return { 
+                'content-type': 'application/json',
+                'X-IDENTIFIER': getIdentifier 
+            }
+        }
+    }
 }
 
 export function fetcher(endpoint: string, options: RequestInit, customEndpoint?: boolean) {
-    const host = `${window.location.origin}/api`
-    const url = host + endpoint
-
-    return customEndpoint 
-        // fetch with custom endpoint
-        ? fetch(endpoint, options)
-        // normal fetch
-        : fetch(url, options)
+    // fetch with custom endpoint
+    if(customEndpoint) {
+        const url = endpoint
+        return fetch(url, options)
+    }
+    // fetch same origin
+    else {
+        const host = `${window.location.origin}/api`
+        const url = host + endpoint
+        return fetch(url, options)
+    }
 }
 
 export function resetAllData(gameState: IGameContext) {
@@ -356,7 +394,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             // set regex
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex, buffRegex, debuffRegex] = [
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex, buffRegex, debuffRegex, minigameRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
@@ -368,8 +406,9 @@ export function filterInput(input: InputIDType, value: string) {
                 'special_card: .* 💳',
                 'get_buff: .* 🙏',
                 'get_debuff: .* 🙏',
+                'mini_game: Scattergories with oomfs 🥳',
             ]
-            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}|${buffRegex}|${debuffRegex}`, 'g')
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}|${buffRegex}|${debuffRegex}|${minigameRegex}`, 'g')
             // set length
             // used to verify the regex, if client send 2 history 
             // but only match 1, something is wrong 
@@ -434,7 +473,7 @@ export function filterInput(input: InputIDType, value: string) {
                     switch(true) {
                         case !display_name.match(/^[a-zA-Z0-9\s]{4,12}$/):
                         case !answer.match(/^[a-z\s]+$/):
-                        case !status.match(/correct$|wrong$|unknown$/):
+                        case !status.match(/correct$|wrong$|unknown$|null$/):
                         case !event_money.match(/^[0-9]{4,5}$/):
                             return null
                     }
