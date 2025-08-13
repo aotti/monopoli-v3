@@ -24,33 +24,6 @@ export default class MinigameController extends Controller {
         }
     }
 
-    async answer(action: string, payload: IGamePlay['mini_game']) {
-        let result: IResponse
-        
-        const filtering = await this.filters(action, payload)
-        if(filtering.status !== 200) return filtering
-        delete payload.token
-        // get filter data
-        const {token, onlinePlayersData} = filtering.data[0]
-
-        // publish data
-        const publishData = {
-            display_name: payload.display_name,
-            minigame_answer: payload.minigame_answer,
-        }
-        const isGamePublished = await this.monopoliPublish(payload.channel, {minigameAnswerData: publishData})
-        console.log(isGamePublished);
-        
-        if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-        // set result
-        const resultData = {
-            token: token
-        }
-        result = this.respond(200, `${action} success`, [resultData])
-        // return result
-        return result
-    }
-
     async preparation(action: string, payload: IGamePlay['mini_game']) {
         let result: IResponse
         
@@ -117,6 +90,75 @@ export default class MinigameController extends Controller {
             token: token
         }
         result = this.respond(200, `${action} success`, [resultData])
+        // return result
+        return result
+    }
+
+    async answer(action: string, payload: IGamePlay['mini_game']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+
+        // publish data
+        const publishData = {
+            display_name: payload.display_name,
+            minigame_answer: payload.minigame_answer,
+        }
+        const isGamePublished = await this.monopoliPublish(payload.channel, {minigameAnswerData: publishData})
+        console.log(isGamePublished);
+        
+        if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+        // set result
+        const resultData = {
+            token: token
+        }
+        result = this.respond(200, `${action} success`, [resultData])
+        // return result
+        return result
+    }
+
+    async unknownAnswer(action: string, payload: IGamePlay['mini_game']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        
+        // ### player_id, room_id, answer_id, answer_words
+        const inputValues = {
+            action: 'insert word alt',
+            payload: [{
+                player_id: 0,
+                room_id: 0,
+                answer_id: 0,
+                answer_words: `${payload.display_name} - ${payload.minigame_answer}`,
+            }],
+        }
+        // word alt api
+        const wordAltAPI = 'https://abc-5-dasar-api.vercel.app/api/word-alt/insert'
+        // fetching
+        const wordAltFetchOptions = fetcherOptions({
+            method: 'POST', 
+            credentials: true, 
+            domain: wordAltAPI, 
+            body: JSON.stringify(inputValues)
+        })
+        const wordAltResponse: IResponse = await (await fetcher(wordAltAPI, wordAltFetchOptions, true)).json()
+        // set result
+        switch (wordAltResponse.status) {
+            case 200:
+                result = this.respond(200, `${action} success`, [{token}])
+                break
+            default:
+                result = this.respond(wordAltResponse.status, wordAltResponse.message, [])
+                break
+        }
         // return result
         return result
     }

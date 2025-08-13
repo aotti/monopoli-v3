@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, userAgent } from "next/server";
 import Controller from "../Controller";
 import MinigameController from "./MinigameController";
+import { IResponse } from "../../../helper/types";
 
 export async function GET(req: NextRequest) {
     // api action
@@ -30,8 +31,6 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    // api action
-    const action = 'minigame answer'
     // client payload
     const payload = await req.json()
     const controller = new Controller()
@@ -47,9 +46,17 @@ export async function POST(req: NextRequest) {
     payload.token = isAuth.data[0].accessToken
     // add user agent
     payload.user_agent = `${userAgent(req).ua}_${checkXID.data}`
+    // get action
+    const action = payload.action
+    delete payload.action
     // process
     const minigameController = new MinigameController()
-    const result = await minigameController.answer(action, payload)
+    let result: IResponse = null
+    switch(action) {
+        case 'minigame answer': result = await minigameController.answer(action, payload); break
+        case 'minigame unknown answer': result = await minigameController.unknownAnswer(action, payload); break
+        default: result = {status: 404, message: 'request failed', data: []}
+    }
     // return data to client
     return NextResponse.json(result, {status: result.status})
 }

@@ -131,7 +131,8 @@ export default class Controller {
             // shop
             case 'shop buy': [filterStatus, filterMessage] = loopKeyValue(); break
             // minigame
-            case 'minigame answer': [filterStatus, filterMessage] = loopKeyValue(); break
+            case 'minigame answer': 
+            case 'minigame unknown answer': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])

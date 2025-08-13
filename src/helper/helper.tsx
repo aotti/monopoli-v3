@@ -165,7 +165,6 @@ export function fetcherOptions(args: FetchOptionsType) {
                     return { 
                         'content-type': 'application/json',
                         'authorization': process.env.MINIGAME_AUTH_TOKEN,
-                        'user-id': process.env.MINIGAME_USER_ID,
                         'credentials': `include`, 
                     }
                 }

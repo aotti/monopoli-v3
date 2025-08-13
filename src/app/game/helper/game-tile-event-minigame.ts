@@ -88,6 +88,7 @@ export async function minigameAnswer(ev: FormEvent<HTMLFormElement>, miscState: 
     const answerButton = qS('#minigame_answer_submit') as HTMLInputElement
     // input value container
     const inputValues = {
+        action: 'minigame answer',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
         minigame_answer: null,
@@ -202,8 +203,9 @@ export function minigameAnswerCorrection(minigameAnswerData: GameRoomListener['m
         // add to answer list
         setAnswerData('unknown', 1_000)
         gameState.setMinigameAnswerList(data => [...data, answerData])
-        // fetch answer to database
-        saveUnknownAnswer(display_name, minigame_answer)
+        // fetch answer to database (only fetch for the answerer)
+        if(display_name == gameState.myPlayerInfo.display_name)
+            saveUnknownAnswer(display_name, minigame_answer)
     }
 
     type AnswerStatusType = IGameContext['minigameAnswerList'][0]['status']
@@ -313,25 +315,17 @@ export function getAnswerList(gameState: IGameContext) {
 
 async function saveUnknownAnswer(displayName: string, minigameAnswer: string) {
     const minigameUnknownStatus = qS('#minigame_unknown_status')
-    // ### player_id, room_id, answer_id, answer_words
-    const inputValues = [{
-        player_id: 0,
-        room_id: 0,
-        answer_id: 0,
-        answer_words: `${displayName} - ${minigameAnswer}`,
-    }]
-    // categories api
-    const wordAltAPI = 'https://abc-5-dasar-api.vercel.app/api/word-alt/insert'
+    // payload
+    const inputValues = {
+        action: 'minigame unknown answer',
+        display_name: displayName,
+        minigame_answer: minigameAnswer
+    }
     // fetching
-    const wordAltFetchOptions = fetcherOptions({
-        method: 'POST', 
-        credentials: true, 
-        domain: wordAltAPI, 
-        body: JSON.stringify(inputValues)
-    })
-    const wordAltResponse: IResponse = await (await fetcher(wordAltAPI, wordAltFetchOptions, true)).json()
+    const unknownAnswerFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const unknownAnswerResponse: IResponse = await (await fetcher(`/minigame`, unknownAnswerFetchOptions)).json()
     // response
-    switch (wordAltResponse.status) {
+    switch (unknownAnswerResponse.status) {
         case 200:
             minigameUnknownStatus.textContent = '✅'
             break

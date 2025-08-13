@@ -353,7 +353,6 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
-        console.log(payload);
         
         // get player turns
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
@@ -479,6 +478,10 @@ export default class GameController extends Controller {
                 }
             }
             // set minigame data for others
+            const minigameResultData = payload.minigame_data.map(v => {
+                const [display_name, answer, status, event_money] = v.split(',')
+                return {display_name, event_money}
+            })
 
             // publish online players
             const publishData = {
@@ -487,6 +490,7 @@ export default class GameController extends Controller {
                 takeMoney: takeMoney,
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory],
+                minigameResult: minigameResultData,
             }
             const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);

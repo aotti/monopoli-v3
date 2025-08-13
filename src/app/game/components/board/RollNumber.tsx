@@ -140,7 +140,7 @@ const buildItemLists = (itemList: any[], gameState: IGameContext, gameRoomInfo?:
         })
     
         // Get a random item from the prizes array
-        let resultItem = getRandomInt(0, itemList.length-1);
+        let resultItem = getRandomInt(1, 1);
         // modify resultItem by dice mode
         switch(gameState.diceMode) {
             case 'odd':
