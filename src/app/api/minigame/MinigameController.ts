@@ -124,10 +124,10 @@ export default class MinigameController extends Controller {
     private getWordCategories() {
         return new Promise(async (resolve: (value: Record<'category', string>[])=>void) => {
             // categories api
-            const wordCategoriesAPI = 'https://abc-5-dasar-api.vercel.app/api/word/categories'
+            const categoriesAPI = 'https://abc-5-dasar-api.vercel.app/api/word/categories'
             // fetching
-            const categoriesFetchOptions = fetcherOptions({method: 'GET', credentials: true, domain: wordCategoriesAPI})
-            const categoriesResponse: IResponse = await (await fetcher(wordCategoriesAPI, categoriesFetchOptions, true)).json()
+            const categoriesFetchOptions = fetcherOptions({method: 'GET', credentials: true, domain: categoriesAPI})
+            const categoriesResponse: IResponse = await (await fetcher(categoriesAPI, categoriesFetchOptions, true)).json()
             // response
             switch(categoriesResponse.status) {
                 case 200:

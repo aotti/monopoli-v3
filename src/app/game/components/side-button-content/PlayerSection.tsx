@@ -175,10 +175,10 @@ function DiceControlOption() {
             </label>
             {isDiceControllerExist
                 ? <button type="button" id="dice_control" className="px-1 border-2" onClick={diceModeHandler}>
-                    {gameState.diceMode}
+                    {translateUI({lang: miscState.language, text: gameState.diceMode})}
                 </button>
                 : <button type="button" id="dice_control" className="px-1 border-2">
-                    {gameState.diceMode}
+                    {translateUI({lang: miscState.language, text: gameState.diceMode})}
                 </button>}
             
         </div>

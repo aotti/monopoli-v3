@@ -206,9 +206,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                                     .replace('ppp', getMessage.fixPlayerTurns[0])
     }
     // minigame prepared data
-    console.log('websoket', getMessage?.minigamePreparedData);
     if(getMessage.minigamePreparedData) {
-        
         // html elements
         const minigameTimer = qS('#minigame_timer')
         const minigameCategories = qSA('.minigame_category')
@@ -237,7 +235,14 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 clearInterval(minigameInterval)
                 minigameInfo('success', 'times up, distributing mini game result..')
                 // display answer list (all players)
-                return getAnswerList(gameState)
+                getAnswerList(gameState)
+                // hide minigame modal
+                return setTimeout(() => {
+                    // hide mini game + reset answer list
+                    miscState.setAnimation(false)
+                    gameState.setShowMiniGame(false)
+                    gameState.setMinigameAnswerList([])
+                }, 3000);
             }
             minigameTimer.textContent = `time: ${minigameCounter}`
             minigameCounter--

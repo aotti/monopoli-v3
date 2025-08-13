@@ -1,22 +1,19 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { translateUI } from "../../../../helper/helper"
-import { minigameAnswer, stopByMinigame } from "../../helper/game-tile-event-minigame"
+import { minigameAnswer } from "../../helper/game-tile-event-minigame"
 
 export default function MiniGame() {
     const miscState = useMisc()
     const gameState = useGame()
-    
-        const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
-        const playerTurnData = gameState.gamePlayerInfo[findPlayer]
 
     return (
         <div className={`relative z-10 top-[15%] lg:top-[25%] flex-col gap-2 bg-darkblue-1 border-8bit-text w-2/3 lg:w-2/4 leading-relaxed
         ${gameState.showMiniGame ? 'flex' : 'hidden'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p className="border-b-2 p-1"> 
-                Mini Game - {translateUI({lang: miscState.language, text: 'Scattergories'})} 
-                <button className="absolute right-1" onClick={() => stopByMinigame(playerTurnData, miscState, gameState)}> test </button>
+                <span> Mini Game - {translateUI({lang: miscState.language, text: 'Scattergories'})} </span>
+                <span id="minigame_unknown_status" className="absolute right-1"></span>
             </p>
 
             {/* question */}

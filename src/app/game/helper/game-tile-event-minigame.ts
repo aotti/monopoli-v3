@@ -202,6 +202,8 @@ export function minigameAnswerCorrection(minigameAnswerData: GameRoomListener['m
         // add to answer list
         setAnswerData('unknown', 1_000)
         gameState.setMinigameAnswerList(data => [...data, answerData])
+        // fetch answer to database
+        saveUnknownAnswer(display_name, minigame_answer)
     }
 
     type AnswerStatusType = IGameContext['minigameAnswerList'][0]['status']
@@ -307,6 +309,36 @@ export function getAnswerList(gameState: IGameContext) {
     gameState.setMinigameAnswerList(tempAnswerList)
     // return answer list
     return payloadAnswerList
+}
+
+async function saveUnknownAnswer(displayName: string, minigameAnswer: string) {
+    const minigameUnknownStatus = qS('#minigame_unknown_status')
+    // ### player_id, room_id, answer_id, answer_words
+    const inputValues = [{
+        player_id: 0,
+        room_id: 0,
+        answer_id: 0,
+        answer_words: `${displayName} - ${minigameAnswer}`,
+    }]
+    // categories api
+    const wordAltAPI = 'https://abc-5-dasar-api.vercel.app/api/word-alt/insert'
+    // fetching
+    const wordAltFetchOptions = fetcherOptions({
+        method: 'POST', 
+        credentials: true, 
+        domain: wordAltAPI, 
+        body: JSON.stringify(inputValues)
+    })
+    const wordAltResponse: IResponse = await (await fetcher(wordAltAPI, wordAltFetchOptions, true)).json()
+    // response
+    switch (wordAltResponse.status) {
+        case 200:
+            minigameUnknownStatus.textContent = '✅'
+            break
+        default:
+            minigameUnknownStatus.textContent = '❌'
+            break
+    }
 }
 
 export function minigameInfo(type: 'error'|'success', message: string) {
