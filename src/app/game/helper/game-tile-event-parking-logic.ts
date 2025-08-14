@@ -51,9 +51,14 @@ export function stopByParking(findPlayer: number, rng: string[], miscState: IMis
                 // modify button
                 const parkingButtons = qSA(`[data-id^=notif_button]`) as NodeListOf<HTMLInputElement>
                 for(let i=0; i<parkingButtons.length; i++) {
-                    // skip prison (tile 10, i 9) & parking (tile 22, i 21) 
-                    // skip special effect (nerf tiles)
-                    if(i === 9 || i === 21 || specialEffect?.match(`${i}`)) continue
+                    // skip start (tile 1, i 0), 
+                    // prison (tile 10, i 9), 
+                    // parking (tile 22, i 21) 
+                    // debuff (tile 3, i 2 and tile 18, i 17)
+                    // cursed (tile 9, i 8 and tile 24, i 23)
+                    // skip tiles from nerf parking card
+                    const skippedTiles = [0, 9, 21, 2, 17, 8, 23]
+                    if(skippedTiles.indexOf(i) !== -1 || specialEffect?.match(`${i}`)) continue
 
                     const pb = parkingButtons[i]
                     pb.classList.remove('hidden')

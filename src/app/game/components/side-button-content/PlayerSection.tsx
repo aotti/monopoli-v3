@@ -164,7 +164,7 @@ function DiceControlOption() {
             case 'even':
                 gameState.setDiceMode('off'); break
             default:
-                ev.currentTarget.textContent = 'off'
+                gameState.setDiceMode('off'); break
         }
     }
 

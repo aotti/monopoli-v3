@@ -65,6 +65,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         localStorage.removeItem('buffDebuffUsed')
         localStorage.removeItem('moreMoney')
         localStorage.removeItem('playerTurns')
+        // reset dice controller value
+        gameState.setDiceMode('off')
 
         // set player turn
         const setPlayerTurnText = () => {
