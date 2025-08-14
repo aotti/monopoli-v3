@@ -119,5 +119,18 @@
             "game_ready;;null;;null",
             "game_over;;random;;https://www.youtube.com/shorts/8iOZb9LfBPs"
         ]
+    },
+    "mini_game": {
+        "page 1": [
+            "minigame can only be played on start tile",
+            "player will get minigame chance every 3 laps",
+            "when someone start the minigame, others can play it too"
+        ],
+        "page 2": [
+            "correct answer will give Rp 15000",
+            "wrong answer will give Rp 7000",
+            "unknown/empty answer will give Rp 1000",
+            "if player 1 answer with \"apple\" then player 2 using the same answer, it will be considered \"wrong\""
+        ]
     }
 }

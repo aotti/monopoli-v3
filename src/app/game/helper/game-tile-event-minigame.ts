@@ -254,7 +254,7 @@ export function getAnswerList(gameState: IGameContext) {
     }
     // if answer amount != player amount
     // auto input player who not answered
-    else if(playerInfo.length !== answerListElement.children.length) {
+    else if(playerInfo.length > answerListElement.children.length) {
         // not answered player container
         let notAnsweredList: string[] = null
         // find player who not answered
