@@ -29,7 +29,7 @@ export default function MiniGame() {
                 <span className="minigame_letter text-green-400"> letter_2 </span>
                 <span className="minigame_letter text-green-400"> letter_3 </span>
                 <span> {translateUI({lang: miscState.language, text: ' based on categories!'})} </span>
-                <span id="minigame_timer" className="block">
+                <span id="minigame_timer" className="block text-green-400">
                     {gameState.minigameHintAnswers ? `hints: ${gameState.minigameHintAnswers.join(', ')}` : ''}
                 </span>
             </p>
