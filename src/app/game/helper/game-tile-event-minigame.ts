@@ -340,3 +340,18 @@ export function minigameInfo(type: 'error'|'success', message: string) {
     minigameResult.className = type == 'error' ? 'text-red-400' : 'text-green-400'
     minigameResult.textContent = message
 }
+
+export function setCategoriesAndLetters(categories: string[], letters: string[], miscState: IMiscContext) {
+    const minigameCategories = qSA('.minigame_category')
+    const minigameLetters = qSA('.minigame_letter')
+
+    for(let i=0; i<3; i++) {
+        const translateCategory = translateUI({lang: miscState.language, text: categories[i] as any, reverse: true})
+        minigameCategories[i].textContent = i == 2 
+                                        ? `${translateCategory}` 
+                                        : `${translateCategory}, `
+        minigameLetters[i].textContent = i == 2 
+                                        ? `${letters[i].toUpperCase()}` 
+                                        : `${letters[i].toUpperCase()}, `
+    }
+}

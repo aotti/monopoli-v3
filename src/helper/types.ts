@@ -92,6 +92,7 @@ export type GameRoomListener = {
         words: string[],
         letters: string[],
         matchedWords: string[],
+        hintAnswers: string[],
     },
     minigameAnswerData: {
         display_name: string,
@@ -264,6 +265,8 @@ export interface IGameContext {
     setMinigameWords: Dispatch<SetStateAction<IGameContext['minigameWords']>>,
     minigameMatchedWords: string[], 
     setMinigameMatchedWords: Dispatch<SetStateAction<IGameContext['minigameMatchedWords']>>,
+    minigameHintAnswers: string[], 
+    setMinigameHintAnswers: Dispatch<SetStateAction<IGameContext['minigameHintAnswers']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~

@@ -521,6 +521,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // set tile info & element if theres special card
         if(playerSpecialCard && playerTurnData.city) 
             [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
+        // set last turn money
+        const lastTurnMoney = localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
 
         // moving params
         let numberStep = 0

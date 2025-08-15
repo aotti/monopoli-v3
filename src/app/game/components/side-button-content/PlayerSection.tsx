@@ -46,6 +46,13 @@ export default function PlayerSection() {
                     const debuffText = player.debuff?.split(';').map(v => v.replace(/_.*/, '')).join('\n') || '-'
                     // buff/debuff tooltip
                     const buffDebuffTooltip = `buff:\n${buffText}\ndebuff:\n${debuffText}`
+                    // get last turn money
+                    const getLastTurnMoney = localStorage.getItem('lastTurnMoney') 
+                                            ? moneyFormat(+localStorage.getItem('lastTurnMoney'))
+                                            : '-'
+                    const lastTurnMoneyTooltip = player.display_name == gameState.myPlayerInfo.display_name
+                                                ? `money before\n${getLastTurnMoney}`
+                                                : null
 
                     return (
                         <div key={i} className="flex items-stretch text-center gap-1">
@@ -53,7 +60,7 @@ export default function PlayerSection() {
                                 <span className="relative w-full" data-tooltip={buffDebuffTooltip}> {player.display_name} </span>
                             </div>
                             <div className="flex items-center w-[15vw] bg-darkblue-2">
-                                <span className="w-full"> {moneyFormat(player.money)} </span>
+                                <span className="w-full" data-tooltip={lastTurnMoneyTooltip}> {moneyFormat(player.money)} </span>
                             </div>
                             <div className={`relative flex items-center bg-darkblue-2 ${player.card ? '' : 'saturate-0'}`} 
                             data-tooltip={`~${translateSpecialCard?.replaceAll(';', '\n~')}`}>

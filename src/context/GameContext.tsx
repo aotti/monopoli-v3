@@ -53,6 +53,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const [minigameWords, setMinigameWords] = useState<string[]>([])
     const [minigameMatchedWords, setMinigameMatchedWords] = useState<string[]>([])
     const [minigameAnswerList, setMinigameAnswerList] = useState<IGameContext['minigameAnswerList']>([])
+    const [minigameHintAnswers, setMinigameHintAnswers] = useState<string[]>(null)
 
     useEffect(() => {
         // set online players if exist
@@ -98,9 +99,6 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         dailyStatus, setDailyStatus,
         lastDailyStatus, setLastDailyStatus,
         dailyHistory, setDailyHistory,
-        minigameWords, setMinigameWords,
-        minigameMatchedWords, setMinigameMatchedWords,
-        minigameAnswerList, setMinigameAnswerList,
     }
 
     const roomStates = {
@@ -119,6 +117,10 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         gameQuakeCity, setGameQuakeCity,
         diceMode, setDiceMode,
         gameHistory, setGameHistory,
+        minigameWords, setMinigameWords,
+        minigameMatchedWords, setMinigameMatchedWords,
+        minigameAnswerList, setMinigameAnswerList,
+        minigameHintAnswers, setMinigameHintAnswers,
     }
 
     const states: IGameContext = {

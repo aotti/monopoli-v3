@@ -4,7 +4,7 @@ import { qS, qSA, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 import { attackCityAnimation } from "./game-tile-event-attack-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
-import { getAnswerList, minigameAnswerCorrection, minigameInfo } from "./game-tile-event-minigame"
+import { getAnswerList, minigameAnswerCorrection, minigameInfo, setCategoriesAndLetters } from "./game-tile-event-minigame"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -209,22 +209,12 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.minigamePreparedData) {
         // html elements
         const minigameTimer = qS('#minigame_timer')
-        const minigameCategories = qSA('.minigame_category')
-        const minigameLetters = qSA('.minigame_letter')
         // set minigame data
-        const {categories, words, letters, matchedWords} = getMessage.minigamePreparedData
+        const {categories, words, letters, matchedWords, hintAnswers} = getMessage.minigamePreparedData
         gameState.setMinigameWords(words)
         gameState.setMinigameMatchedWords(matchedWords)
         // set categories and letters
-        for(let i=0; i<3; i++) {
-            const translateCategory = translateUI({lang: miscState.language, text: categories[i] as any, reverse: true})
-            minigameCategories[i].textContent = i == 2 
-                                            ? `${translateCategory}` 
-                                            : `${translateCategory}, `
-            minigameLetters[i].textContent = i == 2 
-                                            ? `${letters[i].toUpperCase()}` 
-                                            : `${letters[i].toUpperCase()}, `
-        }
+        setCategoriesAndLetters(categories, letters, miscState)
         // set info
         minigameInfo('success', '')
         // set timer
@@ -236,13 +226,22 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 minigameInfo('success', 'times up, distributing mini game result..')
                 // display answer list (all players)
                 getAnswerList(gameState)
+                // display 6 hint answer
+                gameState.setMinigameHintAnswers(hintAnswers)
                 // hide minigame modal
                 return setTimeout(() => {
+                    // reset categories and letters
+                    setCategoriesAndLetters(
+                        ['category_1', 'category_2', 'category_3'],
+                        ['letter_1', 'letter_2', 'letter_3'],
+                        miscState
+                    )
                     // hide mini game + reset answer list
                     miscState.setAnimation(false)
                     gameState.setShowMiniGame(false)
                     gameState.setMinigameAnswerList([])
-                }, 3000);
+                    gameState.setMinigameHintAnswers(null)
+                }, 5000);
             }
             minigameTimer.textContent = `time: ${minigameCounter}`
             minigameCounter--

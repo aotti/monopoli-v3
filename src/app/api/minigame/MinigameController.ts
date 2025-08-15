@@ -72,6 +72,17 @@ export default class MinigameController extends Controller {
             })
         }
         console.log('set letters & matched words success')
+        // set 6 hint answers
+        const tempMatchedWords = matchedWords
+        const hintAnswers: string[] = []
+        const hintAmount = 6
+        for(let i=0; i<hintAmount; i++) {
+            // set random index
+            const randHint = Math.floor(Math.random() * tempMatchedWords.length)
+            // push hint word to hint answers
+            const hintWord = tempMatchedWords.splice(randHint, 1)[0]
+            hintAnswers.push(hintWord)
+        }
 
         // publish data
         const publishData = {
@@ -79,6 +90,7 @@ export default class MinigameController extends Controller {
             words: getWords,
             letters: selectedLetters,
             matchedWords: matchedWords,
+            hintAnswers: hintAnswers,
         }
         const gameroomChannel = `monopoli-gameroom-${payload.room_id}`
         const isGamePublished = await this.monopoliPublish(gameroomChannel, {minigamePreparedData: publishData})
