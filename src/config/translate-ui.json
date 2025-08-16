@@ -1,6 +1,13 @@
 {
     "test": ["Create Account"],
     "indonesia": {
+        "__TRANSLATE BAGIAN LAIN__": "__TRANSLATE BAGIAN LAIN__",
+        "Fix": "Perbaiki",
+        "report bugs": "lapor keanehan",
+        "you can only report every 10 minutes, please send proper report": "anda hanya bisa lapor tiap 10 menit, tolong kirim laporan yang benar",
+        "description": "jelaskan",
+        "ex: when playing, i have anti prison card but when i go to prison, theres no choices to use the card": "contoh: saat bermain, saya punya kartu anti penjara tapi waktu masuk penjara, kartunya gk bisa dipake",
+        
         "__TRANSLATE BAGIAN HOME__": "__TRANSLATE BAGIAN HOME__",
         "Do you already have an account?": "Apakah anda sudah punya akun?",
         "takes too long? back to ": "terlalu lama? kembali ke ",
@@ -182,7 +189,6 @@
         "even": "genap",
         "Game History": "Catatan Main",
         "Attack City": "Serang Kota",
-        "Fix": "Perbaiki",
         "sell": "jual",
         "raid": "gas",
         "quake": "gempa",
@@ -446,7 +452,7 @@
         "__MINIGAME TRANSLATE__": "__MINIGAME TRANSLATE__",
         "Scattergories": "ABC 5 Dasar",
         "answer": "jawaban",
-        "send": "kirim",
+        "Send": "Kirim",
         "only letters and spaces allowed": "hanya boleh huruf dan spasi",
         "answer list": "daftar jawaban",
         "Categories: ": "Kategori: ",

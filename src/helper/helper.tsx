@@ -298,6 +298,8 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[a-zA-Z0-9]+$/) : null
         case 'language':
             return value ? value.match(/english$|indonesia$/) : null
+        case 'description':
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{4,}$/) : null
 
         // ====== PLAYER TYPE ======
         // filter uuid

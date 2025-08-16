@@ -48,7 +48,7 @@ export default function MiniGame() {
                         </label>
                         <input type="text" id="minigame_answer" className="w-2/4 px-1" minLength={3} placeholder="type your answer" />
                         <button type="submit" id="minigame_answer_submit" className="min-w-8 bg-blue-500 border-8bit-primary !mx-4">
-                            {translateUI({lang: miscState.language, text: 'send'})}
+                            {translateUI({lang: miscState.language, text: 'Send', lowercase: true})}
                         </button>
                     </div>
                 </form>

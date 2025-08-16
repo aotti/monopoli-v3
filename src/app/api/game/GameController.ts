@@ -1,5 +1,14 @@
+import { Ratelimit } from "@upstash/ratelimit";
+import { fetcher, fetcherOptions } from "../../../helper/helper";
 import { ICreateRoom, IGameContext, IGamePlay, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
+import { Redis } from "@upstash/redis";
+
+const rateLimitSendReportBugs = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(1, '10m'),
+    prefix: '@upstash/ratelimit',
+})
 
 export default class GameController extends Controller {
     private async filters(action: string, payload: any) {
@@ -728,6 +737,41 @@ export default class GameController extends Controller {
         // set result
         result = this.respond(200, `${action} success`, [1])
         // return result
+        return result
+    }
+
+    async sendReportBugs(action: string, payload: IGamePlay['report_bugs']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitSendReportBugs.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+        
+        // fetching
+        const reportBugsWebhook = process.env.REPORT_BUGS_WEBHOOK
+        const reportBugsContent = {
+            content: `${process.env.REPORT_BUGS_TARGET}\n**Bug Report**\n${payload.display_name} - ${payload.description}`
+        }
+        const reportBugsFetchOptions = fetcherOptions({method: 'POST', credentials: true, domain: reportBugsWebhook, body: JSON.stringify(reportBugsContent)})
+        const reportBugsResponse: Response = await fetcher(reportBugsWebhook, reportBugsFetchOptions, true)
+        // response
+        switch(true) {
+            case reportBugsResponse.status < 300: 
+                result = this.respond(200, `${action} success`, [])
+                break
+            default:
+                result = this.respond(reportBugsResponse.status, reportBugsResponse.statusText, [])
+                break
+        }
         return result
     }
 }

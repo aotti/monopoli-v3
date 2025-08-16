@@ -153,7 +153,7 @@ export default class MinigameController extends Controller {
             }],
         }
         // word alt api
-        const wordAltAPI = 'https://abc-5-dasar-api.vercel.app/api/word-alt/insert'
+        const wordAltAPI = `${process.env.MINIGAME_API}/word-alt/insert`
         // fetching
         const wordAltFetchOptions = fetcherOptions({
             method: 'POST', 
@@ -178,7 +178,7 @@ export default class MinigameController extends Controller {
     private getWordCategories() {
         return new Promise(async (resolve: (value: Record<'category', string>[])=>void) => {
             // categories api
-            const categoriesAPI = 'https://abc-5-dasar-api.vercel.app/api/word/categories'
+            const categoriesAPI = `${process.env.MINIGAME_API}/word/categories`
             // fetching
             const categoriesFetchOptions = fetcherOptions({method: 'GET', credentials: true, domain: categoriesAPI})
             const categoriesResponse: IResponse = await (await fetcher(categoriesAPI, categoriesFetchOptions, true)).json()
@@ -217,7 +217,7 @@ export default class MinigameController extends Controller {
             const wordsContainer: {id: number; word: string}[] = []
             for(let category of categoryList) {
                 // get words 
-                const wordsAPI = `https://abc-5-dasar-api.vercel.app/api/word/${category}`
+                const wordsAPI = `${process.env.MINIGAME_API}/word/${category}`
                 const wordsFetchOptions = fetcherOptions({method: 'GET', credentials: true, domain: wordsAPI})
                 const wordsResponse: IResponse = await (await fetcher(wordsAPI, wordsFetchOptions, true)).json()
                 switch(wordsResponse.status) {

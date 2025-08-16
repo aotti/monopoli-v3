@@ -382,7 +382,7 @@ type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
 type MinigameType = 'minigame_answer'|'minigame_chance'|'minigame_data'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'language'|'user_agent'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'description'|'language'|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -574,7 +574,11 @@ export interface IGamePlay {
         display_name: string,
         minigame_answer: string,
         player_amount: string,
-    } & ITokenPayload
+    } & ITokenPayload,
+    report_bugs: {
+        display_name: string,
+        description: string,
+    } & ITokenPayload,
 }
 
 // stop by event
