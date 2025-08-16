@@ -37,7 +37,6 @@ export function useSpecialCard(data: SpecialCardEventType, findPlayer: number, m
             // split card
             const splitSpecialCard = playerTurnData.card?.split(';')
             // get card
-            // ### KEMUNGKINAN ERROR DISINI
             const specialCard = splitSpecialCard?.map(v => v.match(/anti tax|nerf tax/i)).flat().filter(i=>i) || []
             // match special card
             for(let sc of specialCard) {
@@ -46,7 +45,7 @@ export function useSpecialCard(data: SpecialCardEventType, findPlayer: number, m
                     // show notif (tax)
                     miscState.setAnimation(true)
                     gameState.setShowGameNotif('with_button-2' as any)
-                    const newPrice = price * .35
+                    const newPrice = price * .5
                     return resolve(await specialCardConfirmation({sc, newValue: newPrice, eventContent}))
                 }
                 else if(sc == 'anti tax') {

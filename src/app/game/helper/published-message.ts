@@ -290,8 +290,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 }
             }
             // if theres minigame
-            console.log('minigame result', getMessage?.minigameResult);
-            
             if(getMessage?.minigameResult) {
                 // update all players except playerTurnEnd
                 for(let other of getMessage?.minigameResult) {
