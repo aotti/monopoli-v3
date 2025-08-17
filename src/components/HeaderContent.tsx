@@ -3,6 +3,7 @@ import Updates from "./Updates"
 import FixBugs from "./FixBugs"
 import LanguageButton from "./LanguageButton"
 import { useGame } from "../context/GameContext"
+import ReportBugs from "./ReportBugs"
 
 export default function HeaderContent() {
     const gameState = useGame()
@@ -20,9 +21,9 @@ export default function HeaderContent() {
             <span className="font-semibold text-base lg:text-xl"> Monopoli Lemao </span>
             <div className="absolute top-2 right-4 flex gap-4">
                 {/* fix bug only admin */}
-                {gameState.myPlayerInfo && gameState.myPlayerInfo.display_name == 'gandesblood'
-                    ? <FixBugs />
-                    : null}
+                {gameState.myPlayerInfo?.display_name == 'gandesblood' ? <FixBugs /> : null}
+                {/* report bug*/}
+                {gameState.myPlayerInfo?.display_name != 'guest' ? <ReportBugs /> : null}
                 {/* translate button */}
                 <LanguageButton />
             </div>

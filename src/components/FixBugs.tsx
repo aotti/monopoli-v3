@@ -15,7 +15,7 @@ export default function FixBugs() {
         <>
             {/* button */}
             <div>
-                <button type="button" className="-ml-4 active:opacity-75 hover:animate-pulse" onClick={() => setShowFixBugs(true)}> 
+                <button type="button" className="active:opacity-75 hover:animate-pulse" onClick={() => setShowFixBugs(true)}> 
                     <img src="https://img.icons8.com/?size=50&id=11151&format=png&color=FFFFFF" alt="fix-bugs" className="!w-8 !h-8 lg:!w-10 lg:!h-10" draggable={false} /> 
                 </button>
             </div>

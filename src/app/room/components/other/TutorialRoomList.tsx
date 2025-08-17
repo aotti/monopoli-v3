@@ -48,7 +48,7 @@ export default function TutorialRoomList() {
             </div>
             {/* player stats */}
             <div className={`${miscState.showTutorial == 'tutorial_roomlist_2' ? 'block' : 'hidden'} 
-            absolute mt-2 pr-1 right-0 bottom-0 lg:bottom-10 w-2/3 lg:right-[calc(20%-1rem)] lg:w-1/2`}>
+            absolute mt-2 pr-1 right-0 bottom-1 lg:bottom-10 w-2/3 lg:right-[calc(20%-1rem)] lg:w-1/2`}>
                 <p className="text-balance">
                     {translateUI({lang: miscState.language, text: tutorialText.part_2[0] as any})}
                 </p>

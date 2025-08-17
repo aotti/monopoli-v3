@@ -8,6 +8,7 @@ import { stopByCursedCity } from "./game-tile-event-cursed-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff, stopByBuffDebuff, updateBuffDebuffList } from "./game-tile-event-buff-debuff-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
+import { stopByMinigame } from "./game-tile-event-minigame"
 
 /*
     TABLE OF CONTENTS
@@ -520,10 +521,13 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // set tile info & element if theres special card
         if(playerSpecialCard && playerTurnData.city) 
             [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
+        // set last turn money
+        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
+            localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
 
         // moving params
         let numberStep = 0
-        let [numberLaps, throughStart] = [playerTurnData.lap, 0]
+        let [numberLaps, throughStart, numberMinigame] = [playerTurnData.lap, 0, 0]
         const currentPos = +playerTurnData.pos.split('x')[0]
         // check next pos (only for board twoway)
         const tempDestinatedPos = (currentPos + playerDice) === 24 || (currentPos + playerDice) === 0 
@@ -622,6 +626,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         specialCardCollection.cards.push(specialCard)
                         specialCardCollection.effects.push(0)
                         throughStart = +specialEffect || 25_000
+                        // +1 minigame every 3 laps
+                        if(numberLaps % 3 === 0) numberMinigame = 1
                     }
                 }
             })
@@ -669,6 +675,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             .then(eventData => resolve(eventData))
                             .catch(err => console.log(err))
                             break
+                        case 'start': 
+                            stopByMinigame(playerTurnData, miscState, gameState)
+                            .then(eventData => resolve(eventData))
+                            .catch(err => console.log(err))
+                            break
                         default: 
                             resolve(null)
                             break
@@ -696,12 +707,17 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             // close notif after 2 secs
             setTimeout(() => {
                 miscState.setAnimation(false)
-                gameState.setShowGameNotif(null)
-            }, 2000);
+                gameState.setShowGameNotif(display => display == 'card' || display =='normal' ? display : null)
+                // hide mini game + reset answer list
+                gameState.setShowMiniGame(false)
+                gameState.setMinigameAnswerList([])
+            }, 3000);
             // prevent other player from doing event
             if(playerTurn != gameState.myPlayerInfo.display_name) return
-            // check sub player dice
+            // check sub player dice (removed after turn end)
+            // rolled dice number saved here to prevent overwriting by move event from chance/community
             const subPlayerDice = localStorage.getItem('subPlayerDice')
+
             // get tax data
             const taxData = eventData?.event == 'pay_tax' 
                             ? {owner: eventData.owner, visitor: eventData.visitor} 
@@ -723,41 +739,49 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 {type: 'debuff', effect: 'reduce money', money: eventMoney},
                 findPlayer, miscState, gameState
             ) as [string, number] : [null, null] as [string, number];
+            // sum event money
+            const sumEventMoney = eventMoney - (reduceMoneyDebuff[1] || 0)
+
             // add debuff reduce money & set notif message
             debuffCollection.push(reduceMoneyDebuff[0])
             notifMessage.textContent += reduceMoneyDebuff[0] ? `\n${translateUI({lang: miscState.language, text: '"debuff reduce money"'})}` : ''
             // get buff/debuff event data
             if((eventData as any)?.buff) buffCollection.push((eventData as any)?.buff)
             if((eventData as any)?.debuff) debuffCollection.push((eventData as any)?.debuff)
+
             // get prison accumulate number
-            const prisonNumber = playerTurnData.prison
-            // check if player is just step on prison / already arrested
-            const isFirstArrested = (eventData as any)?.accumulate === 0
-            const isArrested = prisonNumber < 0 ? null : prisonNumber
-            // accumulate dice number
-            const prisonAccumulate = isFirstArrested 
-                                    ? 0 
-                                    : typeof isArrested == 'number' && isArrested > -1 
-                                        ? (isArrested + playerDice) 
-                                        : -1
-            // check if accumulate dice is enough
-            // 1 dice = 6, 2 dice = 12
-            const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
-            const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
+            const isPrisonAccumulatePass = checkPrisonStatus({
+                playerTurnData, 
+                eventData, 
+                playerDice, 
+                diceAmount: gameState.gameRoomInfo[findRoom].dice
+            })
+            
             // check if player is losing
             const playerTurnEndMoney = (playerTurnData.money + (eventMoney - (reduceMoneyDebuff[1] || 0)))
             const playerTurnEndLose = playerTurnEndMoney < loseCondition
             // the void buff
-            const playerVoidMoney = playerTurnEndLose ? useBuffDebuff(
-                {type: 'buff', effect: 'the void', money: playerTurnData.money + (eventMoney - (reduceMoneyDebuff[1] || 0))},
-                findPlayer, miscState, gameState
-            ) as [string, number] : [null, null] as [string, number];
+            const playerVoidMoney = playerTurnEndLose 
+                ? useBuffDebuff(
+                    {type: 'buff', effect: 'the void', money: playerTurnData.money + sumEventMoney},
+                    findPlayer, miscState, gameState
+                ) as [string, number] 
+                : [null, null] as [string, number];
             // add buff the void & set notif message
             buffCollection.push(playerVoidMoney[0])
             notifMessage.textContent += playerVoidMoney[0] ? `\n${translateUI({lang: miscState.language, text: '"buff the void"'})}` : ''
             // update buff/debuff list
             const buffLeft = updateBuffDebuffList(buffCollection, playerTurnData.buff)
             const debuffLeft = updateBuffDebuffList(debuffCollection, playerTurnData.debuff)
+            // mini game data
+            const tempMinigameChance: number = (eventData as any)?.mini_chance
+            const minigameChance = typeof tempMinigameChance == 'number' 
+                                // after play minigame + get minigame chance (lap multiple of 3)
+                                ? tempMinigameChance + numberMinigame 
+                                // default 0/1
+                                : numberMinigame
+            const minigameData = (eventData as any)?.mini_data || []
+
             // input values container
             const inputValues: IGamePlay['turn_end'] & {action: string} = {
                 action: 'game turn end',
@@ -769,7 +793,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     : destinatedPos,
                 lap: numberLaps.toString(),
                 // money from event that occured
-                event_money: (playerVoidMoney[1] || eventMoney - (reduceMoneyDebuff[1] || 0)).toString(),
+                event_money: (playerVoidMoney[1] || sumEventMoney).toString(),
                 // history = rolled_dice: num;buy_city: str;pay_tax: str;sell_city: str;get_card: str;use_card: str
                 // Math.abs to prevent move backward event cuz dice number gonna be minus
                 history: setEventHistory(`rolled_dice: ${subPlayerDice || Math.abs(playerDice)}`, eventData),
@@ -785,9 +809,12 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 // taking money from players
                 take_money: (eventData as any)?.takeMoney || null,
                 // prison accumulate
-                prison: isPrisonAccumulatePass.toString()
+                prison: isPrisonAccumulatePass.toString(),
+                // minigame
+                minigame_chance: minigameChance.toString(),
+                minigame_data: minigameData,
             }
-            // remove sub data
+            // remove sub data (event history)
             localStorage.removeItem('subPlayerDice')
             localStorage.removeItem('subEventData')
             localStorage.removeItem('parkingEventData')
@@ -831,6 +858,33 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             }
         }
     })
+}
+
+interface IPrisonData {
+    playerTurnData: IGameContext['gamePlayerInfo'][0], 
+    eventData: EventDataType, 
+    playerDice: number, 
+    diceAmount: number,
+}
+function checkPrisonStatus(data: IPrisonData) {
+    const {playerTurnData, eventData, playerDice, diceAmount} = data
+    // get prison accumulate number
+    const prisonNumber = playerTurnData.prison
+    // check if player is just step on prison / already arrested
+    const isFirstArrested = (eventData as any)?.accumulate === 0
+    const isArrested = prisonNumber < 0 ? null : prisonNumber
+    // accumulate dice number
+    const prisonAccumulate = isFirstArrested 
+                            ? 0 
+                            : typeof isArrested == 'number' && isArrested > -1 
+                                ? (isArrested + playerDice) 
+                                : -1
+    // check if accumulate dice is enough
+    // 1 dice = 6, 2 dice = 12
+    // const prisonAccumulateLimit = gameState.gameRoomInfo[findRoom].dice * 6
+    const prisonAccumulateLimit = diceAmount * 6
+    const isPrisonAccumulatePass = prisonAccumulate > prisonAccumulateLimit ? -1 : prisonAccumulate
+    return isPrisonAccumulatePass
 }
 
 // ========== # CHECK BRANCH TILES ==========
@@ -898,6 +952,9 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
         case 'get_buff': 
         case 'get_debuff':
             historyArray.push(`${eventData.event}: ${eventData.type} 🙏`)
+            return historyArray.join(';')
+        case 'mini_game':
+            historyArray.push(`${eventData.event}: Scattergories with oomfs 🥳`)
             return historyArray.join(';')
         default: 
             return historyArray.join(';')

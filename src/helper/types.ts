@@ -8,6 +8,7 @@ export interface ITranslate {
     lang: 'english' | 'indonesia',
     text: keyof typeof translateUI_data['indonesia'],
     lowercase?: boolean,
+    reverse?: boolean,
 }
 
 // tooltip
@@ -86,6 +87,23 @@ export type GameRoomListener = {
         card: string,
     }[],
     fixPlayerTurns: string[],
+    minigamePreparedData: {
+        categories: string[],
+        words: string[],
+        letters: string[],
+        matchedWords: string[],
+        hintAnswers: string[],
+    },
+    minigameAnswerData: {
+        display_name: string,
+        minigame_answer: string,
+        status?: boolean,
+        event_money?: number,
+    },
+    minigameResult: {
+        display_name: string,
+        event_money: number,
+    }[],
 }
 
 // context
@@ -146,6 +164,7 @@ interface IGamePlayerInfo {
     card: string,
     city: string,
     prison: number,
+    minigame: number,
     buff: string,
     debuff: string,
 }
@@ -161,12 +180,21 @@ interface IMyShopItems {
     buff: string[],
 }
 
+interface IMinigameAnswerList {
+    display_name: string,
+    answer: string,
+    status: 'correct'|'wrong'|'unknown',
+    event_money: number,
+}
+
 export interface IGameContext {
     // board
     showTileImage: 'city'|'other',
     setShowTileImage: Dispatch<SetStateAction<IGameContext['showTileImage']>>,
     showGameNotif: 'normal'|'with_button'|'card'|'card_with_button',
     setShowGameNotif: Dispatch<SetStateAction<IGameContext['showGameNotif']>>,
+    showMiniGame: boolean,
+    setShowMiniGame: Dispatch<SetStateAction<boolean>>,
     rollNumber: 'dice'|'turn',
     setRollNumber: Dispatch<SetStateAction<IGameContext['rollNumber']>>,
     // side buttons
@@ -199,10 +227,6 @@ export interface IGameContext {
     setLastDailyStatus: Dispatch<SetStateAction<string>>,
     dailyHistory: Record<'reward_type'|'reward_item'|'reward_date', string>[],
     setDailyHistory: Dispatch<SetStateAction<IGameContext['dailyHistory']>>,
-    myCoins: number,
-    setMyCoins: Dispatch<SetStateAction<number>>,
-    myShopItems: IMyShopItems[], 
-    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
     // room 
     roomList: ICreateRoom['list'][],
     setRoomList: Dispatch<SetStateAction<ICreateRoom['list'][]>>,
@@ -229,6 +253,20 @@ export interface IGameContext {
     setDiceMode: Dispatch<SetStateAction<IGameContext['diceMode']>>,
     gameHistory: IGameHistory[], 
     setGameHistory: Dispatch<SetStateAction<IGameContext['gameHistory']>>,
+    // shop
+    myCoins: number,
+    setMyCoins: Dispatch<SetStateAction<number>>,
+    myShopItems: IMyShopItems[], 
+    setMyShopItems: Dispatch<SetStateAction<IGameContext['myShopItems']>>,
+    // minigame
+    minigameAnswerList: IMinigameAnswerList[], 
+    setMinigameAnswerList: Dispatch<SetStateAction<IGameContext['minigameAnswerList']>>,
+    minigameWords: string[], 
+    setMinigameWords: Dispatch<SetStateAction<IGameContext['minigameWords']>>,
+    minigameMatchedWords: string[], 
+    setMinigameMatchedWords: Dispatch<SetStateAction<IGameContext['minigameMatchedWords']>>,
+    minigameHintAnswers: string[], 
+    setMinigameHintAnswers: Dispatch<SetStateAction<IGameContext['minigameHintAnswers']>>,
 }
 
 // ~~ POSTGREST RETURN TYPE PROMISE ~~
@@ -244,7 +282,7 @@ interface IQueryBuilder {
     table: 'users'|'players'|'rooms'|'games';
     selectColumn?: string;
     function?: string;
-    function_args?: {[key: string]: string | number | boolean};
+    function_args?: {[key: string]: string | string[] | number | boolean};
     order?: [string, 'asc' | 'desc']
 }
 
@@ -268,18 +306,20 @@ export interface IQueryUpdate extends IQueryBuilder {
 }
 
 // fetch
-export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'DELETE'}
+export type RequestInitMod = Omit<RequestInit, 'method'> & {method: 'GET'|'POST'|'PUT'|'PATCH'|'DELETE'}
 
 interface IFetchWithoutBody {
     method: Extract<RequestInitMod['method'], 'GET'>,
     credentials?: boolean,
     noCache?: boolean,
+    domain?: string,
 }
 interface IFetchWithBody {
     method: Exclude<RequestInitMod['method'], 'GET'>,
     body: RequestInitMod['body'],
     credentials?: boolean,
     noCache?: boolean,
+    domain?: string,
 }
 interface IFetchOptions {
     without: Omit<IFetchWithoutBody, 'credentials'> & {headers?: RequestInitMod['headers']},
@@ -341,7 +381,8 @@ type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
 type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city_property'|'target_city'|'target_card'|'target_special_card'|'attack_type'|'attacker_name'|'attacker_city'
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|'language'|'user_agent'
+type MinigameType = 'minigame_answer'|'minigame_chance'|'minigame_data'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'description'|'language'|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -515,6 +556,8 @@ export interface IGamePlay {
         tax_visitor: string,
         tax_owner: string,
         take_money: string,
+        minigame_chance: string,
+        minigame_data: string[],
     } & ITokenPayload,
     game_over: {
         room_id: string,
@@ -524,6 +567,17 @@ export interface IGamePlay {
     fix_player_turns: {
         channel: string,
         display_name: string,
+    } & ITokenPayload,
+    mini_game: {
+        channel: string,
+        room_id: string,
+        display_name: string,
+        minigame_answer: string,
+        player_amount: string,
+    } & ITokenPayload,
+    report_bugs: {
+        display_name: string,
+        description: string,
     } & ITokenPayload,
 }
 
@@ -617,7 +671,14 @@ interface IEventDebuff {
     debuff?: string,
 }
 
-export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff
+interface IEventMinigame {
+    event: 'mini_game',
+    mini_chance: number,
+    mini_data: string[],
+    money: number,
+}
+
+export type EventDataType = IEventBuyCity | IEventPayTax | IEventCards | IEventPrison | IEventParking | IEventCursed | IEventSpecial | IEventBuff | IEventDebuff | IEventMinigame
 
 interface IBuyCity {
     action: 'buy',

@@ -5,8 +5,20 @@ import { createHash, randomBytes } from "crypto";
 import { JWTPayload, jwtVerify } from "jose";
 
 export function translateUI(params: ITranslate) {
-    const { lang, text, lowercase } = params
-    const translated = lang == 'indonesia' ? translateUI_data[lang][text] : text
+    const { lang, text, lowercase, reverse } = params
+    const translated = reverse
+                    // if reverse translate = true
+                    ? lang == 'indonesia'
+                        // dont translate 
+                        ? text
+                        // translate text to english
+                        : translateUI_data['indonesia'][text]
+                    // if reverse translate = false
+                    : lang == 'indonesia'
+                        // translate text to indonesia
+                        ? translateUI_data[lang][text]
+                        // dont translate 
+                        : text
     return lowercase ? translated.toLowerCase() : translated
 }
 
@@ -103,27 +115,15 @@ export function sha256(text: string) {
 
 export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>
 export function fetcherOptions(args: FetchOptionsType) {
-    const { method, credentials, noCache } = args
+    const { method, credentials, noCache, domain } = args
     // get access token
-    const accessToken = localStorage.getItem('accessToken')
+    const accessToken = domain ? null : localStorage.getItem('accessToken')
     // get identifier
-    const getIdentifier = localStorage.getItem('identifier')
+    const getIdentifier = domain ? null : localStorage.getItem('identifier')
     // headers
-    const headers = credentials 
-                    // auth
-                    ? method == 'GET'
-                        // GET will only have authorization
-                        ? { 'authorization': `Bearer ${accessToken}`,
-                            'X-IDENTIFIER': getIdentifier }
-                        // POST, PUT, DELETE with auth
-                        : { 'content-type': 'application/json',
-                            'authorization': `Bearer ${accessToken}`,
-                            'X-IDENTIFIER': getIdentifier }
-                    // POST register/login
-                    : { 'content-type': 'application/json',
-                        'X-IDENTIFIER': getIdentifier }
+    const headers = setCustomHeaders()
     // cache
-    const cache = noCache ? { cache: 'no-store' } : null
+    const cache = noCache ? { cache: 'no-store' } : {}
     // method
     switch(method) {
         case 'GET': 
@@ -131,16 +131,83 @@ export function fetcherOptions(args: FetchOptionsType) {
                 return { method: method, headers: headers, ...cache }
             // public
             return { method: method, ...cache }
-        case 'POST': return { method: method, headers: headers, body: args.body }
-        case 'PUT': return { method: method, headers: headers, body: args.body }
-        case 'DELETE': return { method: method, headers: headers, body: args.body }
+        case 'POST': 
+        case 'PUT': 
+        case 'PATCH': 
+        case 'DELETE': 
+            return { method: method, headers: headers, body: args.body }
+    }
+
+    function setCustomHeaders() {
+        // with authorization header
+        if(credentials) {
+            // is method GET
+            if(method === 'GET') {
+                // fetching custom domain
+                if(domain) {
+                    return { 
+                        'content-type': 'application/json',
+                        'credentials': `include`, 
+                    }
+                }
+                // fetching same origin
+                else {
+                    return { 
+                        'authorization': `Bearer ${accessToken}`,
+                        'X-IDENTIFIER': getIdentifier 
+                    }
+                }
+            }
+            // is method POST
+            else if(method === 'POST') {
+                // fetching custom domain
+                if(domain) {
+                    return { 
+                        'content-type': 'application/json',
+                        'authorization': process.env.MINIGAME_AUTH_TOKEN,
+                        'credentials': `include`, 
+                    }
+                }
+                // fetching same origin
+                else {
+                    return { 
+                        'authorization': `Bearer ${accessToken}`,
+                        'X-IDENTIFIER': getIdentifier 
+                    }
+                }
+            }
+            // method PUT, DELETE
+            else {
+                return { 
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${accessToken}`,
+                    'X-IDENTIFIER': getIdentifier 
+                }
+            }
+        }
+        // without authorization header
+        else {
+            // for POST register/login
+            return { 
+                'content-type': 'application/json',
+                'X-IDENTIFIER': getIdentifier 
+            }
+        }
     }
 }
 
-export function fetcher(endpoint: string, options: RequestInit) {
-    const host = `${window.location.origin}/api`
-    const url = host + endpoint
-    return fetch(url, options)
+export function fetcher(endpoint: string, options: RequestInit, customEndpoint?: boolean) {
+    // fetch with custom endpoint
+    if(customEndpoint) {
+        const url = endpoint
+        return fetch(url, options)
+    }
+    // fetch same origin
+    else {
+        const host = `${window.location.origin}/api`
+        const url = host + endpoint
+        return fetch(url, options)
+    }
 }
 
 export function resetAllData(gameState: IGameContext) {
@@ -231,6 +298,8 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[a-zA-Z0-9]+$/) : null
         case 'language':
             return value ? value.match(/english$|indonesia$/) : null
+        case 'description':
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{4,}$/) : null
 
         // ====== PLAYER TYPE ======
         // filter uuid
@@ -326,7 +395,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/^[0-9]{1,2}$/) : null
         case 'history': 
             // set regex
-            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex, buffRegex, debuffRegex] = [
+            const [rolledDiceRegex, buyCityRegex, payTaxRegex, getCardRegex, getArrestedRegex, parkingRegex, cursedRegex, specialCityRegex, specialCardRegex, buffRegex, debuffRegex, minigameRegex] = [
                 'rolled_dice: ([0-9]|1[0-2])',
                 'buy_city: .* \\(\\w+\\)|buy_city: none',
                 'pay_tax: .* to \\w+',
@@ -338,8 +407,9 @@ export function filterInput(input: InputIDType, value: string) {
                 'special_card: .* 💳',
                 'get_buff: .* 🙏',
                 'get_debuff: .* 🙏',
+                'mini_game: Scattergories with oomfs 🥳',
             ]
-            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}|${buffRegex}|${debuffRegex}`, 'g')
+            const historyRegex = new RegExp(`${rolledDiceRegex}|${getCardRegex}|${buyCityRegex}|${payTaxRegex}|${getArrestedRegex}|${parkingRegex}|${cursedRegex}|${specialCityRegex}|${specialCardRegex}|${buffRegex}|${debuffRegex}|${minigameRegex}`, 'g')
             // set length
             // used to verify the regex, if client send 2 history 
             // but only match 1, something is wrong 
@@ -387,6 +457,33 @@ export function filterInput(input: InputIDType, value: string) {
         // ====== DAILY TYPE ======
         case 'week':
             return value ? value.match(/1$|2$/) : null
+        // ====== MINIGAME TYPE ======
+        case 'minigame_answer':
+            return value ? value.match(/^[a-z\s]+$/) : null
+        case 'minigame_chance':
+            return value ? value.match(/^[0-9]+$/) : null
+        case 'minigame_data':
+            // is array
+            if(Array.isArray(value)) {
+                // loop array, match element with regex
+                const minigameData = value as string[]
+                for(let data of minigameData) {
+                    // display name, answer, status, money
+                    const [display_name, answer, status, event_money] = data.split(',')
+                    // value not match regex
+                    switch(true) {
+                        case !display_name.match(/^[a-zA-Z0-9\s]{4,12}$/):
+                        case !answer.match(/^[a-z\s]+$/):
+                        case !status.match(/correct$|wrong$|unknown$|null$/):
+                        case !event_money.match(/^[0-9]{4,5}$/):
+                            return null
+                    }
+                }
+                // value match regex
+                return minigameData
+            }
+            // not array
+            return null
         // ====== MISC TYPE ======
         case 'user_agent': 
             return value ? value.match(/firefox|chrome|safari|edg|opera/i) : null

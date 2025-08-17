@@ -6,9 +6,9 @@ export default function TutorialGameRoom() {
     // tutorial text
     const tutorialText = {
         part_1: [
-            `"help" contain info about community & chance cards, special card, buff/debuff area.`,
-            `"players" contain info about name, money and special card (note icon).`,
-            `"player settings" (gear icon)\nauto roll dice = if u tired clicking\nsell city = sell any city owned\ngame history = see all player action\nattack city = attack other player city`
+            `"help" has info about community, chance cards, special card, buff/debuff area, game sounds & minigame.`,
+            `"players" has info about name, money and special card (note icon).`,
+            `"player menu" (burger icon) has sell city, attack city, dice control, game history`
         ],
         part_2: [
             `there are 3 stage before play`,
@@ -18,7 +18,7 @@ export default function TutorialGameRoom() {
         part_3: [
             `"back to room" to enter room list without leave the game. there's also tutorial button 😎 and some info about this room.`,
             `if you turn on the "game history" on player setting, it will display a box to see all player actions.`,
-            `i hate css 💀`
+            `this game will auto save the game progress, so you can take a break after 3 laps then continue later (as long as the game room is not deleted)`
         ]
     }
 

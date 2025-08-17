@@ -1,9 +1,10 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
-import { qS, translateUI } from "../../../helper/helper"
+import { qS, qSA, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 import { attackCityAnimation } from "./game-tile-event-attack-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
+import { getAnswerList, minigameAnswerCorrection, minigameInfo, setCategoriesAndLetters } from "./game-tile-event-minigame"
 
 export function gameMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & GameRoomListener
@@ -204,6 +205,52 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
                                     .replace('ppp', getMessage.fixPlayerTurns[0])
     }
+    // minigame prepared data
+    if(getMessage.minigamePreparedData) {
+        // html elements
+        const minigameTimer = qS('#minigame_timer')
+        // set minigame data
+        const {categories, words, letters, matchedWords, hintAnswers} = getMessage.minigamePreparedData
+        gameState.setMinigameWords(words)
+        gameState.setMinigameMatchedWords(matchedWords)
+        // set categories and letters
+        setCategoriesAndLetters(categories, letters, miscState)
+        // set info
+        minigameInfo('success', '')
+        // set timer
+        const playerAmount = gameState.gamePlayerInfo.length
+        let minigameCounter = playerAmount === 2 ? 20 : 25 // seconds 
+        const minigameInterval = setInterval(() => {
+            if(minigameCounter < 0) {
+                clearInterval(minigameInterval)
+                minigameInfo('success', 'times up, distributing mini game result..')
+                // display answer list (all players)
+                getAnswerList(gameState)
+                // display 6 hint answer
+                gameState.setMinigameHintAnswers(hintAnswers)
+                // hide minigame modal
+                return setTimeout(() => {
+                    // reset categories and letters
+                    setCategoriesAndLetters(
+                        ['category_1', 'category_2', 'category_3'],
+                        ['letter_1', 'letter_2', 'letter_3'],
+                        miscState
+                    )
+                    // hide mini game + reset answer list
+                    miscState.setAnimation(false)
+                    gameState.setShowMiniGame(false)
+                    gameState.setMinigameAnswerList([])
+                    gameState.setMinigameHintAnswers(null)
+                }, 5000);
+            }
+            minigameTimer.textContent = `time: ${minigameCounter}`
+            minigameCounter--
+        }, 1000);
+    }
+    // minigame answer correction
+    if(getMessage.minigameAnswerData) {
+        minigameAnswerCorrection(getMessage.minigameAnswerData, miscState, gameState)
+    }
     // end turn
     if(getMessage.playerTurnEnd) {
         // save playerTurns
@@ -220,31 +267,43 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setGameHistory(getMessage.gameHistory)
         // update player
         gameState.setGamePlayerInfo(players => {
-            const newPlayerInfo = [...players]
+            const allPlayerInfo = [...players]
             // find turn end player
             // ### when pay tax, visitor money already reduced in db
             // ### and return as playerTurnEnd, no need to reduce it anymore
-            const findPlayer = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurnEnd.display_name)
-            newPlayerInfo[findPlayer] = getMessage.playerTurnEnd
+            const findPlayer = allPlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurnEnd.display_name)
+            allPlayerInfo[findPlayer] = getMessage.playerTurnEnd
             // if theres taxes
             if(getMessage?.taxes) {
                 // ### money is in minus state (ex: -5000)
                 // ### for owner use - to reduce (- with - = +)
                 // add owner money
-                const findOwner = newPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.owner)
-                newPlayerInfo[findOwner].money -= getMessage.taxes.money
+                const findOwner = allPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.owner)
+                allPlayerInfo[findOwner].money -= getMessage.taxes.money
             }
+            // if theres transfer money event
             if(getMessage?.takeMoney) {
                 // update other player money
                 for(let other of getMessage.takeMoney.from) {
-                    const findOther = newPlayerInfo.map(v => v.display_name).indexOf(other)
-                    newPlayerInfo[findOther].money -= getMessage.takeMoney.money
+                    const findOther = allPlayerInfo.map(v => v.display_name).indexOf(other)
+                    allPlayerInfo[findOther].money -= getMessage.takeMoney.money
+                }
+            }
+            // if theres minigame
+            if(getMessage?.minigameResult) {
+                // update all players except playerTurnEnd
+                for(let other of getMessage?.minigameResult) {
+                    // skip playerTurnEnd
+                    if(other.display_name === getMessage.playerTurnEnd.display_name) continue
+                    // update player data
+                    const findOther = allPlayerInfo.map(v => v.display_name).indexOf(other.display_name)
+                    allPlayerInfo[findOther].money += other.event_money
                 }
             }
             // check player alive
-            checkGameProgress(newPlayerInfo, miscState, gameState)
+            checkGameProgress(allPlayerInfo, miscState, gameState)
             // return data
-            return newPlayerInfo
+            return allPlayerInfo
         })
     }
     // game over

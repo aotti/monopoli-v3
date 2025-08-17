@@ -13,6 +13,7 @@ export default function HelpSection() {
     const specialCard = board_help_items.special_card
     const buffdebuffArea = board_help_items.area_items
     const gameSounds = board_help_items.game_sounds
+    const minigame = board_help_items.mini_game
 
     return (
         <div className={`${gameState.gameSideButton == 'help' ? 'block' : 'hidden'}
@@ -33,6 +34,8 @@ export default function HelpSection() {
                 <ListWithTabs title="Buff/Debuff Area" data={buffdebuffArea} />
                 {/* game sounds */}
                 <ListWithTabs title="Game Sounds" data={gameSounds} />
+                {/* mini game */}
+                <ListWithTabs title="Minigame" data={minigame} />
             </ol>
         </div>
     )

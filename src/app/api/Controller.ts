@@ -37,7 +37,7 @@ export default class Controller {
         // this.redisReset('decidePlayers_33')
         // this.redisReset('gameHistory_33')
         // this.redisReset('playerTurns_162')
-        // this.redisSet('playerTurns_219', ['suwanto', 'tester123'])
+        // this.redisSet('playerTurns_234', ['suwanto', 'tester123'])
         // this.redisSet('playerTurns_162', ['gandesblood', 'suwanto'])
         // this.redisSet('disabledCharacters_32', [
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
@@ -127,9 +127,13 @@ export default class Controller {
             case 'game attack city': 
             case 'game turn end': 
             case 'game fix player turns': 
+            case 'game report bugs': 
             case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
             // shop
             case 'shop buy': [filterStatus, filterMessage] = loopKeyValue(); break
+            // minigame
+            case 'minigame answer': 
+            case 'minigame unknown answer': [filterStatus, filterMessage] = loopKeyValue(); break
         }
         // return filter
         return this.respond(filterStatus ? 200 : 400, filterMessage, [])

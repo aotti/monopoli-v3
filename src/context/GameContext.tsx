@@ -9,6 +9,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // board
     const [showTileImage, setShowTileImage] = useState<IGameContext['showTileImage']>(null)
     const [showGameNotif, setShowGameNotif] = useState<IGameContext['showGameNotif']>(null)
+    const [showMiniGame, setShowMiniGame] = useState(false)
     const [rollNumber, setRollNumber] = useState<IGameContext['rollNumber']>(null)
     // side buttons
     const [gameSideButton, setGameSideButton] = useState<IGameContext['gameSideButton']>(null)
@@ -48,6 +49,11 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     // shop
     const [myCoins, setMyCoins] = useState(0)
     const [myShopItems, setMyShopItems] = useState<IGameContext['myShopItems']>(null)
+    // minigame
+    const [minigameWords, setMinigameWords] = useState<string[]>([])
+    const [minigameMatchedWords, setMinigameMatchedWords] = useState<string[]>([])
+    const [minigameAnswerList, setMinigameAnswerList] = useState<IGameContext['minigameAnswerList']>([])
+    const [minigameHintAnswers, setMinigameHintAnswers] = useState<string[]>(null)
 
     useEffect(() => {
         // set online players if exist
@@ -69,6 +75,7 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
     const boardStates = {
         showTileImage, setShowTileImage,
         showGameNotif, setShowGameNotif,
+        showMiniGame, setShowMiniGame,
         rollNumber, setRollNumber,
     }
     
@@ -110,6 +117,10 @@ export const GameProvider = ({ children }: {children: React.ReactNode}) => {
         gameQuakeCity, setGameQuakeCity,
         diceMode, setDiceMode,
         gameHistory, setGameHistory,
+        minigameWords, setMinigameWords,
+        minigameMatchedWords, setMinigameMatchedWords,
+        minigameAnswerList, setMinigameAnswerList,
+        minigameHintAnswers, setMinigameHintAnswers,
     }
 
     const states: IGameContext = {

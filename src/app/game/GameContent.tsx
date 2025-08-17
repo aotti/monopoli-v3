@@ -20,6 +20,7 @@ import GameSounds from "../../components/GameSounds"
 import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
 import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
+import MiniGame from "./components/board/MiniGame"
 
 export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -64,6 +65,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         localStorage.removeItem('buffDebuffUsed')
         localStorage.removeItem('moreMoney')
         localStorage.removeItem('playerTurns')
+        // reset dice controller value
+        gameState.setDiceMode('off')
 
         // set player turn
         const setPlayerTurnText = () => {
@@ -106,7 +109,9 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             })
             pubnubClient.removeListener(publishedMessage)
         }
-    }, [gameState.gamePlayerInfo, gameState.showGameNotif])
+    }, [gameState.gamePlayerInfo, gameState.showGameNotif, 
+        gameState.minigameWords, gameState.minigameMatchedWords, 
+        gameState.minigameAnswerList])
 
     return (
         <div className="grid grid-cols-12 h-[calc(100vh-3.75rem)]">
@@ -165,14 +170,12 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         <GameButtons />
                     </div>
                 }
-                {/* game notif + roll number */}
-                <div className={`${gameState.showGameNotif || gameState.rollNumber ? 'block' : 'hidden'} 
+                {/* game notif + roll number + minigame */}
+                <div className={`${gameState.showGameNotif || gameState.showMiniGame || gameState.rollNumber ? 'block' : 'hidden'} 
                 absolute h-full w-full text-center text-2xs lg:text-xs`}>
-                    {gameState.rollNumber
-                        ? <RollNumber roomId={gameState.gameRoomId} />
-                        : null
-                    }
+                    {gameState.rollNumber ? <RollNumber roomId={gameState.gameRoomId} /> : null}
                     <GameNotif />
+                    <MiniGame />
                 </div>
             </section>
 

@@ -1,11 +1,29 @@
 {
     "updates": [
         {
+            "version": "v3.10",
+            "date": "15 August 2025",
+            "changes": [
+                "add mini game feature",
+                "add mini game info to help (in game room)",
+                "add tooltip on money (game room > player tab)",
+                "fix some bugs"
+            ]
+        },
+        {
+            "version": "v3.09",
+            "date": "~",
+            "changes": [
+                "version skip"
+            ]
+        },
+        {
             "version": "v3.08",
             "date": "22 July 2025",
             "changes": [
                 "add the shifter card in shop",
-                "add info on loading stuck",
+                "add info if stuck on loading",
+                "change translate button behavior",
                 "fix some bugs"
             ]
         },
