@@ -25,7 +25,7 @@ export default function ReportBugs() {
             ${showReportBugs ? 'flex' : 'hidden'} items-center justify-center
             h-[calc(100vh-1rem)] w-[calc(100vw-1rem)]`}>
                 <div className="flex flex-col gap-2 justify-center bg-darkblue-1 border-8bit-text p-1">
-                    <form onSubmit={ev => reportBugsTurnsGameRoom(ev, miscState, gameState)}>
+                    <form onSubmit={ev => reportBugs(ev, miscState, gameState)}>
                         {/* head */}
                         <div className="border-b-2">
                             <span> {translateUI({lang: miscState.language, text: 'report bugs'})} </span>
@@ -44,7 +44,7 @@ export default function ReportBugs() {
                         <ResultMessage id="result_report_bugs" />
                         {/* buttons */}
                         <div className="flex justify-around border-t-2 mt-1">
-                            <button type="submit" className="text-green-400 active:opacity-75">
+                            <button id="send_report_bugs" type="submit" className="text-green-400 active:opacity-75">
                                 {translateUI({lang: miscState.language, text: 'Send'})}
                             </button>
                             <button type="button" className="text-white px-2" onClick={() => setShowReportBugs(false)}> 
@@ -58,12 +58,14 @@ export default function ReportBugs() {
     )
 }
 
-async function reportBugsTurnsGameRoom(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
+async function reportBugs(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     // result message
     const resultMessage = qS('#result_report_bugs')
     resultMessage.className = 'mx-auto text-center text-2xs lg:text-[12px]'
     resultMessage.textContent = ''
+    // submit button
+    const sendButton = qS('#send_report_bugs') as HTMLInputElement
     // input values container
     const inputValues = {
         action: 'game report bugs',
@@ -86,6 +88,8 @@ async function reportBugsTurnsGameRoom(ev: FormEvent<HTMLFormElement>, miscState
         }
     }
     // set state to disable "back to room & surrender" buttons
+    sendButton.textContent = '...'
+    sendButton.disabled = true
     miscState.setDisableButtons('gameroom')
     // fetch
     const reportBugsFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
@@ -94,10 +98,11 @@ async function reportBugsTurnsGameRoom(ev: FormEvent<HTMLFormElement>, miscState
     switch(reportBugsResponse.status) {
         case 200:
             // reset disable buttons
+            sendButton.textContent = 'done'
             miscState.setDisableButtons(null)
             // success message
             resultMessage.classList.add('text-green-400')
-            resultMessage.textContent = `✅ report send`
+            resultMessage.textContent = translateUI({lang: miscState.language, text: '✅ report sent'})
             return
         default:
             // reset disable buttons
