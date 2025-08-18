@@ -2,7 +2,6 @@
     "test": ["Create Account"],
     "indonesia": {
         "__TRANSLATE BAGIAN LAIN__": "__TRANSLATE BAGIAN LAIN__",
-        "Fix": "Perbaiki",
         "report bugs": "lapor keanehan",
         "you can only report every 10 minutes, please send proper report": "anda hanya bisa lapor tiap 10 menit, tolong kirim laporan yang benar",
         "description": "jelaskan",
@@ -461,7 +460,7 @@
         " based on categories!": " berdasarkan kategori di atas!",
         "sayuran": "vegetables",
         "buah buahan": "fruits",
-        "barang dapur": "kitchen utensils",
+        "alat dapur": "kitchen utensils",
         "alat elektronik": "electronic devices",
         "alat tulis": "school stationery",
         "alat mandi": "bathroom tools",
