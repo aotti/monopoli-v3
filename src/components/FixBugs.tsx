@@ -47,7 +47,7 @@ export default function FixBugs() {
                         {/* buttons */}
                         <div className="flex justify-around border-t-2">
                             <button type="submit" className="text-green-400 active:opacity-75">
-                                {translateUI({lang: miscState.language, text: 'Fix'})}
+                                Fix
                             </button>
                             <button type="button" className="text-white px-2" onClick={() => setShowFixBugs(false)}> 
                                 Close 
