@@ -367,6 +367,7 @@ export default class GameController extends Controller {
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
         // update game history (buy city, get cards, etc)
         const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+
         // check payload.history, if it contain get_card with multiple effects (one of them is move type)
         // dont end player turn, if only 1 effect this part will be skipped
         if(payload.history.match('get_card')) {
@@ -401,7 +402,6 @@ export default class GameController extends Controller {
                 return result
             }
         }
-
         // get temp event money
         const getTempEventMoney = await this.redisGet(`tempEventMoney_${payload.display_name}_${roomId}`)
         let tempEventMoney: number = 0
@@ -410,6 +410,7 @@ export default class GameController extends Controller {
             // remove after used
             await this.redisReset(`tempEventMoney_${payload.display_name}_${roomId}`)
         }
+        
         // check taxes
         const isTaxes = payload.tax_owner && payload.tax_visitor
         const taxes = isTaxes ? {

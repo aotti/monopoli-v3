@@ -1,6 +1,6 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { translateUI } from "../../../../helper/helper"
+import { simpleEncrypt, translateUI } from "../../../../helper/helper"
 import { minigameAnswer } from "../../helper/game-tile-event-minigame"
 
 export default function MiniGame() {
@@ -62,12 +62,14 @@ export default function MiniGame() {
                 <p> {translateUI({lang: miscState.language, text: 'answer list'})} </p>
                 <div id="minigame_answer_list">
                     {gameState.minigameAnswerList.map((v,i) => {
+                        const answerData = `${v.display_name},${v.answer},${v.status},${v.event_money}`
+                        const encAnswerData = simpleEncrypt(answerData, miscState.simpleKey)
                         const answerStatusClass = v.status == 'correct' ? 'text-green-400' 
                                                 : v.status == 'wrong' ? 'text-red-400'
                                                                         : 'text-gray-400'
 
                         return (
-                            <div key={i} className="grid grid-cols-3" data-answer={`${v.display_name},${v.answer},${v.status},${v.event_money}`}>
+                            <div key={i} className="grid grid-cols-3" data-answer={encAnswerData}>
                                 <span className={answerStatusClass}> {v.display_name} </span>
                                 <span className={answerStatusClass}> {v.answer} </span>
                                 <span className={answerStatusClass}> +Rp {v.event_money} </span>

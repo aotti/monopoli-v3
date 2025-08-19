@@ -110,6 +110,7 @@ export type GameRoomListener = {
 export interface IMiscProvider {
     accessSecret: string, 
     savedLanguage: ITranslate['lang'], 
+    cryptoKey: string, 
     children: React.ReactNode
 }
 
@@ -132,6 +133,8 @@ export interface IMiscContext {
     setShowTutorial: Dispatch<SetStateAction<IMiscContext['showTutorial']>>,
     secret: string,
     setSecret: Dispatch<SetStateAction<string>>,
+    simpleKey: number,
+    setSimpleKey: Dispatch<SetStateAction<number>>,
     isLoading: boolean,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     messageItems: Omit<IChat, 'channel'|'token'>[],

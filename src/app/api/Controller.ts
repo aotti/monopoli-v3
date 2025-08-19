@@ -351,7 +351,12 @@ export default class Controller {
         else {
             // token expired / not exist
             // remove token
-            cookies().delete('refreshToken')
+            cookies().set('refreshToken', '', { 
+                path: '/',
+                maxAge: 0, // expire in 0sec
+                httpOnly: true,
+                sameSite: 'strict',
+            })
             return null
         }
     }

@@ -6,7 +6,7 @@ import { translateUI } from "../helper/helper";
 
 const MiscContext = createContext<IMiscContext>(null)
 
-export const MiscProvider = ({ accessSecret, savedLanguage, children }: IMiscProvider) => {
+export const MiscProvider = ({ accessSecret, savedLanguage, cryptoKey, children }: IMiscProvider) => {
     const [screenType, setScreenType] = useState<'landscape'|'portrait'>(null)
     const [language, setLanguage] = useState<ITranslate['lang']>(savedLanguage || 'english')
     const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
@@ -17,6 +17,7 @@ export const MiscProvider = ({ accessSecret, savedLanguage, children }: IMiscPro
     const [showTutorial, setShowTutorial] = useState<IMiscContext['showTutorial']>(null)
     // access token secret
     const [secret, setSecret] = useState<string>(accessSecret)
+    const [simpleKey, setSimpleKey] = useState<number>(+cryptoKey)
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [disableButtons, setDisableButtons] = useState<'roomlist'|'gameroom'>(null)
     // message items
@@ -67,6 +68,7 @@ export const MiscProvider = ({ accessSecret, savedLanguage, children }: IMiscPro
         isChatFocus, setIsChatFocus,
         showTutorial, setShowTutorial,
         secret, setSecret,
+        simpleKey, setSimpleKey,
         isLoading, setIsLoading,
         messageItems, setMessageItems,
         screenType, setScreenType,
