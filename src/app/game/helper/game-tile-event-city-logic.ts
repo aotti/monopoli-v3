@@ -1,5 +1,5 @@
 import { FormEvent } from "react"
-import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, translateUI } from "../../../helper/helper"
+import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, simpleDecrypt, translateUI } from "../../../helper/helper"
 import { EventDataType, IGameContext, IMiscContext, IResponse, UpdateCityListType } from "../../../helper/types"
 import { rollDiceGameRoom } from "./game-prepare-playing-logic"
 import { useSpecialCard } from "./game-tile-event-special-card-logic"
@@ -16,8 +16,9 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         const notifMessage = qS('#result_notif_message')
         const notifTimer = qS('#result_notif_timer')
         // get city info
-        const getCityInfo = tileElement.dataset.cityInfo.split(',')
-        const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = getCityInfo
+        const getCityInfo = tileElement.dataset.cityInfo
+        const decCityInfo = simpleDecrypt(getCityInfo, miscState.simpleKey).split(',')
+        const [buyCityName, buyCityProperty, buyCityPrice, buyCityOwner] = decCityInfo
         // if city quaked, set 0.5 multiplier, else 1
         const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(buyCityName) : null
         // check type of number to prevent bug, because 0 == false

@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { catchError, fetcher, fetcherOptions, qS, qSA, setInputValue, translateUI } from "../../../helper/helper";
+import { catchError, fetcher, fetcherOptions, qS, qSA, setInputValue, simpleDecrypt, translateUI } from "../../../helper/helper";
 import { EventDataType, GameRoomListener, IGameContext, IMiscContext, IResponse } from "../../../helper/types";
 
 export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0], miscState: IMiscContext, gameState: IGameContext) {
@@ -220,7 +220,8 @@ export function minigameAnswerCorrection(minigameAnswerData: GameRoomListener['m
         const answerListElement = qS('#minigame_answer_list') as HTMLElement
         for(let element of answerListElement.children) {
             const answerData = element as HTMLElement
-            const [display_name, answer, status, event_money] = answerData.dataset.answer.split(',')
+            const decAnswerData = simpleDecrypt(answerData.dataset.answer, miscState.simpleKey).split(',')
+            const [display_name, answer, status, event_money] = decAnswerData
             // push answer to array
             tempPrevAnswers.push(answer)
         }

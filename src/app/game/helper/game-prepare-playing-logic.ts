@@ -706,8 +706,15 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                                         .replace('ppp', playerTurn)
             // close notif after 2 secs
             setTimeout(() => {
-                miscState.setAnimation(false)
-                gameState.setShowGameNotif(display => display == 'card' || display =='normal' ? display : null)
+                gameState.setShowGameNotif(display => {
+                    const newDisplay = display == 'card' || display =='normal' ? display : null
+                    console.log({newDisplay});
+                    
+                    // if display = card | normal, then set animation true 
+                    // to prevent no animation when closing notif
+                    newDisplay ? miscState.setAnimation(true) : miscState.setAnimation(false)
+                    return newDisplay
+                })
                 // hide mini game + reset answer list
                 gameState.setShowMiniGame(false)
                 gameState.setMinigameAnswerList([])

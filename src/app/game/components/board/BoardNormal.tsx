@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, moneyFormat, simpleEncrypt, translateUI } from "../../../../helper/helper"
 import board_normal from '../../config/board-normal.json'
 import Image from "next/image"
 import Character from "./Character"
@@ -149,8 +149,9 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const [cityName, cityOwner, cityPrice, cityProperty, cityIcon, cityQuake] = getCityData as [string, string, number, string, string, string]
     // city info
     // ### DONT TRANSLATE CITY INFO
-    // ### ITS USED ON GAME LOGIC
+    // ### ITS USED IN GAME LOGIC
     const cityInfo = cityOwner ? `${name},${cityProperty},${cityPrice},${cityOwner}` : `${name},land,${cursedCityPrice || price}`
+    const encCityInfo = simpleEncrypt(cityInfo, miscState.simpleKey)
     // modify info
     const cityBoughtInfo = cityOwner 
                         ? cityProperty == 'realestate'
@@ -178,7 +179,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
 
     return (
         <div className="relative">
-            <div className="absolute z-20" data-player-path={square} data-tile-info={tileInfo} data-city-info={cityInfo}>
+            <div className="absolute z-20" data-player-path={square} data-tile-info={tileInfo} data-city-info={encCityInfo}>
                 {gameState.gamePlayerInfo.map((player, i) => player.pos == `${square}` ? <Character key={i} playerData={player}/> : null)}
             </div>
             <div data-tooltip={newInfo.replaceAll(';', '\n')} className="relative flex flex-col">

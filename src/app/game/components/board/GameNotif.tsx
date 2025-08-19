@@ -19,7 +19,7 @@ export default function GameNotif() {
     })
     
     return (
-        <div ref={gameNotifRef} className={`relative z-10 top-[17.5%] lg:top-1/3 flex-col gap-2 bg-darkblue-1 border-8bit-text w-3/4 lg:w-2/5 leading-relaxed
+        <div ref={gameNotifRef} className={`relative z-10 top-[17.5%] lg:top-1/3 flex-col gap-2 bg-darkblue-1 border-8bit-text w-3/4 lg:w-1/2 leading-relaxed
         ${gameState.showGameNotif ? 'flex' : 'hidden'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p id="result_notif_title" className="border-b-2 p-1"></p>

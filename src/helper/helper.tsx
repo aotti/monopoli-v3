@@ -106,11 +106,31 @@ export function errorCreateRoom(input: string, language: ITranslate['lang']) {
 }
 
 /**
- * @returns encrypted text
+ * @returns hashed text
  */
 export function sha256(text: string) {
     const hash = createHash('sha256').update(text).digest('hex')
     return hash
+}
+
+export function simpleEncrypt(text: string, key: number) {
+    let encryptedText = "";
+    for (let i = 0; i < text.length; i++) {
+        const charCode = text.charCodeAt(i);
+        const encryptedCharCode = charCode + key; // Simple shift
+        encryptedText += String.fromCharCode(encryptedCharCode);
+    }
+    return encryptedText;
+}
+
+export function simpleDecrypt(encryptedText: string, key: number) {
+    let decryptedText = "";
+    for (let i = 0; i < encryptedText.length; i++) {
+        const charCode = encryptedText.charCodeAt(i);
+        const decryptedCharCode = charCode - key; // Reverse the shift
+        decryptedText += String.fromCharCode(decryptedCharCode);
+    }
+    return decryptedText;
 }
 
 export function fetcherOptions<T extends FetchOptionsType>(args: T): FetchOptionsReturnType<T>

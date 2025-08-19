@@ -24,10 +24,11 @@ export default function RootLayout({
 }) {
   const accessSecret = process.env.ACCESS_TOKEN_SECRET
   const savedLanguage = cookies().get('language')?.value as any
+  const cryptoKey = process.env.CRYPTO_KEY
 
   return (
     <html lang="en">
-      <MiscProvider accessSecret={accessSecret} savedLanguage={savedLanguage}>
+      <MiscProvider accessSecret={accessSecret} savedLanguage={savedLanguage} cryptoKey={cryptoKey}>
         <GameProvider>
           <body className={`${retroFont.className}`}>
             {children}
