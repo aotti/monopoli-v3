@@ -184,7 +184,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         {/* shop */}
                         <Shop />
                         {/* daily */}
-                        <Daily />
+                        {gameState.lastDailyStatus ? <Daily /> : null}
                     </div>
                 </div>
                 {/* room list cards 

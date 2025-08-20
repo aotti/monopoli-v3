@@ -20,14 +20,26 @@ export default function Daily() {
         week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
         week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
     }
+    // '1-2' split '-' 
+    // day => [0] = 1 
+    // week => [1] = 2 
     const [lastDayNumber, lastWeekNumber] = gameState.lastDailyStatus 
                                         ? gameState.lastDailyStatus.split('-')
                                         : ['1', '1']
     // get day number
-    const currentDayNumber = dayOfWeek.week_1.map(v => v.match(today) ? v.split('-')[1] : null).filter(i => i)[0]
-    // if today > last day, then continue last week reward
-    // else assume its week 2 reward
-    const currentWeek = +lastDayNumber < +currentDayNumber ? +lastWeekNumber : 2
+    const currentDayNumber = dayOfWeek[`week_${lastWeekNumber}`]
+                            .map(v => v.match(today) ? v.split('-')[1] : null)
+                            .filter(i => i)[0]
+    // if today > last day
+    const currentWeek = +currentDayNumber > +lastDayNumber 
+                        // then continue last week reward
+                        ? +lastWeekNumber 
+                        // is today < last day
+                        : +currentDayNumber < +lastDayNumber
+                            // assume its back to week 1
+                            ? 1
+                            // else assume it still week 2
+                            : 2
     
     const convertDate = (rewardDate: string) => {
         const [day, date] = rewardDate.split(', ')
