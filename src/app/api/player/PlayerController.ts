@@ -245,6 +245,7 @@ export default class PlayerController extends Controller {
             const getWeekValues: string[] = dayOfWeek[`week_${payload.week}`]
             const dayNumber = getWeekValues 
                             ? getWeekValues.map(v => v.match(currentDay) ? v.split('-')[1] : null).filter(i => i)[0]
+                            // day 0 so player can get any day, if day 1 player cant get monday
                             : 0
             // claim date (Monday, 6/22/2029; 1-1)
             const claimDate = `${todayDate}; ${dayNumber}-${payload.week}`
