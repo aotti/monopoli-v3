@@ -659,8 +659,10 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
                 localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
                 gameState.setMyShopItems(playerShopItems)
             }
-            // start animation
+            // start animation and sound
             await claimAnimation()
+            const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
+            soundClaimReward.play()
             return
         default: 
             // stop loading claim
