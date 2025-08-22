@@ -1,5 +1,6 @@
 import PubNub from "pubnub"
 import { IChat, IGameContext, IMiscContext, RoomListListener } from "../../../helper/types"
+import { qS } from "../../../helper/helper"
 
 export function roomMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & RoomListListener
@@ -15,6 +16,9 @@ export function roomMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setRoomList(room => [...room, getMessage.roomCreated])
         // set game room info
         gameState.setGameRoomInfo(rooms => [...rooms, getMessage.roomInfo])
+        // play sound
+        const soundCreateRoom = qS('#sound_create_room') as HTMLAudioElement
+        soundCreateRoom.play()
     }
     // player join
     if(getMessage.joinedRoomId) {
