@@ -611,6 +611,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         const rollPack = qS('#roll_pack')
         // only roll if element exist
         if(rollPack) {
+            chatInput.value = 'rolling pack..'
             chosenPackItem = qS('.roll-result').textContent
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
@@ -622,6 +623,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         }
         // element doesnt exist
         else {
+            chatInput.value = 'skip rolling pack..'
             const randItem = Math.floor(Math.random() * items.length)
             chosenPackItem = items[randItem]
         }
