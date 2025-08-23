@@ -587,50 +587,33 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     ev ? ev.preventDefault() : null
     
     const chatInput = qS('#message_text') as HTMLInputElement
-    chatInput.value = 'starting claim daily..'
-    
+
     const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const {week, day, name, type, items} = rewardData
     // result message
     const resultMessage = qS('#result_daily')
     // claim button
     const claimButton = qS(`#daily_claim_button_${day}`) as HTMLButtonElement
-    chatInput.value = 'checking status..'
-
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
         await claimAnimation()
         return `${today} daily reward has been claimed`
     }
-    chatInput.value = 'preparing reward value..'
-
     // if type is pack, start roll animation
     let chosenPackItem: string = null
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
-        // only roll if element exist
-        if(claimButton && rollPack) {
+        rollPack.classList.toggle('flex')
+        rollPack.classList.toggle('hidden')
+        startAnimation(items, miscState, gameState)
+        chosenPackItem = qS('.roll-result').textContent
+        setTimeout(() => {
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
-            chatInput.value = 'rolling pack..'
-            startAnimation(items, miscState, gameState)
-            chosenPackItem = qS('.roll-result').textContent
-            setTimeout(() => {
-                chatInput.value = 'pack rolled..'
-                rollPack.classList.toggle('flex')
-                rollPack.classList.toggle('hidden')
-            }, 5000);
-        }
-        // element doesnt exist
-        else {
-            chatInput.value = 'skip rolling pack..'
-            const randItem = Math.floor(Math.random() * items.length)
-            chosenPackItem = items[randItem]
-        }
+        }, 5000);
     }
 
-    chatInput.value = 'setting reward value..'
     // claim data
     const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
@@ -662,6 +645,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     switch(claimDailyResponse.status) {
         case 200: 
             // stop loading claim
+            chatInput.value = ''
             clearInterval(loadingClaimInterval)
             // destruct data
             const {token, dailyStatus, dailyHistory, playerCoins, playerShopItems} = claimDailyResponse.data[0]

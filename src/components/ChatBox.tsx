@@ -203,7 +203,6 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                     inputValues.display_name = 'system'
                     inputValues.message_text = claimResult
                     miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
-                    messageInput.value = ''
                 }
                 return
             }
