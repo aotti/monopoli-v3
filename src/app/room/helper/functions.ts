@@ -586,8 +586,8 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
 export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any, miscState: IMiscContext, gameState: IGameContext) {
     ev ? ev.preventDefault() : null
     
-    const chatInput = qS('#message_text')
-    chatInput.textContent = 'starting claim daily..'
+    const chatInput = qS('#message_text') as HTMLInputElement
+    chatInput.value = 'starting claim daily..'
     
     const today = new Date().toLocaleString([], {weekday: 'long'})
     const {week, day, name, type, items} = rewardData
@@ -605,16 +605,19 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     // if type is pack, start roll animation
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
-        rollPack.classList.toggle('flex')
-        rollPack.classList.toggle('hidden')
-        startAnimation(items, miscState, gameState)
-        setTimeout(() => {
+        // only if element exist
+        if(rollPack) {
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
-        }, 5000);
+            startAnimation(items, miscState, gameState)
+            setTimeout(() => {
+                rollPack.classList.toggle('flex')
+                rollPack.classList.toggle('hidden')
+            }, 5000);
+        }
     }
 
-    chatInput.textContent = 'setting reward value..'
+    chatInput.value = 'setting reward value..'
     // claim data
     const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
@@ -635,7 +638,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         }
     }, 1000);
 
-    chatInput.textContent = 'fetching reward..'
+    chatInput.value = 'fetching reward..'
     // fetch
     const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(rewardValue)})
     const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
