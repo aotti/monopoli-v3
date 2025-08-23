@@ -589,14 +589,14 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     const chatInput = qS('#message_text') as HTMLInputElement
     chatInput.value = 'starting claim daily..'
     
-    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const {week, day, name, type, items} = rewardData
     // result message
     const resultMessage = qS('#result_daily')
     // claim button
     const claimButton = qS(`#daily_claim_button_${day}`) as HTMLButtonElement
     chatInput.value = 'preparing reward value..'
-    
+
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
