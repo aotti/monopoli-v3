@@ -595,7 +595,8 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
-        return await claimAnimation()
+        await claimAnimation()
+        return `${today} daily reward has been claimed`
     }
     // if type is pack, start roll animation
     if(type == 'pack') {
@@ -663,7 +664,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
             const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
             soundClaimReward.play()
             await claimAnimation()
-            return
+            return `${today} daily reward has been claimed`
         default: 
             // stop loading claim
             clearInterval(loadingClaimInterval)
@@ -673,7 +674,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
             // display notif
             resultMessage.classList.remove('hidden')
             setTimeout(() => resultMessage.classList.add('hidden'), 3000);
-            return
+            return `${claimDailyResponse.status}: ${claimDailyResponse.message}`
     }
 }
 

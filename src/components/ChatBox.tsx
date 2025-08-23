@@ -199,8 +199,7 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                     messageInput.value = ''
                 }
                 else {
-                    messageInput.value = ''
-                    claimDaily(ev, rewardData, miscState, gameState)
+                    messageInput.value = await claimDaily(ev, rewardData, miscState, gameState)
                 }
                 return
             }
