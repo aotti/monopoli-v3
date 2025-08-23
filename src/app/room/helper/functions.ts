@@ -595,13 +595,14 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     const resultMessage = qS('#result_daily')
     // claim button
     const claimButton = qS(`#daily_claim_button_${day}`) as HTMLButtonElement
+    chatInput.value = 'preparing reward value..'
+    
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
         await claimAnimation()
         return `${today} daily reward has been claimed`
     }
-    chatInput.value = 'preparing reward value..'
 
     // if type is pack, start roll animation
     let chosenPackItem: string = null
