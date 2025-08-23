@@ -603,10 +603,12 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     }
 
     // if type is pack, start roll animation
+    let chosenPackItem: string = null
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
         // only if element exist
         if(rollPack) {
+            chosenPackItem = qS('.roll-result').textContent
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
             startAnimation(items, miscState, gameState)
@@ -615,6 +617,11 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
                 rollPack.classList.toggle('hidden')
             }, 5000);
         }
+        // if element doesnt exist
+        else {
+            const randItem = Math.floor(Math.random() * items.length)
+            chosenPackItem = items[randItem]
+        }
     }
 
     chatInput.value = 'setting reward value..'
@@ -622,7 +629,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
         week: week.toString(),
-        item_name: type === 'coin' ? 'coin' : qS('.roll-result').textContent,
+        item_name: type === 'coin' ? 'coin' : chosenPackItem,
     }
     // loading claim button
     let loadingIncrement = 3
