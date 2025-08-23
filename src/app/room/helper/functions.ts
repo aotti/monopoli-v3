@@ -590,14 +590,18 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     const {week, day, name, type, items} = rewardData
     // result message
     const resultMessage = qS('#result_daily')
+    const chatInput = qS('#message_text')
     // claim button
     const claimButton = qS(`#daily_claim_button_${day}`) as HTMLButtonElement
+
+    chatInput.textContent = 'starting claim daily..'
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
         await claimAnimation()
         return `${today} daily reward has been claimed`
     }
+
     // if type is pack, start roll animation
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
@@ -610,6 +614,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         }, 5000);
     }
 
+    chatInput.textContent = 'setting reward value..'
     // claim data
     const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
@@ -630,6 +635,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         }
     }, 1000);
 
+    chatInput.textContent = 'fetching reward..'
     // fetch
     const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(rewardValue)})
     const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
