@@ -190,9 +190,18 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                 messageInput.value = ''
                 return
             }
+            // daily command only work from room list
             else if(input.value == '/daily') {
-                messageInput.value = ''
-                claimDaily(ev, rewardData, miscState, gameState)
+                if(id) {
+                    inputValues.display_name = 'system'
+                    inputValues.message_text = 'only work in roomlist'
+                    miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+                    messageInput.value = ''
+                }
+                else {
+                    messageInput.value = ''
+                    claimDaily(ev, rewardData, miscState, gameState)
+                }
                 return
             }
             // filter message
