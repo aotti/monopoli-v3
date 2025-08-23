@@ -633,15 +633,18 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     }
     // loading claim button
     let loadingIncrement = 3
-    claimButton.disabled = true
+    claimButton ? claimButton.disabled = true : null
     const loadingClaimInterval = setInterval(() => {
-        if(loadingIncrement === 3) {
-            claimButton.textContent = '.'
-            loadingIncrement = 0
-        }
-        else if(loadingIncrement < 3) {
-            claimButton.textContent += '.'
-            loadingIncrement++
+        // only set loading if claim button exist
+        if(claimButton) {
+            if(loadingIncrement === 3) {
+                claimButton.textContent = '.'
+                loadingIncrement = 0
+            }
+            else if(loadingIncrement < 3) {
+                claimButton.textContent += '.'
+                loadingIncrement++
+            }
         }
     }, 1000);
 
@@ -684,12 +687,14 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         default: 
             // stop loading claim
             clearInterval(loadingClaimInterval)
-            claimButton.textContent = 'claim'
-            // result message
-            resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
-            // display notif
-            resultMessage.classList.remove('hidden')
-            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            claimButton ? claimButton.textContent = 'claim' : null
+            // result message, only if element exist
+            if(resultMessage) {
+                resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
+                // display notif
+                resultMessage.classList.remove('hidden')
+                setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            }
             return `${claimDailyResponse.status}: ${claimDailyResponse.message}`
     }
 }
