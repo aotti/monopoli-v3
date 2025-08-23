@@ -610,7 +610,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     }
 
     // claim data
-    const claimValue = {
+    const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
         week: week.toString(),
         item_name: type === 'coin' ? 'coin' : qS('.roll-result').textContent,
@@ -630,7 +630,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     }, 1000);
 
     // fetch
-    const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(claimValue)})
+    const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(rewardValue)})
     const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
     // response
     switch(claimDailyResponse.status) {
@@ -660,9 +660,9 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
                 gameState.setMyShopItems(playerShopItems)
             }
             // start animation and sound
-            await claimAnimation()
             const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
             soundClaimReward.play()
+            await claimAnimation()
             return
         default: 
             // stop loading claim

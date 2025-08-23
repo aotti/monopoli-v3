@@ -7,13 +7,13 @@ import emotes from "../config/emotes.json"
 import { clickInsideElement } from "../helper/click-inside"
 import PubNub, { Listener } from "pubnub"
 import Image from "next/image"
+import { claimDaily } from "../app/room/helper/functions"
 
 interface IChatBox {
     page: 'room'|'game', 
-    id?: number, 
     pubnubSetting: {monopoly: any, chatting: any}
 }
-export default function ChatBox({ page, id, pubnubSetting }: IChatBox) {
+export default function ChatBox({ page, pubnubSetting }: IChatBox) {
     const miscState = useMisc()
     const gameState = useGame()
 
@@ -52,7 +52,7 @@ export default function ChatBox({ page, id, pubnubSetting }: IChatBox) {
             // room list
             ? <ChatRoomList />
             // game room
-            : <ChatGameRoom id={id} />
+            : <ChatGameRoom />
     )
 }
 
@@ -67,49 +67,12 @@ function ChatRoomList() {
     )
 }
 
-function ChatGameRoom({ id }: {id: number}) {
+function ChatGameRoom() {
     const miscState = useMisc()
-    const gameState = useGame()
-    // chat emotes ref
-    const chatEmotesRef = useRef()
-    clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
-
-    useEffect(() => {
-        if(gameState.gameSideButton == 'chat') {
-            // scroll to bottom
-            const chatContainer = qS('#chat_container')
-            if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
-            // auto focus
-            const chatInput = qS('#message_text') as HTMLInputElement
-            chatInput.focus()
-        }
-    }, [gameState.gameSideButton])
 
     return (
-        <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
-        absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
-        text-left [writing-mode:horizontal-tb] p-1 
-        bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
-            <div id="chat_container" className="overflow-y-scroll h-[calc(100%-1.5rem)] lg:h-[calc(100%-3rem)]">
-                <ChatContainer />
-            </div>
-            {/* chat form */}
-            <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
-            onSubmit={ev => sendChat(ev, miscState, gameState, id)}>
-                {/* input chat */}
-                <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
-                placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
-                {/* emote list */}
-                {miscState.showEmotes ? <ChatEmotes isGameRoom={true} /> : null}
-                {/* emote button */}
-                <button ref={chatEmotesRef} type="button" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
-                    <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
-                </button>
-                {/* submit chat */}
-                <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
-                    <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
-                </button>
-            </form>
+        <div id="chat_container" className="overflow-y-scroll h-[calc(100%-1.5rem)] lg:h-[calc(100%-3rem)]">
+            <ChatContainer />
         </div>
     )
 }
@@ -177,13 +140,13 @@ export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
     return (
         <div className={`absolute ${emoteListPos} top z-40 grid grid-cols-5 gap-2 bg-darkblue-1 border-8bit-text w-40`}>
             {emoteList.map((v, i) => {
-                return <Image key={i} src={v.url} alt={v.alias} title={v.name} className="!h-min my-auto hover:bg-darkblue-3" priority={true} unoptimized onClick={handleChosenEmote} />
+                return <Image key={i} src={v.url} alt={v.alias} width={50} height={50} title={v.name} className="!h-min my-auto hover:bg-darkblue-3" priority={true} unoptimized onClick={handleChosenEmote} />
             })}
         </div>
     )
 }
 
-export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext, id?: number) {
+export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext, id?: number, rewardData?: any) {
     ev.preventDefault()
 
     const messageInput = qS('#message_text') as HTMLInputElement
@@ -225,6 +188,11 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                 inputValues.message_text = inputValues.channel.split('-')[1]
                 miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
                 messageInput.value = ''
+                return
+            }
+            else if(input.value == '/daily') {
+                messageInput.value = ''
+                claimDaily(ev, rewardData, miscState, gameState)
                 return
             }
             // filter message

@@ -4,42 +4,15 @@ import { useMisc } from "../../../../context/MiscContext"
 import { applyTooltipEvent, qS, translateUI } from "../../../../helper/helper"
 import daily_rewards from "../../config/daily-rewards.json"
 import { claimDaily } from "../../helper/functions"
+import { IGameContext } from "../../../../helper/types"
 
 export default function Daily() {
     const miscState = useMisc()
     const gameState = useGame()
 
     const dailyRewards = daily_rewards.data
-    // ### JIKA lastDailyStatus = 1-1 (Monday-1) LALU PLAYER LOGIN LAGI Monday
-    // ### MAKA DIANGGAP Monday-8 (week 2)
-    // ### TAPI, JIKA PLAYER LOGIN Tuesday WALAUPUN SUDAH MASUK week 2
-    // ### AKAN DIANGGAP Tuesday-2 (week 1)
-    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const serverTime = new Date().toLocaleString('en', {hour: 'numeric', minute: 'numeric', timeZone: 'Asia/Jakarta'})
-    const dayOfWeek = {
-        week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
-        week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
-    }
-    // '1-2' split '-' 
-    // day => [0] = 1 
-    // week => [1] = 2 
-    const [lastDayNumber, lastWeekNumber] = gameState.lastDailyStatus 
-                                        ? gameState.lastDailyStatus.split('-')
-                                        : ['1', '1']
-    // get day number
-    const currentDayNumber = dayOfWeek[`week_${lastWeekNumber}`]
-                            .map(v => v.match(today) ? v.split('-')[1] : null)
-                            .filter(i => i)[0]
-    // if today > last day
-    const currentWeek = +currentDayNumber > +lastDayNumber 
-                        // then continue last week reward
-                        ? +lastWeekNumber 
-                        // is today < last day
-                        : +currentDayNumber < +lastDayNumber
-                            // assume its back to week 1
-                            ? 1
-                            // else assume it still week 2
-                            : 2
+    const currentWeek = getCurrentWeek(gameState)
     
     const convertDate = (rewardDate: string) => {
         const [day, date] = rewardDate.split(', ')
@@ -88,7 +61,7 @@ export default function Daily() {
                                 day: v.days[i],
                                 name: reward.name,
                                 type: reward.type,
-                                items: reward.items
+                                items: reward.items,
                             }
 
                             return <RewardItem key={i} rewardData={rewardData} />
@@ -202,4 +175,37 @@ function RewardItem({ rewardData }) {
             </div>
         </form>
     )
+}
+
+// ### JIKA lastDailyStatus = 1-1 (Monday-1) LALU PLAYER LOGIN LAGI Monday
+// ### MAKA DIANGGAP Monday-8 (week 2)
+// ### TAPI, JIKA PLAYER LOGIN Tuesday WALAUPUN SUDAH MASUK week 2
+// ### AKAN DIANGGAP Tuesday-2 (week 1)
+export function getCurrentWeek(gameState: IGameContext) {
+    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
+    const dayOfWeek = {
+        week_1: ['Monday-1', 'Tuesday-2', 'Wednesday-3', 'Thursday-4', 'Friday-5', 'Saturday-6', 'Sunday-7'],
+        week_2: ['Monday-8', 'Tuesday-9', 'Wednesday-10', 'Thursday-11', 'Friday-12', 'Saturday-13', 'Sunday-14'],
+    }
+    // '1-2' split '-' 
+    // day => [0] = 1 
+    // week => [1] = 2 
+    const [lastDayNumber, lastWeekNumber] = gameState.lastDailyStatus 
+                                        ? gameState.lastDailyStatus.split('-')
+                                        : ['1', '1']
+    // get day number
+    const currentDayNumber = dayOfWeek[`week_${lastWeekNumber}`]
+                            .map(v => v.match(today) ? v.split('-')[1] : null)
+                            .filter(i => i)[0]
+    // if today > last day
+    const currentWeek = +currentDayNumber > +lastDayNumber 
+                        // then continue last week reward
+                        ? +lastWeekNumber 
+                        // is today < last day
+                        : +currentDayNumber < +lastDayNumber
+                            // assume its back to week 1
+                            ? 1
+                            // else assume it still week 2
+                            : 2
+    return currentWeek
 }

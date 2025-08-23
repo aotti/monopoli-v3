@@ -7,7 +7,7 @@ import BoardTwoway from "./components/board/BoardTwoway"
 import GameInfo from "./components/board/GameInfo"
 import HelpSection from "./components/side-button-content/HelpSection"
 import PlayerSection from "./components/side-button-content/PlayerSection"
-import ChatBox from "../../components/ChatBox"
+import ChatBox, { ChatEmotes, sendChat } from "../../components/ChatBox"
 import PlayerSettingGameHistory from "./components/side-button-content/PlayerSettingGameHistory"
 import GameButtons from "./components/board/GameButtons"
 import GameNotif from "./components/board/GameNotif"
@@ -21,6 +21,7 @@ import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
 import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
 import MiniGame from "./components/board/MiniGame"
+import { clickInsideElement } from "../../helper/click-inside"
 
 export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -198,7 +199,14 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 {/* chat */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'chat'} setGameSideButton={gameState.setGameSideButton} />
-                    {gameState.gameRoomId ? <ChatBox page="game" id={gameState.gameRoomId} pubnubSetting={pubnubSetting} /> : null}
+                    {!gameState.gameRoomId ? null : 
+                    <div className={`${gameState.gameSideButton == 'chat' ? 'block' : 'hidden'}
+                    absolute top-[0vh] right-[calc(0rem+2.25rem)] lg:right-[calc(0rem+2.75rem)] 
+                    text-left [writing-mode:horizontal-tb] p-1 
+                    bg-darkblue-1 border-8bit-text w-[30vw] h-[calc(100%-1rem)]`}>
+                        <ChatBox page="game" pubnubSetting={pubnubSetting} />
+                        <GameroomChatForm id={gameState.gameRoomId} />
+                    </div>}
                 </div>
             </div>
 
@@ -224,3 +232,31 @@ function SideButtons({ text, setGameSideButton }) {
         onClick={() => setGameSideButton(text)}> {translateUI({lang: miscState.language, text: text})} </button>
     )
 }
+
+function GameroomChatForm({ id }: {id: number}) {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    // chat emotes ref
+    const chatEmotesRef = useRef()
+    clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
+    
+    return (
+        <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
+        onSubmit={ev => sendChat(ev, miscState, gameState, id)}>
+            {/* input chat */}
+            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
+            placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required />
+            {/* emote list */}
+            {miscState.showEmotes ? <ChatEmotes isGameRoom={true} /> : null}
+            {/* emote button */}
+            <button ref={chatEmotesRef} type="button" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" draggable={false} />
+            </button>
+            {/* submit chat */}
+            <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
+                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" draggable={false} />
+            </button>
+        </form>
+    )
+} 
