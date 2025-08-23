@@ -199,7 +199,6 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
                     messageInput.value = ''
                 }
                 else {
-                    messageInput.value = 'loading..'
                     const claimResult = await claimDaily(null, rewardData, miscState, gameState)
                     inputValues.display_name = 'system'
                     inputValues.message_text = claimResult
