@@ -584,7 +584,7 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
 }
     
 export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any, miscState: IMiscContext, gameState: IGameContext) {
-    ev.preventDefault()
+    ev?.preventDefault()
     
     const today = new Date().toLocaleString([], {weekday: 'long'})
     const {week, day, name, type, items} = rewardData
