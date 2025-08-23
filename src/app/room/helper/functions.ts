@@ -610,13 +610,14 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
         // only roll if element exist
-        if(claimButton) {
+        if(claimButton && rollPack) {
             chatInput.value = 'rolling pack..'
             chosenPackItem = qS('.roll-result').textContent
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
             startAnimation(items, miscState, gameState)
             setTimeout(() => {
+                chatInput.value = 'pack rolled..'
                 rollPack.classList.toggle('flex')
                 rollPack.classList.toggle('hidden')
             }, 5000);
