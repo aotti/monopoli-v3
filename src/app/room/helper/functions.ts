@@ -601,12 +601,13 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         await claimAnimation()
         return `${today} daily reward has been claimed`
     }
+    chatInput.value = 'preparing reward value..'
 
     // if type is pack, start roll animation
     let chosenPackItem: string = null
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
-        // only if element exist
+        // only roll if element exist
         if(rollPack) {
             chosenPackItem = qS('.roll-result').textContent
             rollPack.classList.toggle('flex')
@@ -617,7 +618,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
                 rollPack.classList.toggle('hidden')
             }, 5000);
         }
-        // if element doesnt exist
+        // element doesnt exist
         else {
             const randItem = Math.floor(Math.random() * items.length)
             chosenPackItem = items[randItem]
