@@ -717,6 +717,7 @@ export function claimAnimation() {
                 { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
             ]
         })
+        chatInput.value = 'end animation..'
         setTimeout(() => resolve(true), 1000);
     })
 } 
