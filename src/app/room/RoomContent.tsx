@@ -16,19 +16,13 @@ import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
 import Ranking from "./components/other/Ranking";
 import Shop from "./components/other/Shop";
-import Daily from "./components/other/Daily";
+import Daily, { getCurrentWeek } from "./components/other/Daily";
+import daily_rewards from "./config/daily-rewards.json"
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
     const gameState = useGame()
     const playerData = gameState.otherPlayerInfo || gameState.myPlayerInfo
-
-    // chat input ref
-    const chatFocusRef = useRef()
-    clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
-    // chat emotes ref
-    const chatEmotesRef = useRef()
-    clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting.monopoly)
@@ -114,22 +108,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         {/* chat box */}
                         <ChatBox page="room" pubnubSetting={pubnubSetting} />
                         {/* chat form */}
-                        <form ref={chatFocusRef} className="relative flex items-center gap-2 mt-2" onSubmit={ev => sendChat(ev, miscState, gameState)}>
-                            {/* inputs */}
-                            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
-                            placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
-                            onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
-                            {/* emote list */}
-                            {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
-                            {/* emote button */}
-                            <button ref={chatEmotesRef} type="button" className="relative w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
-                                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" width={100} height={100} draggable={false} />
-                            </button>
-                            {/* submit chat */}
-                            <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
-                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" width={100} height={100} draggable={false} />
-                            </button>
-                        </form>
+                        <RoomlistChatForm />
                     </div>
                 </div>
                 {/* player stats */}
@@ -213,6 +192,62 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* game sounds */}
             <GameSounds />
         </div>
+    )
+}
+
+function RoomlistChatForm() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    // chat input ref
+    const chatFocusRef = useRef()
+    clickOutsideElement(chatFocusRef, () => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('off'))
+    // chat emotes ref
+    const chatEmotesRef = useRef()
+    clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
+
+    // claim daily stuff
+    const dailyRewards = daily_rewards.data
+    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
+    const currentWeek = getCurrentWeek(gameState)
+
+    interface IRewardList {
+        type: string,
+        name: string,
+        items: string[],
+    }
+    const [rewardList, rewardDays] = dailyRewards.map(v => 
+        v.week === currentWeek 
+            ? [v.list, v.days] 
+            : null
+    ).filter(i=>i)[0] as [IRewardList[], string[]]
+    const todayReward = rewardDays.indexOf(today)
+    const rewardData = {
+        week: currentWeek,
+        day: today,
+        name: rewardList[todayReward].name,
+        type: rewardList[todayReward].type,
+        items: rewardList[todayReward].items,
+    }
+    
+    return (
+        <form ref={chatFocusRef} className="relative flex items-center gap-2 mt-2" 
+        onSubmit={ev => sendChat(ev, miscState, gameState, null, rewardData)}>
+            {/* inputs */}
+            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
+            placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
+            onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
+            {/* emote list */}
+            {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
+            {/* emote button */}
+            <button ref={chatEmotesRef} type="button" className="relative w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
+                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" width={100} height={100} draggable={false} />
+            </button>
+            {/* submit chat */}
+            <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
+                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" width={100} height={100} draggable={false} />
+            </button>
+        </form>
     )
 }
 

@@ -584,9 +584,11 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
 }
     
 export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any, miscState: IMiscContext, gameState: IGameContext) {
-    ev.preventDefault()
+    ev ? ev.preventDefault() : null
     
-    const today = new Date().toLocaleString([], {weekday: 'long'})
+    const chatInput = qS('#message_text') as HTMLInputElement
+
+    const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const {week, day, name, type, items} = rewardData
     // result message
     const resultMessage = qS('#result_daily')
@@ -595,14 +597,17 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
-        return await claimAnimation()
+        await claimAnimation()
+        return `${today} daily reward has been claimed`
     }
     // if type is pack, start roll animation
+    let chosenPackItem: string = null
     if(type == 'pack') {
         const rollPack = qS('#roll_pack')
         rollPack.classList.toggle('flex')
         rollPack.classList.toggle('hidden')
         startAnimation(items, miscState, gameState)
+        chosenPackItem = qS('.roll-result').textContent
         setTimeout(() => {
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
@@ -610,27 +615,31 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     }
 
     // claim data
-    const claimValue = {
+    const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
         week: week.toString(),
-        item_name: type === 'coin' ? 'coin' : qS('.roll-result').textContent,
+        item_name: type === 'coin' ? 'coin' : chosenPackItem,
     }
     // loading claim button
     let loadingIncrement = 3
-    claimButton.disabled = true
+    claimButton ? claimButton.disabled = true : null
     const loadingClaimInterval = setInterval(() => {
-        if(loadingIncrement === 3) {
-            claimButton.textContent = '.'
-            loadingIncrement = 0
-        }
-        else if(loadingIncrement < 3) {
-            claimButton.textContent += '.'
-            loadingIncrement++
+        // only set loading if claim button exist
+        if(claimButton) {
+            if(loadingIncrement === 3) {
+                claimButton.textContent = '.'
+                loadingIncrement = 0
+            }
+            else if(loadingIncrement < 3) {
+                claimButton.textContent += '.'
+                loadingIncrement++
+            }
         }
     }, 1000);
 
+    chatInput.value = 'fetching reward..'
     // fetch
-    const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(claimValue)})
+    const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(rewardValue)})
     const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
     // response
     switch(claimDailyResponse.status) {
@@ -660,27 +669,29 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
                 gameState.setMyShopItems(playerShopItems)
             }
             // start animation and sound
-            await claimAnimation()
             const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
             soundClaimReward.play()
-            return
+            await claimAnimation()
+            return `you claimed ${today} daily reward`
         default: 
             // stop loading claim
             clearInterval(loadingClaimInterval)
-            claimButton.textContent = 'claim'
-            // result message
-            resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
-            // display notif
-            resultMessage.classList.remove('hidden')
-            setTimeout(() => resultMessage.classList.add('hidden'), 3000);
-            return
+            claimButton ? claimButton.textContent = 'claim' : null
+            // result message, only if element exist
+            if(resultMessage) {
+                resultMessage.textContent = `${claimDailyResponse.status}: ${claimDailyResponse.message}`
+                // display notif
+                resultMessage.classList.remove('hidden')
+                setTimeout(() => resultMessage.classList.add('hidden'), 3000);
+            }
+            return `${claimDailyResponse.status}: ${claimDailyResponse.message}`
     }
 }
 
 export function claimAnimation() {
     return new Promise(resolve => {
         const animate: FunctionComponent<IAnimate> = anime
-        const today = new Date().toLocaleString([], {weekday: 'long'})
+        const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
         const rewardImg = qS(`#reward_${today}`) as HTMLImageElement
         const rotateValue = rewardImg.style.transform.match('360deg') ? 0 : 360
 
@@ -702,6 +713,6 @@ export function claimAnimation() {
                 { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
             ]
         })
-        setTimeout(() => resolve(true), 1000);
+        setTimeout(() => resolve('done'), 1000);
     })
 } 
