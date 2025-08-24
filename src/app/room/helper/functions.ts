@@ -645,7 +645,6 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     switch(claimDailyResponse.status) {
         case 200: 
             // stop loading claim
-            chatInput.value = ''
             clearInterval(loadingClaimInterval)
             // destruct data
             const {token, dailyStatus, dailyHistory, playerCoins, playerShopItems} = claimDailyResponse.data[0]
@@ -673,7 +672,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
             const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
             soundClaimReward.play()
             await claimAnimation()
-            return `${today} daily reward has been claimed`
+            return `you claimed ${today} daily reward`
         default: 
             // stop loading claim
             clearInterval(loadingClaimInterval)
