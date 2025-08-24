@@ -691,11 +691,14 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
 
 export function claimAnimation() {
     return new Promise(resolve => {
+        const chatInput = qS('#message_text') as HTMLInputElement
+
         const animate: FunctionComponent<IAnimate> = anime
-        const today = new Date().toLocaleString([], {weekday: 'long'})
+        const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
         const rewardImg = qS(`#reward_${today}`) as HTMLImageElement
         const rotateValue = rewardImg.style.transform.match('360deg') ? 0 : 360
 
+        chatInput.value = 'start animation..'
         animate({
             targets: rewardImg,
             // Properti yang dianimasikan
