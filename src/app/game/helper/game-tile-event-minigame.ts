@@ -31,7 +31,7 @@ export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0]
                 if(minigameCounter < -1) {
                     clearInterval(minigameInterval)
                     // get answer list to update minigame players (player turn)
-                    const answerList = getAnswerList(gameState)
+                    const answerList = getAnswerList(miscState, gameState)
                     return setTimeout(() => resolve({
                         event: 'mini_game',
                         mini_chance: playerTurnData.minigame - 1,
@@ -230,7 +230,7 @@ export function minigameAnswerCorrection(minigameAnswerData: GameRoomListener['m
     }
 }
 
-export function getAnswerList(gameState: IGameContext) {
+export function getAnswerList(miscState: IMiscContext, gameState: IGameContext) {
     // get player amount and answer list
     const playerInfo = gameState.gamePlayerInfo
     // 2 array container for answer
@@ -261,7 +261,8 @@ export function getAnswerList(gameState: IGameContext) {
         // find player who not answered
         for(let element of answerListElement.children) {
             const answerElement = element as HTMLElement
-            const [display_name, answer, status, event_money] = answerElement.dataset.answer.split(',')
+            const decAnswerData = simpleDecrypt(answerElement.dataset.answer, miscState.simpleKey).split(',')
+            const [display_name, answer, status, event_money] = decAnswerData
 
             // get player data
             const isAnswered = playerInfo.map(v => v.display_name).indexOf(display_name)
@@ -295,7 +296,8 @@ export function getAnswerList(gameState: IGameContext) {
     else {
         for(let element of answerListElement.children) {
             const answerElement = element as HTMLElement
-            const [display_name, answer, status, event_money] = answerElement.dataset.answer.split(',')
+            const decAnswerData = simpleDecrypt(answerElement.dataset.answer, miscState.simpleKey).split(',')
+            const [display_name, answer, status, event_money] = decAnswerData
             // push to temp answer list
             const answerData: IGameContext['minigameAnswerList'][0] = {
                 display_name: display_name, 
