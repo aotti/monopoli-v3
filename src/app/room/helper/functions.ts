@@ -597,7 +597,8 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
-        await claimAnimation()
+        const test = await claimAnimation()
+        chatInput.value = test as any
         return `${today} daily reward has been claimed`
     }
     // if type is pack, start roll animation
@@ -717,7 +718,9 @@ export function claimAnimation() {
                 { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
             ]
         })
-        chatInput.value = 'end animation..'
-        setTimeout(() => resolve(true), 1000);
+        setTimeout(() => {
+            chatInput.value = 'end animation..'
+            resolve('done')
+        }, 1000);
     })
 } 
