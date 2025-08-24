@@ -597,8 +597,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     // if player click other day reward OR the reward has been claimed, only play animation
     if(day !== today || gameState.dailyStatus === 'claimed') {
         // start animation
-        const test = await claimAnimation()
-        chatInput.value = test as any
+        await claimAnimation()
         return `${today} daily reward has been claimed`
     }
     // if type is pack, start roll animation
@@ -692,14 +691,11 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
 
 export function claimAnimation() {
     return new Promise(resolve => {
-        const chatInput = qS('#message_text') as HTMLInputElement
-
         const animate: FunctionComponent<IAnimate> = anime
         const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
         const rewardImg = qS(`#reward_${today}`) as HTMLImageElement
         const rotateValue = rewardImg.style.transform.match('360deg') ? 0 : 360
 
-        chatInput.value = 'start animation..'
         animate({
             targets: rewardImg,
             // Properti yang dianimasikan
@@ -718,9 +714,6 @@ export function claimAnimation() {
                 { value: 1, duration: 300, easing: 'easeOutBounce', delay: 200 } // Kembali normal saat mendarat
             ]
         })
-        setTimeout(() => {
-            chatInput.value = 'end animation..'
-            resolve('done')
-        }, 1000);
+        setTimeout(() => resolve('done'), 1000);
     })
 } 
