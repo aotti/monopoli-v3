@@ -377,7 +377,7 @@ type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mo
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'|'rng'|'special_card'
-type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
+type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'tax_money'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
 type SellCityType = 'city_left'|'sell_city_name'|'sell_city_price'
@@ -615,7 +615,7 @@ interface IEventPayTax {
     event: 'pay_tax',
     owner: string,
     visitor: string,
-    tax: number,
+    taxMoney: number,
     money: number,
     card?: string,
     debuff?: string,

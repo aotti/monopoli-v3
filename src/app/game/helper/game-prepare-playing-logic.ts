@@ -730,7 +730,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                             ? {
                                 owner: eventData.owner, 
                                 visitor: eventData.visitor,
-                                money: eventData.tax,
+                                money: eventData.taxMoney,
                             } 
                             : null
             // get special card event data
@@ -947,7 +947,7 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
             }
             return historyArray.join(';')
         case 'pay_tax': 
-            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
+            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.taxMoney)} to ${eventData.owner}`)
             return historyArray.join(';')
         case 'get_card': 
             historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName} ${eventData.rank})`)

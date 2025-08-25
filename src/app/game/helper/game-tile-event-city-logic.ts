@@ -197,7 +197,7 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
                 event: 'pay_tax', 
                 owner: buyCityOwner, 
                 visitor: playerTurnData.display_name,
-                tax: taxPrice * cityQuake,
+                taxMoney: taxPrice * cityQuake,
                 money: 0,
                 card: specialCard,
                 debuff: buffDebuff
