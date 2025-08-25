@@ -440,6 +440,7 @@ export default class GameController extends Controller {
                 tmp_card: payload.card,
                 tmp_take_money: payload.take_money,
                 tmp_prison: payload.prison,
+                tmp_minigame: +payload.minigame_chance,
                 tmp_buff: payload.buff,
                 tmp_debuff: payload.debuff,
                 tmp_minigame_result: payload.minigame_data,
