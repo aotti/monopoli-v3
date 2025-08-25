@@ -727,7 +727,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
 
             // get tax data
             const taxData = eventData?.event == 'pay_tax' 
-                            ? {owner: eventData.owner, visitor: eventData.visitor} 
+                            ? {
+                                owner: eventData.owner, 
+                                visitor: eventData.visitor,
+                                money: eventData.tax,
+                            } 
                             : null
             // get special card event data
             if((eventData as any)?.card) specialCardCollection.cards.push((eventData as any)?.card)
@@ -808,6 +812,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 city: playerTurnEndLose ? null : (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
+                tax_money: taxData?.money.toString() || null,
                 card: specialCardLeft,
                 buff: buffLeft,
                 debuff: debuffLeft,
