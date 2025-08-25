@@ -225,7 +225,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
                 clearInterval(minigameInterval)
                 minigameInfo('success', 'times up, distributing mini game result..')
                 // display answer list (all players)
-                getAnswerList(gameState)
+                getAnswerList(miscState, gameState)
                 // display 6 hint answer
                 gameState.setMinigameHintAnswers(hintAnswers)
                 // hide minigame modal

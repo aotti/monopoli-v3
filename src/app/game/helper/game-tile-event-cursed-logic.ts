@@ -1,4 +1,4 @@
-import { qS, translateUI, moneyFormat } from "../../../helper/helper";
+import { qS, translateUI, moneyFormat, simpleDecrypt } from "../../../helper/helper";
 import { IMiscContext, IGameContext, EventDataType } from "../../../helper/types";
 import { playGameSounds } from "./game-tile-event-sounds";
 import { useSpecialCard } from "./game-tile-event-special-card-logic";
@@ -7,8 +7,9 @@ import { useSpecialCard } from "./game-tile-event-special-card-logic";
 // ========== # CURSED CITY EVENT ==========
 export function stopByCursedCity(findPlayer: number, tileElement: HTMLElement, miscState: IMiscContext, gameState: IGameContext) {
     return new Promise(async (resolve: (value: EventDataType)=>void) => {
-        const getCityInfo = tileElement.dataset.cityInfo.split(',')
-        const [cityName, cityProperty, cityPrice, cityOwner] = getCityInfo as string[];
+        const getCityInfo = tileElement.dataset.cityInfo
+        const decCityInfo = simpleDecrypt(getCityInfo, miscState.simpleKey).split(',')
+        const [cityName, cityProperty, cityPrice, cityOwner] = decCityInfo;
         // result message
         const notifTitle = qS('#result_notif_title')
         const notifMessage = qS('#result_notif_message')

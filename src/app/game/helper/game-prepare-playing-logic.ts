@@ -613,6 +613,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     // update laps for moving player
                     if(fixedNextStep == 1 || `${fixedNextStep}${branchStep}` == '1x') {
                         numberLaps += 1
+                        // +1 minigame every 3 laps
+                        if(numberLaps % 3 === 0) numberMinigame = 1
                         // update laps
                         gameState.setGamePlayerInfo(players => {
                             const newLapInfo = [...players]
@@ -626,8 +628,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         specialCardCollection.cards.push(specialCard)
                         specialCardCollection.effects.push(0)
                         throughStart = +specialEffect || 25_000
-                        // +1 minigame every 3 laps
-                        if(numberLaps % 3 === 0) numberMinigame = 1
                     }
                 }
             })

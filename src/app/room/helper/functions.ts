@@ -617,7 +617,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     // claim data
     const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
-        week: week.toString(),
+        week: `${week}`,
         item_name: type === 'coin' ? 'coin' : chosenPackItem,
     }
     // loading claim button
