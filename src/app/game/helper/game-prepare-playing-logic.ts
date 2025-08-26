@@ -812,7 +812,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 city: playerTurnEndLose ? null : (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
-                tax_money: taxData?.money.toString() || null,
+                tax_money: taxData?.money.toString() || '0',
                 card: specialCardLeft,
                 buff: buffLeft,
                 debuff: debuffLeft,
