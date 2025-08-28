@@ -708,8 +708,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             setTimeout(() => {
                 gameState.setShowGameNotif(display => {
                     const newDisplay = display == 'card' || display =='normal' ? display : null
-                    console.log({newDisplay});
-                    
                     // if display = card | normal, then set animation true 
                     // to prevent no animation when closing notif
                     newDisplay ? miscState.setAnimation(true) : miscState.setAnimation(false)
@@ -789,8 +787,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const minigameChance = typeof tempMinigameChance == 'number' 
                                 // after play minigame + get minigame chance (lap multiple of 3)
                                 ? tempMinigameChance + numberMinigame 
-                                // default 0/1
-                                : numberMinigame
+                                // check if player still have chance left
+                                // else, default 0/1
+                                : (playerTurnData.minigame || numberMinigame)
             const minigameData = (eventData as any)?.mini_data || []
 
             // input values container

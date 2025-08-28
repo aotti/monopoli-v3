@@ -261,8 +261,8 @@ export function getAnswerList(miscState: IMiscContext, gameState: IGameContext) 
         // find player who not answered
         for(let element of answerListElement.children) {
             const answerElement = element as HTMLElement
-            const decAnswerData = simpleDecrypt(answerElement.dataset.answer, miscState.simpleKey).split(',')
-            const [display_name, answer, status, event_money] = decAnswerData
+            const decAnswerData = simpleDecrypt(answerElement.dataset.answer, miscState.simpleKey)
+            const [display_name, answer, status, event_money] = decAnswerData.split(',')
 
             // get player data
             const isAnswered = playerInfo.map(v => v.display_name).indexOf(display_name)
@@ -277,7 +277,7 @@ export function getAnswerList(miscState: IMiscContext, gameState: IGameContext) 
                 }
                 tempAnswerList.push(answerData)
                 // push to payload answer list
-                payloadAnswerList.push(answerElement.dataset.answer)
+                payloadAnswerList.push(decAnswerData)
             }
         }
         // not answered player
@@ -296,8 +296,8 @@ export function getAnswerList(miscState: IMiscContext, gameState: IGameContext) 
     else {
         for(let element of answerListElement.children) {
             const answerElement = element as HTMLElement
-            const decAnswerData = simpleDecrypt(answerElement.dataset.answer, miscState.simpleKey).split(',')
-            const [display_name, answer, status, event_money] = decAnswerData
+            const decAnswerData = simpleDecrypt(answerElement.dataset.answer, miscState.simpleKey)
+            const [display_name, answer, status, event_money] = decAnswerData.split(',')
             // push to temp answer list
             const answerData: IGameContext['minigameAnswerList'][0] = {
                 display_name: display_name, 
@@ -307,7 +307,7 @@ export function getAnswerList(miscState: IMiscContext, gameState: IGameContext) 
             }
             tempAnswerList.push(answerData)
             // push to payload answer list
-            payloadAnswerList.push(answerElement.dataset.answer)
+            payloadAnswerList.push(decAnswerData)
         }
     }
     // update answer list state

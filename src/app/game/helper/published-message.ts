@@ -253,20 +253,22 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // end turn
     if(getMessage.playerTurnEnd) {
-        // save playerTurns
-        localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
-        // show notif next player turn
-        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
-                                    .replace('ppp', getMessage.playerTurns[0])
-        // play player turn sound
-        if(getMessage.playerTurns[0] === gameState.myPlayerInfo.display_name) {
-            const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
-            soundPlayerTurn.play()
-        }
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
         // update player
         gameState.setGamePlayerInfo(players => {
+            // save playerTurns
+            localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
+            // show notif next player turn
+            playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                        .replace('ppp', getMessage.playerTurns[0])
+            // play player turn sound
+            if(getMessage.playerTurns[0] === gameState.myPlayerInfo.display_name) {
+                const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
+                soundPlayerTurn.play()
+            }
+            
+            // update player
             const allPlayerInfo = [...players]
             // find turn end player
             // ### when pay tax, visitor money already reduced in db
