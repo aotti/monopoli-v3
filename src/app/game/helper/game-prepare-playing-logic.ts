@@ -708,8 +708,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             setTimeout(() => {
                 gameState.setShowGameNotif(display => {
                     const newDisplay = display == 'card' || display =='normal' ? display : null
-                    console.log({newDisplay});
-                    
                     // if display = card | normal, then set animation true 
                     // to prevent no animation when closing notif
                     newDisplay ? miscState.setAnimation(true) : miscState.setAnimation(false)
@@ -727,7 +725,11 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
 
             // get tax data
             const taxData = eventData?.event == 'pay_tax' 
-                            ? {owner: eventData.owner, visitor: eventData.visitor} 
+                            ? {
+                                owner: eventData.owner, 
+                                visitor: eventData.visitor,
+                                money: eventData.taxMoney,
+                            } 
                             : null
             // get special card event data
             if((eventData as any)?.card) specialCardCollection.cards.push((eventData as any)?.card)
@@ -785,8 +787,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             const minigameChance = typeof tempMinigameChance == 'number' 
                                 // after play minigame + get minigame chance (lap multiple of 3)
                                 ? tempMinigameChance + numberMinigame 
-                                // default 0/1
-                                : numberMinigame
+                                // check if player still have chance left
+                                // else, default 0/1
+                                : (playerTurnData.minigame || numberMinigame)
             const minigameData = (eventData as any)?.mini_data || []
 
             // input values container
@@ -808,6 +811,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                 city: playerTurnEndLose ? null : (eventData as any)?.city || playerTurnData.city,
                 tax_owner: taxData?.owner || null,
                 tax_visitor: taxData?.visitor || null,
+                tax_money: taxData?.money.toString() || '0',
                 card: specialCardLeft,
                 buff: buffLeft,
                 debuff: debuffLeft,
@@ -942,7 +946,7 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
             }
             return historyArray.join(';')
         case 'pay_tax': 
-            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.money)} to ${eventData.owner}`)
+            historyArray.push(`${eventData.event}: ${moneyFormat(eventData.taxMoney)} to ${eventData.owner}`)
             return historyArray.join(';')
         case 'get_card': 
             historyArray.push(`${eventData.event}: ${eventData.type} (${eventData.tileName} ${eventData.rank})`)

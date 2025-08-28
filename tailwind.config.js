@@ -16,6 +16,7 @@ module.exports = {
         'zoom-out': 'zoom-out .3s linear 1',
         'slide-down': 'slide-down .5s linear 1',
         'slide-up': 'slide-up .5s linear 1',
+        'player-pos': 'player-pos 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         'zoom-in': {
@@ -33,6 +34,14 @@ module.exports = {
         'slide-up': {
           '0%': { opacity: '1', top: '33.33%' },
           '100%': { opacity: '0', top: '20%' },
+        },
+        'player-pos': {
+          '50%': { 
+            boxShadow: '5px 5px 30px inset #4ade80', 
+          },
+          '0%, 100%': { 
+            backgroundColor: 'rgb(245 232 199 / 0.9)', 
+          },
         }
       },
       backgroundColor: {

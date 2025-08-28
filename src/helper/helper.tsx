@@ -439,6 +439,7 @@ export function filterInput(input: InputIDType, value: string) {
             return isValueMatch
         case 'money': 
         case 'event_money':
+        case 'tax_money':
         case 'sell_city_price':
             return value ? value.match(/^[\d]+$|^-[\d]+$/) : null
         case 'city': 

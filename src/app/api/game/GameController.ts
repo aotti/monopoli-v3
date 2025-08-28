@@ -416,7 +416,7 @@ export default class GameController extends Controller {
         const taxes = isTaxes ? {
             owner: payload.tax_owner, 
             visitor: payload.tax_visitor, 
-            money: +payload.event_money + tempEventMoney
+            money: +payload.tax_money + tempEventMoney
         } : null
         // transfer money
         const isTakeMoney = payload.take_money ? payload.take_money.split(';') : null
@@ -437,6 +437,7 @@ export default class GameController extends Controller {
                 tmp_event_money: +payload.event_money + tempEventMoney,
                 tmp_city: payload.city,
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
+                tmp_tax_money: isTaxes ? +payload.tax_money : null,
                 tmp_card: payload.card,
                 tmp_take_money: payload.take_money,
                 tmp_prison: payload.prison,

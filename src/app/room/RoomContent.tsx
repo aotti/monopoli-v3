@@ -23,6 +23,10 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
     const miscState = useMisc()
     const gameState = useGame()
     const playerData = gameState.otherPlayerInfo || gameState.myPlayerInfo
+    
+    // menu item ref
+    const menuItemRef = useRef()
+    clickOutsideElement(menuItemRef, () => miscState.showRoomListMenu ? miscState.setShowRoomListMenu(false) : null)
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting.monopoly)
@@ -143,7 +147,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                         {/* menu button */}
                         <MenuButton />
                         {/* menu item */}
-                        <div className={`${miscState.showRoomListMenu ? 'flex' : 'hidden'} flex-col gap-2 absolute z-10 right-16 border-8bit-text bg-darkblue-1 w-max`}>
+                        <div ref={menuItemRef} className={`${miscState.showRoomListMenu ? 'flex' : 'hidden'} flex-col gap-2 absolute z-10 right-16 border-8bit-text bg-darkblue-1 w-max`}>
                             {/* ranking button */}
                             <RankingButton />
                             {/* shop button */}
@@ -255,16 +259,16 @@ function MenuButton() {
     const miscState = useMisc()
     const gameState = useGame()
 
-    useEffect(() => {
-        let menuTimeout = null
-        if(miscState.showRoomListMenu) {
-            // auto close menu after 10s
-            menuTimeout = setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
-        }
-        else {
-            clearInterval(menuTimeout)
-        }
-    }, [miscState.showRoomListMenu])
+    // useEffect(() => {
+    //     let menuTimeout = null
+    //     if(miscState.showRoomListMenu) {
+    //         // auto close menu after 10s
+    //         menuTimeout = setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
+    //     }
+    //     else {
+    //         clearInterval(menuTimeout)
+    //     }
+    // }, [miscState.showRoomListMenu])
 
     return (
         <div data-tooltip="menu" className={`w-8 my-auto text-right`}>
