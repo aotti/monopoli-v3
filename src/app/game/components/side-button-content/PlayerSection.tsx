@@ -187,7 +187,6 @@ function DiceControlOption() {
                 : <button type="button" id="dice_control" className="px-1 border-2">
                     {translateUI({lang: miscState.language, text: gameState.diceMode})}
                 </button>}
-            
         </div>
     )
 }

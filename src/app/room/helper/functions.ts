@@ -637,7 +637,8 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         }
     }, 1000);
 
-    chatInput.value = 'fetching reward..'
+    // only show text if claim from chat box
+    ev ? null : chatInput.placeholder = 'fetching reward..'
     // fetch
     const claimDailyFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(rewardValue)})
     const claimDailyResponse: IResponse = await (await fetcher('/player/daily', claimDailyFetchOptions)).json()
@@ -646,6 +647,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         case 200: 
             // stop loading claim
             clearInterval(loadingClaimInterval)
+            chatInput.placeholder = translateUI({lang: miscState.language, text: 'chat here'})
             // destruct data
             const {token, dailyStatus, dailyHistory, playerCoins, playerShopItems} = claimDailyResponse.data[0]
             // save access token

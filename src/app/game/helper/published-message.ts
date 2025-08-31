@@ -51,6 +51,9 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // ready
     if(getMessage.readyPlayers) {
+        // reset player shop items
+        const getLastReadyPlayer = getMessage.readyPlayers.pop()
+        if(gameState.myPlayerInfo.display_name === getLastReadyPlayer) gameState.setMyShopItems(null)
         // set players ready text
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp player(s) ready'})
                                     .replace('ppp', getMessage.readyPlayers.length.toString())

@@ -743,6 +743,16 @@ export default class GameController extends Controller {
         return result
     }
 
+    async getMissingCards(action: string, payload: IGamePlay['mini_game']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+    }
+
     async sendReportBugs(action: string, payload: IGamePlay['report_bugs']) {
         let result: IResponse
         
