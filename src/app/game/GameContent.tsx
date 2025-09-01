@@ -250,7 +250,7 @@ function GameroomChatForm({ id }: {id: number}) {
         <form className="absolute bottom-0 flex items-center justify-center gap-2 w-full" 
         onSubmit={ev => sendChat(ev, miscState, gameState, id)}>
             {/* input chat */}
-            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
+            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={80}
             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
             onFocus={() => scrollToBottom()}/>
             {/* emote list */}

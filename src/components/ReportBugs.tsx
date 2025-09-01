@@ -36,8 +36,8 @@ export default function ReportBugs() {
                                 <span> {translateUI({lang: miscState.language, text: 'you can only report every 10 minutes, please send proper report'})} </span>
                             </div>
                             <div className="my-auto">
-                                <label htmlFor="room_id"> {translateUI({lang: miscState.language, text: 'description'})}: </label>
-                                <textarea id="description" className="w-[28rem] lg:w-[32rem] h-[5.5rem] lg:h-[7rem] resize-none bg-gray-200 text-black p-1" minLength={4} placeholder={reportBugExample}></textarea>
+                                <label htmlFor="description"> {translateUI({lang: miscState.language, text: 'description'})}: </label>
+                                <textarea id="description" className="w-[28rem] lg:w-[32rem] h-[5.5rem] lg:h-[7rem] resize-none bg-gray-200 text-black p-1" minLength={4} maxLength={256} placeholder={reportBugExample}></textarea>
                             </div>
                         </div>
                         {/* message */}
