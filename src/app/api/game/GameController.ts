@@ -116,8 +116,6 @@ export default class GameController extends Controller {
         if(checkReadyPlayer !== -1) return this.respond(403, 'fight me ni-', [])
         // set new ready player
         await this.redisSet(`readyPlayers_${roomId}`, [...getReadyPlayers, payload.display_name])
-        // reset player shop items
-        await this.redisReset(`${payload.display_name}_shopItems`)
         // publish online players
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
@@ -175,6 +173,9 @@ export default class GameController extends Controller {
         else {
             // set game stage
             await this.redisSet(`gameStage_${roomId}`, ['decide'])
+            // reset player shop items
+            for(let playerName of getReadyPlayers)
+                await this.redisReset(`${playerName}_shopItems`)
             // publish online players
             const publishData = {
                 startGame: 'start',
@@ -459,6 +460,7 @@ export default class GameController extends Controller {
                 character: (data[0] as any).player_character
             }
             delete (newPlayerTurnEndData as any).player_character
+            
             // game history container
             const gameHistory: IGameContext['gameHistory'] = []
             // history = rolled_dice: num;buy_city: str;sell_city: str;get_card: str;use_card: str
@@ -495,19 +497,26 @@ export default class GameController extends Controller {
                 return {display_name, event_money: +event_money}
             })
 
-            // publish online players
-            const publishData = {
+            // publish turn end data 1
+            const publishData_1 = {
+                playerTurns: getPlayerTurns,
+                gameHistory: [...getGameHistory, ...gameHistory],
+            }
+            const isGamePublished_1 = await this.monopoliPublish(payload.channel, publishData_1)
+            console.log(isGamePublished_1);
+            if(!isGamePublished_1.timetoken) return this.respond(500, 'realtime error, try again', [])
+
+            // publish turn end data 2
+            const publishData_2 = {
                 playerTurnEnd: newPlayerTurnEndData,
                 taxes: taxes,
                 takeMoney: takeMoney,
-                playerTurns: getPlayerTurns,
-                gameHistory: [...getGameHistory, ...gameHistory],
                 minigameResult: minigameResultData,
             }
-            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
-            console.log(isGamePublished);
-            
-            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            const isGamePublished_2 = await this.monopoliPublish(payload.channel, publishData_2)
+            console.log(isGamePublished_2);
+            if(!isGamePublished_2.timetoken) return this.respond(500, 'realtime error, try again', [])
+
             // set result
             const resultData = {
                 token: token,
@@ -741,6 +750,16 @@ export default class GameController extends Controller {
         result = this.respond(200, `${action} success`, [1])
         // return result
         return result
+    }
+
+    async getMissingCards(action: string, payload: IGamePlay['mini_game']) {
+        let result: IResponse
+        
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
     }
 
     async sendReportBugs(action: string, payload: IGamePlay['report_bugs']) {

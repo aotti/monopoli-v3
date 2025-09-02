@@ -1,6 +1,6 @@
-import { MouseEvent, useEffect, useRef, useState } from "react"
+import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react"
 import { useGame } from "../../../../context/GameContext"
-import { applyTooltipEvent, moneyFormat, translateUI } from "../../../../helper/helper"
+import { applyTooltipEvent, moneyFormat, qS, translateUI } from "../../../../helper/helper"
 import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
@@ -161,33 +161,29 @@ function DiceControlOption() {
     })
     const isDiceControllerExist = diceController.flat().filter(i=>i).length === 1
 
-    const diceModeHandler = (ev: MouseEvent<HTMLButtonElement>) => {
-        const currentMode = ev.currentTarget.textContent
+    const diceModeHandler = (ev: ChangeEvent<HTMLSelectElement>) => {
+        const currentMode = ev.currentTarget.value
         switch(currentMode) {
-            case 'off':
-                gameState.setDiceMode('odd'); break
-            case 'odd':
-                gameState.setDiceMode('even'); break
-            case 'even':
-                gameState.setDiceMode('off'); break
-            default:
-                gameState.setDiceMode('off'); break
+            case 'odd': gameState.setDiceMode('odd'); break
+            case 'even': gameState.setDiceMode('even'); break
+            default: gameState.setDiceMode('off'); break
         }
     }
 
     return (
         <div className={`flex items-center gap-2 p-1 hover:bg-darkblue-2 ${isDiceControllerExist ? '' : 'saturate-0'}`}>
-            <label htmlFor="dice_control" className="w-full">
+            <label htmlFor="dice_control" className="w-full" onClick={() => (qS('#dice_control') as any).showPicker()}>
                 {translateUI({lang: miscState.language, text: 'Dice Control'})}
             </label>
             {isDiceControllerExist
-                ? <button type="button" id="dice_control" className="px-1 border-2" onClick={diceModeHandler}>
-                    {translateUI({lang: miscState.language, text: gameState.diceMode})}
-                </button>
-                : <button type="button" id="dice_control" className="px-1 border-2">
+                ? <select id="dice_control" className="p-px max-w-12 lg:max-w-16" onChange={diceModeHandler} value={gameState.diceMode}>
+                    <option className="text-sm lg:text-lg" value="odd"> {translateUI({lang: miscState.language, text: 'odd'})} </option>
+                    <option className="text-sm lg:text-lg" value="even"> {translateUI({lang: miscState.language, text: 'even'})} </option>
+                    <option className="text-sm lg:text-lg" value="off" selected> {translateUI({lang: miscState.language, text: 'off'})} </option>
+                </select>
+                : <button id="dice_control" type="button" className="px-1 border-2">
                     {translateUI({lang: miscState.language, text: gameState.diceMode})}
                 </button>}
-            
         </div>
     )
 }

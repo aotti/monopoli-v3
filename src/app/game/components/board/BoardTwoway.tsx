@@ -198,7 +198,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                         : null}
                 </div>
                 {/* tile label */}
-                <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''} 
+                <div className={`${isPlayerOnTop !== -1 ? 'animate-player-pos' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
                     <p className={`${cityProperty ? 'text-red-600' : priceTextClass} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
                     data-price={moneyFormat(cityPrice || (cursedCityPrice || price))}> 
@@ -249,7 +249,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
                 {/* tile image */}
                 <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
                 {/* tile label */}
-                <div className={`${isPlayerOnTop !== -1 ? 'shadow-inner-md shadow-green-400' : ''}
+                <div className={`${isPlayerOnTop !== -1 ? 'animate-player-pos' : ''}
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
                     <p className={`leading-3 lg:leading-relaxed text-[2vh]`}> 
                         {translateUI({lang: miscState.language, text: name as any})} 

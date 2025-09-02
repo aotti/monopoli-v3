@@ -439,6 +439,7 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
+    const playerTurnNotif = qS('#player_turn_notif')
     // submit button
     const surrenderButton = qS('#surrender_button') as HTMLInputElement
     // input value container
@@ -454,6 +455,7 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
     const tempButtonText = surrenderButton.textContent
     surrenderButton.textContent = 'Loading'
     surrenderButton.disabled = true
+    surrenderButton.classList.add('saturate-0')
     // fetch
     const surrenderFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
     const surrenderResponse: IResponse = await (await fetcher('/game', surrenderFetchOptions)).json()
@@ -473,6 +475,9 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
                 localStorage.setItem('playerData', JSON.stringify(newMyPlayer))
                 return newMyPlayer
             })
+            // return button text and show notif
+            surrenderButton.textContent = tempButtonText
+            playerTurnNotif.textContent = 'you can back to roomlist now'
             return
         default: 
             // show notif

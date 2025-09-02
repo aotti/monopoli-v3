@@ -319,7 +319,7 @@ export function filterInput(input: InputIDType, value: string) {
         case 'language':
             return value ? value.match(/english$|indonesia$/) : null
         case 'description':
-            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{4,}$/) : null
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{4,256}$/) : null
 
         // ====== PLAYER TYPE ======
         // filter uuid
@@ -348,7 +348,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/) : null
         // message text can have letter, number, whitespace, symbol (.,#-+@)
         case 'message_text': 
-            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,60}$/) : null
+            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,80}$/) : null
         // time of chat
         case 'message_time': 
             return value ? value.match(/^[\d{2}:\d{2}]{4,5}$/) : null
@@ -558,16 +558,7 @@ export async function checkAccessToken(miscState: IMiscContext, gameState: IGame
                 gameState.setGuestMode(false)
                 break
             default: 
-                // set dummy myPlayerInfo
-                gameState.setMyPlayerInfo({
-                    display_name: 'guest',
-                    game_played: 0,
-                    worst_money_lost: 0,
-                    avatar: null
-                })
-                // remove local storages
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('onlinePlayers')
+                resetAllData(gameState)
                 break
         }
         miscState.setIsLoading(false)

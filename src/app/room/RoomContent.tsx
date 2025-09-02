@@ -1,5 +1,5 @@
 import { useMisc } from "../../context/MiscContext";
-import { applyTooltipEvent, translateUI, verifyAccessToken } from "../../helper/helper";
+import { applyTooltipEvent, qS, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { ChatEmotes, sendChat } from "../../components/ChatBox";
 import CreateRoom from "./components/room-list/CreateRoom";
 import PlayerList from "./components/other/PlayerList";
@@ -210,6 +210,11 @@ function RoomlistChatForm() {
     const chatEmotesRef = useRef()
     clickInsideElement(chatEmotesRef, () => miscState.showEmotes ? miscState.setShowEmotes(false) : null)
 
+    const scrollToBottom = () => {
+        const chatContainer = qS('#chat_container')
+        if(chatContainer) chatContainer.scrollTo({top: chatContainer.scrollHeight})
+    }
+
     // claim daily stuff
     const dailyRewards = daily_rewards.data
     const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
@@ -238,9 +243,12 @@ function RoomlistChatForm() {
         <form ref={chatFocusRef} className="relative flex items-center gap-2 mt-2" 
         onSubmit={ev => sendChat(ev, miscState, gameState, null, rewardData)}>
             {/* inputs */}
-            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={60}
+            <input type="text" id="message_text" className="w-4/5 lg:h-10 lg:p-1" minLength={1} maxLength={80}
             placeholder={translateUI({lang: miscState.language, text: 'chat here'})} autoComplete="off" required 
-            onFocus={() => miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')} />
+            onFocus={() => {
+                setTimeout(() => scrollToBottom(), 500); 
+                miscState.isChatFocus == 'stay' ? null : miscState.setIsChatFocus('on')
+            }} />
             {/* emote list */}
             {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
             {/* emote button */}

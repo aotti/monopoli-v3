@@ -190,8 +190,12 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
             // set tax price
             const taxPrice = specialCard?.match('anti tax') ? 0 
                             : -buyCityPrice + (buffDebuffEffect || 0) + (specialEffect || 0)
-            // only play sound if pay tax
-            if(taxPrice < 0) playGameSounds('city_tax', miscState)
+            // update tax notif and only play sound if pay tax
+            if(taxPrice < 0) {
+                playGameSounds('city_tax', miscState)
+                const newTaxNotif = notifMessage.textContent.replace(/Rp\s[0-9.]+/, `${moneyFormat(taxPrice * cityQuake)}`)
+                notifMessage.textContent = newTaxNotif
+            }
             // set event data (for history)
             const eventData: EventDataType = {
                 event: 'pay_tax', 

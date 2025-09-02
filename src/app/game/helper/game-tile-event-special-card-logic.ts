@@ -263,7 +263,7 @@ export function useSpecialCard(data: SpecialCardEventType, findPlayer: number, m
  */
 export function updateSpecialCardList(cardData: string[], currentSpecialCard: string) {
     const tempCurrentSpecialCard = currentSpecialCard?.split(';') || []
-    // console.log(cardData, currentSpecialCard, {tempCurrentSpecialCard});
+    console.log(cardData, currentSpecialCard, {tempCurrentSpecialCard});
     
     for(let cd of cardData) {
         // card null
@@ -282,7 +282,7 @@ export function updateSpecialCardList(cardData: string[], currentSpecialCard: st
             tempCurrentSpecialCard.splice(findSpecialCard, 1)
         }
     }
-    // console.log({tempCurrentSpecialCard});
+    console.log({tempCurrentSpecialCard});
     
     return tempCurrentSpecialCard.length === 0 ? null : tempCurrentSpecialCard.join(';')
 }

@@ -71,6 +71,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         gameState.setGameStages('decide')
         // remove players ready text
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'click roll turn'})
+        // reset all player shop items
+        gameState.setMyShopItems(null)
     }
     // decide
     if(getMessage.decidePlayers) {
@@ -251,23 +253,25 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.minigameAnswerData) {
         minigameAnswerCorrection(getMessage.minigameAnswerData, miscState, gameState)
     }
-    // end turn
-    if(getMessage.playerTurnEnd) {
+    // end turn 1
+    if(getMessage.playerTurns) {
+        // save playerTurns
+        localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
+        // show notif next player turn
+        playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
+                                    .replace('ppp', getMessage.playerTurns[0])
+        // play player turn sound
+        if(getMessage.playerTurns[0] === gameState.myPlayerInfo.display_name) {
+            const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
+            soundPlayerTurn.play()
+        }
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
+    }
+    // end turn 2
+    if(getMessage.playerTurnEnd) {
         // update player
         gameState.setGamePlayerInfo(players => {
-            // save playerTurns
-            localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
-            // show notif next player turn
-            playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
-                                        .replace('ppp', getMessage.playerTurns[0])
-            // play player turn sound
-            if(getMessage.playerTurns[0] === gameState.myPlayerInfo.display_name) {
-                const soundPlayerTurn = qS('#sound_player_turn') as HTMLAudioElement
-                soundPlayerTurn.play()
-            }
-            
             // update player
             const allPlayerInfo = [...players]
             // find turn end player
