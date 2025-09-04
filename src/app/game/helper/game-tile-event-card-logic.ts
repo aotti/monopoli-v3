@@ -280,17 +280,15 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                                     // show number on selected coin
                                     coinButtons[i].textContent = `${coinPrizes[i]}`
                                     // set timeout to hide all buttons
-                                    setTimeout(() => {
-                                        for(let coin of coinButtons) coin.classList.add('hidden')
-                                        // return event data
-                                        resolve({
-                                            event: 'get_card',
-                                            rank: rank,
-                                            type: type,
-                                            tileName: tileName,
-                                            money: +effect * coinPrizes[i]
-                                        })
-                                    }, 1500);
+                                    for(let coin of coinButtons) coin.classList.add('hidden')
+                                    // return event data
+                                    resolve({
+                                        event: 'get_card',
+                                        rank: rank,
+                                        type: type,
+                                        tileName: tileName,
+                                        money: +effect * coinPrizes[i]
+                                    })
                                 }
                             }
                         }

@@ -5,6 +5,7 @@ import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
 import { clickOutsideElement } from "../../../../helper/click-outside"
+import { missingCardGameRoom } from "../../helper/game-prepare-playing-logic"
 
 export default function PlayerSection() {
     const miscState = useMisc()
@@ -105,6 +106,7 @@ function PlayerSettingButton() {
                         <SellUpgradeCityOption />
                         <AttackCityOption />
                         <DiceControlOption />
+                        <MissingCardOption />
                         <GameHistoryOption />
                     </>
                     // button for spectator
@@ -184,6 +186,19 @@ function DiceControlOption() {
                 : <button id="dice_control" type="button" className="px-1 border-2">
                     {translateUI({lang: miscState.language, text: gameState.diceMode})}
                 </button>}
+        </div>
+    )
+}
+
+function MissingCardOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div className="flex items-center hover:bg-darkblue-2">
+            <button type="button" id="missing_card" className="w-full text-left p-1" onClick={() => missingCardGameRoom(miscState, gameState)}>
+                {translateUI({lang: miscState.language, text: 'Missing Card'})}
+            </button>
         </div>
     )
 }

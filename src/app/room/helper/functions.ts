@@ -621,8 +621,8 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         item_name: type === 'coin' ? 'coin' : chosenPackItem,
     }
     // loading claim button
-    let loadingIncrement = 3
     claimButton ? claimButton.disabled = true : null
+    let loadingIncrement = 3
     const loadingClaimInterval = setInterval(() => {
         // only set loading if claim button exist
         if(claimButton) {

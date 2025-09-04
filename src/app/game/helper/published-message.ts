@@ -253,8 +253,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.minigameAnswerData) {
         minigameAnswerCorrection(getMessage.minigameAnswerData, miscState, gameState)
     }
-    // end turn 1
-    if(getMessage.playerTurns) {
+    // end turn 
+    if(getMessage.playerTurnEnd) {
         // save playerTurns
         localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
         // show notif next player turn
@@ -267,9 +267,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         }
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
-    }
-    // end turn 2
-    if(getMessage.playerTurnEnd) {
         // update player
         gameState.setGamePlayerInfo(players => {
             // update player

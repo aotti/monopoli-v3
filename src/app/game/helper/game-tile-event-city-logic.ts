@@ -2,7 +2,7 @@ import { FormEvent } from "react"
 import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, simpleDecrypt, translateUI } from "../../../helper/helper"
 import { EventDataType, IGameContext, IMiscContext, IResponse, UpdateCityListType } from "../../../helper/types"
 import { rollDiceGameRoom } from "./game-prepare-playing-logic"
-import { useSpecialCard } from "./game-tile-event-special-card-logic"
+import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff } from "./game-tile-event-buff-debuff-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
 
@@ -386,33 +386,46 @@ export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'
 // ========== > HANDLE SPECIAL UPGRADE CITY ==========
 // ========== > HANDLE SPECIAL UPGRADE CITY ==========
 export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
-    const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
-    if(!confirm(upgradeCityWarning)) return
-    // sound effect
-    const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
-    // roll dice button
-    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
-    // loading button
-    const tempRollDiceText = rollDiceButton.textContent
-    rollDiceButton.textContent = 'Loading'
-    // set history
-    localStorage.setItem('specialCardUsed', `special_card: upgrade city 💳`)
-    soundSpecialCard.play()
-    // ### check if player really have the card
-    // ### check if player really have the card
-    // ### ONLY DO CHECKING IN published-message
+    // get player data
     const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
-    const isUpgradeCityCardExist = gameState.gamePlayerInfo[findPlayer].card.match(/upgrade city/i)
-    // player dont have upgrade city card
-    if(!isUpgradeCityCardExist) {
-        const notifTitle = qS('#result_notif_title')
-        const notifMessage = qS('#result_notif_message')
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
-        notifTitle.textContent = 'error 400'
-        notifMessage.textContent = translateUI({lang: miscState.language, text: 'you dont have upgrade city card 💀'})
-        return
+    const playerData = gameState.gamePlayerInfo[findPlayer]
+    // input value container
+    const inputValues = {
+        action: 'game upgrade city',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        event_money: null,
+        special_card: 'used-upgrade city',
+        card: updateSpecialCardList(['used-upgrade city'], playerData.card)
     }
-    rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
+
+
+    // const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
+    // if(!confirm(upgradeCityWarning)) return
+    // // sound effect
+    // const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
+    // // roll dice button
+    // const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+    // // loading button
+    // const tempRollDiceText = rollDiceButton.textContent
+    // rollDiceButton.textContent = 'Loading'
+    // // set history
+    // localStorage.setItem('specialCardUsed', `special_card: upgrade city 💳`)
+    // soundSpecialCard.play()
+    // // ### check if player really have the card
+    // // ### check if player really have the card
+    // // ### ONLY DO CHECKING IN published-message
+    // const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    // const isUpgradeCityCardExist = gameState.gamePlayerInfo[findPlayer].card.match(/upgrade city/i)
+    // // player dont have upgrade city card
+    // if(!isUpgradeCityCardExist) {
+    //     const notifTitle = qS('#result_notif_title')
+    //     const notifMessage = qS('#result_notif_message')
+    //     // show notif
+    //     miscState.setAnimation(true)
+    //     gameState.setShowGameNotif('normal')
+    //     notifTitle.textContent = 'error 400'
+    //     notifMessage.textContent = translateUI({lang: miscState.language, text: 'you dont have upgrade city card 💀'})
+    //     return
+    // }
+    // rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
 }

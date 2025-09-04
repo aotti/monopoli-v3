@@ -18,6 +18,7 @@ import { stopByMinigame } from "./game-tile-event-minigame"
         # START GAME
         # ROLL TURN
     - GAME PLAYING
+        # MISSING CARD
         # ROLL DICE
         # LEAVE GAME
         # SURRENDER GAME
@@ -27,8 +28,8 @@ import { stopByMinigame } from "./game-tile-event-minigame"
         # GAME OVER
 */
 
-// ========== GAME PREPARE ==========
-// ========== GAME PREPARE ==========
+// ========== - GAME PREPARE ==========
+// ========== - GAME PREPARE ==========
 
 // ========== # GET PLAYER INFO ==========
 // ========== # GET PLAYER INFO ==========
@@ -288,12 +289,67 @@ export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, t
     }
 }
 
-// ========== GAME PLAYING ==========
-// ========== GAME PLAYING ==========
+// ========== - GAME PLAYING ==========
+// ========== - GAME PLAYING ==========
 
 // ========== # ROLL DICE ==========
 // ========== # ROLL DICE ==========
-export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext, specialCard?: string) {
+export async function missingCardGameRoom(miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const missingButton = qS('#missing_card') as HTMLInputElement
+    // payload data
+    const inputValues = {
+        action: 'game missing card',
+        room_id: gameState.gameRoomId,
+        display_name: gameState.myPlayerInfo.display_name,
+    }
+    // disable and loading button
+    missingButton.disabled = true
+    let missingIncrement = 3
+    const missingInterval = setInterval(() => {
+        if(missingIncrement === 3) {
+            missingButton.textContent = `${translateUI({lang: miscState.language, text: 'Missing Card'})} .`
+            missingIncrement = 0
+        }
+        else if(missingIncrement < 3) {
+            missingButton.textContent += '.'
+            missingIncrement++
+        }
+    }, 1000);
+    
+    // fetching
+    const missingCardFetchOption = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const missingCardResponse: IResponse = await (await fetcher('/game', missingCardFetchOption)).json()
+    // response
+    switch(missingCardResponse.status) {
+        case 200:
+            // update player data
+            gameState.setGamePlayerInfo(playerData => {
+                const newPlayerData = playerData
+                const findPlayer = newPlayerData.map(v => v.display_name).indexOf(inputValues.display_name)
+                newPlayerData[findPlayer].card = missingCardResponse.data[0].missingCard
+                return newPlayerData
+            })
+            return
+        default:
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${missingCardResponse.status}`
+            notifMessage.textContent = `${missingCardResponse.message}`
+            return
+    }
+}
+
+// ========== # ROLL DICE ==========
+// ========== # ROLL DICE ==========
+export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -308,13 +364,12 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
         action: 'game roll dice',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
-        rolled_dice: specialCard ? '0' : null,
+        rolled_dice: null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
             Math.floor(Math.random() * 101), 
             branchRNG[0]
         ].toString(),
-        special_card: specialCard ? specialCard : null
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {

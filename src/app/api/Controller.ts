@@ -128,6 +128,7 @@ export default class Controller {
             case 'game turn end': 
             case 'game fix player turns': 
             case 'game report bugs': 
+            case 'game missing card': 
             case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
             // shop
             case 'shop buy': [filterStatus, filterMessage] = loopKeyValue(); break

@@ -497,25 +497,18 @@ export default class GameController extends Controller {
                 return {display_name, event_money: +event_money}
             })
 
-            // publish turn end data 1
-            const publishData_1 = {
+            // publish turn end data 
+            const publishData = {
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory],
-            }
-            const isGamePublished_1 = await this.monopoliPublish(payload.channel, publishData_1)
-            console.log(isGamePublished_1);
-            if(!isGamePublished_1.timetoken) return this.respond(500, 'realtime error, try again', [])
-
-            // publish turn end data 2
-            const publishData_2 = {
                 playerTurnEnd: newPlayerTurnEndData,
                 taxes: taxes,
                 takeMoney: takeMoney,
                 minigameResult: minigameResultData,
             }
-            const isGamePublished_2 = await this.monopoliPublish(payload.channel, publishData_2)
-            console.log(isGamePublished_2);
-            if(!isGamePublished_2.timetoken) return this.respond(500, 'realtime error, try again', [])
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
 
             // set result
             const resultData = {
@@ -594,6 +587,10 @@ export default class GameController extends Controller {
         }
         // return result
         return result
+    }
+
+    async upgradeCity(action: string, payload) {
+        
     }
 
     async attackCity(action: string, payload: IGamePlay['declare_attack_city']) {
@@ -760,6 +757,38 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        // get game logs
+        const getGameLog: IGamePlay['turn_end'][] = await this.redisGet(`gameLog_${payload.room_id}`)
+        if(getGameLog.length === 0) 
+            return this.respond(400, 'no missing card', [])
+        // get logs based on player name
+        const filteredGameLog = getGameLog.filter(v => v.display_name == payload.display_name)
+        // get card and history data (no dupe card)
+        const cardData = filteredGameLog.map(v => v.card).join(';').split(';').filter((v,i,arr) => arr.indexOf(v) == i)
+        const historyData = filteredGameLog.map(v => v.history)
+
+        // loop history to find used special card
+        for(let history of historyData) {
+            const tempHistory = history.match(/special_card: .* 💳/)
+            if(tempHistory) {
+                // [special_card, anti, tax, 💳]
+                const specialCard = tempHistory[0].split(' ')
+                const isCardUsed = cardData.indexOf(specialCard[1] + specialCard[2])
+                // card used, remove it
+                if(isCardUsed !== -1) cardData.splice(isCardUsed, 1)
+            }
+        }
+        
+        // if card data empty, return
+        if(cardData.length === 0) 
+            return this.respond(400, 'no missing card', [])
+        // missing card found, set result
+        const resultData = {
+            missingCard: cardData
+        }
+        result = this.respond(200, `${action} success`, [resultData])
+        return result
     }
 
     async sendReportBugs(action: string, payload: IGamePlay['report_bugs']) {
