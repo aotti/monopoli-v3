@@ -590,7 +590,84 @@ export default class GameController extends Controller {
     }
 
     async upgradeCity(action: string, payload) {
+        let result: IResponse
         
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        
+        const roomId = payload.channel.match(/\d+/)[0]
+        // check player turn
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.attacker_name) 
+            return this.respond(400, 'only allowed on your turn', [])
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_upgrade_city',
+            function_args: {
+                tmp_display_name: payload.display_name,
+                tmp_city: payload.city,
+                tmp_event_money: +payload.event_money,
+                tmp_card: payload.card,
+                tmp_special_card: payload.special_card.split('-')[1], // origin 'used-upgrade city'
+            }
+        }
+        // run query
+        const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
+        if(error) {
+            // upgrade failed
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
+        }
+        else {
+            // set upgrade history
+            const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            const upgradeHistory: IGameContext['gameHistory'] = [
+                {
+                    display_name: payload.display_name,
+                    room_id: +roomId,
+                    history: `special_card: ${payload.special_card.split('-')[1]} 💳`
+                },
+                {
+                    display_name: payload.display_name,
+                    room_id: +roomId,
+                    history: payload.target_city 
+                            ? `buy_city: ${payload.target_city} (${payload.target_city_property})`
+                            : `buy_city: none`
+                },
+            ]
+            // update game history
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...upgradeHistory])
+
+            // publish data
+            const publishData = {
+                upgradeCity: data[0],
+                targetCity: payload.target_city,
+                targetCityProperty: payload.target_city_property,
+                gameHistory: [...getGameHistory, ...upgradeHistory]
+            }
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // publish to roomlist
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            console.log(isRoomPublished);
+            
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // set result
+            const resultData = {
+                token: token
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
     }
 
     async attackCity(action: string, payload: IGamePlay['declare_attack_city']) {
@@ -628,7 +705,10 @@ export default class GameController extends Controller {
         // run query
         const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
         if(error) {
-            result = this.respond(500, error.message, [])
+            // attack failed
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
         }
         else {
             // set attack history
@@ -638,7 +718,7 @@ export default class GameController extends Controller {
                 room_id: +roomId,
                 history: `attack_city: ${payload.target_city} city attacked by ${payload.attacker_name} (${attackType})`
             }]
-            // set attack shifted history
+            // set attack shifted history (the shifter card)
             const shiftedHistory: IGameContext['gameHistory'] = !payload.target_special_card ? [] : [{
                 display_name: payload.target_city_owner,
                 room_id: +roomId,

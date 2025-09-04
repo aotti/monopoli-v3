@@ -124,6 +124,7 @@ export default class Controller {
             case 'game roll dice': 
             case 'game surrender': 
             case 'game sell city': 
+            case 'game upgrade city': 
             case 'game attack city': 
             case 'game turn end': 
             case 'game fix player turns': 

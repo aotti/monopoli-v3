@@ -74,6 +74,7 @@ export type GameRoomListener = {
         to: string,
         money: number
     },
+    upgradeCity: IGamePlayerInfo,
     attackerName: string,
     attackType: string,
     targetCity: string,

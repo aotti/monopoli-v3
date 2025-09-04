@@ -292,8 +292,8 @@ export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, t
 // ========== - GAME PLAYING ==========
 // ========== - GAME PLAYING ==========
 
-// ========== # ROLL DICE ==========
-// ========== # ROLL DICE ==========
+// ========== # MISSING CARD ==========
+// ========== # MISSING CARD ==========
 export async function missingCardGameRoom(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -551,7 +551,7 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
 // ========== # PLAYER MOVING ==========
 // ========== # PLAYER MOVING ==========
 export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContext, gameState: IGameContext) {
-    const {playerTurn, playerDice, playerRNG, playerSpecialCard} = rollDiceData
+    const {playerTurn, playerDice, playerRNG} = rollDiceData
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -578,9 +578,9 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
         // get tile element for stop by event
         let [tileInfo, tileElement]: [string, HTMLElement] = [null, null]
-        // set tile info & element if theres special card
-        if(playerSpecialCard && playerTurnData.city) 
-            [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
+        // // set tile info & element if theres special card
+        // if(playerSpecialCard && playerTurnData.city) 
+        //     [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
         // set last turn money
         if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
             localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
@@ -603,8 +603,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // get prison data for checking prison status
         const prisonNumber = playerTurnData.prison
         // special card container
-        // player special card = nerf parking card (nullable)
-        const specialCardCollection = {cards: [playerSpecialCard], effects: []}
+        const specialCardCollection = {cards: [], effects: []}
         // buff/debuff container
         const buffCollection = []
         const debuffCollection = []
@@ -995,15 +994,10 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
     // check event data
     switch(eventData?.event) {
         case 'buy_city': 
-            // check status
-            if(eventData.status) {
-                // buying city
-                historyArray.push(`${eventData.event}: ${eventData.name} (${eventData.property})`)
-            }
-            else {
-                // not buy || property max
-                historyArray.push(`${eventData.event}: none`)
-            }
+            // buying city
+            if(eventData.status) historyArray.push(`${eventData.event}: ${eventData.name} (${eventData.property})`)
+            // not buy || property max
+            else historyArray.push(`${eventData.event}: none`)
             return historyArray.join(';')
         case 'pay_tax': 
             historyArray.push(`${eventData.event}: ${moneyFormat(eventData.taxMoney)} to ${eventData.owner}`)
