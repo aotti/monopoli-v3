@@ -160,6 +160,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // sound effect
         const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
         soundSpecialCard.play()
+        // update game history
+        gameState.setGameHistory(getMessage.gameHistory)
         // update player data
         gameState.setGamePlayerInfo(players => {
             // get player data
