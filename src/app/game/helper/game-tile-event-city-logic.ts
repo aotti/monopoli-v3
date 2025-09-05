@@ -1,5 +1,5 @@
 import { FormEvent } from "react"
-import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, simpleDecrypt, translateUI } from "../../../helper/helper"
+import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, simpleDecrypt, simpleEncrypt, translateUI } from "../../../helper/helper"
 import { EventDataType, IGameContext, IMiscContext, IResponse, UpdateCityListType } from "../../../helper/types"
 import { rollDiceGameRoom } from "./game-prepare-playing-logic"
 import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
@@ -370,14 +370,17 @@ export function updateCityList(data: UpdateCityListType) {
 
 // ========== > SPECIAL UPGRADE CITY ==========
 // ========== > SPECIAL UPGRADE CITY ==========
-export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number) {
+export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number, miscState: IMiscContext) {
     // get all owned city, except special & fully upgrade city
-    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel|special/))
+    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel|special/i))
+    console.log(myCityList);
+    
     // get city name
     const upgradeRNG = rng % myCityList.length
     const upgradeCityName = myCityList[upgradeRNG].split('*')[0]
+    const encUpgradeCityName = simpleEncrypt(upgradeCityName, miscState.simpleKey)
     // get city element & tile info
-    const upgradeCityElement = qS(`[data-city-info^='${upgradeCityName}']`) as HTMLElement
+    const upgradeCityElement = qS(`[data-city-info^='${encUpgradeCityName}']`) as HTMLElement
     const upgradeCityTileInfo = upgradeCityElement.dataset.tileInfo
     // return data
     return [upgradeCityTileInfo, upgradeCityElement] as [string, HTMLElement]
@@ -396,6 +399,7 @@ export async function handleUpgradeCity(miscState: IMiscContext, gameState: IGam
     const inputValues = {
         action: 'game upgrade city',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
         city: null,
         target_city: null,
         target_city_property: null,
@@ -403,22 +407,21 @@ export async function handleUpgradeCity(miscState: IMiscContext, gameState: IGam
         card: updateSpecialCardList(['used-upgrade city'], playerData.card),
         special_card: 'used-upgrade city',
     }
+    // warning before display buy city modal
+    const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
+    if(!confirm(upgradeCityWarning)) return
 
     // get upgrade city data
     const upgradeRNG = Math.floor(Math.random() * 101)
-    const [upgradeCityTileInfo, upgradeCityElement] = specialUpgradeCity(playerData, upgradeRNG)
+    const [upgradeCityTileInfo, upgradeCityElement] = specialUpgradeCity(playerData, upgradeRNG, miscState)
     // buy city event
     const buyCityData = await stopByCity(upgradeCityTileInfo as any, findPlayer, upgradeCityElement, miscState, gameState)
     if(buyCityData.event == 'buy_city') {
         inputValues.target_city = buyCityData.status ? buyCityData.name : null
         inputValues.target_city_property = buyCityData.status ? buyCityData.property : null
         inputValues.city = buyCityData.status ? buyCityData.city : playerData.city
-        inputValues.event_money = buyCityData.money
+        inputValues.event_money = buyCityData.money.toString()
     }
-
-    // warning
-    const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
-    if(!confirm(upgradeCityWarning)) return
     // set state to disable "back to room & surrender" buttons
     miscState.setDisableButtons('gameroom')
 

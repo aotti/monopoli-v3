@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
         case 'game start': result = await gameController.startGame(action, payload); break
         case 'game roll turn': result = await gameController.decideTurn(action, payload); break
         case 'game roll dice': result = await gameController.rollDice(action, payload); break
+        case 'game upgrade city': result = await gameController.upgradeCity(action, payload); break
         case 'game attack city': result = await gameController.attackCity(action, payload); break
         case 'game fix player turns': result = await gameController.fixPlayerTurns(action, payload); break
         case 'game report bugs': result = await gameController.sendReportBugs(action, payload); break

@@ -589,7 +589,7 @@ export default class GameController extends Controller {
         return result
     }
 
-    async upgradeCity(action: string, payload) {
+    async upgradeCity(action: string, payload: IGamePlay['upgrade_city']) {
         let result: IResponse
         
         const filtering = await this.filters(action, payload)
@@ -601,7 +601,7 @@ export default class GameController extends Controller {
         const roomId = payload.channel.match(/\d+/)[0]
         // check player turn
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
-        if(getPlayerTurns[0] != payload.attacker_name) 
+        if(getPlayerTurns[0] != payload.display_name) 
             return this.respond(400, 'only allowed on your turn', [])
         // set payload for db query
         const queryObject: Partial<IQueryUpdate> = {

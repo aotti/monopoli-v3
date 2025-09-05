@@ -529,6 +529,16 @@ export interface IGamePlay {
         sell_city_price: string,
         city_left: string,
     } & ITokenPayload,
+    upgrade_city: {
+        channel: string,
+        display_name: string,
+        city: string,
+        target_city: string,
+        target_city_property: string,
+        event_money: string,
+        special_card: string,
+        card: string,
+    } & ITokenPayload,
     declare_attack_city: {
         channel: string,
         attacker_name: string,

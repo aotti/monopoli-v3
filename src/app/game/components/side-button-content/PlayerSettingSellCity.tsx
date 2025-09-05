@@ -1,6 +1,6 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { moneyFormat, qSA, translateUI } from "../../../../helper/helper"
+import { moneyFormat, qSA, simpleDecrypt, translateUI } from "../../../../helper/helper"
 import { handleUpgradeCity, sellCity } from "../../helper/game-tile-event-city-logic"
 
 export default function PlayerSettingSellCity() {
@@ -21,7 +21,8 @@ export default function PlayerSettingSellCity() {
             // loop city
             const dataCityInfo = qSA(`[data-city-info]`) as NodeListOf<HTMLElement>
             for(let city of dataCityInfo) {
-                const [cityName, cityProperty, cityPrice, cityOwner] = city.dataset.cityInfo.split(',')
+                const decCityInfo = simpleDecrypt(city.dataset.cityInfo, miscState.simpleKey)
+                const [cityName, cityProperty, cityPrice, cityOwner] = decCityInfo.split(',')
                 // match owned city then push
                 v.city?.match(cityName) ? mySellCityList.push(`${cityName},${cityPrice}`) : null
             }

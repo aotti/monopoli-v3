@@ -181,7 +181,7 @@ function DiceControlOption() {
                 ? <select id="dice_control" className="p-px max-w-12 lg:max-w-16" onChange={diceModeHandler} value={gameState.diceMode}>
                     <option className="text-sm lg:text-lg" value="odd"> {translateUI({lang: miscState.language, text: 'odd'})} </option>
                     <option className="text-sm lg:text-lg" value="even"> {translateUI({lang: miscState.language, text: 'even'})} </option>
-                    <option className="text-sm lg:text-lg" value="off" selected> {translateUI({lang: miscState.language, text: 'off'})} </option>
+                    <option className="text-sm lg:text-lg" value="off"> {translateUI({lang: miscState.language, text: 'off'})} </option>
                 </select>
                 : <button id="dice_control" type="button" className="px-1 border-2">
                     {translateUI({lang: miscState.language, text: gameState.diceMode})}
