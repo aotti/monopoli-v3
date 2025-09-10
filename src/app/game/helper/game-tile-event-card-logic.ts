@@ -15,6 +15,8 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
         const notifTitle = qS('#result_notif_title')
         const notifMessage = qS('#result_notif_message')
         const notifImage = qS('#card_image') as HTMLImageElement
+        // play sound
+        playGameSounds(card, miscState)
         // cards data
         const cardsList = card == 'chance' ? chance_cards_list.cards : community_cards_list.cards
         // check buff
@@ -49,8 +51,6 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                 const eventData = await cardEffects(cardData, findPlayer, rng, miscState, gameState)
                 // add buff/debuff to event data
                 if(buffDebuff) (eventData as any).buff = buffDebuff
-                // play sound
-                playGameSounds(card, miscState)
                 // resolve event data
                 return resolve(eventData)
             }
@@ -250,20 +250,20 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                             notifTimer.textContent = ``
                             // show number on selected coin
                             coinButtons[0] ? coinButtons[0].textContent = `${coinPrizes[0]}` : null
+                            // return event data
+                            resolve({
+                                event: 'get_card',
+                                rank: rank,
+                                type: type,
+                                tileName: tileName,
+                                money: +effect * coinPrizes[0]
+                            })
                             // set timeout to hide all buttons
                             return setTimeout(() => {
                                 for(let coin of coinButtons) coin ? coin.classList.add('hidden') : null
                                 // hide notif after click
                                 miscState.setAnimation(false)
                                 gameState.setShowGameNotif(null)
-                                // return event data
-                                resolve({
-                                    event: 'get_card',
-                                    rank: rank,
-                                    type: type,
-                                    tileName: tileName,
-                                    money: +effect * coinPrizes[0]
-                                })
                             }, 1500);
                         }
                         if(coinButtons[0] && playerTurnData.display_name == gameState.myPlayerInfo.display_name) {
@@ -279,8 +279,6 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                                     notifTimer.textContent = ``
                                     // show number on selected coin
                                     coinButtons[i].textContent = `${coinPrizes[i]}`
-                                    // set timeout to hide all buttons
-                                    for(let coin of coinButtons) coin.classList.add('hidden')
                                     // return event data
                                     resolve({
                                         event: 'get_card',
@@ -289,6 +287,10 @@ export function cardEffects(cardData: Record<'tileName'|'rank'|'effectData', str
                                         tileName: tileName,
                                         money: +effect * coinPrizes[i]
                                     })
+                                    // set timeout to hide all buttons
+                                    setTimeout(() => {
+                                        for(let coin of coinButtons) coin ? coin.classList.add('hidden') : null
+                                    }, 1500);
                                 }
                             }
                         }

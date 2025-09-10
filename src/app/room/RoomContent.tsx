@@ -153,7 +153,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
                             {/* shop button */}
                             <ShopButton />
                             {/* daily button */}
-                            <DailyButton />
+                            {gameState.myPlayerInfo.display_name != 'guest' ? <DailyButton /> : null}
                         </div>
                     </div>
                     {/* create room, ranking, shop, calendar modal */}
@@ -266,21 +266,11 @@ function RoomlistChatForm() {
 function MenuButton() {
     const miscState = useMisc()
     const gameState = useGame()
-
-    // useEffect(() => {
-    //     let menuTimeout = null
-    //     if(miscState.showRoomListMenu) {
-    //         // auto close menu after 10s
-    //         menuTimeout = setTimeout(() => miscState.setShowRoomListMenu(false), 10_000)
-    //     }
-    //     else {
-    //         clearInterval(menuTimeout)
-    //     }
-    // }, [miscState.showRoomListMenu])
+    const warningClass = `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`
 
     return (
         <div data-tooltip="menu" className={`w-8 my-auto text-right`}>
-            <button type="button" className={`invert active:opacity-75 ${gameState.dailyStatus == 'unclaim' ? "after:absolute after:-top-1 after:invert after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full" : ''}`} onClick={() => miscState.setShowRoomListMenu(true)}>
+            <button type="button" className={`invert active:opacity-75 ${gameState.dailyStatus == 'unclaim' ? `after:absolute after:-top-1 after:invert ${warningClass}` : ''}`} onClick={() => miscState.setShowRoomListMenu(true)}>
                 <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
             </button>
         </div>
@@ -341,10 +331,11 @@ function ShopButton() {
 function DailyButton() {
     const miscState = useMisc()
     const gameState = useGame()
+    const warningClass = `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`
 
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className={`flex items-center gap-2 w-full invert ${gameState.dailyStatus == 'unclaim' ? "after:invert after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full" : ''}`} onClick={() => {
+            <button type="button" className={`flex items-center gap-2 w-full invert ${gameState.dailyStatus == 'unclaim' ? `after:invert ${warningClass}` : ''}`} onClick={() => {
                 // close join modal 
                 miscState.setShowJoinModal(null)
                 // close room list menu

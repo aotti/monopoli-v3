@@ -93,9 +93,9 @@
                     "effect": "special card_tax nerf"
                 },
                 {
-                    "description": "You get 20.000 times the number on the selected coin",
+                    "description": "You get 25.000 times the number on the selected coin",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
-                    "effect": "button-get money_20000"
+                    "effect": "button-get money_25000"
                 }
             ]
         },
@@ -104,9 +104,9 @@
             "chance": [48, 95],
             "data": [
                 {
-                    "description": "Gift from the bank, you get 40.000",
+                    "description": "Gift from the bank, you get 30.000",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_D-XUzERZjUnFjj7p7Bbnob38eygzCt2C.png",
-                    "effect": "get money_40000"
+                    "effect": "get money_30000"
                 },
                 {
                     "description": "Your birthday, get 15.000 from each player",
@@ -114,9 +114,9 @@
                     "effect": "take money_15000"
                 },
                 {
-                    "description": "You get an inheritance of 65.000",
+                    "description": "You get an inheritance of 40.000",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_D-XUzERZjUnFjj7p7Bbnob38eygzCt2C.png",
-                    "effect": "get money_65000"
+                    "effect": "get money_40000"
                 }
             ]
         }

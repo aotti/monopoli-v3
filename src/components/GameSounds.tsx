@@ -17,6 +17,7 @@ export default function GameSounds() {
         area_debuff: `https://${hostname}/sound/area_debuff-w2A9Kjeu2r9pc0k8ZLkO3UZKd17Rc6.mp3`,
         create_room: `https://${hostname}/sound/create_room-kpRv5RboBBYBIpOKZIslDz43gG9cdn.mp3`,
         claim_reward: `https://${hostname}/sound/claim_reward-n10xCcu0IUK88MVjVjYLlzJCDuShn3.mp3`,
+        missing_data: `https://${hostname}/sound/missing_data-spcwpdgPdKjs4hmnd9ys1wlewCIDI7.mp3`,
         // meme sfx indonesia
         id_prison: `https://${hostname}/sound/indonesia/id_prison-Zeriq61Yy6LWzMrw27eYTrPYoZz5yE.mp3`,
         id_parking: `https://${hostname}/sound/indonesia/id_parking-qMb7AGBS89Bj9STTUfQYl860kPc1lS.mp3`,

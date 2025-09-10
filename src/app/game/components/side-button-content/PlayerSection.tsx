@@ -5,7 +5,7 @@ import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
 import { clickOutsideElement } from "../../../../helper/click-outside"
-import { missingCardGameRoom } from "../../helper/game-prepare-playing-logic"
+import { missingDataGameRoom } from "../../helper/game-prepare-playing-logic"
 
 export default function PlayerSection() {
     const miscState = useMisc()
@@ -90,7 +90,7 @@ function PlayerSettingButton() {
     clickOutsideElement(playerSettingRef, () => gameState.setOpenPlayerSetting(false))
 
     return (
-        <div className="absolute z-10 top-0 right-1 w-6 lg:w-8">
+        <div id="player_setting_button" className="absolute z-10 top-0 right-1 w-6 lg:w-8 after:absolute after:right-5 after:lg:right-6">
             {/* setting button */}
             <button type="button" onClick={() => gameState.setOpenPlayerSetting(b => !b)}>
                 <img src="https://img.icons8.com/?id=95245&format=png&color=FFFFFF" alt="setting" width={100} height={100} draggable={false} />
@@ -106,7 +106,7 @@ function PlayerSettingButton() {
                         <SellUpgradeCityOption />
                         <AttackCityOption />
                         <DiceControlOption />
-                        <MissingCardOption />
+                        <MissingDataOption />
                         <GameHistoryOption />
                     </>
                     // button for spectator
@@ -190,14 +190,14 @@ function DiceControlOption() {
     )
 }
 
-function MissingCardOption() {
+function MissingDataOption() {
     const miscState = useMisc()
     const gameState = useGame()
 
     return (
-        <div className="flex items-center hover:bg-darkblue-2">
-            <button type="button" id="missing_card" className="w-full text-left p-1" onClick={() => missingCardGameRoom(miscState, gameState)}>
-                {translateUI({lang: miscState.language, text: 'Missing Card'})}
+        <div id="missing_data_option" className="flex items-center hover:bg-darkblue-2">
+            <button type="button" id="missing_card" className="w-full text-left p-1" onClick={() => missingDataGameRoom(miscState, gameState)}>
+                {translateUI({lang: miscState.language, text: 'Missing Data'})}
             </button>
         </div>
     )

@@ -819,3 +819,9 @@ export interface IAnimate {
     delay?: number,
     loop?: boolean,
 }
+
+export interface IMissingData {
+    display_name: string,
+    city: string,
+    card: string,
+}

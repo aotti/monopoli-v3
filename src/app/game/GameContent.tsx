@@ -53,11 +53,11 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         applyTooltipEvent()
         // reset disable buttons
         miscState.setDisableButtons(null)
-        // get player list
+        // get player list and set room id
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
         getPlayerInfo(gameroomParam, miscState, gameState)
-
         gameState.setGameRoomId(gameroomParam)
+
         // remove sub event data
         localStorage.removeItem('subPlayerDice')
         localStorage.removeItem('subEventData')
@@ -192,7 +192,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     <HelpSection />
                 </div>
                 {/* player */}
-                <div className="h-20 lg:h-32 p-1">
+                <div id="player_side_button" className="h-20 lg:h-32 p-1">
                     <SideButtons text={'players'} setGameSideButton={gameState.setGameSideButton} />
                     <PlayerSection />
                 </div>

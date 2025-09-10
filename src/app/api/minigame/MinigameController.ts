@@ -176,7 +176,7 @@ export default class MinigameController extends Controller {
     }
 
     private getWordCategories() {
-        return new Promise(async (resolve: (value: Record<'category', string>[])=>void) => {
+        return new Promise(async (resolve: (value: Record<'category', string>[])=>void, reject: (value: Error)=>void) => {
             // categories api
             const categoriesAPI = `${process.env.MINIGAME_API}/word/categories`
             // fetching
@@ -189,10 +189,10 @@ export default class MinigameController extends Controller {
                     break
                 default:
                     // error message, minigame canceled
-                    resolve({
-                        name: categoriesResponse.status,
+                    reject({
+                        name: `${categoriesResponse.status}`,
                         message: categoriesResponse.message,
-                    } as any)
+                    })
                     break
             }
         })
@@ -212,7 +212,7 @@ export default class MinigameController extends Controller {
     }
 
     private getWordsPerCategory(categoryList: string[]) {
-        return new Promise(async (resolve: (value: string[])=>void) => {
+        return new Promise(async (resolve: (value: string[])=>void, reject: (value: Error)=>void) => {
             // get words from database
             const wordsContainer: {id: number; word: string}[] = []
             for(let category of categoryList) {
@@ -228,10 +228,10 @@ export default class MinigameController extends Controller {
                         break
                     default:
                         // error message, minigame canceled
-                        resolve({
-                            name: wordsResponse.status,
+                        reject({
+                            name: `${wordsResponse.status}`,
                             message: wordsResponse.message,
-                        } as any)
+                        })
                         break
                 }
             }

@@ -7,11 +7,13 @@ export default function Updates() {
     // updates state
     const [showUpdates, setShowUpdates] = useState(false)
     const [showVersion, setShowVersion] = useState(null)
+
     useEffect(() => {
         // check stored version
         const storedVersion = localStorage.getItem('version') || ''
         setShowVersion(storedVersion)
     }, [])
+
     // updates data
     const changeLogs = change_logs.updates
     const handleShowMarkUpdates = () => {
@@ -22,10 +24,11 @@ export default function Updates() {
         setShowVersion(getCurrentVersion)
         localStorage.setItem('version', getCurrentVersion)
     }
+    const warningClass = `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`
 
     return (
         <>
-            <div className={showVersion == currentVersion ? `hover:animate-pulse` : `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full hover:animate-pulse`} data-version={currentVersion}>
+            <div className={showVersion == currentVersion ? `hover:animate-pulse` : `hover:animate-pulse ${warningClass}`} data-version={currentVersion}>
                 <button type="button" className="bg-darkblue-1 border-8bit-text active:opacity-75" onClick={handleShowMarkUpdates}> 
                     updates 
                 </button>
