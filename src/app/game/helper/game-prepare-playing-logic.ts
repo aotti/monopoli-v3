@@ -331,13 +331,6 @@ export async function missingDataGameRoom(miscState: IMiscContext, gameState: IG
             clearInterval(missingInterval)
             // enable gameroom buttons
             miscState.setDisableButtons(null)
-            // update player data
-            gameState.setGamePlayerInfo(playerData => {
-                const newPlayerData = playerData
-                const findPlayer = newPlayerData.map(v => v.display_name).indexOf(inputValues.display_name)
-                newPlayerData[findPlayer].card = missingCardResponse.data[0].missingCard
-                return newPlayerData
-            })
             return
         default:
             // stop interval
