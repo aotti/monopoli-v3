@@ -939,7 +939,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     setTimeout(() => {
                         // check data after 3 sec
                         setMissingDataWarning(playerTurnEndResponse.data[0].missingData, gameState)
-                    }, 5000);
+                    }, 10000);
                     return
                 default: 
                     // show notif
