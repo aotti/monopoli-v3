@@ -867,6 +867,11 @@ export default class GameController extends Controller {
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
 
+        const roomId = payload.channel.match(/\d+/)[0]
+        // check player turn
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.display_name) 
+            return this.respond(400, 'only allowed on your turn', [])
         // check limit
         const getMissingLimit = await this.redisGet(`missingLimit_${payload.display_name}`)
         if(getMissingLimit.length > 0 && getMissingLimit[0] === 3)
@@ -876,11 +881,11 @@ export default class GameController extends Controller {
         await this.redisSet(`missingLimit_${payload.display_name}`, [missingLimit])
 
         // get missing data
-        const roomId = payload.channel.match(/\d+/)[0]
         const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
         // set missing data for turn end player
         const findPlayer = getMissingData.map(v => v.display_name).indexOf(payload.display_name)
         const playerMissingData = getMissingData[findPlayer]
+        console.log({playerMissingData})
 
         // publish data
         const publishData = {

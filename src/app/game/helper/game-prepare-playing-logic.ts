@@ -295,6 +295,11 @@ export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, t
 // ========== # MISSING DATA ==========
 // ========== # MISSING DATA ==========
 export async function missingDataGameRoom(miscState: IMiscContext, gameState: IGameContext) {
+    // missing data elements
+    const playerSideButton = qS('#player_side_button')
+    const playerSettingButton = qS('#player_setting_button')
+    const missingDataOption = qS('#missing_data_option')
+    const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -306,6 +311,8 @@ export async function missingDataGameRoom(miscState: IMiscContext, gameState: IG
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
     }
+    // warning
+    alert('[warning]: you can only retrieve missing data 3x per game')
     // disable and loading button
     miscState.setDisableButtons('gameroom')
     missingButton.disabled = true
@@ -329,14 +336,26 @@ export async function missingDataGameRoom(miscState: IMiscContext, gameState: IG
         case 200:
             // stop interval
             clearInterval(missingInterval)
+            missingButton.textContent = translateUI({lang: miscState.language, text: 'Missing Data'})
             // enable gameroom buttons
+            missingButton.disabled = false
             miscState.setDisableButtons(null)
+            // remove warning icon on player tab and missing data option
+            playerSideButton.classList.remove(...warningClass)
+            playerSettingButton.classList.remove(...warningClass)
+            missingDataOption.classList.remove(...warningClass)
             return
         default:
             // stop interval
             clearInterval(missingInterval)
+            missingButton.textContent = translateUI({lang: miscState.language, text: 'Missing Data'})
             // enable gameroom buttons
+            missingButton.disabled = false
             miscState.setDisableButtons(null)
+            // remove warning icon on player tab and missing data option
+            playerSideButton.classList.remove(...warningClass)
+            playerSettingButton.classList.remove(...warningClass)
+            missingDataOption.classList.remove(...warningClass)
             // show notif
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
@@ -920,7 +939,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     setTimeout(() => {
                         // check data after 3 sec
                         setMissingDataWarning(playerTurnEndResponse.data[0].missingData, gameState)
-                    }, 3000);
+                    }, 5000);
                     return
                 default: 
                     // show notif

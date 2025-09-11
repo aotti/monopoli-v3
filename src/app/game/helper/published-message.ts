@@ -171,6 +171,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             allPlayerInfo[findPlayer].money = money
             allPlayerInfo[findPlayer].city = city
             allPlayerInfo[findPlayer].card = card
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            notifTitle.textContent = 'Missing Data'
+            notifMessage.textContent = `${display_name} returned data:\ncity: ${city}\ncard: ${card}`
             // return data
             return allPlayerInfo
         })
