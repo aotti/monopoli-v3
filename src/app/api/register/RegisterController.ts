@@ -17,12 +17,14 @@ export default class RegisterController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+        
         // check register rate limit
         const rateLimitID = payload.identifier
         const rateLimitResult = await rateLimitRegister.limit(rateLimitID);
         if(!rateLimitResult.success) {
             return this.respond(429, 'too many request', [])
         }
+
         // set payload for db query
         const queryObject: Omit<IQueryInsert, 'insertColumn'> = {
             table: 'users',

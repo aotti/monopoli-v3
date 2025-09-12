@@ -1,6 +1,14 @@
 import { cookies } from "next/headers";
 import { IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
 import Controller from "../Controller";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const rateLimitLogin = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(5, '12h'),
+    prefix: '@upstash/ratelimit',
+})
 
 export default class LoginController extends Controller {
 
@@ -10,6 +18,14 @@ export default class LoginController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+
+        // check login rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitLogin.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         // set payload for db query
         const queryObject: IQuerySelect = {
             table: 'users',
