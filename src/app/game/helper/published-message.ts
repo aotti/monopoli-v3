@@ -154,6 +154,26 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return cityLeftInfo
         })
     }
+    // missing data
+    if(getMessage.missingData) {
+        const {display_name, city, card} = getMessage.missingData
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = 'Missing Data'
+        notifMessage.textContent = `${display_name} returned data:\ncity: ${city}\ncard: ${card}`
+        // update player data
+        gameState.setGamePlayerInfo(players => {
+            // get player data
+            const allPlayerInfo = [...players]
+            const findPlayer = allPlayerInfo.map(v => v.display_name).indexOf(display_name)
+            // update
+            allPlayerInfo[findPlayer].city = city
+            allPlayerInfo[findPlayer].card = card
+            // return data
+            return allPlayerInfo
+        })
+    }
     // upgrade city
     if(getMessage.upgradeCity) {
         const {display_name, money, city, card} = getMessage.upgradeCity
@@ -171,11 +191,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             allPlayerInfo[findPlayer].money = money
             allPlayerInfo[findPlayer].city = city
             allPlayerInfo[findPlayer].card = card
-            // show notif
-            miscState.setAnimation(true)
-            gameState.setShowGameNotif('normal')
-            notifTitle.textContent = 'Missing Data'
-            notifMessage.textContent = `${display_name} returned data:\ncity: ${city}\ncard: ${card}`
             // return data
             return allPlayerInfo
         })

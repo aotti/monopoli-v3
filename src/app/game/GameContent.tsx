@@ -134,9 +134,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     playerSettingButton.classList.add(...warningClass)
                     missingDataOption.classList.add(...warningClass)
                 }
-                // if data match, remove missing data and warning
+                // if data match remove warning
                 else {
-                    localStorage.removeItem('missingData')
                     // remove warning icon
                     const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
                     playerSideButton.classList.remove(...warningClass)
