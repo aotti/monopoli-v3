@@ -121,6 +121,8 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     display_name: playerData.display_name,
                     city: playerData.city,
                     card: playerData.card,
+                    buff: playerData.buff,
+                    debuff: playerData.debuff,
                 }
                 // match player data with missing data, if doesnt match show warning
                 const strTempPlayerData = JSON.stringify(tempPlayerData)

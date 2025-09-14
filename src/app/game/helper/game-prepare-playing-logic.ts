@@ -919,7 +919,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     // save access token
                     if(playerTurnEndResponse.data[0].token) {
                         localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
-                        delete playerTurnEndResponse.data[0].token
                     }
                     // update player turns
                     localStorage.setItem('playerTurns', JSON.stringify(playerTurnEndResponse.data[0].playerTurns))
@@ -938,7 +937,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     // save missing data to localStorage (only for checking)
                     setTimeout(() => {
                         localStorage.setItem('missingData', JSON.stringify(playerTurnEndResponse.data[0].missingData))
-                        // setMissingDataWarning(playerTurnEndResponse.data[0].missingData, gameState)
                     }, 5000);
                     return
                 default: 
