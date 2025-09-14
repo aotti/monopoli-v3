@@ -179,7 +179,7 @@ export default class GameController extends Controller {
                 // reset player shop items
                 await this.redisReset(`${playerName}_shopItems`)
                 // set missing data
-                tempMissingData.push({display_name: playerName, city: null, card: null})
+                tempMissingData.push({display_name: playerName, city: null, card: null, buff: null, debuff: null})
             }
             // save missing data
             await this.redisSet(`missingData_${roomId}`, tempMissingData)
@@ -523,6 +523,8 @@ export default class GameController extends Controller {
             const findPlayer = getMissingData.map(v => v.display_name).indexOf(newPlayerTurnEndData.display_name)
             getMissingData[findPlayer].city = newPlayerTurnEndData.city
             getMissingData[findPlayer].card = newPlayerTurnEndData.card
+            getMissingData[findPlayer].buff = newPlayerTurnEndData.buff
+            getMissingData[findPlayer].debuff = newPlayerTurnEndData.debuff
             // save missing data
             await this.redisSet(`missingData_${roomId}`, [...getMissingData])
             // get turn end data for turn end player

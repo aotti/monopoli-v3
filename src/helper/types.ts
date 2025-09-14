@@ -825,4 +825,6 @@ export interface IMissingData {
     display_name: string,
     city: string,
     card: string,
+    buff: string,
+    debuff: string,
 }

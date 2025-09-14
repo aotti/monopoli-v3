@@ -156,7 +156,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // missing data
     if(getMessage.missingData) {
-        const {display_name, city, card} = getMessage.missingData
+        const {display_name, city, card, buff, debuff} = getMessage.missingData
         // show notif
         miscState.setAnimation(true)
         gameState.setShowGameNotif('normal')
@@ -170,6 +170,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // update
             allPlayerInfo[findPlayer].city = city
             allPlayerInfo[findPlayer].card = card
+            allPlayerInfo[findPlayer].buff = buff
+            allPlayerInfo[findPlayer].debuff = debuff
             // return data
             return allPlayerInfo
         })
