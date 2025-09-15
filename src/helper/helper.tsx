@@ -395,7 +395,7 @@ export function filterInput(input: InputIDType, value: string) {
             const optionalSpecialCard = value === null || value.match(/used\W.*/) ? true : false
             return optionalSpecialCard
         case 'game_data':
-            return value ? value.match(/^{".*"}$/) : null
+            return value ? value.match(/^{".*"}$|^{".*}$/) : null
 
         // ====== DECLARE ATTACK CITY TYPE ======
         case 'target_city':
