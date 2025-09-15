@@ -378,7 +378,7 @@ type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
-type RollDiceType = 'rolled_dice'|'rng'|'special_card'
+type RollDiceType = 'rolled_dice'|'rng'|'special_card'|'game_data'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'tax_money'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
@@ -517,6 +517,7 @@ export interface IGamePlay {
         rolled_dice: string,
         rng: string,
         special_card: string,
+        game_data: string,
     } & ITokenPayload,
     surrender: {
         channel: string,

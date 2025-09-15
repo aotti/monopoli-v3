@@ -374,10 +374,18 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
     const notifMessage = qS('#result_notif_message')
     // roll dice button
     const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+
     // set rng for twoway board
     const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     const currentPos = gameState.gamePlayerInfo[findPlayer].pos
     const branchRNG: number[] = checkBranchTiles('roll_dice', currentPos)
+    const playerGameData = {
+        display_name: gameState.gamePlayerInfo[findPlayer].display_name,
+        city: gameState.gamePlayerInfo[findPlayer].city,
+        card: gameState.gamePlayerInfo[findPlayer].card,
+        buff: gameState.gamePlayerInfo[findPlayer].buff,
+        debuff: gameState.gamePlayerInfo[findPlayer].debuff,
+    }
     // input values container
     const inputValues = {
         action: 'game roll dice',
@@ -389,6 +397,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
             Math.floor(Math.random() * 101), 
             branchRNG[0]
         ].toString(),
+        game_data: JSON.stringify(playerGameData),
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {

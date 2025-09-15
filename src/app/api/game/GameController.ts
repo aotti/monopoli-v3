@@ -269,11 +269,20 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
         // check player turn
         const roomId = payload.channel.match(/\d+/)[0]
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
         if(getPlayerTurns[0] != payload.display_name) 
             return this.respond(400, 'its not your turn', [])
+        // check missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        const findPlayer = getMissingData.map(v => v.display_name).indexOf(payload.display_name)
+        const playerMissingData = JSON.stringify(getMissingData[findPlayer])
+        // if player game data not match with missing data, then theres missing data
+        if(payload.game_data !== playerMissingData)
+            return this.respond(400, 'there is missing data', [])
+
         // update player turns to empty
         getPlayerTurns.splice(0, 1, '')
         await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
@@ -887,7 +896,15 @@ export default class GameController extends Controller {
         // set missing data for turn end player
         const findPlayer = getMissingData.map(v => v.display_name).indexOf(payload.display_name)
         const playerMissingData = getMissingData[findPlayer]
-        console.log({playerMissingData})
+        // game history container
+        const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+        const missingHistory = {
+            room_id: roomId,
+            display_name: payload.display_name,
+            history: 'retrieve missing data 🥺',
+        }
+        // save game history to redis
+        await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, missingHistory])
 
         // publish data
         const publishData = {
