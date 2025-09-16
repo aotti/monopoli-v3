@@ -179,12 +179,12 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         async function payingTaxes() {
             // check debuff
             const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
-                {type: 'debuff', effect: 'tax more', price: (+buyCityPrice * cityQuake)},
+                {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
                 findPlayer, miscState, gameState
             ) as [string, number];
             // check if special card exist
             const [specialCard, specialEffect] = await useSpecialCard(
-                {type: 'city', price: (+buyCityPrice * cityQuake), debuff: buffDebuff}, 
+                {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, 
                 findPlayer, miscState, gameState
             ) as [string, number];
             // set tax price

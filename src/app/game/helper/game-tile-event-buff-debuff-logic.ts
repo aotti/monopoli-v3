@@ -506,8 +506,8 @@ export function useBuffDebuff(data: BuffDebuffEventType, findPlayer: number, mis
             const debuff = splitDebuff.map(v => v.match(/tax more/i)).flat().filter(i=>i)
             if(debuff[0]) {
                 setBuffDebuffHistory('get_debuff', effect)
-                const newPrice = -(data.price * .3)
-                return [`used-${debuff[0]}`, newPrice]
+                const newPrice = data.price * .3
+                return [`used-${debuff[0]}`, -newPrice]
             }
         }
         else if(effect == 'reduce money') {

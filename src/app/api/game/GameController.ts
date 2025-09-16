@@ -454,7 +454,7 @@ export default class GameController extends Controller {
                 tmp_event_money: +payload.event_money + tempEventMoney,
                 tmp_city: payload.city,
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
-                tmp_tax_money: isTaxes ? +payload.tax_money : null,
+                tmp_tax_money: isTaxes ? +payload.tax_money + +payload.event_money + tempEventMoney : null,
                 tmp_card: payload.card,
                 tmp_take_money: payload.take_money,
                 tmp_prison: payload.prison,
@@ -901,7 +901,7 @@ export default class GameController extends Controller {
         const missingHistory = {
             room_id: roomId,
             display_name: payload.display_name,
-            history: 'retrieve missing data 🥺',
+            history: 'missing data: retrieved 🥺',
         }
         // save game history to redis
         await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, missingHistory])
