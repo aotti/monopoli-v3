@@ -108,6 +108,7 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
         // save ready players to redis
         const roomId = payload.channel.match(/\d+/)[0]
         const getReadyPlayers = await this.redisGet(`readyPlayers_${roomId}`)
@@ -116,6 +117,35 @@ export default class GameController extends Controller {
         if(checkReadyPlayer !== -1) return this.respond(403, 'fight me ni-', [])
         // set new ready player
         await this.redisSet(`readyPlayers_${roomId}`, [...getReadyPlayers, payload.display_name])
+        
+        // check shop items
+        const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
+        const shopItemList = {
+            special_card: [],
+            buff: [],
+        }
+        // fill shop item list
+        const shopItemKeys = Object.keys(shopItemList)
+        for(let key of shopItemKeys) {
+            const isKeyExist = getShopItems.map(v => Object.keys(v)).flat().indexOf(key)
+            // shop item exist, set value
+            if(isKeyExist !== -1) 
+                shopItemList[key] = getShopItems[isKeyExist][key]
+        }
+
+        // get missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        // set missing data
+        const tempMissingData: IMissingData = {
+            display_name: payload.display_name, 
+            city: null, 
+            card: shopItemList.special_card.length > 0 ? shopItemList.special_card.join(';') : null, 
+            buff: shopItemList.buff.length > 0 ? shopItemList.buff.join(';') : null, 
+            debuff: null,
+        }
+        // save missing data
+        await this.redisSet(`missingData_${roomId}`, [...getMissingData, tempMissingData])
+        
         // publish online players
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
@@ -174,15 +204,10 @@ export default class GameController extends Controller {
             // set game stage
             await this.redisSet(`gameStage_${roomId}`, ['decide'])
             // loop players
-            const tempMissingData: IMissingData[] = []
             for(let playerName of getReadyPlayers) {
                 // reset player shop items
                 await this.redisReset(`${playerName}_shopItems`)
-                // set missing data
-                tempMissingData.push({display_name: playerName, city: null, card: null, buff: null, debuff: null})
             }
-            // save missing data
-            await this.redisSet(`missingData_${roomId}`, tempMissingData)
             // publish online players
             const publishData = {
                 startGame: 'start',
