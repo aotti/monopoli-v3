@@ -88,9 +88,9 @@
                     "effect": "lose money_35000"
                 },
                 {
-                    "description": "You pick up the tax nerf card that Gilang dropped",
+                    "description": "You pick up the nerf tax card that Gilang dropped",
                     "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
-                    "effect": "special card_tax nerf"
+                    "effect": "special card_nerf tax"
                 },
                 {
                     "description": "You get 25.000 times the number on the selected coin",

@@ -551,18 +551,8 @@ export default class GameController extends Controller {
             console.log(isGamePublished);
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
                 
-            // get missing data
-            const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
-            // set missing data for turn end player
-            const findPlayer = getMissingData.map(v => v.display_name).indexOf(newPlayerTurnEndData.display_name)
-            getMissingData[findPlayer].city = newPlayerTurnEndData.city
-            getMissingData[findPlayer].card = newPlayerTurnEndData.card
-            getMissingData[findPlayer].buff = newPlayerTurnEndData.buff
-            getMissingData[findPlayer].debuff = newPlayerTurnEndData.debuff
             // save missing data
-            await this.redisSet(`missingData_${roomId}`, [...getMissingData])
-            // get turn end data for turn end player
-            const turnEndMissingData = getMissingData[findPlayer]
+            const savedMissingData = await this.saveMissingData(+roomId, newPlayerTurnEndData)
 
             // set result
             const resultData = {
@@ -570,7 +560,7 @@ export default class GameController extends Controller {
                 playerTurns: getPlayerTurns,
                 // ### SEND MISSING DATA AS RESPONSE 
                 // ### TO WARN PLAYER IF THERES MISSING DATA
-                missingData: turnEndMissingData,
+                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -636,9 +626,16 @@ export default class GameController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
+            // save missing data
+            const savedMissingData = await this.saveMissingData(+roomId, data[0])
+
             // set result
             const resultData = {
-                token: token
+                token: token,
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -677,7 +674,8 @@ export default class GameController extends Controller {
             }
         }
         // run query
-        const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
+        // return [display name, money, city, card, buff, debuff]
+        const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
         if(error) {
             // upgrade failed
             if(error.code == 'P0001') result = this.respond(403, error.message, [])
@@ -721,9 +719,16 @@ export default class GameController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
+            // save missing data
+            const savedMissingData = await this.saveMissingData(+roomId, data[0])
+
             // set result
             const resultData = {
-                token: token
+                token: token,
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -768,7 +773,7 @@ export default class GameController extends Controller {
             }
         }
         // run query
-        const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
+        const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
         if(error) {
             // attack failed
             if(error.code == 'P0001') result = this.respond(403, error.message, [])
@@ -820,9 +825,24 @@ export default class GameController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
+            // save missing data (multiple data)
+            const tempSavedMissingData: IMissingData[] = []
+            for(let d of data) {
+                const temp = await this.saveMissingData(+roomId, d)
+                tempSavedMissingData.push(temp)
+            }
+            // get attacker missing data
+            const savedMissingData = tempSavedMissingData
+                                    .map(v => v.display_name == payload.attacker_name ? v : null)
+                                    .filter(i=>i)[0]
+
             // set result
             const resultData = {
-                token: token
+                token: token,
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -942,6 +962,21 @@ export default class GameController extends Controller {
         
         result = this.respond(200, `${action} success`, [])
         return result
+    }
+    
+    private async saveMissingData(roomId: number, playerData: IGameContext['gamePlayerInfo'][0]) {
+        // get missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        // set missing data for turn end player
+        const findPlayer = getMissingData.map(v => v.display_name).indexOf(playerData.display_name)
+        getMissingData[findPlayer].city = playerData.city
+        getMissingData[findPlayer].card = playerData.card
+        getMissingData[findPlayer].buff = playerData.buff
+        getMissingData[findPlayer].debuff = playerData.debuff
+        // save missing data
+        await this.redisSet(`missingData_${roomId}`, [...getMissingData])
+        // return missing data
+        return getMissingData[findPlayer]
     }
 
     async sendReportBugs(action: string, payload: IGamePlay['report_bugs']) {

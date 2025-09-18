@@ -219,6 +219,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             targetCityProperty: getMessage.targetCityProperty
         })
         setTimeout(() => {
+            // set missing data local storage
+            getMessage.playerData.forEach(missingData => {
+                if(missingData.display_name === gameState.myPlayerInfo.display_name)
+                    localStorage.setItem('missingData', JSON.stringify(missingData))
+            })
             // set game quake city
             gameState.setGameQuakeCity(getMessage.quakeCity)
             // update player data

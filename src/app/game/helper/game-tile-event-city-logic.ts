@@ -214,7 +214,7 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
 
 // ========== > SELL CITY ==========
 // ========== > SELL CITY ==========
-export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
+export async function handleSellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -280,6 +280,10 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
                 localStorage.setItem('accessToken', sellCityResponse.data[0].token)
                 delete sellCityResponse.data[0].token
             }
+            // save missing data to localStorage (only for checking)
+            setTimeout(() => {
+                localStorage.setItem('missingData', JSON.stringify(sellCityResponse.data[0].missingData))
+            }, 3000);
             // enable gameroom buttons
             miscState.setDisableButtons(null)
             // submit button normal
@@ -386,8 +390,8 @@ export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'
     return [upgradeCityTileInfo, upgradeCityElement] as [string, HTMLElement]
 }
 
-// ========== > HANDLE SPECIAL UPGRADE CITY ==========
-// ========== > HANDLE SPECIAL UPGRADE CITY ==========
+// ========== > HANDLE UPGRADE CITY ==========
+// ========== > HANDLE UPGRADE CITY ==========
 export async function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -436,6 +440,10 @@ export async function handleUpgradeCity(miscState: IMiscContext, gameState: IGam
                 localStorage.setItem('accessToken', upgradeCityResponse.data[0].token)
                 delete upgradeCityResponse.data[0].token
             }
+            // save missing data to localStorage (only for checking)
+            setTimeout(() => {
+                localStorage.setItem('missingData', JSON.stringify(upgradeCityResponse.data[0].missingData))
+            }, 3000);
             // enable gameroom buttons
             miscState.setDisableButtons(null)
             return
