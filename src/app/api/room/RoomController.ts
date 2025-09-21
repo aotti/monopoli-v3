@@ -152,6 +152,26 @@ export default class RoomController extends Controller {
             }
             // match joined room with room list
             const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
+            
+            // check + get missing data
+            let validMissingData = null
+            if(tempTPayload?.display_name != 'guest') {
+                // check missing data limit
+                const getMissingLimit = await this.redisGet(`missingLimit_${tempTPayload.display_name}`)
+                // missing data limit reached
+                if(getMissingLimit.length > 0 && getMissingLimit[0] === 3) {
+                    validMissingData = null
+                }
+                // missing data limit not reached
+                else {
+                    // get missing data
+                    const getMissingData = await this.redisGet(`missingData_${data[isMyGameExist]?.room_id || +getJoinedRoom}`)
+                    // find player
+                    const findPlayer = getMissingData.map(v => v.display_name).indexOf(tempTPayload.display_name)
+                    validMissingData = getMissingData.length > 0 ? getMissingData[findPlayer] : null
+                }
+            }
+
             // set result
             const resultData = {
                 // lastDailyStatus for setting daily rewards, 
@@ -160,6 +180,7 @@ export default class RoomController extends Controller {
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
                 roomListInfo: roomListInfo,
                 roomList: data,
+                missingData: validMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }

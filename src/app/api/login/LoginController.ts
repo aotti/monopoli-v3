@@ -61,13 +61,13 @@ export default class LoginController extends Controller {
                                 : 'unclaim'
             // get player daily history
             const getPlayerDailyHistory = await this.redisGet(`${data[0].display_name}_dailyHistory`)
-            // get player coins
+            // get player coins, if empty create it
             const getPlayerCoins = await this.redisGet(`${data[0].display_name}_coins`)
-            // get player shop items
-            const getPlayerShopItems = await this.redisGet(`${data[0].display_name}_shopItems`)
-            // if empty, create it
             if(getPlayerCoins.length === 0) 
                 await this.redisSet(`${data[0].display_name}_coins`, [0])
+            // get player shop items
+            const getPlayerShopItems = await this.redisGet(`${data[0].display_name}_shopItems`)
+
             // log user
             const onlinePlayers = await this.getOnlinePlayers(data[0], payload.user_agent)
             if(onlinePlayers.status !== 200) return onlinePlayers
@@ -88,6 +88,8 @@ export default class LoginController extends Controller {
             })
             // generate access token
             const accessToken = await this.generateToken({type: 'access', payload: data[0], expire: '10min'})
+
+            // set result
             const resultData = {
                 player: data[0],
                 dailyStatus: isDailyReset,
@@ -149,13 +151,13 @@ export default class LoginController extends Controller {
                                 : 'unclaim'
             // get player daily history
             const getPlayerDailyHistory = await this.redisGet(`${renewData.display_name}_dailyHistory`)
-            // get player coins
+            // get player coins, if empty create it
             const getPlayerCoins = await this.redisGet(`${renewData.display_name}_coins`)
-            // get player shop items
-            const getPlayerShopItems = await this.redisGet(`${renewData.display_name}_shopItems`)
-            // if empty, create it
             if(getPlayerCoins.length === 0) 
                 await this.redisSet(`${renewData.display_name}_coins`, [0])
+            // get player shop items
+            const getPlayerShopItems = await this.redisGet(`${renewData.display_name}_shopItems`)
+
             // new renew data
             const newRenewData: IPlayer = {
                 ...renewData,
@@ -171,6 +173,7 @@ export default class LoginController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
             // set result
             const resultData = {
                 player: newRenewData,

@@ -26,12 +26,19 @@ export async function getRoomList(gameState: IGameContext) {
                     arr.findLastIndex(obj2 => obj2.room_name == obj1.room_name) === i
                 ))
             }
+            // if my current game is empty, remove missing data
+            getRoomResponse.data[0].currentGame ? null : localStorage.removeItem('missingData')
             // set my current game
             gameState.setMyCurrentGame(getRoomResponse.data[0].currentGame)
             // set game room info
             gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
             // set last daily status
             gameState.setLastDailyStatus(getRoomResponse.data[0].lastDailyStatus)
+            // save missing data to localStorage (only for checking)
+            // save if exist, remove if null
+            getRoomResponse.data[0]?.missingData
+                ? localStorage.setItem('missingData', JSON.stringify(getRoomResponse.data[0].missingData))
+                : localStorage.removeItem('missingData')
             return
         default: 
             resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
@@ -244,6 +251,8 @@ export async function viewRanking(miscState: IMiscContext, gameState: IGameConte
     }
 }
 
+// ========== - PLAYER STATS FUNCTION ==========
+// ========== - PLAYER STATS FUNCTION ==========
 /**
  * @param display_name player in game name
  * @param publicId avatar pathname
@@ -328,6 +337,61 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
         default: 
             logoutButton.textContent = `error${logoutResponse.status}`
             return
+    }
+}
+
+// ========== - ROOM CARD FUNCTION ==========
+// ========== - ROOM CARD FUNCTION ==========
+export function joinPromptInputs(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, setShowInputPassword) {
+    ev.preventDefault()
+    // input value container
+    const inputValues = {
+        character: null,
+        room_password: null
+    }
+    // get input elements
+    const formInputs = ev.currentTarget.elements
+    for(let i=0; i<formInputs.length; i++) {
+        const input = formInputs.item(i) as HTMLInputElement
+        if(input.nodeName.match(/INPUT/) && input.type != 'radio') {
+            // dont lowercase link
+            if(input.id == 'select_character') inputValues.character = input.value.trim()
+            else if(input.id == `input_password_${roomId}`) inputValues.room_password = input.value.trim().toLowerCase()
+        }
+    }
+    // fill input element values
+    const selectCharacter = qS(`#select_character_${roomId}`) as HTMLInputElement
+    const roomPassword = qS(`#room_password_${roomId}`) as HTMLInputElement
+    selectCharacter.value = inputValues.character
+    roomPassword.value = inputValues.room_password
+    // submit join form
+    const joinButton = qS(`#join_button_${roomId}`) as HTMLInputElement
+    joinButton.type = 'submit' // to trigger form submit
+    joinButton.click()
+    // close join prompt
+    setShowInputPassword ? setShowInputPassword(false) : null
+    miscState.setShowJoinModal(null)
+}
+
+export function manageRoomCardForm(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
+    ev.preventDefault()
+    // hide tutorial
+    miscState.setShowTutorial(null)
+    // submitter
+    const submitterId = (ev.nativeEvent as any).submitter.id
+    // form inputs
+    const formInputs = ev.currentTarget.elements
+
+    switch(submitterId) {
+        // join room function
+        case `join_button_${roomId}`: 
+            joinRoom(formInputs, roomId, miscState, gameState); break
+        // spectate room function
+        case `spectate_button_${roomId}`: 
+            spectateRoom(roomId, miscState, gameState); break
+        // delete room function
+        case `delete_button_${roomId}`: 
+            deleteRoom(formInputs, roomId, miscState, gameState); break
     }
 }
 
@@ -534,6 +598,8 @@ export async function deleteRoom(formInputs: HTMLFormControlsCollection, roomId:
     }
 }
 
+// ========== - SHOP FUNCTION ==========
+// ========== - SHOP FUNCTION ==========
 export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
 
@@ -582,7 +648,9 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
             return
     }
 }
-    
+
+// ========== - DAILY REWARD FUNCTION ==========
+// ========== - DAILY REWARD FUNCTION ==========
 export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any, miscState: IMiscContext, gameState: IGameContext) {
     ev ? ev.preventDefault() : null
     

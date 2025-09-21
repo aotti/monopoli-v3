@@ -945,7 +945,10 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     }
                     // save missing data to localStorage (only for checking)
                     setTimeout(() => {
-                        localStorage.setItem('missingData', JSON.stringify(playerTurnEndResponse.data[0].missingData))
+                        // save if exist, remove if null
+                        playerTurnEndResponse.data[0]?.missingData
+                            ? localStorage.setItem('missingData', JSON.stringify(playerTurnEndResponse.data[0].missingData))
+                            : localStorage.removeItem('missingData')
                     }, 3000);
                     return
                 default: 

@@ -965,6 +965,10 @@ export default class GameController extends Controller {
     }
     
     private async saveMissingData(roomId: number, playerData: IGameContext['gamePlayerInfo'][0]) {
+        // check missing data limit
+        const getMissingLimit = await this.redisGet(`missingLimit_${playerData.display_name}`)
+        if(getMissingLimit.length > 0 && getMissingLimit[0] === 3)
+            return null
         // get missing data
         const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
         // set missing data for turn end player

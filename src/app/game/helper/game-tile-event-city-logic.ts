@@ -280,15 +280,18 @@ export async function handleSellCity(ev: FormEvent<HTMLFormElement>, currentCity
                 localStorage.setItem('accessToken', sellCityResponse.data[0].token)
                 delete sellCityResponse.data[0].token
             }
-            // save missing data to localStorage (only for checking)
-            setTimeout(() => {
-                localStorage.setItem('missingData', JSON.stringify(sellCityResponse.data[0].missingData))
-            }, 3000);
             // enable gameroom buttons
             miscState.setDisableButtons(null)
             // submit button normal
             sellButton.textContent = tempButtonText
             sellButton.removeAttribute('disabled')
+            // save missing data to localStorage (only for checking)
+            setTimeout(() => {
+                // save if exist, remove if null
+                sellCityResponse.data[0]?.missingData
+                    ? localStorage.setItem('missingData', JSON.stringify(sellCityResponse.data[0].missingData))
+                    : localStorage.removeItem('missingData')
+            }, 3000);
             return
         default: 
             // enable gameroom buttons
@@ -442,7 +445,10 @@ export async function handleUpgradeCity(miscState: IMiscContext, gameState: IGam
             }
             // save missing data to localStorage (only for checking)
             setTimeout(() => {
-                localStorage.setItem('missingData', JSON.stringify(upgradeCityResponse.data[0].missingData))
+                // save if exist, remove if null
+                upgradeCityResponse.data[0]?.missingData
+                    ? localStorage.setItem('missingData', JSON.stringify(upgradeCityResponse.data[0].missingData))
+                    : localStorage.removeItem('missingData')
             }, 3000);
             // enable gameroom buttons
             miscState.setDisableButtons(null)
