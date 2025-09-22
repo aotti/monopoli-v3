@@ -75,6 +75,7 @@ export type GameRoomListener = {
         money: number
     },
     missingData: IMissingData,
+    multiMissingData: IMissingData[],
     upgradeCity: IGamePlayerInfo,
     attackerName: string,
     attackType: string,

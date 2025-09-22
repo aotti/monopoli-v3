@@ -14,7 +14,7 @@ export default function BoardTwoway() {
     const boardTwoway = board_twoway
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        applyTooltipEvent()
+        setTimeout(() => applyTooltipEvent(), 2000)
     }, [gameState.gamePlayerInfo])
 
     return (

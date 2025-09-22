@@ -804,6 +804,14 @@ export default class GameController extends Controller {
                 filteredQuakeCity = [...getQuakeCity, payload.target_city].filter((v, i, arr) => arr.indexOf(v) == i)
                 await this.redisSet(`gameQuakeCity_${roomId}`, filteredQuakeCity)
             }
+                
+            // save missing data (multiple data)
+            const multiSavedMissingData: IMissingData[] = []
+            for(let d of data) {
+                const temp = await this.saveMissingData(+roomId, d)
+                multiSavedMissingData.push(temp)
+            }
+
             // publish data
             const publishData = {
                 attackerName: payload.attacker_name,
@@ -813,7 +821,10 @@ export default class GameController extends Controller {
                 targetSpecialCard: payload.target_special_card?.split('-')[1] || null, // origin 'used-the shifter
                 quakeCity: filteredQuakeCity,
                 playerData: data,
-                gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory]
+                gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory],
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                multiMissingData: multiSavedMissingData,
             }
             const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);
@@ -825,24 +836,10 @@ export default class GameController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-                
-            // save missing data (multiple data)
-            const tempSavedMissingData: IMissingData[] = []
-            for(let d of data) {
-                const temp = await this.saveMissingData(+roomId, d)
-                tempSavedMissingData.push(temp)
-            }
-            // get attacker missing data
-            const savedMissingData = tempSavedMissingData
-                                    .map(v => v.display_name == payload.attacker_name ? v : null)
-                                    .filter(i=>i)[0]
 
             // set result
             const resultData = {
                 token: token,
-                // ### SEND MISSING DATA AS RESPONSE 
-                // ### TO WARN PLAYER IF THERES MISSING DATA
-                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }

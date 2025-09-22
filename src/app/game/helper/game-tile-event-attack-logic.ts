@@ -134,13 +134,6 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
             }
             // enable gameroom buttons
             miscState.setDisableButtons(null)
-            // save missing data to localStorage (only for checking)
-            setTimeout(() => {
-                // save if exist, remove if null
-                attackCityResponse.data[0]?.missingData
-                    ? localStorage.setItem('missingData', JSON.stringify(attackCityResponse.data[0].missingData))
-                    : localStorage.removeItem('missingData')
-            }, 3000);
             return
         default: 
             // enable gameroom buttons

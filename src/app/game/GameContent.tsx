@@ -195,8 +195,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* middle side */}
             {/* tutorial: relative z-10 */}
             <section className={`${miscState.showTutorial == 'tutorial_gameroom_2' ? 'relative z-10' : ''}
-            col-span-10 grid grid-rows-6 gap-8 justify-center
-            h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
+            col-span-10 grid grid-rows-6 gap-8 justify-center h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
                 {/* board */}
                 {gameState.gameRoomId
                     ? <>
@@ -232,8 +231,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* tutorial: relative z-10 */}
             <div ref={gameSideButtonRef} className={`${miscState.showTutorial == 'tutorial_gameroom_1' ? 'z-10' : ''}
             absolute top-[20vh] right-[calc(0rem+1rem)]     flex items-center [writing-mode:vertical-lr] 
-            text-center text-2xs lg:text-sm     h-60 lg:h-96 w-6 lg:w-8
-            bg-darkblue-1 border-8bit-text`}>
+            text-center text-2xs lg:text-sm     h-60 lg:h-96 w-6 lg:w-8     bg-darkblue-1 border-8bit-text`}>
                 {/* help */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'help'} setGameSideButton={gameState.setGameSideButton} />

@@ -220,9 +220,9 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         })
         setTimeout(() => {
             // set missing data local storage
-            getMessage.playerData.forEach(missingData => {
-                if(missingData.display_name === gameState.myPlayerInfo.display_name)
-                    localStorage.setItem('missingData', JSON.stringify(missingData))
+            getMessage.multiMissingData.forEach(data => {
+                if(data.display_name === gameState.myPlayerInfo.display_name) 
+                    localStorage.setItem('missingData', JSON.stringify(data))
             })
             // set game quake city
             gameState.setGameQuakeCity(getMessage.quakeCity)
