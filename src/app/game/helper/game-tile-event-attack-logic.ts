@@ -64,16 +64,16 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         attacker_name: gameState.myPlayerInfo.display_name,
         attacker_city: null,
+        attack_type: attackType,
+        event_money: '0',
+        special_card: 'used-attack city',
+        card: updateSpecialCardList(['used-attack city'], attackerData.card),
         target_city_owner: targetCityOwner, // used for db validation
         target_city_left: null,
         target_city_property: targetCityProperty,
         target_city: targetCityName,
         target_special_card: getTheShifter ? 'used-the shifter' : null, // used for notif
         target_card: getTheShifter ? updateSpecialCardList(['used-the shifter'], targetData.card) : targetData.card,
-        attack_type: attackType,
-        event_money: '0',
-        special_card: 'used-attack city',
-        card: updateSpecialCardList(['used-attack city'], attackerData.card)
     }
     // warning message
     const quakeWarning = translateUI({lang: miscState.language, text: 'Send earthquake to destined city and cause permanent damage that reduce city tax by 50%. Are you sure wanna attack?'})
@@ -88,7 +88,7 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
         if(!confirm(meteorWarning)) return
         // remove target city from owner with meteor
         const targetCityLeft = updateCityList({action: 'sell', currentCity: targetCurrentCity, cityName: targetCityName})
-        inputValues.target_city_left = targetCityLeft
+        inputValues.target_city_left = targetCityLeft || null
     }
     else if(attackType.match('steal')) {
         // steal price = 20% normal price
