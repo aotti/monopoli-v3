@@ -98,7 +98,7 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
         // move ownership from target to the attacker
         // remove city from target
         const targetCityLeft = updateCityList({action: 'sell', currentCity: targetCurrentCity, cityName: targetCityName})
-        inputValues.target_city_left = targetCityLeft
+        inputValues.target_city_left = targetCityLeft || null
         // get attacker city data
         const attackerCurrentCity = attackerData.city
         // add the city to attacker
