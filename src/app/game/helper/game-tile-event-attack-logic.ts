@@ -54,7 +54,7 @@ export async function declareAttackCity(ev: FormEvent<HTMLFormElement>, attackCi
     // submit button (attack type)
     const submitButton = (ev.nativeEvent as any).submitter as HTMLInputElement
     // check the shifter card
-    const getTheShifter = targetData.card.match(/the shifter/i)
+    const getTheShifter = targetData.card?.match(/the shifter/i)
     // set attack type
     const attackType = getTheShifter ? shiftAttackType(submitButton.id) : submitButton.id
     

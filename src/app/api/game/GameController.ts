@@ -810,7 +810,7 @@ export default class GameController extends Controller {
                 attackType: attackType,
                 targetCity: payload.target_city,
                 targetCityProperty: payload.target_city_property,
-                targetSpecialCard: payload.target_special_card.split('-')[1], // origin 'used-the shifter
+                targetSpecialCard: payload.target_special_card?.split('-')[1] || null, // origin 'used-the shifter
                 quakeCity: filteredQuakeCity,
                 playerData: data,
                 gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory]
