@@ -118,34 +118,6 @@ export default class GameController extends Controller {
         // set new ready player
         await this.redisSet(`readyPlayers_${roomId}`, [...getReadyPlayers, payload.display_name])
         
-        // check shop items
-        const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
-        const shopItemList = {
-            special_card: [],
-            buff: [],
-        }
-        // fill shop item list
-        const shopItemKeys = Object.keys(shopItemList)
-        for(let key of shopItemKeys) {
-            const isKeyExist = getShopItems.map(v => Object.keys(v)).flat().indexOf(key)
-            // shop item exist, set value
-            if(isKeyExist !== -1) 
-                shopItemList[key] = getShopItems[isKeyExist][key]
-        }
-
-        // get missing data
-        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
-        // set missing data
-        const tempMissingData: IMissingData = {
-            display_name: payload.display_name, 
-            city: null, 
-            card: shopItemList.special_card.length > 0 ? shopItemList.special_card.join(';') : null, 
-            buff: shopItemList.buff.length > 0 ? shopItemList.buff.join(';') : null, 
-            debuff: null,
-        }
-        // save missing data
-        await this.redisSet(`missingData_${roomId}`, [...getMissingData, tempMissingData])
-        
         // publish online players
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
@@ -259,9 +231,40 @@ export default class GameController extends Controller {
         }].sort((a,b) => b.rolled_number - a.rolled_number)
         // get fixed players
         const getFixedPlayers = await this.redisGet(`readyPlayers_${roomId}`)
-        // set player turns if game stage == play
+        // set player turns if ready players == roll turn players
         if(sortDecidePlayers.length === getFixedPlayers.length)
             await this.redisSet(`playerTurns_${roomId}`, sortDecidePlayers.map(v => v.display_name))
+        
+        // check shop items for missing data
+        const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${payload.display_name}_shopItems`)
+        const shopItemList = {
+            special_card: [],
+            buff: [],
+        }
+        // fill shop item list
+        const shopItemKeys = Object.keys(shopItemList)
+        for(let key of shopItemKeys) {
+            const isKeyExist = getShopItems.map(v => Object.keys(v)).flat().indexOf(key)
+            // shop item exist, set value
+            if(isKeyExist !== -1) 
+                shopItemList[key] = getShopItems[isKeyExist][key]
+        }
+
+        // get missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        // set missing data
+        const tempMissingData: IMissingData = {
+            display_name: payload.display_name, 
+            city: null, 
+            card: shopItemList.special_card.length > 0 ? shopItemList.special_card.join(';') : null, 
+            buff: shopItemList.buff.length > 0 ? shopItemList.buff.join(';') : null, 
+            debuff: null,
+        }
+        // save missing data
+        await this.redisSet(`missingData_${roomId}`, [...getMissingData, tempMissingData])
+        // reset missing limit
+        await this.redisReset(`missingLimit_${payload.display_name}`)
+
         // publish online players
         const publishData = {
             decidePlayers: sortDecidePlayers,
@@ -962,10 +965,6 @@ export default class GameController extends Controller {
     }
     
     private async saveMissingData(roomId: number, playerData: IGameContext['gamePlayerInfo'][0]) {
-        // check missing data limit
-        const getMissingLimit = await this.redisGet(`missingLimit_${playerData.display_name}`)
-        if(getMissingLimit.length > 0 && getMissingLimit[0] === 3)
-            return null
         // get missing data
         const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
         // set missing data for turn end player
@@ -976,6 +975,10 @@ export default class GameController extends Controller {
         getMissingData[findPlayer].debuff = playerData.debuff
         // save missing data
         await this.redisSet(`missingData_${roomId}`, [...getMissingData])
+        // if missing data is limit, return null but still save the data
+        const getMissingLimit = await this.redisGet(`missingLimit_${playerData.display_name}`)
+        if(getMissingLimit.length > 0 && getMissingLimit[0] === 3)
+            return null
         // return missing data
         return getMissingData[findPlayer]
     }
