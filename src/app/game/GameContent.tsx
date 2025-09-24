@@ -22,6 +22,7 @@ import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
 import MiniGame from "./components/board/MiniGame"
 import { clickInsideElement } from "../../helper/click-inside"
+import { IMissingData } from "../../helper/types"
 
 export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -53,11 +54,11 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         applyTooltipEvent()
         // reset disable buttons
         miscState.setDisableButtons(null)
-        // get player list
+        // get player list and set room id
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
         getPlayerInfo(gameroomParam, miscState, gameState)
-
         gameState.setGameRoomId(gameroomParam)
+
         // remove sub event data
         localStorage.removeItem('subPlayerDice')
         localStorage.removeItem('subEventData')
@@ -103,12 +104,59 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             message: (data) => gameMessageListener(data, miscState, gameState)
         }
         pubnubClient.addListener(publishedMessage)
+
+        // set missing data warning
+        const setMissingDataWarning = () => {
+            // get warning elements
+            const playerSideButton = qS('#player_side_button')
+            const playerSettingButton = qS('#player_setting_button')
+            const missingDataOption = qS('#missing_data_option')
+            // get missing data from localStorage
+            const getMissingData = localStorage.getItem('missingData')
+            if(getMissingData) {
+                // get player data
+                const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+                const playerData = gameState.gamePlayerInfo[findPlayer]
+                const tempPlayerData: IMissingData = {
+                    display_name: playerData.display_name,
+                    city: playerData.city,
+                    card: playerData.card,
+                    buff: playerData.buff,
+                    debuff: playerData.debuff,
+                }
+                // match player data with missing data, if doesnt match show warning
+                const strTempPlayerData = JSON.stringify(tempPlayerData)
+                if(getMissingData !== strTempPlayerData) {
+                    // sound effect
+                    const soundMissingData = qS('#sound_missing_data') as HTMLAudioElement
+                    soundMissingData.play()
+                    // show warning icon on player tab and missing data option
+                    const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
+                    playerSideButton.classList.add(...warningClass)
+                    playerSettingButton.classList.add(...warningClass)
+                    missingDataOption.classList.add(...warningClass)
+                }
+                // if data match remove warning
+                else {
+                    // remove warning icon
+                    const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
+                    playerSideButton.classList.remove(...warningClass)
+                    playerSettingButton.classList.remove(...warningClass)
+                    missingDataOption.classList.remove(...warningClass)
+                }
+            }
+        }
+        document.body.tabIndex = 0
+        document.body.addEventListener('click', setMissingDataWarning)
+        
         // unsub and remove listener
         return () => {
             pubnubClient.unsubscribe({ 
                 channels: [gameroomChannel] 
             })
             pubnubClient.removeListener(publishedMessage)
+
+            document.body.removeEventListener('click', setMissingDataWarning)
         }
     }, [gameState.gamePlayerInfo, gameState.showGameNotif, 
         gameState.minigameWords, gameState.minigameMatchedWords, 
@@ -147,8 +195,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* middle side */}
             {/* tutorial: relative z-10 */}
             <section className={`${miscState.showTutorial == 'tutorial_gameroom_2' ? 'relative z-10' : ''}
-            col-span-10 grid grid-rows-6 gap-8 justify-center
-            h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
+            col-span-10 grid grid-rows-6 gap-8 justify-center h-[calc(100vh-3.75rem)] scale-90 -mt-2`}>
                 {/* board */}
                 {gameState.gameRoomId
                     ? <>
@@ -184,15 +231,14 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
             {/* tutorial: relative z-10 */}
             <div ref={gameSideButtonRef} className={`${miscState.showTutorial == 'tutorial_gameroom_1' ? 'z-10' : ''}
             absolute top-[20vh] right-[calc(0rem+1rem)]     flex items-center [writing-mode:vertical-lr] 
-            text-center text-2xs lg:text-sm     h-60 lg:h-96 w-6 lg:w-8
-            bg-darkblue-1 border-8bit-text`}>
+            text-center text-2xs lg:text-sm     h-60 lg:h-96 w-6 lg:w-8     bg-darkblue-1 border-8bit-text`}>
                 {/* help */}
                 <div className="h-20 lg:h-32 p-1">
                     <SideButtons text={'help'} setGameSideButton={gameState.setGameSideButton} />
                     <HelpSection />
                 </div>
                 {/* player */}
-                <div className="h-20 lg:h-32 p-1">
+                <div id="player_side_button" className="h-20 lg:h-32 p-1">
                     <SideButtons text={'players'} setGameSideButton={gameState.setGameSideButton} />
                     <PlayerSection />
                 </div>

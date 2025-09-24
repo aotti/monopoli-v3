@@ -23,7 +23,7 @@ export default function PlayerSettingGameHistory() {
                     // split history
                     const [historyTitle, historyContent] = v.history.split(': ')
                     // check card content
-                    const checkHistoryContent1 = historyContent.match(/lose money,move place|get money,more money|special card|more money|get money|lose money|take money|move place|move forward|move backward|take card|destroy property|upgrade city|sell city/) || ''
+                    const checkHistoryContent1 = historyContent.match(/lose money,move place|get money,more money|special card|more money|get money|lose money|take money|move place|move forward|move backward|take card|destroy property|upgrade city|sell city|retrieved 🥺/) || ''
                     // check if its buy city, chance, community history
                     const checkHistoryContent2 = historyContent.match(/land|1house|2house|chance|community|none/) || ''
                     // translate history

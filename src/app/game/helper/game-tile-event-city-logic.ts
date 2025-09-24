@@ -1,8 +1,8 @@
 import { FormEvent } from "react"
-import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, simpleDecrypt, translateUI } from "../../../helper/helper"
+import { fetcher, fetcherOptions, moneyFormat, qS, setInputValue, simpleDecrypt, simpleEncrypt, translateUI } from "../../../helper/helper"
 import { EventDataType, IGameContext, IMiscContext, IResponse, UpdateCityListType } from "../../../helper/types"
 import { rollDiceGameRoom } from "./game-prepare-playing-logic"
-import { useSpecialCard } from "./game-tile-event-special-card-logic"
+import { updateSpecialCardList, useSpecialCard } from "./game-tile-event-special-card-logic"
 import { useBuffDebuff } from "./game-tile-event-buff-debuff-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
 
@@ -179,12 +179,12 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
         async function payingTaxes() {
             // check debuff
             const [buffDebuff, buffDebuffEffect] = useBuffDebuff(
-                {type: 'debuff', effect: 'tax more', price: (+buyCityPrice * cityQuake)},
+                {type: 'debuff', effect: 'tax more', price: +buyCityPrice},
                 findPlayer, miscState, gameState
             ) as [string, number];
             // check if special card exist
             const [specialCard, specialEffect] = await useSpecialCard(
-                {type: 'city', price: (+buyCityPrice * cityQuake), debuff: buffDebuff}, 
+                {type: 'city', price: +buyCityPrice, debuff: buffDebuff}, 
                 findPlayer, miscState, gameState
             ) as [string, number];
             // set tax price
@@ -214,7 +214,7 @@ export function stopByCity(tileInfo: 'city'|'special', findPlayer: number, tileE
 
 // ========== > SELL CITY ==========
 // ========== > SELL CITY ==========
-export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
+export async function handleSellCity(ev: FormEvent<HTMLFormElement>, currentCity: string, miscState: IMiscContext, gameState: IGameContext) {
     ev.preventDefault()
     // result message
     const notifTitle = qS('#result_notif_title')
@@ -285,6 +285,13 @@ export async function sellCity(ev: FormEvent<HTMLFormElement>, currentCity: stri
             // submit button normal
             sellButton.textContent = tempButtonText
             sellButton.removeAttribute('disabled')
+            // save missing data to localStorage (only for checking)
+            setTimeout(() => {
+                // save if exist, remove if null
+                sellCityResponse.data[0]?.missingData
+                    ? localStorage.setItem('missingData', JSON.stringify(sellCityResponse.data[0].missingData))
+                    : localStorage.removeItem('missingData')
+            }, 3000);
             return
         default: 
             // enable gameroom buttons
@@ -370,49 +377,91 @@ export function updateCityList(data: UpdateCityListType) {
 
 // ========== > SPECIAL UPGRADE CITY ==========
 // ========== > SPECIAL UPGRADE CITY ==========
-export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number) {
+export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number, miscState: IMiscContext) {
     // get all owned city, except special & fully upgrade city
-    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel|special/))
+    const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel|special/i))
+    console.log(myCityList);
+    
     // get city name
     const upgradeRNG = rng % myCityList.length
     const upgradeCityName = myCityList[upgradeRNG].split('*')[0]
+    const encUpgradeCityName = simpleEncrypt(upgradeCityName, miscState.simpleKey)
     // get city element & tile info
-    const upgradeCityElement = qS(`[data-city-info^='${upgradeCityName}']`) as HTMLElement
+    const upgradeCityElement = qS(`[data-city-info^='${encUpgradeCityName}']`) as HTMLElement
     const upgradeCityTileInfo = upgradeCityElement.dataset.tileInfo
     // return data
     return [upgradeCityTileInfo, upgradeCityElement] as [string, HTMLElement]
 }
 
-// ========== > HANDLE SPECIAL UPGRADE CITY ==========
-// ========== > HANDLE SPECIAL UPGRADE CITY ==========
-export function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
+// ========== > HANDLE UPGRADE CITY ==========
+// ========== > HANDLE UPGRADE CITY ==========
+export async function handleUpgradeCity(miscState: IMiscContext, gameState: IGameContext) {
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // get player data
+    const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+    const playerData = gameState.gamePlayerInfo[findPlayer]
+    // input value container
+    const inputValues = {
+        action: 'game upgrade city',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+        city: null,
+        target_city: null,
+        target_city_property: null,
+        event_money: null,
+        card: updateSpecialCardList(['used-upgrade city'], playerData.card),
+        special_card: 'used-upgrade city',
+    }
+    // warning before display buy city modal
     const upgradeCityWarning = translateUI({lang: miscState.language, text: 'Only use if you have any city! (not special city) Otherwise, the card will be used and do nothing.\nProceed to upgrade city?'})
     if(!confirm(upgradeCityWarning)) return
-    // sound effect
-    const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
-    // roll dice button
-    const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
-    // loading button
-    const tempRollDiceText = rollDiceButton.textContent
-    rollDiceButton.textContent = 'Loading'
-    // set history
-    localStorage.setItem('specialCardUsed', `special_card: upgrade city 💳`)
-    soundSpecialCard.play()
-    // ### check if player really have the card
-    // ### check if player really have the card
-    // ### ONLY DO CHECKING IN published-message
-    const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
-    const isUpgradeCityCardExist = gameState.gamePlayerInfo[findPlayer].card.match(/upgrade city/i)
-    // player dont have upgrade city card
-    if(!isUpgradeCityCardExist) {
-        const notifTitle = qS('#result_notif_title')
-        const notifMessage = qS('#result_notif_message')
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
-        notifTitle.textContent = 'error 400'
-        notifMessage.textContent = translateUI({lang: miscState.language, text: 'you dont have upgrade city card 💀'})
-        return
+
+    // get upgrade city data
+    const upgradeRNG = Math.floor(Math.random() * 101)
+    const [upgradeCityTileInfo, upgradeCityElement] = specialUpgradeCity(playerData, upgradeRNG, miscState)
+    // buy city event
+    const buyCityData = await stopByCity(upgradeCityTileInfo as any, findPlayer, upgradeCityElement, miscState, gameState)
+    if(buyCityData.event == 'buy_city') {
+        inputValues.target_city = buyCityData.status ? buyCityData.name : null
+        inputValues.target_city_property = buyCityData.status ? buyCityData.property : null
+        inputValues.city = buyCityData.status ? buyCityData.city : playerData.city
+        inputValues.event_money = buyCityData.money.toString()
     }
-    rollDiceGameRoom([] as any, tempRollDiceText, miscState, gameState, `used-upgrade city`)
+    // set state to disable "back to room & surrender" buttons
+    miscState.setDisableButtons('gameroom')
+
+    // fetching
+    const upgradeCityFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const upgradeCityResponse: IResponse = await (await fetcher('/game', upgradeCityFetchOptions)).json()
+    // response
+    switch(upgradeCityResponse.status) {
+        case 200:
+            // save access token
+            if(upgradeCityResponse.data[0].token) {
+                localStorage.setItem('accessToken', upgradeCityResponse.data[0].token)
+                delete upgradeCityResponse.data[0].token
+            }
+            // save missing data to localStorage (only for checking)
+            setTimeout(() => {
+                // save if exist, remove if null
+                upgradeCityResponse.data[0]?.missingData
+                    ? localStorage.setItem('missingData', JSON.stringify(upgradeCityResponse.data[0].missingData))
+                    : localStorage.removeItem('missingData')
+            }, 3000);
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
+            return
+        default:
+            // enable gameroom buttons
+            miscState.setDisableButtons(null)
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${upgradeCityResponse.status}`
+            notifMessage.textContent = `${upgradeCityResponse.message}`
+            return
+    }
 }

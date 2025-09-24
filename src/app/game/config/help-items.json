@@ -1,16 +1,16 @@
 {
     "community_card": {
         ">25%": [
-            "Gift from the bank, you get 40.000",
+            "Gift from the bank, you get 30.000",
             "Your birthday, get 15.000 from each player",
-            "You get an inheritance of 65.000"
+            "You get an inheritance of 40.000"
         ],
         "25%": [
             "Gilang the hacker hacks your bank account and loses 20.000",
             "Due to the small amount of aid from the government, you only get a fortune block card",
             "Your car is broken, pay 35.000 repair costs",
             "You pick up the tax nerf card that Gilang dropped",
-            "You get 20.000 times the number on the selected coin"
+            "You get 25.000 times the number on the selected coin"
         ],
         "15%": [
             "You take 1 step back when being chased by debt collectors, then get caught and pay 30%",

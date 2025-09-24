@@ -5,6 +5,7 @@ import PlayerSettingSellCity from "./PlayerSettingSellCity"
 import PlayerSettingAttackCity from "./PlayerSettingAttackCity"
 import { useMisc } from "../../../../context/MiscContext"
 import { clickOutsideElement } from "../../../../helper/click-outside"
+import { missingDataGameRoom } from "../../helper/game-prepare-playing-logic"
 
 export default function PlayerSection() {
     const miscState = useMisc()
@@ -89,7 +90,7 @@ function PlayerSettingButton() {
     clickOutsideElement(playerSettingRef, () => gameState.setOpenPlayerSetting(false))
 
     return (
-        <div className="absolute z-10 top-0 right-1 w-6 lg:w-8">
+        <div id="player_setting_button" className="absolute z-10 top-0 right-1 w-6 lg:w-8 after:absolute after:right-5 after:lg:right-6">
             {/* setting button */}
             <button type="button" onClick={() => gameState.setOpenPlayerSetting(b => !b)}>
                 <img src="https://img.icons8.com/?id=95245&format=png&color=FFFFFF" alt="setting" width={100} height={100} draggable={false} />
@@ -105,6 +106,7 @@ function PlayerSettingButton() {
                         <SellUpgradeCityOption />
                         <AttackCityOption />
                         <DiceControlOption />
+                        <MissingDataOption />
                         <GameHistoryOption />
                     </>
                     // button for spectator
@@ -179,11 +181,24 @@ function DiceControlOption() {
                 ? <select id="dice_control" className="p-px max-w-12 lg:max-w-16" onChange={diceModeHandler} value={gameState.diceMode}>
                     <option className="text-sm lg:text-lg" value="odd"> {translateUI({lang: miscState.language, text: 'odd'})} </option>
                     <option className="text-sm lg:text-lg" value="even"> {translateUI({lang: miscState.language, text: 'even'})} </option>
-                    <option className="text-sm lg:text-lg" value="off" selected> {translateUI({lang: miscState.language, text: 'off'})} </option>
+                    <option className="text-sm lg:text-lg" value="off"> {translateUI({lang: miscState.language, text: 'off'})} </option>
                 </select>
                 : <button id="dice_control" type="button" className="px-1 border-2">
                     {translateUI({lang: miscState.language, text: gameState.diceMode})}
                 </button>}
+        </div>
+    )
+}
+
+function MissingDataOption() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    return (
+        <div id="missing_data_option" className="flex items-center hover:bg-darkblue-2">
+            <button type="button" id="missing_card" className="w-full text-left p-1" onClick={() => missingDataGameRoom(miscState, gameState)}>
+                {translateUI({lang: miscState.language, text: 'Missing Data'})}
+            </button>
         </div>
     )
 }

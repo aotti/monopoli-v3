@@ -1,6 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { fetcher, fetcherOptions } from "../../../helper/helper";
-import { ICreateRoom, IGameContext, IGamePlay, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
+import { ICreateRoom, IGameContext, IGamePlay, IMissingData, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
 import { Redis } from "@upstash/redis";
 
@@ -108,6 +108,7 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
         // save ready players to redis
         const roomId = payload.channel.match(/\d+/)[0]
         const getReadyPlayers = await this.redisGet(`readyPlayers_${roomId}`)
@@ -116,6 +117,7 @@ export default class GameController extends Controller {
         if(checkReadyPlayer !== -1) return this.respond(403, 'fight me ni-', [])
         // set new ready player
         await this.redisSet(`readyPlayers_${roomId}`, [...getReadyPlayers, payload.display_name])
+        
         // publish online players
         const publishData = {
             readyPlayers: [...getReadyPlayers, payload.display_name],
@@ -147,6 +149,7 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
         // check player amount
         const roomId = payload.channel.match(/\d+/)[0]
         const getReadyPlayers = await this.redisGet(`readyPlayers_${roomId}`)
@@ -173,9 +176,40 @@ export default class GameController extends Controller {
         else {
             // set game stage
             await this.redisSet(`gameStage_${roomId}`, ['decide'])
-            // reset player shop items
-            for(let playerName of getReadyPlayers)
+            // loop players
+            for(let playerName of getReadyPlayers) {
+                // check shop items for missing data
+                const getShopItems: IGameContext['myShopItems'] = await this.redisGet(`${playerName}_shopItems`)
+                const shopItemList = {
+                    special_card: [],
+                    buff: [],
+                }
+                // fill shop item list
+                const shopItemKeys = Object.keys(shopItemList)
+                for(let key of shopItemKeys) {
+                    const isKeyExist = getShopItems.map(v => Object.keys(v)).flat().indexOf(key)
+                    // shop item exist, set value
+                    if(isKeyExist !== -1) 
+                        shopItemList[key] = getShopItems[isKeyExist][key]
+                }
+                // reset player shop items
                 await this.redisReset(`${playerName}_shopItems`)
+
+                // get missing data
+                const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+                // set missing data
+                const tempMissingData: IMissingData = {
+                    display_name: playerName, 
+                    city: null, 
+                    card: shopItemList.special_card.length > 0 ? shopItemList.special_card.join(';') : null, 
+                    buff: shopItemList.buff.length > 0 ? shopItemList.buff.join(';') : null, 
+                    debuff: null,
+                }
+                // save missing data
+                await this.redisSet(`missingData_${roomId}`, [...getMissingData, tempMissingData])
+                // reset missing limit
+                await this.redisReset(`missingLimit_${playerName}`)
+            }
             // publish online players
             const publishData = {
                 startGame: 'start',
@@ -227,9 +261,10 @@ export default class GameController extends Controller {
         }].sort((a,b) => b.rolled_number - a.rolled_number)
         // get fixed players
         const getFixedPlayers = await this.redisGet(`readyPlayers_${roomId}`)
-        // set player turns if game stage == play
+        // set player turns if ready players == roll turn players
         if(sortDecidePlayers.length === getFixedPlayers.length)
             await this.redisSet(`playerTurns_${roomId}`, sortDecidePlayers.map(v => v.display_name))
+
         // publish online players
         const publishData = {
             decidePlayers: sortDecidePlayers,
@@ -262,11 +297,20 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
         // check player turn
         const roomId = payload.channel.match(/\d+/)[0]
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
         if(getPlayerTurns[0] != payload.display_name) 
             return this.respond(400, 'its not your turn', [])
+        // check missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        const findPlayer = getMissingData.map(v => v.display_name).indexOf(payload.display_name)
+        const playerMissingData = JSON.stringify(getMissingData[findPlayer])
+        // if player game data not match with missing data, then theres missing data
+        if(payload.game_data !== playerMissingData)
+            return this.respond(400, 'there is missing data', [])
+
         // update player turns to empty
         getPlayerTurns.splice(0, 1, '')
         await this.redisSet(`playerTurns_${roomId}`, getPlayerTurns)
@@ -438,7 +482,7 @@ export default class GameController extends Controller {
                 tmp_event_money: +payload.event_money + tempEventMoney,
                 tmp_city: payload.city,
                 tmp_taxes: isTaxes ? `${payload.tax_visitor};${payload.tax_owner}` : null,
-                tmp_tax_money: isTaxes ? +payload.tax_money : null,
+                tmp_tax_money: isTaxes ? +payload.tax_money + +payload.event_money + tempEventMoney : null,
                 tmp_card: payload.card,
                 tmp_take_money: payload.take_money,
                 tmp_prison: payload.prison,
@@ -497,30 +541,29 @@ export default class GameController extends Controller {
                 return {display_name, event_money: +event_money}
             })
 
-            // publish turn end data 1
-            const publishData_1 = {
+            // publish turn end data 
+            const publishData = {
                 playerTurns: getPlayerTurns,
                 gameHistory: [...getGameHistory, ...gameHistory],
-            }
-            const isGamePublished_1 = await this.monopoliPublish(payload.channel, publishData_1)
-            console.log(isGamePublished_1);
-            if(!isGamePublished_1.timetoken) return this.respond(500, 'realtime error, try again', [])
-
-            // publish turn end data 2
-            const publishData_2 = {
                 playerTurnEnd: newPlayerTurnEndData,
                 taxes: taxes,
                 takeMoney: takeMoney,
                 minigameResult: minigameResultData,
             }
-            const isGamePublished_2 = await this.monopoliPublish(payload.channel, publishData_2)
-            console.log(isGamePublished_2);
-            if(!isGamePublished_2.timetoken) return this.respond(500, 'realtime error, try again', [])
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
+            // save missing data
+            const savedMissingData = await this.saveMissingData(+roomId, newPlayerTurnEndData)
 
             // set result
             const resultData = {
                 token: token,
-                playerTurns: getPlayerTurns
+                playerTurns: getPlayerTurns,
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -586,9 +629,109 @@ export default class GameController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
+            // save missing data
+            const savedMissingData = await this.saveMissingData(+roomId, data[0])
+
             // set result
             const resultData = {
-                token: token
+                token: token,
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                missingData: savedMissingData,
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+        }
+        // return result
+        return result
+    }
+
+    async upgradeCity(action: string, payload: IGamePlay['upgrade_city']) {
+        let result: IResponse
+        
+        const roomId = payload.channel.match(/\d+/)[0]
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
+        // filter payload
+        const filtering = await this.filters(action, payload)
+        if(filtering.status !== 200) return filtering
+        delete payload.token
+        // get filter data
+        const {token, onlinePlayersData} = filtering.data[0]
+        
+        // check player turn
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.display_name) 
+            return this.respond(400, 'only allowed on your turn', [])
+        // set payload for db query
+        const queryObject: Partial<IQueryUpdate> = {
+            table: 'games',
+            function: 'mnp_upgrade_city',
+            function_args: {
+                tmp_display_name: payload.display_name,
+                tmp_city: payload.city,
+                tmp_event_money: +payload.event_money,
+                tmp_card: payload.card,
+                tmp_special_card: payload.special_card.split('-')[1], // origin 'used-upgrade city'
+            }
+        }
+        // run query
+        // return [display name, money, city, card, buff, debuff]
+        const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
+        if(error) {
+            // upgrade failed
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
+        }
+        else {
+            // set upgrade history
+            const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+            const upgradeHistory: IGameContext['gameHistory'] = [
+                {
+                    display_name: payload.display_name,
+                    room_id: +roomId,
+                    history: `special_card: ${payload.special_card.split('-')[1]} 💳`
+                },
+                {
+                    display_name: payload.display_name,
+                    room_id: +roomId,
+                    history: payload.target_city 
+                            ? `buy_city: ${payload.target_city} (${payload.target_city_property})`
+                            : `buy_city: none`
+                },
+            ]
+            // update game history
+            await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, ...upgradeHistory])
+
+            // publish data
+            const publishData = {
+                upgradeCity: data[0],
+                targetCity: payload.target_city,
+                targetCityProperty: payload.target_city_property,
+                gameHistory: [...getGameHistory, ...upgradeHistory]
+            }
+            const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+            console.log(isGamePublished);
+            
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            // publish to roomlist
+            const roomlistChannel = 'monopoli-roomlist'
+            const isRoomPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayersData)})
+            console.log(isRoomPublished);
+            
+            if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+                
+            // save missing data
+            const savedMissingData = await this.saveMissingData(+roomId, data[0])
+
+            // set result
+            const resultData = {
+                token: token,
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                missingData: savedMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -599,13 +742,17 @@ export default class GameController extends Controller {
     async attackCity(action: string, payload: IGamePlay['declare_attack_city']) {
         let result: IResponse
         
+        const roomId = payload.channel.match(/\d+/)[0]
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
+        // filter payload
         const filtering = await this.filters(action, payload)
         if(filtering.status !== 200) return filtering
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
         
-        const roomId = payload.channel.match(/\d+/)[0]
         // get attack type
         const attackType = payload.attack_type.match(/quake|meteor|steal/i)[0]
         // check player turn
@@ -629,9 +776,12 @@ export default class GameController extends Controller {
             }
         }
         // run query
-        const {data, error} = await this.dq.update(queryObject as IQueryUpdate)
+        const {data, error} = await this.dq.update<IGameContext['gamePlayerInfo'][0]>(queryObject as IQueryUpdate)
         if(error) {
-            result = this.respond(500, error.message, [])
+            // attack failed
+            if(error.code == 'P0001') result = this.respond(403, error.message, [])
+            // other error
+            else result = this.respond(500, error.message, [])
         }
         else {
             // set attack history
@@ -641,7 +791,7 @@ export default class GameController extends Controller {
                 room_id: +roomId,
                 history: `attack_city: ${payload.target_city} city attacked by ${payload.attacker_name} (${attackType})`
             }]
-            // set attack shifted history
+            // set attack shifted history (the shifter card)
             const shiftedHistory: IGameContext['gameHistory'] = !payload.target_special_card ? [] : [{
                 display_name: payload.target_city_owner,
                 room_id: +roomId,
@@ -657,16 +807,27 @@ export default class GameController extends Controller {
                 filteredQuakeCity = [...getQuakeCity, payload.target_city].filter((v, i, arr) => arr.indexOf(v) == i)
                 await this.redisSet(`gameQuakeCity_${roomId}`, filteredQuakeCity)
             }
+                
+            // save missing data (multiple data)
+            const multiSavedMissingData: IMissingData[] = []
+            for(let d of data) {
+                const temp = await this.saveMissingData(+roomId, d)
+                multiSavedMissingData.push(temp)
+            }
+
             // publish data
             const publishData = {
                 attackerName: payload.attacker_name,
                 attackType: attackType,
                 targetCity: payload.target_city,
                 targetCityProperty: payload.target_city_property,
-                targetSpecialCard: payload.target_special_card.split('-')[1], // origin 'used-the shifter
+                targetSpecialCard: payload.target_special_card?.split('-')[1] || null, // origin 'used-the shifter
                 quakeCity: filteredQuakeCity,
                 playerData: data,
-                gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory]
+                gameHistory: [...getGameHistory, ...attackHistory, ...shiftedHistory],
+                // ### SEND MISSING DATA AS RESPONSE 
+                // ### TO WARN PLAYER IF THERES MISSING DATA
+                multiMissingData: multiSavedMissingData,
             }
             const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
             console.log(isGamePublished);
@@ -678,9 +839,10 @@ export default class GameController extends Controller {
             console.log(isRoomPublished);
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+
             // set result
             const resultData = {
-                token: token
+                token: token,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -752,7 +914,7 @@ export default class GameController extends Controller {
         return result
     }
 
-    async getMissingCards(action: string, payload: IGamePlay['mini_game']) {
+    async getMissingData(action: string, payload: IGamePlay['mini_game']) {
         let result: IResponse
         
         const filtering = await this.filters(action, payload)
@@ -760,6 +922,65 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        const roomId = payload.channel.match(/\d+/)[0]
+        // check player turn
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns[0] != payload.display_name) 
+            return this.respond(400, 'only allowed on your turn', [])
+        // check limit
+        const getMissingLimit = await this.redisGet(`missingLimit_${payload.display_name}`)
+        if(getMissingLimit.length > 0 && getMissingLimit[0] === 3)
+            return this.respond(400, 'missing data has reached limit', [])
+        // set limit
+        const missingLimit: number = getMissingLimit.length > 0 ? getMissingLimit[0] + 1 : 0
+        await this.redisSet(`missingLimit_${payload.display_name}`, [missingLimit])
+
+        // get missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        // set missing data for turn end player
+        const findPlayer = getMissingData.map(v => v.display_name).indexOf(payload.display_name)
+        const playerMissingData = getMissingData[findPlayer]
+        // game history container
+        const getGameHistory = await this.redisGet(`gameHistory_${roomId}`)
+        const missingHistory = {
+            room_id: roomId,
+            display_name: payload.display_name,
+            history: 'missing data: retrieved 🥺',
+        }
+        // save game history to redis
+        await this.redisSet(`gameHistory_${roomId}`, [...getGameHistory, missingHistory])
+
+        // publish data
+        const publishData = {
+            missingData: playerMissingData,
+        }
+        const isGamePublished = await this.monopoliPublish(payload.channel, publishData)
+        console.log(isGamePublished);
+        
+        if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+        
+        result = this.respond(200, `${action} success`, [])
+        return result
+    }
+    
+    private async saveMissingData(roomId: number, playerData: IGameContext['gamePlayerInfo'][0]) {
+        // get missing data
+        const getMissingData: IMissingData[] = await this.redisGet(`missingData_${roomId}`)
+        // set missing data for turn end player
+        const findPlayer = getMissingData.map(v => v.display_name).indexOf(playerData.display_name)
+        getMissingData[findPlayer].city = playerData.city
+        getMissingData[findPlayer].card = playerData.card
+        getMissingData[findPlayer].buff = playerData.buff
+        getMissingData[findPlayer].debuff = playerData.debuff
+        // save missing data
+        await this.redisSet(`missingData_${roomId}`, [...getMissingData])
+        // if missing data is limit, return null but still save the data
+        const getMissingLimit = await this.redisGet(`missingLimit_${playerData.display_name}`)
+        if(getMissingLimit.length > 0 && getMissingLimit[0] === 3)
+            return null
+        // return missing data
+        return getMissingData[findPlayer]
     }
 
     async sendReportBugs(action: string, payload: IGamePlay['report_bugs']) {

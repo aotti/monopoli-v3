@@ -1,11 +1,11 @@
-import { FormEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useMisc } from "../../../../context/MiscContext"
-import { applyTooltipEvent, qS, translateUI } from "../../../../helper/helper"
-import { ICreateRoom, IGameContext, IMiscContext } from "../../../../helper/types"
+import { applyTooltipEvent, translateUI } from "../../../../helper/helper"
+import { ICreateRoom } from "../../../../helper/types"
 import { useGame } from "../../../../context/GameContext"
 import Link from "next/link"
 import SelectCharacter from "./SelectCharacter"
-import { deleteRoom, joinRoom, spectateRoom } from "../../helper/functions"
+import { joinPromptInputs, manageRoomCardForm } from "../../helper/functions"
 
 export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) {
     const miscState = useMisc()
@@ -49,7 +49,7 @@ export default function RoomCard({ roomData }: {roomData: ICreateRoom['list']}) 
 
     return (
         <div className={`relative w-[calc(100%-52.5%)] h-56 lg:h-60 border-2 ${roomStatusColor} animate-fade-down animate-once`}>
-            <form onSubmit={ev => manageFormSubmits(ev, roomId, miscState, gameState)}>
+            <form onSubmit={ev => manageRoomCardForm(ev, roomId, miscState, gameState)}>
                 {/* room id */}
                 <input type="hidden" id="room_id" value={roomId} />
                 <input type="hidden" id={`room_password_${roomId}`} />
@@ -153,13 +153,16 @@ function JoinRoomButton(
 function SpectateRoomButton({roomId, roomCreator}: {roomId: number, roomCreator: string}) {
     const miscState = useMisc()
     const gameState = useGame()
+    
+    const spectateClass = `${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75 ${gameState.myCurrentGame === roomId ? 'saturate-0' : ''}`
 
     return (
         // only show for rooms that not mine
         gameState.myPlayerInfo.display_name == roomCreator
             ? null
-            : <button type="submit" id={`spectate_button_${roomId}`} disabled={gameState.myCurrentGame === roomId ? true : miscState.disableButtons == 'roomlist' ? true : false} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs bg-primary border-8bit-primary active:opacity-75 
-            ${gameState.myCurrentGame === roomId ? 'saturate-0' : ''}`}>
+            : <button type="submit" id={`spectate_button_${roomId}`} 
+            disabled={gameState.myCurrentGame === roomId ? true : miscState.disableButtons == 'roomlist' ? true : false} 
+            className={spectateClass}>
                 {translateUI({lang: miscState.language, text: 'Spectate'})}
             </button>
     )
@@ -211,57 +214,4 @@ function JoinRoomPrompt({ roomId, showInputPassword, setShowInputPassword }) {
             </form>
         </div>
     )
-}
-
-function joinPromptInputs(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, setShowInputPassword) {
-    ev.preventDefault()
-    // input value container
-    const inputValues = {
-        character: null,
-        room_password: null
-    }
-    // get input elements
-    const formInputs = ev.currentTarget.elements
-    for(let i=0; i<formInputs.length; i++) {
-        const input = formInputs.item(i) as HTMLInputElement
-        if(input.nodeName.match(/INPUT/) && input.type != 'radio') {
-            // dont lowercase link
-            if(input.id == 'select_character') inputValues.character = input.value.trim()
-            else if(input.id == `input_password_${roomId}`) inputValues.room_password = input.value.trim().toLowerCase()
-        }
-    }
-    // fill input element values
-    const selectCharacter = qS(`#select_character_${roomId}`) as HTMLInputElement
-    const roomPassword = qS(`#room_password_${roomId}`) as HTMLInputElement
-    selectCharacter.value = inputValues.character
-    roomPassword.value = inputValues.room_password
-    // submit join form
-    const joinButton = qS(`#join_button_${roomId}`) as HTMLInputElement
-    joinButton.type = 'submit' // to trigger form submit
-    joinButton.click()
-    // close join prompt
-    setShowInputPassword ? setShowInputPassword(false) : null
-    miscState.setShowJoinModal(null)
-}
-
-function manageFormSubmits(ev: FormEvent<HTMLFormElement>, roomId: number, miscState: IMiscContext, gameState: IGameContext) {
-    ev.preventDefault()
-    // hide tutorial
-    miscState.setShowTutorial(null)
-    // submitter
-    const submitterId = (ev.nativeEvent as any).submitter.id
-    // form inputs
-    const formInputs = ev.currentTarget.elements
-
-    switch(submitterId) {
-        // join room function
-        case `join_button_${roomId}`: 
-            joinRoom(formInputs, roomId, miscState, gameState); break
-        // spectate room function
-        case `spectate_button_${roomId}`: 
-            spectateRoom(roomId, miscState, gameState); break
-        // delete room function
-        case `delete_button_${roomId}`: 
-            deleteRoom(formInputs, roomId, miscState, gameState); break
-    }
 }

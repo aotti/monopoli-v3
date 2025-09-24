@@ -74,6 +74,9 @@ export type GameRoomListener = {
         to: string,
         money: number
     },
+    missingData: IMissingData,
+    multiMissingData: IMissingData[],
+    upgradeCity: IGamePlayerInfo,
     attackerName: string,
     attackType: string,
     targetCity: string,
@@ -376,7 +379,7 @@ type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type DecideTurnType = 'rolled_number'
-type RollDiceType = 'rolled_dice'|'rng'|'special_card'
+type RollDiceType = 'rolled_dice'|'rng'|'special_card'|'game_data'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'tax_money'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
 type SurrenderType = 'money'
 type GameOverType = 'all_player_stats'
@@ -515,6 +518,7 @@ export interface IGamePlay {
         rolled_dice: string,
         rng: string,
         special_card: string,
+        game_data: string,
     } & ITokenPayload,
     surrender: {
         channel: string,
@@ -527,6 +531,16 @@ export interface IGamePlay {
         sell_city_name: string,
         sell_city_price: string,
         city_left: string,
+    } & ITokenPayload,
+    upgrade_city: {
+        channel: string,
+        display_name: string,
+        city: string,
+        target_city: string,
+        target_city_property: string,
+        event_money: string,
+        special_card: string,
+        card: string,
     } & ITokenPayload,
     declare_attack_city: {
         channel: string,
@@ -807,4 +821,12 @@ export interface IAnimate {
     direction?: 'normal'|'reverse'|'alternate',
     delay?: number,
     loop?: boolean,
+}
+
+export interface IMissingData {
+    display_name: string,
+    city: string,
+    card: string,
+    buff: string,
+    debuff: string,
 }

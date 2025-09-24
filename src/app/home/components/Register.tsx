@@ -1,4 +1,4 @@
-import { errorLoginRegister, fetcher, fetcherOptions, qS, setInputValue, sha256, translateUI } from "../../../helper/helper"
+import { applyTooltipEvent, errorLoginRegister, fetcher, fetcherOptions, qS, questionMark, setInputValue, sha256, translateUI } from "../../../helper/helper"
 import { useMisc } from "../../../context/MiscContext"
 import { FormEvent, useEffect, useRef } from "react";
 import { IUser, IResponse, IMiscContext } from "../../../helper/types";
@@ -8,6 +8,14 @@ import FormButtons from "../../../components/FormButtons";
 export default function Register() {
     const miscState = useMisc()
 
+    const tooltip = {
+        username: 'used for login',
+        name: 'player name',
+    }
+    // tooltip (the element must have position: relative)
+    useEffect(() => {
+        applyTooltipEvent()
+    }, [])
     // input focus
     const inputFocus = useRef<HTMLInputElement>()
     useEffect(() => {
@@ -25,7 +33,9 @@ export default function Register() {
             <form className="flex flex-col gap-2 lg:gap-4" onSubmit={ev => userRegister(ev, miscState)}>
                 {/* username */}
                 <div className="flex justify-between">
-                    <label htmlFor="username" className="w-min"> Username </label>
+                    <label htmlFor="username" data-tooltip={tooltip.username} className="relative flex w-max">
+                        <span className={questionMark()}> Username </span>
+                    </label>
                     <input ref={inputFocus} type="text" className="w-2/3 px-1" id="username" minLength={4} maxLength={10} placeholder={translateUI({lang: miscState.language, text: 'max 10 letters'})}  autoComplete="off" required />
                 </div>
                 {/* password */}
@@ -40,7 +50,9 @@ export default function Register() {
                 </div>
                 {/* name */}
                 <div className="flex justify-between">
-                    <label htmlFor="display_name" className="w-min"> {translateUI({lang: miscState.language, text: 'Name'})} </label>
+                    <label htmlFor="display_name" data-tooltip={tooltip.name} className="relative flex w-max">
+                        <span className={questionMark()}> {translateUI({lang: miscState.language, text: 'Name'})} </span>
+                    </label>
                     <input type="text" className="w-2/3 px-1" id="display_name" minLength={4} maxLength={12} placeholder={translateUI({lang: miscState.language, text: 'max 12 letters'})} required />
                 </div>
                 {/* message */}

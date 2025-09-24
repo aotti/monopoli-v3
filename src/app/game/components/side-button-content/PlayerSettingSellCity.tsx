@@ -1,7 +1,7 @@
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
-import { moneyFormat, qSA, translateUI } from "../../../../helper/helper"
-import { handleUpgradeCity, sellCity } from "../../helper/game-tile-event-city-logic"
+import { moneyFormat, qSA, simpleDecrypt, translateUI } from "../../../../helper/helper"
+import { handleUpgradeCity, handleSellCity } from "../../helper/game-tile-event-city-logic"
 
 export default function PlayerSettingSellCity() {
     const miscState = useMisc()
@@ -21,7 +21,8 @@ export default function PlayerSettingSellCity() {
             // loop city
             const dataCityInfo = qSA(`[data-city-info]`) as NodeListOf<HTMLElement>
             for(let city of dataCityInfo) {
-                const [cityName, cityProperty, cityPrice, cityOwner] = city.dataset.cityInfo.split(',')
+                const decCityInfo = simpleDecrypt(city.dataset.cityInfo, miscState.simpleKey)
+                const [cityName, cityProperty, cityPrice, cityOwner] = decCityInfo.split(',')
                 // match owned city then push
                 v.city?.match(cityName) ? mySellCityList.push(`${cityName},${cityPrice}`) : null
             }
@@ -46,7 +47,7 @@ export default function PlayerSettingSellCity() {
                         const translatedCityName = translateUI({lang: miscState.language, text: cityName as any}) 
 
                         return (
-                            <form key={i} onSubmit={ev => sellCity(ev, tempCityInfo, miscState, gameState)} 
+                            <form key={i} onSubmit={ev => handleSellCity(ev, tempCityInfo, miscState, gameState)} 
                             className="grid grid-cols-5 gap-1 items-center">
                                 <span className="col-span-2"> {translatedCityName || cityName} </span>
                                 <span className="col-span-2"> {moneyFormat(+cityPrice)} </span>

@@ -1,6 +1,6 @@
 import PubNub from "pubnub"
 import { GameRoomListener, IChat, IGameContext, IMiscContext, IRollDiceData } from "../../../helper/types"
-import { qS, qSA, translateUI } from "../../../helper/helper"
+import { qS, translateUI } from "../../../helper/helper"
 import { checkGameProgress, playerMoving } from "./game-prepare-playing-logic"
 import { attackCityAnimation } from "./game-tile-event-attack-logic"
 import { playGameSounds } from "./game-tile-event-sounds"
@@ -98,14 +98,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             playerTurn: getMessage.playerTurn,
             playerDice: getMessage.playerDice,
             playerRNG: getMessage.playerRNG,
-            playerSpecialCard: getMessage.playerSpecialCard
         }
-        // check if player have special card (upgrade city)
-        const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(getMessage.playerTurn)
-        const tempCurrentSpecialCard = gameState.gamePlayerInfo[findPlayer].card
-        // player have no special card, delete it
-        if(!tempCurrentSpecialCard?.match(getMessage.playerSpecialCard?.split('-')[1]))
-            rollDiceData.playerSpecialCard = null
         // save dice for history, just in case if get card \w move effect
         localStorage.setItem('subPlayerDice', `${getMessage.playerDice}`)
         // move player pos
@@ -161,6 +154,49 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return cityLeftInfo
         })
     }
+    // missing data
+    if(getMessage.missingData) {
+        const {display_name, city, card, buff, debuff} = getMessage.missingData
+        // show notif
+        miscState.setAnimation(true)
+        gameState.setShowGameNotif('normal')
+        notifTitle.textContent = 'Missing Data'
+        notifMessage.textContent = `${display_name} returned data:\ncity: ${city}\ncard: ${card}`
+        // update player data
+        gameState.setGamePlayerInfo(players => {
+            // get player data
+            const allPlayerInfo = [...players]
+            const findPlayer = allPlayerInfo.map(v => v.display_name).indexOf(display_name)
+            // update
+            allPlayerInfo[findPlayer].city = city
+            allPlayerInfo[findPlayer].card = card
+            allPlayerInfo[findPlayer].buff = buff
+            allPlayerInfo[findPlayer].debuff = debuff
+            // return data
+            return allPlayerInfo
+        })
+    }
+    // upgrade city
+    if(getMessage.upgradeCity) {
+        const {display_name, money, city, card} = getMessage.upgradeCity
+        // sound effect
+        const soundSpecialCard = qS('#sound_special_card') as HTMLAudioElement
+        soundSpecialCard.play()
+        // update game history
+        gameState.setGameHistory(getMessage.gameHistory)
+        // update player data
+        gameState.setGamePlayerInfo(players => {
+            // get player data
+            const allPlayerInfo = [...players]
+            const findPlayer = allPlayerInfo.map(v => v.display_name).indexOf(display_name)
+            // update
+            allPlayerInfo[findPlayer].money = money
+            allPlayerInfo[findPlayer].city = city
+            allPlayerInfo[findPlayer].card = card
+            // return data
+            return allPlayerInfo
+        })
+    }
     // attack city
     if(getMessage.attackType) {
         // update game history
@@ -183,6 +219,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             targetCityProperty: getMessage.targetCityProperty
         })
         setTimeout(() => {
+            // set missing data local storage
+            getMessage.multiMissingData.forEach(data => {
+                if(data?.display_name === gameState.myPlayerInfo.display_name) 
+                    localStorage.setItem('missingData', JSON.stringify(data))
+            })
             // set game quake city
             gameState.setGameQuakeCity(getMessage.quakeCity)
             // update player data
@@ -253,8 +294,8 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     if(getMessage.minigameAnswerData) {
         minigameAnswerCorrection(getMessage.minigameAnswerData, miscState, gameState)
     }
-    // end turn 1
-    if(getMessage.playerTurns) {
+    // end turn 
+    if(getMessage.playerTurnEnd) {
         // save playerTurns
         localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
         // show notif next player turn
@@ -267,9 +308,6 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         }
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
-    }
-    // end turn 2
-    if(getMessage.playerTurnEnd) {
         // update player
         gameState.setGamePlayerInfo(players => {
             // update player
@@ -314,11 +352,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     }
     // game over
     if(getMessage.gameOverPlayers) {
-        // show notif after 1 sec
+        // show notif after 0.5 sec
         setTimeout(() => {
             miscState.setAnimation(true)
             gameState.setShowGameNotif('normal')
-        }, 1000);
+        }, 500);
         // set local storage for temp syncronize data
         getMessage.gameOverPlayers.forEach(v => {
             if(v.player_name == gameState.myPlayerInfo.display_name) {

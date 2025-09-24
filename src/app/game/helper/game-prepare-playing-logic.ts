@@ -1,6 +1,6 @@
 import { fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
 import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData } from "../../../helper/types"
-import { specialUpgradeCity, stopByCity } from "./game-tile-event-city-logic"
+import { stopByCity } from "./game-tile-event-city-logic"
 import { stopByCards } from "./game-tile-event-card-logic"
 import { stopByPrison } from "./game-tile-event-prison-logic"
 import { stopByParking } from "./game-tile-event-parking-logic"
@@ -18,6 +18,7 @@ import { stopByMinigame } from "./game-tile-event-minigame"
         # START GAME
         # ROLL TURN
     - GAME PLAYING
+        # MISSING DATA
         # ROLL DICE
         # LEAVE GAME
         # SURRENDER GAME
@@ -27,8 +28,8 @@ import { stopByMinigame } from "./game-tile-event-minigame"
         # GAME OVER
 */
 
-// ========== GAME PREPARE ==========
-// ========== GAME PREPARE ==========
+// ========== - GAME PREPARE ==========
+// ========== - GAME PREPARE ==========
 
 // ========== # GET PLAYER INFO ==========
 // ========== # GET PLAYER INFO ==========
@@ -288,33 +289,115 @@ export async function rollTurnGameRoom(formInputs: HTMLFormControlsCollection, t
     }
 }
 
-// ========== GAME PLAYING ==========
-// ========== GAME PLAYING ==========
+// ========== - GAME PLAYING ==========
+// ========== - GAME PLAYING ==========
+
+// ========== # MISSING DATA ==========
+// ========== # MISSING DATA ==========
+export async function missingDataGameRoom(miscState: IMiscContext, gameState: IGameContext) {
+    // missing data elements
+    const playerSideButton = qS('#player_side_button')
+    const playerSettingButton = qS('#player_setting_button')
+    const missingDataOption = qS('#missing_data_option')
+    const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
+    // result message
+    const notifTitle = qS('#result_notif_title')
+    const notifMessage = qS('#result_notif_message')
+    // submit button
+    const missingButton = qS('#missing_card') as HTMLInputElement
+    // payload data
+    const inputValues = {
+        action: 'game missing data',
+        channel: `monopoli-gameroom-${gameState.gameRoomId}`,
+        display_name: gameState.myPlayerInfo.display_name,
+    }
+    // warning
+    alert('[warning]: you can only retrieve missing data 3x per game')
+    // disable and loading button
+    miscState.setDisableButtons('gameroom')
+    missingButton.disabled = true
+    let missingIncrement = 3
+    const missingInterval = setInterval(() => {
+        if(missingIncrement === 3) {
+            missingButton.textContent = `${translateUI({lang: miscState.language, text: 'Missing Data'})} .`
+            missingIncrement = 0
+        }
+        else if(missingIncrement < 3) {
+            missingButton.textContent += '.'
+            missingIncrement++
+        }
+    }, 1000);
+    
+    // fetching
+    const missingCardFetchOption = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(inputValues)})
+    const missingCardResponse: IResponse = await (await fetcher('/game', missingCardFetchOption)).json()
+    // response
+    switch(missingCardResponse.status) {
+        case 200:
+            // stop interval
+            clearInterval(missingInterval)
+            missingButton.textContent = translateUI({lang: miscState.language, text: 'Missing Data'})
+            // enable gameroom buttons
+            missingButton.disabled = false
+            miscState.setDisableButtons(null)
+            // remove warning icon on player tab and missing data option
+            playerSideButton.classList.remove(...warningClass)
+            playerSettingButton.classList.remove(...warningClass)
+            missingDataOption.classList.remove(...warningClass)
+            return
+        default:
+            // stop interval
+            clearInterval(missingInterval)
+            missingButton.textContent = translateUI({lang: miscState.language, text: 'Missing Data'})
+            // enable gameroom buttons
+            missingButton.disabled = false
+            miscState.setDisableButtons(null)
+            // remove warning icon on player tab and missing data option
+            playerSideButton.classList.remove(...warningClass)
+            playerSettingButton.classList.remove(...warningClass)
+            missingDataOption.classList.remove(...warningClass)
+            // show notif
+            miscState.setAnimation(true)
+            gameState.setShowGameNotif('normal')
+            // error message
+            notifTitle.textContent = `error ${missingCardResponse.status}`
+            notifMessage.textContent = `${missingCardResponse.message}`
+            return
+    }
+}
 
 // ========== # ROLL DICE ==========
 // ========== # ROLL DICE ==========
-export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext, specialCard?: string) {
+export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, tempButtonText: string, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
     // roll dice button
     const rollDiceButton = qS('#roll_dice_button') as HTMLInputElement
+
     // set rng for twoway board
     const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     const currentPos = gameState.gamePlayerInfo[findPlayer].pos
     const branchRNG: number[] = checkBranchTiles('roll_dice', currentPos)
+    const playerGameData = {
+        display_name: gameState.gamePlayerInfo[findPlayer].display_name,
+        city: gameState.gamePlayerInfo[findPlayer].city,
+        card: gameState.gamePlayerInfo[findPlayer].card,
+        buff: gameState.gamePlayerInfo[findPlayer].buff,
+        debuff: gameState.gamePlayerInfo[findPlayer].debuff,
+    }
     // input values container
     const inputValues = {
         action: 'game roll dice',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
         display_name: gameState.myPlayerInfo.display_name,
-        rolled_dice: specialCard ? '0' : null,
+        rolled_dice: null,
         // Math.floor(Math.random() * 101).toString()
         rng: [
             Math.floor(Math.random() * 101), 
             branchRNG[0]
         ].toString(),
-        special_card: specialCard ? specialCard : null
+        game_data: JSON.stringify(playerGameData),
     }
     // get input elements
     for(let i=0; i<formInputs.length; i++) {
@@ -496,7 +579,7 @@ export async function surrenderGameRoom(miscState: IMiscContext, gameState: IGam
 // ========== # PLAYER MOVING ==========
 // ========== # PLAYER MOVING ==========
 export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContext, gameState: IGameContext) {
-    const {playerTurn, playerDice, playerRNG, playerSpecialCard} = rollDiceData
+    const {playerTurn, playerDice, playerRNG} = rollDiceData
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -523,12 +606,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
         // get tile element for stop by event
         let [tileInfo, tileElement]: [string, HTMLElement] = [null, null]
-        // set tile info & element if theres special card
-        if(playerSpecialCard && playerTurnData.city) 
-            [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
-        // set last turn money
-        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-            localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
 
         // moving params
         let numberStep = 0
@@ -548,8 +625,7 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         // get prison data for checking prison status
         const prisonNumber = playerTurnData.prison
         // special card container
-        // player special card = nerf parking card (nullable)
-        const specialCardCollection = {cards: [playerSpecialCard], effects: []}
+        const specialCardCollection = {cards: [], effects: []}
         // buff/debuff container
         const buffCollection = []
         const debuffCollection = []
@@ -837,6 +913,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             localStorage.removeItem('specialCardUsed')
             localStorage.removeItem('buffDebuffUsed')
             localStorage.removeItem('moreMoney')
+            // set last turn money
+            localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
             // fetch
             const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
             const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
@@ -846,7 +924,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                     // save access token
                     if(playerTurnEndResponse.data[0].token) {
                         localStorage.setItem('accessToken', playerTurnEndResponse.data[0].token)
-                        delete playerTurnEndResponse.data[0].token
                     }
                     // update player turns
                     localStorage.setItem('playerTurns', JSON.stringify(playerTurnEndResponse.data[0].playerTurns))
@@ -862,6 +939,13 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
                         // save to local storage
                         localStorage.setItem('playerData', JSON.stringify(newPlayerInfo))
                     }
+                    // save missing data to localStorage (only for checking)
+                    setTimeout(() => {
+                        // save if exist, remove if null
+                        playerTurnEndResponse.data[0]?.missingData
+                            ? localStorage.setItem('missingData', JSON.stringify(playerTurnEndResponse.data[0].missingData))
+                            : localStorage.removeItem('missingData')
+                    }, 3000);
                     return
                 default: 
                     // show notif
@@ -940,15 +1024,10 @@ function setEventHistory(rolled_dice: string, eventData: EventDataType) {
     // check event data
     switch(eventData?.event) {
         case 'buy_city': 
-            // check status
-            if(eventData.status) {
-                // buying city
-                historyArray.push(`${eventData.event}: ${eventData.name} (${eventData.property})`)
-            }
-            else {
-                // not buy || property max
-                historyArray.push(`${eventData.event}: none`)
-            }
+            // buying city
+            if(eventData.status) historyArray.push(`${eventData.event}: ${eventData.name} (${eventData.property})`)
+            // not buy || property max
+            else historyArray.push(`${eventData.event}: none`)
             return historyArray.join(';')
         case 'pay_tax': 
             historyArray.push(`${eventData.event}: ${moneyFormat(eventData.taxMoney)} to ${eventData.owner}`)

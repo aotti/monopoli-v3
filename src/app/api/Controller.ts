@@ -1,7 +1,7 @@
 import { jwtVerify, SignJWT } from "jose";
 import { DatabaseQueries } from "../../helper/DatabaseQueries";
 import { filterInput, verifyAccessToken } from "../../helper/helper";
-import { ILoggedUsers, IPlayer, IResponse, IToken, TokenPayloadType } from "../../helper/types";
+import { ILoggedUsers, IMissingData, IPlayer, IResponse, IToken, TokenPayloadType } from "../../helper/types";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import PubNub from "pubnub";
@@ -54,6 +54,23 @@ export default class Controller {
         //     {reward_type: 'coin', reward_item: '10', reward_date: 'Friday, 6/27/2025'},
         //     {reward_type: 'pack', reward_item: 'yoga lupa', reward_date: 'Saturday, 6/28/2025'},
         // ])
+        // this.redisSet('missingData_262', [
+        //     {
+        //         display_name: 'suwanto',
+        //         city: 'Bandung*land;Pulau Komodo*land',
+        //         card: null,
+        //         buff: null,
+        //         debuff: null,
+        //     },
+        //     {
+        //         display_name: 'tester123',
+        //         city: null,
+        //         card: 'attack city',
+        //         buff: null,
+        //         debuff: null,
+        //     },
+        // ] as IMissingData[])
+        // this.redisReset('missingLimit_gandesblood')
     }
 
     protected chattingPublish(channel: string, data: any) {
@@ -124,10 +141,12 @@ export default class Controller {
             case 'game roll dice': 
             case 'game surrender': 
             case 'game sell city': 
+            case 'game upgrade city': 
             case 'game attack city': 
             case 'game turn end': 
             case 'game fix player turns': 
             case 'game report bugs': 
+            case 'game missing data': 
             case 'game over': [filterStatus, filterMessage] = loopKeyValue(); break
             // shop
             case 'shop buy': [filterStatus, filterMessage] = loopKeyValue(); break
