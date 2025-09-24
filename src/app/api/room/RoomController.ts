@@ -494,6 +494,7 @@ export default class RoomController extends Controller {
             const getDisabledCharacters = await this.redisGet(`disabledCharacters_${payload.room_id}`)
             const removeChosenCharacter = getDisabledCharacters.filter(char => char != payload.select_character)
             await this.redisSet(`disabledCharacters_${payload.room_id}`, removeChosenCharacter)
+            
             // publish online players
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {

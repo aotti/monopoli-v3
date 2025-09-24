@@ -606,12 +606,6 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
         const playerTurnData = gameState.gamePlayerInfo[findPlayer]
         // get tile element for stop by event
         let [tileInfo, tileElement]: [string, HTMLElement] = [null, null]
-        // // set tile info & element if theres special card
-        // if(playerSpecialCard && playerTurnData.city) 
-        //     [tileInfo, tileElement] = specialUpgradeCity(playerTurnData, +playerRNG[0])
-        // set last turn money
-        if(playerTurnData.display_name == gameState.myPlayerInfo.display_name)
-            localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
 
         // moving params
         let numberStep = 0
@@ -919,6 +913,8 @@ export function playerMoving(rollDiceData: IRollDiceData, miscState: IMiscContex
             localStorage.removeItem('specialCardUsed')
             localStorage.removeItem('buffDebuffUsed')
             localStorage.removeItem('moreMoney')
+            // set last turn money
+            localStorage.setItem('lastTurnMoney', playerTurnData.money.toString())
             // fetch
             const playerTurnEndFetchOptions = fetcherOptions({method: 'PUT', credentials: true, body: JSON.stringify(inputValues)})
             const playerTurnEndResponse: IResponse = await (await fetcher('/game', playerTurnEndFetchOptions)).json()
