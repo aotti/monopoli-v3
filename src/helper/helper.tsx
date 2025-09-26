@@ -475,7 +475,7 @@ export function filterInput(input: InputIDType, value: string) {
         case 'item_type':
             return value ? value.match(/buff$|special_card$/) : null
         case 'item_name':
-            return value ? value.match(/coin$|nerf tax$|anti prison$|gaming dice$|dice controller$|the shifter$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
+            return value ? value.match(/10$|20$|30$|nerf tax$|anti prison$|gaming dice$|dice controller$|the shifter$|attack city$|upgrade city$|curse reverser$|reduce price$|the void$|the twond$/) : null
         
         // ====== DAILY TYPE ======
         case 'week':
