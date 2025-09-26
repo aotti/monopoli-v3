@@ -250,16 +250,16 @@ export default class PlayerController extends Controller {
             // claim date (Monday, 6/22/2029; 1-1)
             const claimDate = `${todayDate}; ${dayNumber}-${payload.week}`
             // reward item is coin
-            if(payload.item_name === 'coin') {
+            if(payload.item_name.match(/10$|20$|30$/)) {
                 // update player coins
-                const gainCoins = getPlayerCoins[0] + 10
+                const gainCoins = getPlayerCoins[0] + +payload.item_name
                 await this.redisSet(`${payload.display_name}_coins`, [gainCoins])
                 // update player daily status
                 await this.redisSet(`${payload.display_name}_dailyStatus`, [claimDate])
                 // update player daily history
                 const newRewardHistory = {
                     reward_type: `coin`, 
-                    reward_item: `10`, 
+                    reward_item: payload.item_name, 
                     reward_date: todayDate
                 }
                 // save daily history

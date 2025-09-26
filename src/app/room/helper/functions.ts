@@ -729,6 +729,10 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
             // update daily status
             localStorage.setItem('dailyStatus', dailyStatus)
             gameState.setDailyStatus(dailyStatus)
+            // start animation and sound before daily history
+            const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
+            soundClaimReward.play()
+            await claimAnimation()
             // update daily history
             localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory))
             gameState.setDailyHistory(dailyHistory)
@@ -744,10 +748,6 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
                 localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
                 gameState.setMyShopItems(playerShopItems)
             }
-            // start animation and sound
-            const soundClaimReward = qS('#sound_claim_reward') as HTMLAudioElement
-            soundClaimReward.play()
-            await claimAnimation()
             return `you claimed ${today} daily reward`
         default: 
             // stop loading claim
