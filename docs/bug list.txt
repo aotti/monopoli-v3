@@ -221,3 +221,31 @@ fix 20 june 2025
 - ~~kartu curse reverser tidak hilang setelah pakai~~
 - ~~timeout game over terlalu lama~~
 - ~~worst money lost visual bug~~
+
+fix 17 aug 2025
+-  ~~kartu nerf tax gk bisa ilang setelah pakai~~
+- ~~pindah penyimpanan refresh token ke redis, karna cookies suka ngebug~~ batal, karna salah cara hapus cookies aja
+- notif dana umum / kesempatan tidak bisa tutup ??
+> > kemungkinan karna player lain tidak resolve promise, jadi tidak masuk ke function turnEnd untuk menutup notif
+> > kesempatan: kartu penjara + 90% denda, pergi ke kota orang lain
+> > dana umum: 
+- ~~hadiah daily jika masuk **minggu B** tidak bisa balik ke **minggu A**~~
+- ~~sond efek buy city (eng) dan game ready (id) perlu edit~~
+- ~~tambah sond efek saat create room~~
+- ~~uang petak curse menjadi NaN~~ 
+- ~~chance minigame tidak bertambah~~
+- ~~jawapan minigame masih enkripsi~~
+- ~~money_tax dan money_event harus terpisah untuk menghindari kena pajak saat lewat start~~
+- ~~saat buka chat, langsung scroll ke paling bawah~~
+- ~~setting fetching reward.. kalo claim daily lewat chat, kalo lewat modal di hide~~
+- ~~tombol dice control tidak bisa berubah di hp~~
+- ~~fix notif untuk pajak~~
+- ~~debuff tax more gk bisa hilang~~
+- ~~tombol surrend jadi loading setelah pakai~~
+- ~~player tidak bisa beli item shop yg sama setelah bermain, karna lupa update client side di published-message > readyPlayers~~
+- ~~attack city ngebug, gk keluar daftar kota~~
+- ~~tambah limit di chat 80karakter, report bug 256 karakter~~
+- daily pack bisa convert 10 coin walau blm punya kartu/buff nya
+- ~~kartu upgrade city tidak masuk log dan history dan membuat player turn ngebug~~
+> > ubah sistem jadi seperti attack city
+- kartu dana umum (pilih koin) ngebug ??

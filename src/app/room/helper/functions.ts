@@ -675,7 +675,13 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
         rollPack.classList.toggle('flex')
         rollPack.classList.toggle('hidden')
         startAnimation(items, miscState, gameState)
+        // set pack item
         chosenPackItem = qS('.roll-result').textContent
+        chosenPackItem = chosenPackItem.match(/\d+/) 
+                        // coin pack
+                        ? chosenPackItem.match(/\d+/)[0] 
+                        // card/buff pack
+                        : chosenPackItem
         setTimeout(() => {
             rollPack.classList.toggle('flex')
             rollPack.classList.toggle('hidden')
