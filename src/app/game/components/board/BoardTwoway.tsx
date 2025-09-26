@@ -125,11 +125,11 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
             // set city color
             let cityColor = null
             switch(true) {
-                case player.character.match('circle') != null: cityColor = 'shadow-md shadow-red-500'; break
-                case player.character.match('square') != null: cityColor = 'shadow-md shadow-purple-400'; break
-                case player.character.match('triangle') != null: cityColor = 'shadow-md shadow-pink-400'; break
-                case player.character.match('diamond') != null: cityColor = 'shadow-md shadow-blue-400'; break
-                case player.character.match('cylinder') != null: cityColor = 'shadow-md shadow-orange-500'; break
+                case player.character.match('circle') != null: cityColor = 'shadow-lg shadow-red-500'; break
+                case player.character.match('square') != null: cityColor = 'shadow-lg shadow-purple-400'; break
+                case player.character.match('triangle') != null: cityColor = 'shadow-lg shadow-pink-400'; break
+                case player.character.match('diamond') != null: cityColor = 'shadow-lg shadow-blue-400'; break
+                case player.character.match('cylinder') != null: cityColor = 'shadow-lg shadow-orange-500'; break
             }
             // check city property (match the latest prop)
             const tempCityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0]
