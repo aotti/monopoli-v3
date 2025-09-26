@@ -25,9 +25,9 @@
                     "items": ["coin"]
                 },
                 {
-                    "type": "coin",
-                    "name": "10 coins",
-                    "items": ["coin"]
+                    "type": "pack",
+                    "name": "coin pack",
+                    "items": ["10 coins", "20 coins", "30 coins"]
                 },
                 {
                     "type": "pack",
@@ -66,9 +66,9 @@
                     "items": ["coin"]
                 },
                 {
-                    "type": "coin",
-                    "name": "10 coins",
-                    "items": ["coin"]
+                    "type": "pack",
+                    "name": "coin pack",
+                    "items": ["10 coins", "20 coins", "30 coins"]
                 },
                 {
                     "type": "pack",

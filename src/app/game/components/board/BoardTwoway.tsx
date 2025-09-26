@@ -122,31 +122,40 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
         // match current city
         const isCityBought = cityList.map(v => v.split('*')[0]).indexOf(name)
         if(isCityBought !== -1) {
+            // set city color
+            let cityColor = null
+            switch(true) {
+                case player.character.match('circle') != null: cityColor = 'shadow-lg shadow-red-500'; break
+                case player.character.match('square') != null: cityColor = 'shadow-lg shadow-purple-400'; break
+                case player.character.match('triangle') != null: cityColor = 'shadow-lg shadow-pink-400'; break
+                case player.character.match('diamond') != null: cityColor = 'shadow-lg shadow-blue-400'; break
+                case player.character.match('cylinder') != null: cityColor = 'shadow-lg shadow-orange-500'; break
+            }
             // check city property (match the latest prop)
             const tempCityProperty = cityList[isCityBought].match(/2house1hotel$|2house$|1house$|land$/)[0]
             // check if city is quaked
-            const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(tempCityName) : null
+            const findQuakeCity = gameState.gameQuakeCity ? gameState.gameQuakeCity.indexOf(name) : null
             // check type of number to prevent bug, because 0 == false
             const isCityQuake = typeof findQuakeCity == 'number' && findQuakeCity !== -1 ? 'quake' : null
             switch(tempCityProperty) {
                 // [owner, price, property]
                 case 'land': 
                     // set city owner (only after bought land property)
-                    getCityData.push(`${tempCityName}\n${player.display_name}`, player.display_name, price + (price * .10), '1house', '', isCityQuake)
+                    getCityData.push(`${tempCityName}\n${player.display_name}`, player.display_name, price + (price * .10), '1house', '', isCityQuake, cityColor)
                     return
                 case '1house': 
-                    getCityData.push(tempCityName, player.display_name, price + (price * .20), '2house', '🏡', isCityQuake)
+                    getCityData.push(tempCityName, player.display_name, price + (price * .20), '2house', '🏡', isCityQuake, cityColor)
                     return
                 case '2house': 
-                    getCityData.push(tempCityName, player.display_name, price + (price * .30), '2house1hotel', '🏡🏡', isCityQuake)
+                    getCityData.push(tempCityName, player.display_name, price + (price * .30), '2house1hotel', '🏡🏡', isCityQuake, cityColor)
                     return
                 case '2house1hotel': 
-                    getCityData.push(tempCityName, player.display_name, price + (price * .40), 'realestate', '🏡🏡🏨', isCityQuake)
+                    getCityData.push(tempCityName, player.display_name, price + (price * .40), 'realestate', '🏡🏡🏨', isCityQuake, cityColor)
                     return
             }
         }
     })
-    const [cityName, cityOwner, cityPrice, cityProperty, cityIcon, cityQuake] = getCityData as [string, string, number, string, string, string]
+    const [cityName, cityOwner, cityPrice, cityProperty, cityIcon, cityQuake, cityColor] = getCityData as [string, string, number, string, string, string, string]
     // city info
     // ### DONT TRANSLATE CITY INFO
     // ### ITS USED IN GAME LOGIC
@@ -191,7 +200,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 <video id={`video_city_meteor_hotel_${name}`} src={attackAnimation.meteor.hotel} className="absolute z-10 hidden" />
                 {/* tile image */}
                 <div className="relative">
-                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
+                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} ${cityColor} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
                     {/* tile image crack */}
                     {cityQuake
                         ? <Image src={crackImage} alt="crack" width={100} height={100} className={`absolute z-10 top-0 saturate-0 w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
@@ -200,7 +209,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'animate-player-pos' : ''} 
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>
-                    <p className={`${cityProperty ? 'text-red-600' : priceTextClass} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
+                    <p className={`${cityProperty ? '' : priceTextClass} leading-3 lg:leading-relaxed text-[2vh] whitespace-pre`} 
                     data-price={moneyFormat(cityPrice || (cursedCityPrice || price))}> 
                         {cityProperty ? `${cityName}\n${cityIcon}` : cityName || translateCityName} 
                     </p>
