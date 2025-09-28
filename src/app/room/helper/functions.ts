@@ -325,7 +325,7 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
         case 200: 
             // stop interval
             clearInterval(loggingOut)
-            logoutButton.textContent = 'logout'
+            logoutButton.textContent = translateUI({lang: miscState.language, text: 'Logout'})
             // reset all data
             resetAllData(gameState)
             // set modal to null
@@ -335,7 +335,10 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
             gotoHome.click()
             return
         default: 
+            // stop interval
+            clearInterval(loggingOut)
             logoutButton.textContent = `error${logoutResponse.status}`
+            setTimeout(() => logoutButton.textContent = translateUI({lang: miscState.language, text: 'Logout'}), 3000)
             return
     }
 }
