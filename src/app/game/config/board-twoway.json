@@ -81,7 +81,7 @@
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
             "info": "100% chance get buff"
         },
-        { "type": null },
+        { "type": "history" },
         { 
             "square": "14x", 
             "type": "city",
@@ -150,7 +150,7 @@
             "name": "Chance Card", 
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
         },
-        { "type": null },
+        { "type": "history" },
         { 
             "square": 24, 
             "type": "city",

@@ -81,7 +81,7 @@
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
             "info": "100% chance get buff"
         },
-        { "type": null },
+        { "type": "history" },
         { "type": null },
         { "type": null },
         { "type": null },
@@ -114,7 +114,7 @@
         { "type": null },
         { "type": null },
         { "type": null },
-        { "type": null },
+        { "type": "history" },
         { 
             "square": 24, 
             "type": "city",

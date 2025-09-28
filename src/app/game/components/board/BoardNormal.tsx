@@ -14,7 +14,7 @@ export default function BoardNormal() {
     const boardNormal = board_normal
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        setTimeout(() => applyTooltipEvent(), 2000)
+        setTimeout(() => applyTooltipEvent(), 3000)
     }, [gameState.gamePlayerInfo])
 
     return (
@@ -41,13 +41,17 @@ export default function BoardNormal() {
                 return (
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
-                        : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileCity data={tile} />
+                        : tile.type == 'history'
+                            ? <div className="relative w-[7.5vw] h-[23vh]">
+                                <TileHistory data={{title: 'chance'}}/>
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileOther data={tile} />
-                            </div>
+                            : tile.type == 'city'
+                                ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
+                                </div>
+                                : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
+                                </div>
                 )
             })}
             </div>
@@ -57,13 +61,17 @@ export default function BoardNormal() {
                 return (
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
-                        : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileCity data={tile} />
+                        : tile.type == 'history'
+                            ? <div className="relative w-[7.5vw] h-[23vh]">
+                                <TileHistory data={{title: 'community'}}/>
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileOther data={tile} />
-                            </div>
+                            : tile.type == 'city'
+                                ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
+                                </div>
+                                : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
+                                </div>
                 )
             })}
             </div>
@@ -265,6 +273,47 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
                     </p>
                 </div>
             </div>
+        </div>
+    )
+}
+
+function TileHistory({ data }) {
+    const miscState = useMisc()
+    const gameState = useGame()
+    
+    const {title} = data
+    const translateTitle = translateUI({lang: miscState.language, text: title})
+    const shortTitle = translateTitle.length <= 4 ? translateTitle : `${translateTitle.slice(0, 4)}-`
+    // class for bottom right history
+    const bottomRightClass = title == 'community' ? 'bottom-0 right-0 text-right justify-end' : ''
+    const expandHistoryClass = gameState.expandGameHistory ? 'w-[15vw] h-[46vh]' : 'w-[7.5vw] h-[23vh]'
+
+    return (
+        // only set z-index if history expand
+        <div className={`absolute z-10 flex flex-col ${bottomRightClass} ${expandHistoryClass} transition-all ease-in-out duration-500 border-2 border-black text-2xs lg:text-xs p-1`}>
+            {title == 'community' 
+                ? <>
+                    <TileHistoryContent />
+                    <span className=""> {gameState.expandGameHistory ? translateTitle : shortTitle} </span>
+                </>
+                : <>
+                    <span> {gameState.expandGameHistory ? translateTitle : shortTitle} </span>
+                    <TileHistoryContent />
+                </>}
+        </div>
+    )
+}
+
+function TileHistoryContent() {
+    const miscState = useMisc()
+    const gameState = useGame()
+
+    const cardHistory = gameState.gameHistory.length === 0 ? []
+                        : gameState.gameHistory.map(v => v.history.match(/community|chance/i) ? v : null).filter(i=>i)
+    console.log({cardHistory})
+    return (
+        <div>
+            content
         </div>
     )
 }
