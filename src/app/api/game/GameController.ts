@@ -115,6 +115,8 @@ export default class GameController extends Controller {
         // check if the same player trying to ready
         const checkReadyPlayer = getReadyPlayers.indexOf(payload.display_name)
         if(checkReadyPlayer !== -1) return this.respond(403, 'fight me ni-', [])
+        // player must join the game to click ready
+        if(!payload.player_joined.match(payload.display_name)) return this.respond(403, 'who r u??!?!', [])
         // set new ready player
         await this.redisSet(`readyPlayers_${roomId}`, [...getReadyPlayers, payload.display_name])
         

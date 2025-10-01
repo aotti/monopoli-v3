@@ -134,22 +134,14 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
     const notifMessage = qS('#result_notif_message')
     // submit button
     const readyButton = qS('#ready_button') as HTMLInputElement
+    // get player joined list
+    const playerJoinedList = gameState.gamePlayerInfo.map(v => v.display_name)
     // input value container
     const inputValues = {
         action: 'game ready player',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
-        display_name: gameState.myPlayerInfo.display_name
-    }
-    // player must be join the room to click ready
-    const isPlayerJoined = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
-    if(isPlayerJoined === -1) {
-        // show notif
-        miscState.setAnimation(true)
-        gameState.setShowGameNotif('normal')
-        // error message
-        notifTitle.textContent = `error 403`
-        notifMessage.textContent = `who are you?`
-        return
+        display_name: gameState.myPlayerInfo.display_name,
+        player_joined: playerJoinedList.join(','),
     }
     // loading button
     const tempButtonText = readyButton.textContent

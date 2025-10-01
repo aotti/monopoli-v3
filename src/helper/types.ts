@@ -378,6 +378,7 @@ type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'
 type ChatType = 'channel'|'message_text'|'message_time'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
+type GameReadyType = 'player_joined'
 type DecideTurnType = 'rolled_number'
 type RollDiceType = 'rolled_dice'|'rng'|'special_card'|'game_data'
 type TurnEndType = 'pos'|'lap'|'history'|'event_money'|'city'|'tax_owner'|'tax_visitor'|'tax_money'|'card'|'take_money'|'prison'|'buff'|'debuff'|'is_lose'
@@ -388,7 +389,7 @@ type DeclareAttackCityType = 'target_city_owner'|'target_city_left'|'target_city
 type ShopType = 'item_type'|'item_name'
 type DailyType = 'week'
 type MinigameType = 'minigame_answer'|'minigame_chance'|'minigame_data'
-export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'description'|'language'|'user_agent'
+export type InputIDType = IdentifierType|PlayerType|ChatType|CreateRoomType|JoinRoomType|GameReadyType|DecideTurnType|RollDiceType|TurnEndType|SurrenderType|GameOverType|SellCityType|DeclareAttackCityType|ShopType|DailyType|MinigameType|'description'|'language'|'user_agent'
 
 // user
 export interface ILoggedUsers {
@@ -506,6 +507,7 @@ export interface IGamePlay {
     ready_player: {
         channel: string,
         display_name: string,
+        player_joined: string,
     } & ITokenPayload,
     decide_player: {
         channel: string,
