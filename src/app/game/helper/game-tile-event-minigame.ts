@@ -25,7 +25,7 @@ export function stopByMinigame(playerTurnData: IGameContext['gamePlayerInfo'][0]
             }
             // set timer
             const playerAmount = gameState.gamePlayerInfo.length
-            let minigameCounter = playerAmount === 2 ? 20 : 25 // seconds 
+            let minigameCounter = playerAmount === 2 ? 25 : 30 // seconds 
             const minigameInterval = setInterval(() => {
                 // counter < 0 = stop at -1 | counter < -1 = stop at -2
                 if(minigameCounter < -1) {
