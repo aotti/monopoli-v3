@@ -383,7 +383,7 @@ export function filterInput(input: InputIDType, value: string) {
         
         // ====== GAME READY TYPE ======
         case 'player_joined': 
-            return value ? value.match(/^[a-zA-Z0-9\s]+$/) : null
+            return value ? value.match(/^[a-zA-Z0-9\s,]+$/) : null
 
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
