@@ -46,7 +46,14 @@ export default class PlayerController extends Controller {
 
         // get logged player stats
         const playerStatsCache = await this.logPlayerStats('get', payload)
-        if(playerStatsCache) return playerStatsCache
+        if(playerStatsCache) {
+            // set result
+            const resultData = {
+                player: playerStatsCache,
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+            return result
+        }
 
         // set payload for db query
         const queryObject: IQuerySelect = {

@@ -184,12 +184,12 @@ export async function viewPlayerStats(ev: FormEvent<HTMLFormElement>, gameState:
     }
     // fetch
     const viewFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
-    const viewResponse: IResponse = await (await fetcher(`/player/?display_name=${inputValues.display_name}`, viewFetchOptions)).json()
+    const viewResponse: IResponse = await (await fetcher(`/player?display_name=${inputValues.display_name}`, viewFetchOptions)).json()
     // response
     switch(viewResponse.status) {
         case 200: 
             // save access token
-            if(viewResponse.data[0].token) {
+            if(viewResponse.data[0]?.token) {
                 localStorage.setItem('accessToken', viewResponse.data[0].token)
                 delete viewResponse.data[0].token
             }
