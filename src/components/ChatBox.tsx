@@ -250,7 +250,13 @@ export function chatMessageListener(data: PubNub.Subscription.Message, miscState
             message_text: getMessage.message_text,
             message_time: getMessage.message_time
         }
-        miscState.setMessageItems(data => [...data, chatData])
+        miscState.setMessageItems(data => {
+            // filter chat data if exceed 200 messages
+            const chats = data
+            if(chats.length > 200) 
+                return [...chats.slice(-200), chatData]
+            return [...chats, chatData]
+        })
         // play notif sound
         const soundMessageNotif = qS('#sound_message') as HTMLAudioElement
         if(getMessage.display_name != gameState.myPlayerInfo.display_name) 

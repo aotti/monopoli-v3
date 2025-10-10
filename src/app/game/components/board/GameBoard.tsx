@@ -16,7 +16,7 @@ export default function GameBoard({ boardType }: {boardType: string}) {
     const board = boardType === 'normal' ? board_normal : board_twoway
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        setTimeout(() => applyTooltipEvent(), 3000)
+        applyTooltipEvent()
     }, [gameState.gamePlayerInfo])
 
     return (

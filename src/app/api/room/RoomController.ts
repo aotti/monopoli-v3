@@ -1,20 +1,9 @@
 import { cookies } from "next/headers";
 import { ICreateRoom, IGameContext, IShiftRoom, IQueryInsert, IQuerySelect, IQueryUpdate, IResponse, IGamePlay } from "../../../helper/types";
 import Controller from "../Controller";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 
-const rateLimitCreateRoom = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(3, '10m'),
-    prefix: '@upstash/ratelimit',
-})
-
-const rateLimitJoinRoom = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(5, '10m'),
-    prefix: '@upstash/ratelimit',
-})
+const rateLimitCreateRoom = Controller.createRateLimit(3, '10m')
+const rateLimitJoinRoom = Controller.createRateLimit(5, '10m')
 
 export default class RoomController extends Controller {
     

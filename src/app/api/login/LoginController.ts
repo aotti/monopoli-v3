@@ -1,14 +1,8 @@
 import { cookies } from "next/headers";
 import { IPlayer, IQuerySelect, IResponse, IUser } from "../../../helper/types";
 import Controller from "../Controller";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 
-const rateLimitLogin = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(5, '12h'),
-    prefix: '@upstash/ratelimit',
-})
+const rateLimitLogin = Controller.createRateLimit(5, '12h')
 
 export default class LoginController extends Controller {
 

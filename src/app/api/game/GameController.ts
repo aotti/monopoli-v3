@@ -1,14 +1,16 @@
-import { Ratelimit } from "@upstash/ratelimit";
 import { fetcher, fetcherOptions } from "../../../helper/helper";
 import { ICreateRoom, IGameContext, IGamePlay, IMissingData, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
-import { Redis } from "@upstash/redis";
 
-const rateLimitSendReportBugs = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(1, '10m'),
-    prefix: '@upstash/ratelimit',
-})
+const rateLimitReadyPlayer = Controller.createRateLimit(1, '5s')
+const rateLimitDecideTurn = Controller.createRateLimit(1, '5s')
+const rateLimitRollDice = Controller.createRateLimit(1, '3s')
+const rateLimitSurrender = Controller.createRateLimit(1, '5s')
+const rateLimitTurnEnd = Controller.createRateLimit(1, '5s')
+const rateLimitSellCity = Controller.createRateLimit(1, '5s')
+const rateLimitUpgradeCity = Controller.createRateLimit(1, '5s')
+const rateLimitAttackCity = Controller.createRateLimit(1, '5s')
+const rateLimitSendReportBugs = Controller.createRateLimit(1, '10m')
 
 export default class GameController extends Controller {
     private async filters(action: string, payload: any) {
@@ -109,6 +111,13 @@ export default class GameController extends Controller {
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
 
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitReadyPlayer.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         // save ready players to redis
         const roomId = payload.channel.match(/\d+/)[0]
         const getReadyPlayers = await this.redisGet(`readyPlayers_${roomId}`)
@@ -156,6 +165,11 @@ export default class GameController extends Controller {
         const roomId = payload.channel.match(/\d+/)[0]
         const getReadyPlayers = await this.redisGet(`readyPlayers_${roomId}`)
         if(getReadyPlayers.length < 2) return this.respond(403, 'go get frens', [])
+        
+        // prevent game start if player turn redis is exist
+        const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
+        if(getPlayerTurns.length > 0) return this.respond(403, 'wat da dog doin', [])
+
         // set payload for db query
         type UpdateColumnType = Partial<ICreateRoom['list'] & {updated_at: string}>
         const queryObject: IQueryUpdate = {
@@ -245,6 +259,14 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitDecideTurn.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         // get decide players
         const roomId = payload.channel.match(/\d+/)[0]
         const getDecidePlayers = await this.redisGet(`decidePlayers_${roomId}`)
@@ -300,6 +322,13 @@ export default class GameController extends Controller {
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
 
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitRollDice.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         // check player turn
         const roomId = payload.channel.match(/\d+/)[0]
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
@@ -350,6 +379,14 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitSurrender.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         // check player turn
         const roomId = payload.channel.match(/\d+/)[0]
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
@@ -409,6 +446,13 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitTurnEnd.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
         
         // get player turns
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
@@ -583,6 +627,13 @@ export default class GameController extends Controller {
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
 
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitSellCity.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
+
         const roomId = payload.channel.match(/\d+/)[0]
         // check player turn
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
@@ -661,6 +712,13 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitUpgradeCity.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
         
         // check player turn
         const getPlayerTurns = await this.redisGet(`playerTurns_${roomId}`)
@@ -754,6 +812,13 @@ export default class GameController extends Controller {
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+
+        // check create rate limit
+        const rateLimitID = payload.user_agent
+        const rateLimitResult = await rateLimitAttackCity.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
         
         // get attack type
         const attackType = payload.attack_type.match(/quake|meteor|steal/i)[0]

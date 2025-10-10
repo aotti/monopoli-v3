@@ -1,13 +1,7 @@
 import { IQueryInsert, IUser, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 
-const rateLimitRegister = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(2, '8h'),
-    prefix: '@upstash/ratelimit',
-})
+const rateLimitRegister = Controller.createRateLimit(2, '8h')
 
 export default class RegisterController extends Controller {
     
