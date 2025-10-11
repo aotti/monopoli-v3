@@ -225,10 +225,6 @@ fix 20 june 2025
 fix 17 aug 2025
 -  ~~kartu nerf tax gk bisa ilang setelah pakai~~
 - ~~pindah penyimpanan refresh token ke redis, karna cookies suka ngebug~~ batal, karna salah cara hapus cookies aja
-- notif dana umum / kesempatan tidak bisa tutup ??
-> > kemungkinan karna player lain tidak resolve promise, jadi tidak masuk ke function turnEnd untuk menutup notif
-> > kesempatan: kartu penjara + 90% denda, pergi ke kota orang lain
-> > dana umum: 
 - ~~hadiah daily jika masuk **minggu B** tidak bisa balik ke **minggu A**~~
 - ~~sond efek buy city (eng) dan game ready (id) perlu edit~~
 - ~~tambah sond efek saat create room~~

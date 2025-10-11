@@ -2,8 +2,6 @@ import { useEffect, useRef } from "react"
 import { useGame } from "../../context/GameContext"
 import { useMisc } from "../../context/MiscContext"
 import { applyTooltipEvent, qS, translateUI } from "../../helper/helper"
-import BoardNormal from "./components/board/BoardNormal"
-import BoardTwoway from "./components/board/BoardTwoway"
 import GameInfo from "./components/board/GameInfo"
 import HelpSection from "./components/side-button-content/HelpSection"
 import PlayerSection from "./components/side-button-content/PlayerSection"
@@ -23,6 +21,7 @@ import { clickOutsideElement } from "../../helper/click-outside"
 import MiniGame from "./components/board/MiniGame"
 import { clickInsideElement } from "../../helper/click-inside"
 import { IMissingData } from "../../helper/types"
+import GameBoard from "./components/board/GameBoard"
 
 export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -201,11 +200,9 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     ? <>
                         {gameState.gameRoomInfo.map((v, i) => {
                             return v.room_id === gameState.gameRoomId 
-                                ? v.board == 'normal'
-                                    ? <BoardNormal key={i} /> 
-                                    : miscState.showTutorial == 'tutorial_gameroom_2' 
-                                        ? <BoardNormal key={i} /> 
-                                        : <BoardTwoway key={i} />
+                                ? miscState.showTutorial == 'tutorial_gameroom_2' 
+                                    ? <GameBoard key={i} boardType={'normal'} /> 
+                                    : <GameBoard key={i} boardType={v.board} /> 
                                 : null
                         })}
                     </>

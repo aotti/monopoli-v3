@@ -381,6 +381,10 @@ export function filterInput(input: InputIDType, value: string) {
         case 'rules': 
             return value ? value.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/) : null
         
+        // ====== GAME READY TYPE ======
+        case 'player_joined': 
+            return value ? value.match(/^[a-zA-Z0-9\s,]+$/) : null
+
         // ====== ROLL TURN TYPE ======
         case 'rolled_number': 
             return value ? value.match(/^[\d]{3}$/) : null

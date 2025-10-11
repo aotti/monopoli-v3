@@ -1,21 +1,13 @@
 import { IChat, IDaily, IGameContext, IPlayer, IQuerySelect, IQueryUpdate, IResponse } from "../../../helper/types";
 import Controller from "../Controller";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import daily_rewards from "../../room/config/daily-rewards.json"
 import { cookies } from "next/headers";
+import { verifyAccessToken } from "../../../helper/helper";
 
-const rateLimitAvatar = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(1, '10m'),
-    prefix: '@upstash/ratelimit',
-})
-
-const rateLimitLanguage = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(1, '1m'),
-    prefix: '@upstash/ratelimit',
-})
+const rateLimitAvatar = Controller.createRateLimit(1, '10m')
+const rateLimitRanking = Controller.createRateLimit(1, '5s')
+const rateLimitLanguage = Controller.createRateLimit(1, '1m')
+const rateLimitChat = Controller.createRateLimit(1, '1s')
 
 export default class PlayerController extends Controller {
     async setLanguage(action: string, payload: IPlayer & {language: string}) {
@@ -51,6 +43,18 @@ export default class PlayerController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+
+        // get logged player stats
+        const playerStatsCache = await this.logPlayerStats('get', payload)
+        if(playerStatsCache) {
+            // set result
+            const resultData = {
+                player: playerStatsCache,
+            }
+            result = this.respond(200, `${action} success`, [resultData])
+            return result
+        }
+
         // set payload for db query
         const queryObject: IQuerySelect = {
             table: 'players',
@@ -64,6 +68,8 @@ export default class PlayerController extends Controller {
             result = this.respond(500, error.message, [])
         }
         else {
+            // log player stats in redis
+            await this.logPlayerStats('push', data[0])
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const isPublished = await this.monopoliPublish(roomlistChannel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
@@ -96,6 +102,13 @@ export default class PlayerController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+        
+        // check avatar rate limit
+        const rateLimitID = `${payload.display_name}_${payload.user_agent}`
+        const rateLimitResult = await rateLimitRanking.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
 
         // set payload for db query
         const queryObject: IQuerySelect = {
@@ -186,6 +199,13 @@ export default class PlayerController extends Controller {
         // filter payload
         const filteredPayload = this.filterPayload(action, payload)
         if(filteredPayload.status !== 200) return filteredPayload
+        
+        // check avatar rate limit
+        const rateLimitID = `${payload.display_name}_${payload.user_agent}`
+        const rateLimitResult = await rateLimitChat.limit(rateLimitID);
+        if(!rateLimitResult.success) {
+            return this.respond(429, 'too many request', [])
+        }
 
         // publish chat
         const publishData = {
@@ -296,7 +316,7 @@ export default class PlayerController extends Controller {
                                 // is item exist in player shop items
                                 const isItemShopExist = getPlayerShopItems.map(v => {
                                     if(v.buff?.indexOf(payload.item_name) !== -1) return true
-                                    else if(v.special_card?.indexOf(payload.item_name) !== -1) return true
+                                    if(v.special_card?.indexOf(payload.item_name) !== -1) return true
                                 }).filter(i => i)[0]
 
                                 // item exist, replace with coins

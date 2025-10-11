@@ -134,11 +134,14 @@ export async function readyGameRoom(miscState: IMiscContext, gameState: IGameCon
     const notifMessage = qS('#result_notif_message')
     // submit button
     const readyButton = qS('#ready_button') as HTMLInputElement
+    // get player joined list
+    const playerJoinedList = gameState.gamePlayerInfo.map(v => v.display_name)
     // input value container
     const inputValues = {
         action: 'game ready player',
         channel: `monopoli-gameroom-${gameState.gameRoomId}`,
-        display_name: gameState.myPlayerInfo.display_name
+        display_name: gameState.myPlayerInfo.display_name,
+        player_joined: playerJoinedList.join(','),
     }
     // loading button
     const tempButtonText = readyButton.textContent

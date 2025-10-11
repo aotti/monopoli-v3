@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import PubNub from "pubnub";
 import { redis } from "../../config/redis";
+import { Duration, Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 // redis
 const redisClient = redis()
@@ -37,7 +39,7 @@ export default class Controller {
         // this.redisReset('decidePlayers_33')
         // this.redisReset('gameHistory_33')
         // this.redisReset('playerTurns_162')
-        // this.redisSet('playerTurns_234', ['suwanto', 'tester123'])
+        // this.redisSet('playerTurns_267', ['suwanto', 'tester123'])
         // this.redisSet('playerTurns_162', ['gandesblood', 'suwanto'])
         // this.redisSet('disabledCharacters_32', [
         //     'https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/characters/circle-MPxBNB61chi1TCQfEnqvWesqXT2IqM.png'
@@ -109,6 +111,14 @@ export default class Controller {
     protected async redisReset(key: string) {
         // reset existing data
         await redisClient.del(key)
+    }
+
+    static createRateLimit(limit: number, timeout: Duration) {
+        return new Ratelimit({
+            redis: Redis.fromEnv(),
+            limiter: Ratelimit.slidingWindow(limit, timeout),
+            prefix: '@upstash/ratelimit',
+        })
     }
 
     protected filterPayload<T>(action: string, payload: T) {
@@ -195,7 +205,7 @@ export default class Controller {
 
     protected async logOnlineUsers(action: 'log'|'out'|'renew', payload: Partial<ILoggedUsers>) {
         const getLoggedPlayers = await this.redisGet('loggedPlayers')
-        let loggedPlayers: ILoggedUsers[] = getLoggedPlayers.length > 0 ? getLoggedPlayers : []
+        let loggedPlayers: ILoggedUsers[] = getLoggedPlayers
         // check players token each request
         if(loggedPlayers.length > 0) {
             const getPlayersToken = loggedPlayers.map(v => v.timeout_token)
@@ -288,6 +298,42 @@ export default class Controller {
                 }
             })
             return newLoggedPlayers
+        }
+    }
+
+    protected async logPlayerStats(action: 'get'|'push', payload?: IPlayer) {
+        type LoggedPlayerStatsType = IPlayer & {timeout: string}
+        const getLoggedPlayerStats = await this.redisGet('loggedPlayerStats')
+        let tempLoggedPlayerStats: LoggedPlayerStatsType[] = getLoggedPlayerStats
+        // get from redis if player stats logged
+        if(action == 'get' && getLoggedPlayerStats.length > 0) {
+            // filter expired player stats
+            const playerStatsTimeouts = tempLoggedPlayerStats.map(v => v.timeout)
+            for(let token of playerStatsTimeouts) {
+                const [error, payload] = await verifyAccessToken({
+                    action: 'verify-only',
+                    token: token,
+                    secret: process.env.ACCESS_TOKEN_SECRET
+                })
+                if(error) tempLoggedPlayerStats = tempLoggedPlayerStats.filter(v => v.timeout != token)
+            }
+            // find player stats
+            const findStats = tempLoggedPlayerStats.map(v => v.display_name).indexOf(payload.display_name)
+            if(findStats !== -1) {
+                // no need to return timeout prop
+                delete tempLoggedPlayerStats[findStats].timeout
+                return tempLoggedPlayerStats[findStats]
+            }
+            else return null
+        }
+        else if(action == 'push') {
+            // keep player stats in redis for 1min
+            const playerStatsTimeout = await this.generateToken({type: 'access', payload: payload, expire: '1m'})
+            const playerStatsData = {
+                ...payload,
+                timeout: playerStatsTimeout,
+            }
+            await this.redisSet('loggedPlayerStats', [...tempLoggedPlayerStats, playerStatsData])
         }
     }
 

@@ -184,12 +184,12 @@ export async function viewPlayerStats(ev: FormEvent<HTMLFormElement>, gameState:
     }
     // fetch
     const viewFetchOptions = fetcherOptions({method: 'GET', credentials: true, noCache: true})
-    const viewResponse: IResponse = await (await fetcher(`/player/?display_name=${inputValues.display_name}`, viewFetchOptions)).json()
+    const viewResponse: IResponse = await (await fetcher(`/player?display_name=${inputValues.display_name}`, viewFetchOptions)).json()
     // response
     switch(viewResponse.status) {
         case 200: 
             // save access token
-            if(viewResponse.data[0].token) {
+            if(viewResponse.data[0]?.token) {
                 localStorage.setItem('accessToken', viewResponse.data[0].token)
                 delete viewResponse.data[0].token
             }
@@ -325,7 +325,7 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
         case 200: 
             // stop interval
             clearInterval(loggingOut)
-            logoutButton.textContent = 'logout'
+            logoutButton.textContent = translateUI({lang: miscState.language, text: 'Logout'})
             // reset all data
             resetAllData(gameState)
             // set modal to null
@@ -335,7 +335,10 @@ export async function userLogout(ev: FormEvent<HTMLFormElement>, miscState: IMis
             gotoHome.click()
             return
         default: 
+            // stop interval
+            clearInterval(loggingOut)
             logoutButton.textContent = `error${logoutResponse.status}`
+            setTimeout(() => logoutButton.textContent = translateUI({lang: miscState.language, text: 'Logout'}), 3000)
             return
     }
 }
@@ -692,7 +695,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     const rewardValue = {
         display_name: gameState.myPlayerInfo.display_name,
         week: `${week}`,
-        item_name: type === 'coin' ? 'coin' : chosenPackItem,
+        item_name: type === 'coin' ? '10' : chosenPackItem,
     }
     // loading claim button
     claimButton ? claimButton.disabled = true : null

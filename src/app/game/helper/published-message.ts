@@ -12,13 +12,35 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
     const playerTurnNotif = qS('#player_turn_notif')
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
-    // join
+
+    /**
+     * CONTENT LIST
+     * - PLAYER JOIN
+     * - PLAYER LEAVE
+     * - ROOM DELETED
+     * - GAME READY
+     * - GAME START
+     * - PLAYER DECIDE TURN
+     * - PLAYER ROLL DICE
+     * - PLAYER SURRENDER
+     * - PLAYER SELL CITY
+     * - PLAYER MISSING DATA
+     * - PLAYER UPGRADE CITY
+     * - PLAYER ATTACK CITY
+     * - FIX PLAYER TURNS
+     * - MINIGAME PREPARE DATA
+     * - MINIGAME ANSWER CORRECTION
+     * - PLAYER TURN END
+     * - GAME OVER
+     */
+
+    // - PLAYER JOIN
     if(getMessage.joinPlayer) {
         gameState.setGamePlayerInfo(players => [...players, getMessage.joinPlayer])
         const soundPlayerJoin = qS('#sound_player_join') as HTMLAudioElement
         soundPlayerJoin.play()
     }
-    // leave
+    // - PLAYER LEAVE
     if(getMessage.leavePlayer) {
         gameState.setGamePlayerInfo(players => {
             const playersLeft = [...players]
@@ -30,7 +52,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         const soundPlayerLeave = qS('#sound_player_leave') as HTMLAudioElement
         soundPlayerLeave.play()
     }
-    // room deleted
+    // - ROOM DELETED
     if(getMessage.roomsLeft) {
         // set game stage to prepare
         gameState.setGameStages('prepare')
@@ -49,7 +71,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             gotoRoom.click()
         }, 2000)
     }
-    // ready
+    // - GAME READY
     if(getMessage.readyPlayers) {
         // set players ready text
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp player(s) ready'})
@@ -65,7 +87,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'if all players are ready, room creator have to click the "start" button'})
         }
     }
-    // start
+    // - GAME START
     if(getMessage.startGame) {
         // change game stage
         gameState.setGameStages('decide')
@@ -74,7 +96,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // reset all player shop items
         gameState.setMyShopItems(null)
     }
-    // decide
+    // - PLAYER DECIDE TURN
     if(getMessage.decidePlayers) {
         // display rolled number
         const decidePlayersRank = []
@@ -92,7 +114,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             notifMessage.textContent = translateUI({lang: miscState.language, text: 'Only buff & debuff area works on lap 1, other event starts on laps > 1'})
         }
     }
-    // roll dice
+    // - PLAYER ROLL DICE
     if(getMessage.playerTurn && typeof getMessage.playerDice == 'number') {
         const rollDiceData: IRollDiceData = {
             playerTurn: getMessage.playerTurn,
@@ -104,7 +126,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         // move player pos
         playerMoving(rollDiceData, miscState, gameState)
     }
-    // surrender
+    // - PLAYER SURRENDER
     if(getMessage.surrendPlayer) {
         gameState.setGamePlayerInfo(players => {
             const surrendPlayerInfo = [...players]
@@ -134,7 +156,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return surrendPlayerInfo
         })
     }
-    // sell city (null = sold all city)
+    // - PLAYER SELL CITY (null = sold all city)
     if(getMessage.cityLeft === null || getMessage.cityLeft?.length > 0) {
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
@@ -154,7 +176,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return cityLeftInfo
         })
     }
-    // missing data
+    // - PLAYER MISSING DATA
     if(getMessage.missingData) {
         const {display_name, city, card, buff, debuff} = getMessage.missingData
         // show notif
@@ -176,7 +198,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return allPlayerInfo
         })
     }
-    // upgrade city
+    // - PLAYER UPGRADE CITY
     if(getMessage.upgradeCity) {
         const {display_name, money, city, card} = getMessage.upgradeCity
         // sound effect
@@ -197,7 +219,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return allPlayerInfo
         })
     }
-    // attack city
+    // - PLAYER ATTACK CITY
     if(getMessage.attackType) {
         // update game history
         gameState.setGameHistory(getMessage.gameHistory)
@@ -240,7 +262,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             })
         }, attackTimer);
     }
-    // fix player turns
+    // - FIX PLAYER TURNS
     if(getMessage.fixPlayerTurns) {
         // save playerTurns
         localStorage.setItem('playerTurns', JSON.stringify(getMessage.fixPlayerTurns))
@@ -248,7 +270,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'ppp turn'})
                                     .replace('ppp', getMessage.fixPlayerTurns[0])
     }
-    // minigame prepared data
+    // - MINIGAME PREPARE DATA
     if(getMessage.minigamePreparedData) {
         // html elements
         const minigameTimer = qS('#minigame_timer')
@@ -262,7 +284,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         minigameInfo('success', '')
         // set timer
         const playerAmount = gameState.gamePlayerInfo.length
-        let minigameCounter = playerAmount === 2 ? 20 : 25 // seconds 
+        let minigameCounter = playerAmount === 2 ? 25 : 30 // seconds 
         const minigameInterval = setInterval(() => {
             if(minigameCounter < 0) {
                 clearInterval(minigameInterval)
@@ -290,11 +312,11 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             minigameCounter--
         }, 1000);
     }
-    // minigame answer correction
+    // - MINIGAME ANSWER CORRECTION
     if(getMessage.minigameAnswerData) {
         minigameAnswerCorrection(getMessage.minigameAnswerData, miscState, gameState)
     }
-    // end turn 
+    // - PLAYER TURN END
     if(getMessage.playerTurnEnd) {
         // save playerTurns
         localStorage.setItem('playerTurns', JSON.stringify(getMessage.playerTurns))
@@ -350,7 +372,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             return allPlayerInfo
         })
     }
-    // game over
+    // - GAME OVER
     if(getMessage.gameOverPlayers) {
         // show notif after 0.5 sec
         setTimeout(() => {

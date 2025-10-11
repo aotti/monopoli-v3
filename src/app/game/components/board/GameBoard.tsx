@@ -2,26 +2,28 @@ import { useEffect } from "react"
 import { useGame } from "../../../../context/GameContext"
 import { useMisc } from "../../../../context/MiscContext"
 import { applyTooltipEvent, moneyFormat, simpleEncrypt, translateUI } from "../../../../helper/helper"
+import board_normal from '../../config/board-normal.json'
 import board_twoway from '../../config/board-twoway.json'
 import Image from "next/image"
 import Character from "./Character"
+import { TileHistory } from "../side-button-content/PlayerSettingGameHistory"
 
-export default function BoardTwoway() {
+export default function GameBoard({ boardType }: {boardType: string}) {
     const gameState = useGame()
 
     const squareNumberStyle = 'before:absolute before:z-10 before:content-[attr(data-square)] before:p-1 before:text-2xs before:lg:text-xs'
     // board tiles
-    const boardTwoway = board_twoway
+    const board = boardType === 'normal' ? board_normal : board_twoway
     // tooltip (the element must have position: relative)
     useEffect(() => {
-        setTimeout(() => applyTooltipEvent(), 2000)
+        applyTooltipEvent()
     }, [gameState.gamePlayerInfo])
 
     return (
         <div className="relative z-10 animate-fade animate-delay-200">
             {/* row 1 */}
             <div className="flex">
-            {boardTwoway.row_1.map((tile, i) => {
+            {board.row_1.map((tile, i) => {
                 return (
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
@@ -37,39 +39,47 @@ export default function BoardTwoway() {
             </div>
             {/* row 2 */}
             <div className="flex">
-            {boardTwoway.row_2.map((tile, i) => {
+            {board.row_2.map((tile, i) => {
                 return (
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
-                        : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileCity data={tile} />
+                        : tile.type == 'history'
+                            ? <div className="relative w-[7.5vw] h-[23vh]">
+                                {gameState.showGameHistory ? <TileHistory data={{title: 'chance'}}/> : null}
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileOther data={tile} />
-                            </div>
+                            : tile.type == 'city'
+                                ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
+                                </div>
+                                : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
+                                </div>
                 )
             })}
             </div>
             {/* row 3 */}
             <div className="flex">
-            {boardTwoway.row_3.map((tile, i) => {
+            {board.row_3.map((tile, i) => {
                 return (
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
-                        : tile.type == 'city'
-                            ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileCity data={tile} />
+                        : tile.type == 'history'
+                            ? <div className="relative w-[7.5vw] h-[23vh]">
+                                {gameState.showGameHistory ? <TileHistory data={{title: 'community'}}/> : null}
                             </div>
-                            : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
-                                <TileOther data={tile} />
-                            </div>
+                            : tile.type == 'city'
+                                ? <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileCity data={tile} />
+                                </div>
+                                : <div key={i} className={`border w-[7.5vw] h-[23vh] ${squareNumberStyle}`} data-square={tile.square}>
+                                    <TileOther data={tile} />
+                                </div>
                 )
             })}
             </div>
             {/* row 4 */}
             <div className="flex">
-            {boardTwoway.row_4.map((tile, i) => {
+            {board.row_4.map((tile, i) => {
                 return (
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
@@ -171,7 +181,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const newInfo = name.match('Cursed')
                     ? `${translateCityName};${curseRand};${translateInfo}`
                     : cityBoughtInfo ? `${translateCityName};${cityBoughtInfo}` : `${translateCityName};${translateInfo}`
-    // tile broken & meteor
+    // tile quake & meteor
     const hostname = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
     const attackAnimation = {
         quake: {
