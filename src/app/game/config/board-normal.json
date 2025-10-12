@@ -36,7 +36,7 @@
             "square": 17, 
             "type": "city",
             "name": "Pulau Komodo", 
-            "imgclass": "tile-city-komodo-island",
+            "imgclass": "tile-city-pulau-komodo",
             "price": 40000,
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"

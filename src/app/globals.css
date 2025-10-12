@@ -145,7 +145,7 @@ ul > li {
 
 /* city tiles */
 .tile-city-aceh, .tile-city-backrooms, .tile-city-denpasar, .tile-city-bandung, .tile-city-jakarta, 
-.tile-city-komodo-island, .tile-city-lawang-sewu, .tile-city-magelang, .tile-city-makassar, .tile-city-nusantara, 
+.tile-city-pulau-komodo, .tile-city-lawang-sewu, .tile-city-magelang, .tile-city-makassar, .tile-city-nusantara, 
 .tile-city-padang, .tile-city-palembang, .tile-city-pontianak, .tile-city-surabaya, .tile-city-yogyakarta
 { max-width: 100%; background-size: 100%; background-image: var(--tile-city-sprite-url); }
  
@@ -154,7 +154,7 @@ ul > li {
 .tile-city-denpasar { background-position: 0 14.285714%; background-size: 100%; }
 .tile-city-bandung { background-position: 0 21.428571%; background-size: 100%; }
 .tile-city-jakarta { background-position: 0 28.571429%; background-size: 100%; }
-.tile-city-komodo-island { background-position: 0 35.714286%; background-size: 100%; }
+.tile-city-pulau-komodo { background-position: 0 35.714286%; background-size: 100%; }
 .tile-city-lawang-sewu { background-position: 0 42.857143%; background-size: 100%; }
 .tile-city-magelang { background-position: 0 50%; background-size: 100%; }
 .tile-city-makassar { background-position: 0 57.142857%; background-size: 100%; }
