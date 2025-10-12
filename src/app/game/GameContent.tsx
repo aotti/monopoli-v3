@@ -117,11 +117,11 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
                 const playerData = gameState.gamePlayerInfo[findPlayer]
                 const tempPlayerData: IMissingData = {
-                    display_name: playerData.display_name,
-                    city: playerData.city,
-                    card: playerData.card,
-                    buff: playerData.buff,
-                    debuff: playerData.debuff,
+                    display_name: playerData?.display_name,
+                    city: playerData?.city,
+                    card: playerData?.card,
+                    buff: playerData?.buff,
+                    debuff: playerData?.debuff,
                 }
                 // match player data with missing data, if doesnt match show warning
                 const strTempPlayerData = JSON.stringify(tempPlayerData)
@@ -131,17 +131,17 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     soundMissingData.play()
                     // show warning icon on player tab and missing data option
                     const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
-                    playerSideButton.classList.add(...warningClass)
-                    playerSettingButton.classList.add(...warningClass)
-                    missingDataOption.classList.add(...warningClass)
+                    playerSideButton ? playerSideButton.classList.add(...warningClass) : null
+                    playerSettingButton ? playerSettingButton.classList.add(...warningClass): null
+                    missingDataOption ? missingDataOption.classList.add(...warningClass) : null
                 }
                 // if data match remove warning
                 else {
                     // remove warning icon
                     const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
-                    playerSideButton.classList.remove(...warningClass)
-                    playerSettingButton.classList.remove(...warningClass)
-                    missingDataOption.classList.remove(...warningClass)
+                    playerSideButton ? playerSideButton.classList.remove(...warningClass) : null
+                    playerSettingButton ? playerSettingButton.classList.remove(...warningClass) : null
+                    missingDataOption ? missingDataOption.classList.remove(...warningClass) : null
                 }
             }
         }
