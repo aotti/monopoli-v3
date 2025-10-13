@@ -47,6 +47,7 @@
     --emote-sprite-url: url('https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/emote_sprites-VdmE6gR3XhJ9rRTLfeI4RNuN5vcEL0.png');
     --tile-city-sprite-url: url('https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/tile_city_sprites-grwOelNZeSvTSJ79nEnrXKl2lEXDjI.png');
     --tile-other-sprite-url: url('https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/tile_other_sprites-aFM8hqo0Bj3VwhDgSflFJCWLqQu0B0.png');
+    --card-sprite-url: url('https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/card_sprites-wwi4Nxhc2lSjqg3UFEN320wXvqmPyB.png');
 }
 
 input, select {
@@ -177,3 +178,19 @@ ul > li {
 .tile-other-prison { background-position: 0 66.666667%; background-size: 100%; }
 .tile-other-parking { background-position: 0 83.333333%; background-size: 100%; }
 .tile-other-crack { background-position: 0 100%; background-size: 100%; }
+
+/* cards */
+.card-chance-a, .card-chance-b, .card-chance-c, .card-chance-d, .card-chance-s, 
+.card-community-a, .card-community-b, .card-community-c, .card-community-d, .card-community-s
+{ max-width: 100%; background-size: 100%; background-image: var(--card-sprite-url); }
+ 
+.card-chance-a { background-position: 0 0%; background-size: 100%; }
+.card-chance-b { background-position: 0 11.111111%; background-size: 100%; }
+.card-chance-c { background-position: 0 22.222222%; background-size: 100%; }
+.card-chance-d { background-position: 0 33.333333%; background-size: 100%; }
+.card-chance-s { background-position: 0 44.444444%; background-size: 100%; }
+.card-community-a { background-position: 0 55.555556%; background-size: 100%; }
+.card-community-b { background-position: 0 66.666667%; background-size: 100%; }
+.card-community-c { background-position: 0 77.777778%; background-size: 100%; }
+.card-community-d { background-position: 0 88.888889%; background-size: 100%; }
+.card-community-s { background-position: 0 100%; background-size: 100%; }

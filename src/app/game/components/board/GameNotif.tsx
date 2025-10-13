@@ -45,7 +45,7 @@ function GameNotifWithImage() {
 
     return (
         <div className={`${showImage} lg:w-44 lg:h-40`}>
-            <Image id="card_image" src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="card-image" width={100} height={100} loading="eager" unoptimized draggable={false} />
+            <Image id="card_image" src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" alt="card-image" width={100} height={150} unoptimized draggable={false} />
         </div>
     )
 }

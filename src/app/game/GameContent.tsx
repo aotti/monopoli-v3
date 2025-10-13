@@ -16,7 +16,6 @@ import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
 import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
-import PreloadCardImages from "./components/other/PreloadCardImages"
 import { clickOutsideElement } from "../../helper/click-outside"
 import MiniGame from "./components/board/MiniGame"
 import { clickInsideElement } from "../../helper/click-inside"
@@ -261,8 +260,6 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
             {/* game sounds */}
             <GameSounds />
-            {/* card images */}
-            <PreloadCardImages />
         </div>
     )
 }
