@@ -620,6 +620,9 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
     // warning
     const buyItemWarning = `"${description}"\nare you sure wanna buy this item?`
     if(!confirm(buyItemWarning)) return
+    // buying notif
+    resultMessage.classList.remove('hidden')
+    resultMessage.textContent = translateUI({lang: miscState.language, text: 'buying item..😪'})
     // fetch
     const buyItemFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(buyItemData)})
     const buyItemResponse: IResponse = await (await fetcher('/shop', buyItemFetchOptions)).json()
@@ -636,9 +639,8 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
             localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
             gameState.setMyShopItems(playerShopItems)
             // result message
-            resultMessage.textContent = translateUI({lang: miscState.language, text: 'item bought'})
+            resultMessage.textContent = translateUI({lang: miscState.language, text: 'item bought 👌'})
             // display notif
-            resultMessage.classList.remove('hidden')
             setTimeout(() => resultMessage.classList.add('hidden'), 3000);
             return
         default:
