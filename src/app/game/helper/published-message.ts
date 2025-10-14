@@ -342,7 +342,7 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
             // if theres taxes
             if(getMessage?.taxes) {
                 // ### money is in minus state (ex: -5000)
-                // ### for owner use - to reduce (- with - = +)
+                // ### for owner use - to increase (- with - become +)
                 // add owner money
                 const findOwner = allPlayerInfo.map(v => v.display_name).indexOf(getMessage.taxes.owner)
                 allPlayerInfo[findOwner].money -= getMessage.taxes.money

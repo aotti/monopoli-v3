@@ -314,11 +314,17 @@ export default class PlayerController extends Controller {
                             // shop items has value
                             if(getPlayerShopItems.length > 0) {
                                 // is item exist in player shop items
-                                const isItemShopExist = getPlayerShopItems.map(v => {
-                                    if(v.buff?.indexOf(payload.item_name) !== -1) return true
-                                    if(v.special_card?.indexOf(payload.item_name) !== -1) return true
-                                }).filter(i => i)[0]
-
+                                let isItemShopExist = []
+                                getPlayerShopItems.forEach(v => {
+                                    const isBuff = v.buff?.indexOf(payload.item_name)
+                                    const isSpecialCard = v.special_card?.indexOf(payload.item_name)
+                                    // ignore null/undefined
+                                    // duplicate buff/special card push to array
+                                    if(isBuff && isBuff !== -1) isItemShopExist.push(true)
+                                    if(isSpecialCard && isSpecialCard !== -1) isItemShopExist.push(true)
+                                })
+                                // filter array
+                                isItemShopExist = isItemShopExist.filter(i=>i)[0]
                                 // item exist, replace with coins
                                 if(isItemShopExist) {
                                     // update player coins

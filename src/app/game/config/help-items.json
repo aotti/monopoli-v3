@@ -94,6 +94,15 @@
             "[7%] Reduce incoming money 50%"
         ]
     },
+    "prison_rules": {
+        "page_1": [
+            "to get out of prison, player must accumulate dice number",
+            "accumulated dice number can be seen in prison tile tooltip",
+            "game with 1 dice must accumulate > 6 dice number",
+            "game with 2 dice must accumulate > 12 dice number",
+            "there is bug where player cannot be imprisoned, good luck 😎"
+        ]
+    },
     "game_sounds": {
         "indonesia": [
             "prison;;ghost panic team;;https://www.youtube.com/watch?v=3gUI2CRJDNo",
@@ -131,6 +140,14 @@
             "wrong answer will give Rp 7000",
             "unknown/empty answer will give Rp 1000",
             "if player 1 answer with \"apple\" then player 2 using the same answer, it will be considered \"wrong\""
+        ]
+    },
+    "missing_data": {
+        "page_1": [
+            "this game still have some weird bugs, maybe because i only use free stuff",
+            "sometimes player missing game data, but can only retrieve city, card, buff & debuff",
+            "player cannot roll dice if missing data still exist",
+            "to get missing data, click on player tab > burger icon > missing data"
         ]
     }
 }
