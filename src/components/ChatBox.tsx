@@ -234,8 +234,11 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
             return
         default: 
             const guestModeError = gameState.guestMode ? `❌ ${chatResponse.status}: ${translateUI({lang: miscState.language, text: 'login required'})}` : null
+            const errorMessage = chatResponse.status === 429 
+                                ? translateUI({lang: miscState.language, text: 'typing too fast'})
+                                : chatResponse.message
             inputValues.display_name = 'system'
-            inputValues.message_text = guestModeError || `${chatResponse.status} ${chatResponse.message}`
+            inputValues.message_text = guestModeError || `${chatResponse.status} ${errorMessage}`
             miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
             return
     }

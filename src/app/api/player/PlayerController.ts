@@ -2,11 +2,10 @@ import { IChat, IDaily, IGameContext, IPlayer, IQuerySelect, IQueryUpdate, IResp
 import Controller from "../Controller";
 import daily_rewards from "../../room/config/daily-rewards.json"
 import { cookies } from "next/headers";
-import { verifyAccessToken } from "../../../helper/helper";
 
 const rateLimitAvatar = Controller.createRateLimit(1, '10m')
 const rateLimitRanking = Controller.createRateLimit(1, '5s')
-const rateLimitLanguage = Controller.createRateLimit(1, '1m')
+const rateLimitLanguage = Controller.createRateLimit(2, process.env.MAINTENANCE_STATUS === 'true' ? '1d' : '5m')
 const rateLimitChat = Controller.createRateLimit(1, '1s')
 
 export default class PlayerController extends Controller {

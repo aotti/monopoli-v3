@@ -2,6 +2,7 @@
     "test": ["Create Account"],
     "indonesia": {
         "__TRANSLATE BAGIAN LAIN__": "__TRANSLATE BAGIAN LAIN__",
+        "Please rotate your screen to landscape 🙏": "Tolong miringkan layar anda menjadi horizontal 🙏",
         "report bugs": "lapor keanehan",
         "you can only report every 10 minutes, please send proper report": "anda hanya bisa lapor tiap 10 menit, tolong kirim laporan yang benar",
         "description": "jelaskan",
@@ -9,6 +10,7 @@
         "✅ report sent": "✅ laporan terkirim",
         
         "__TRANSLATE BAGIAN HOME__": "__TRANSLATE BAGIAN HOME__",
+        "Game is under maintenance 😓": "Permainan sedang dalam perbaikan 😓",
         "Do you already have an account?": "Apakah anda sudah punya akun?",
         "takes too long? back to ": "terlalu lama? kembali ke ",
         "or view as": "atau masuk sebagai",
@@ -364,6 +366,7 @@
         "name: length must be 4 to 12 | only letter, number and spaces allowed": "nama: panjang harus 4~12 | hanya huruf, angka dan spasi",
         "only letter, number, spaces and symbols .,#-+=@?! allowed": "hanya huruf, angka, spasi dan simbol .,#-+=@?!",
         "value doesnt match": "tidak ada pilihan itu!",
+        "typing too fast": "terlalu cepat mengirim",
         "login required": "anda hanya tamu",
         "name: room name already exist": "nama: nama ruang sudah ada!",
         "✅ chat box will persist": "✅ kotak obrolan akan tetap ada",

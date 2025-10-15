@@ -14,7 +14,7 @@ const rateLimitSendReportBugs = Controller.createRateLimit(1, '10m')
 
 export default class GameController extends Controller {
     private async filters(action: string, payload: any) {
-        let filterResult: IResponse = null
+        let filterResult: IResponse
         // get token payload
         const tokenPayload = await this.getTokenPayload({ token: payload.token })
         if(tokenPayload.status !== 200) return tokenPayload
@@ -437,15 +437,16 @@ export default class GameController extends Controller {
         
         // get room id
         const roomId = payload.channel.match(/\d+/)[0]
-        // log query args to redis
-        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
-        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
         // filter payload
         const filtering = await this.filters(action, payload)
         if(filtering.status !== 200) return filtering
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
 
         // check create rate limit
         const rateLimitID = payload.user_agent
@@ -703,15 +704,16 @@ export default class GameController extends Controller {
         let result: IResponse
         
         const roomId = payload.channel.match(/\d+/)[0]
-        // log query args to redis
-        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
-        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
         // filter payload
         const filtering = await this.filters(action, payload)
         if(filtering.status !== 200) return filtering
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
 
         // check create rate limit
         const rateLimitID = payload.user_agent
@@ -803,15 +805,16 @@ export default class GameController extends Controller {
         let result: IResponse
         
         const roomId = payload.channel.match(/\d+/)[0]
-        // log query args to redis
-        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
-        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
         // filter payload
         const filtering = await this.filters(action, payload)
         if(filtering.status !== 200) return filtering
         delete payload.token
         // get filter data
         const {token, onlinePlayersData} = filtering.data[0]
+        
+        // log query args to redis
+        const getGameLogs = await this.redisGet(`gameLog_${roomId}`)
+        await this.redisSet(`gameLog_${roomId}`, [...getGameLogs, payload])
 
         // check create rate limit
         const rateLimitID = payload.user_agent
