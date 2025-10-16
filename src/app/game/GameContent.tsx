@@ -15,7 +15,7 @@ import TutorialGameRoom from "./components/other/TutorialGameRoom"
 import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
-import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
+import { getAllPlayerData } from "./helper/game-prepare-playing-logic"
 import { clickOutsideElement } from "../../helper/click-outside"
 import MiniGame from "./components/board/MiniGame"
 import { clickInsideElement } from "../../helper/click-inside"
@@ -54,7 +54,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         miscState.setDisableButtons(null)
         // get player list and set room id
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
-        getPlayerInfo(gameroomParam, miscState, gameState)
+        getAllPlayerData(gameroomParam, miscState, gameState)
         gameState.setGameRoomId(gameroomParam)
 
         // remove sub event data

@@ -1,5 +1,5 @@
 import { fetcher, fetcherOptions, moneyFormat, qS, qSA, setInputValue, translateUI } from "../../../helper/helper"
-import { EventDataType, IGameContext, IGamePlay, IMiscContext, IResponse, IRollDiceData } from "../../../helper/types"
+import { EventDataType, IGameContext, IGamePlay, IMiscContext, IMissingData, IResponse, IRollDiceData } from "../../../helper/types"
 import { stopByCity } from "./game-tile-event-city-logic"
 import { stopByCards } from "./game-tile-event-card-logic"
 import { stopByPrison } from "./game-tile-event-prison-logic"
@@ -13,7 +13,7 @@ import { stopByMinigame } from "./game-tile-event-minigame"
 /*
     TABLE OF CONTENTS
     - GAME PREPARE
-        # GET PLAYER INFO
+        # GET PLAYER DATA
         # READY GAME
         # START GAME
         # ROLL TURN
@@ -31,9 +31,9 @@ import { stopByMinigame } from "./game-tile-event-minigame"
 // ========== - GAME PREPARE ==========
 // ========== - GAME PREPARE ==========
 
-// ========== # GET PLAYER INFO ==========
-// ========== # GET PLAYER INFO ==========
-export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
+// ========== # GET PLAYER DATA ==========
+// ========== # GET PLAYER DATA ==========
+export async function getAllPlayerData(roomId: number, miscState: IMiscContext, gameState: IGameContext) {
     // result message
     const notifTitle = qS('#result_notif_title')
     const notifMessage = qS('#result_notif_message')
@@ -47,7 +47,7 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
     // response
     switch(getPlayerResponse.status) {
         case 200: 
-            const { getPlayers, gameStage, decidePlayers, preparePlayers, quakeCity, gameHistory, playerTurns } = getPlayerResponse.data[0]
+            const { getPlayers, gameStage, decidePlayers, preparePlayers, quakeCity, gameHistory, playerTurns, allMissingData, missingLimitPlayers } = getPlayerResponse.data[0]
             // set game stage
             gameState.setGameStages(gameStage)
             // set player list
@@ -58,6 +58,25 @@ export async function getPlayerInfo(roomId: number, miscState: IMiscContext, gam
             gameState.setGameHistory(gameHistory)
             // set player turns
             localStorage.setItem('playerTurns', JSON.stringify(playerTurns))
+            // set missing data
+            if(allMissingData) {
+                const tempAllMissingData: IMissingData[] = allMissingData
+                // check player missing limit, if player on limit remove missing data
+                const isPlayerOnLimit = missingLimitPlayers.indexOf(gameState.myPlayerInfo.display_name)
+                if(isPlayerOnLimit !== -1) 
+                    localStorage.removeItem('missingData')
+                else {
+                    // find player
+                    const findPlayer = tempAllMissingData.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
+                    const playerMissingData = tempAllMissingData[findPlayer]
+                    // save missing data to localStorage (only for checking)
+                    // save if exist, remove if null
+                    playerMissingData
+                        ? localStorage.setItem('missingData', JSON.stringify(playerMissingData))
+                        : localStorage.removeItem('missingData')
+                }
+            }
+
             // set decide players
             if(decidePlayers) {
                 // change game stage
