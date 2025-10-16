@@ -4,28 +4,32 @@
             "square": 13, 
             "type": "other",
             "name": "Community Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
+            "imgclass": "tile-other-community",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png"
         },
         { 
             "square": 14, 
             "type": "city",
             "name": "Special-3",
             "price": 40000, 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Yogyakarta_100_Revision-KB4e6LbRMrtfeOaUDQhWIimu7nWOlV.png",
+            "imgclass": "tile-city-yogyakarta",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "<Yogyakarta>\nafter buying, get money every visit" 
         },
         { 
             "square": 15, 
             "type": "other",
             "name": "Chance Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+            "imgclass": "tile-other-chance",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" 
         },
         { 
             "square": 16, 
             "type": "city",
             "name": "Denpasar", 
             "price": 35000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Bali_100-Sww22czn5DJNVh1ycYmf3t7w5aDyrj.png",
+            "imgclass": "tile-city-denpasar",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { 
@@ -33,14 +37,16 @@
             "type": "city",
             "name": "Pulau Komodo", 
             "price": 40000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Komodo_Island_100_Revision-DnRIGgxlGT1PjrSPHGQqqL3pFVJBbZ.png",
+            "imgclass": "tile-city-pulau-komodo",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { 
             "square": 18, 
             "type": "other",
             "name": "Debuff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
+            "imgclass": "tile-other-debuff",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "65% chance get debuff"
         },
         { 
@@ -48,7 +54,8 @@
             "type": "city",
             "name": "Special-4",
             "price": 50000, 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Makassar_100-KQI2wyZj34yZf1GIZGfx3yUuP5OcNC.png",
+            "imgclass": "tile-city-makassar",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "<Makassar>\nafter buying, get money every visit"
         },
         { 
@@ -56,20 +63,23 @@
             "type": "city",
             "name": "Nusantara",
             "price": 45000, 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Nusantara_100-0pA4KBLsMIzIEp7tpbYbUdBAXJ73ss.png",
+            "imgclass": "tile-city-nusantara",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade" 
         },
         { 
             "square": 21, 
             "type": "other",
             "name": "Community Card",
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
+            "imgclass": "tile-other-community",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png"
         },
         { 
             "square": 22, 
             "type": "other",
             "name": "Free Parking 😎", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Parking_100-0bNthQvUZ8ZeknwzolhmI0YbKz6jWN.png",
+            "imgclass": "tile-other-parking",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "go to anywhere except prison" 
         }
     ],
@@ -78,7 +88,8 @@
             "square": 12, 
             "type": "other",
             "name": "Buff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
+            "imgclass": "tile-other-buff",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "100% chance get buff"
         },
         { "type": "history" },
@@ -87,7 +98,8 @@
             "type": "city",
             "name": "Magelang", 
             "price": 32000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Magelang_100_Revision-fUbfBTaoCf35NafcQvpa9dP7TQa7R6.png",
+            "imgclass": "tile-city-magelang",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { "type": null },
@@ -99,14 +111,16 @@
             "type": "city",
             "name": "Surabaya", 
             "price": 47000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Surabaya_100-Qp3K9VvAIcyUxN0WkNtM8MchxjFY9w.png",
+            "imgclass": "tile-city-surabaya",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { 
             "square": "24x", 
             "type": "other",
             "name": "Buff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Buff_100-ASvQxMDh44WJQ9iFCkKVOjBG7J2cj3.png",
+            "imgclass": "tile-other-buff",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "100% chance get buff"
         },
         { 
@@ -114,7 +128,8 @@
             "type": "city",
             "name": "Pontianak", 
             "price": 50000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Pontianak_100-ZhKtMGe0VuFTHAsLKBQu4oWcjJfuEA.png",
+            "imgclass": "tile-city-pontianak",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         }
     ],
@@ -124,20 +139,23 @@
             "type": "city",
             "name": "Special-2", 
             "price": 30000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Jakarta_100_Revision-W32qQihw3gfXiL84wk0e8UHN9wSU9j.png",
+            "imgclass": "tile-city-jakarta",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "<Jakarta>\nafter buying, get money every visit"
         },
         { 
             "square": "12x", 
             "type": "other",
             "name": "Community Card",
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png"
+            "imgclass": "tile-other-community",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png"
         },
         { 
             "square": "13x", 
             "type": "other",
             "name": "Debuff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
+            "imgclass": "tile-other-debuff",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "65% chance get debuff"
         },
         { "type": null },
@@ -148,7 +166,8 @@
             "square": "2x", 
             "type": "other",
             "name": "Chance Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+            "imgclass": "tile-other-chance",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" 
         },
         { "type": "history" },
         { 
@@ -156,7 +175,8 @@
             "type": "city",
             "name": "Cursed-2", 
             "price": 35000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Backrooms_100-R3NC0fRDQ5Gmjqo3m9kyoG55wIyPaJ.png",
+            "imgclass": "tile-city-backrooms",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "<Backrooms>\nlose money every visit"
         }
     ],
@@ -165,7 +185,8 @@
             "square": 10, 
             "type": "other",
             "name": "Get Arrested 👮", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Jail_100l-ICZXioK3ZAtyBzFw1EDulpESLGnpYt.png",
+            "imgclass": "tile-other-prison",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "prison\naccumulation\ndice xxx of xxx"
         },
         { 
@@ -173,21 +194,24 @@
             "type": "city",
             "name": "Cursed-1", 
             "price": 25000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Lawang_Sewu_100-OgKDUcfqHVUE1cmvSilsFZvU1DzRlX.png",
+            "imgclass": "tile-city-lawang-sewu",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "<Lawang Sewu>\nlose money every visit"
         },
         { 
             "square": 8, 
             "type": "other",
             "name": "Chance Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Chance_100-xBEssQz2WiIV0YFXbFog0D4JzGq4Jp.png" 
+            "imgclass": "tile-other-chance",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" 
         },
         { 
             "square": 7, 
             "type": "city",
             "name": "Bandung", 
             "price": 30000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Bandung_100-NZHi1igo18j5x8xSTfWWtx5PNNh3sK.png",
+            "imgclass": "tile-city-bandung",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { 
@@ -195,7 +219,8 @@
             "type": "city",
             "name": "Palembang", 
             "price": 25000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Palembang_100-QNw03JGc5PepXjqNvBoynheDKVulxS.png",
+            "imgclass": "tile-city-palembang",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { 
@@ -203,20 +228,23 @@
             "type": "city",
             "name": "Special-1", 
             "price": 20000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Aceh_100-KDP7nZIFp80TCSaaSA2HAioxfwY6hb.png",
+            "imgclass": "tile-city-aceh",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "<Aceh>\nafter buying, get money every visit"
         },
         { 
             "square": 4, 
             "type": "other",
             "name": "Community Card", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Community_100-z7QvaQzB5F5DGK7xTf2ZZStswyNJxb.png" 
+            "imgclass": "tile-other-community",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" 
         },
         { 
             "square": 3, 
             "type": "other",
             "name": "Debuff Area", 
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Debuff_100-BbJMQCWfSFsvCk1iowtXD0iX9ixlHU.png",
+            "imgclass": "tile-other-debuff",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "65% chance get debuff"  
         },
         { 
@@ -224,13 +252,15 @@
             "type": "city",
             "name": "Padang", 
             "price": 20000,
-            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_city/Padang_100-WWvCOlfpWXSBy3Ue9HiFBkrOk2OHu9.png",
+            "imgclass": "tile-city-padang",
+            "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png",
             "info": "price +10% for each upgrade"
         },
         { 
             "square": 1, 
             "type": "other",
             "name": "Start line", 
+            "imgclass": "tile-other-start",
             "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/tile_other/Start_100-wIOOcS7Dm9xTo36ZgtEHTNabPzjoz1.gif",
             "info": "get 25k when passing or staying\nminigame: xxx" 
         }

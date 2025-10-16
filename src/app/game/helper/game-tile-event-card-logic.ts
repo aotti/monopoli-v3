@@ -40,7 +40,7 @@ export function stopByCards(card: 'chance'|'community', findPlayer: number, rng:
                                         : translateUI({lang: miscState.language, text: 'Community Card'})
                 notifMessage.textContent = translateUI({lang: miscState.language, text: cards.data[cardRNG].description as any})
                                         + (buffDebuff ? `\n${translateUI({lang: miscState.language, text: '"buff pick rarity"'})}` : '')
-                notifImage.src = cards.data[cardRNG].img
+                notifImage.className = cards.data[cardRNG].imgclass
                 // run card effect
                 const cardData = {
                     tileName: card,

@@ -44,7 +44,7 @@ export default function GameBoard({ boardType }: {boardType: string}) {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'history'
-                            ? <div className="relative w-[7.5vw] h-[23vh]">
+                            ? <div key={i} className="relative w-[7.5vw] h-[23vh]">
                                 {gameState.showGameHistory ? <TileHistory data={{title: 'chance'}}/> : null}
                             </div>
                             : tile.type == 'city'
@@ -64,7 +64,7 @@ export default function GameBoard({ boardType }: {boardType: string}) {
                     tile.type === null
                         ? <div key={i} className="w-[7.5vw] h-[23vh]"></div>
                         : tile.type == 'history'
-                            ? <div className="relative w-[7.5vw] h-[23vh]">
+                            ? <div key={i} className="relative w-[7.5vw] h-[23vh]">
                                 {gameState.showGameHistory ? <TileHistory data={{title: 'community'}}/> : null}
                             </div>
                             : tile.type == 'city'
@@ -101,8 +101,8 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
     const miscState = useMisc()
     const gameState = useGame()
     // tile data
-    type TileCityType = {name: string, price: number, img: string, info: string, square: number}
-    const { name, price, img, info, square } = data as TileCityType 
+    type TileCityType = {name: string, price: number, img: string, imgclass: string, info: string, square: number}
+    const { name, price, img, imgclass, info, square } = data as TileCityType 
     // tile name
     const translateCityName = name.match(/\d/) ? translateUI({lang: miscState.language, text: name as any}) : name
     // get room info
@@ -210,7 +210,7 @@ function TileCity({ data }: {data: {[key:string]: string|number}}) {
                 <video id={`video_city_meteor_hotel_${name}`} src={attackAnimation.meteor.hotel} className="absolute z-10 hidden" />
                 {/* tile image */}
                 <div className="relative">
-                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} ${cityColor} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
+                    <Image src={img} alt={name} width={100} height={100} className={`${cityQuake ? 'saturate-0' : ''} ${cityColor} ${imgclass} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
                     {/* tile image crack */}
                     {cityQuake
                         ? <Image src={crackImage} alt="crack" width={100} height={100} className={`absolute z-10 top-0 saturate-0 w-[7.5vw] h-[23vh]`} draggable={false} priority={true} />
@@ -233,8 +233,8 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
     const miscState = useMisc()
     const gameState = useGame()
     // tile data
-    type TileOtherType = {name: string, img: string, info: string, square: number}
-    const { name, img, info, square } = data as TileOtherType 
+    type TileOtherType = {name: string, img: string, imgclass: string, info: string, square: number}
+    const { name, img, imgclass, info, square } = data as TileOtherType 
     const translateInfo = translateUI({lang: miscState.language, text: info as any})
     // highlight
     const isPlayerOnTop = gameState.gamePlayerInfo.map(v => v.pos).indexOf(`${square}`)
@@ -266,7 +266,7 @@ function TileOther({ data }: {data: {[key:string]: string|number}}) {
             </div>
             <div data-tooltip={info ? newInfo : null} className="relative flex flex-col">
                 {/* tile image */}
-                <Image src={img} alt={name} width={100} height={100} className={`w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
+                <Image src={img} alt={name} width={100} height={100} className={`${imgclass} w-[7.5vw] h-[23vh]`} draggable={false} priority={true} unoptimized />
                 {/* tile label */}
                 <div className={`${isPlayerOnTop !== -1 ? 'animate-player-pos' : ''}
                 font-mono ml-px w-[7.1vw] h-[6.75vh] bg-darkblue-4/90 text-black text-center`}>

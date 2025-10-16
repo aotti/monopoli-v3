@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import HomePage from "./home/HomePage";
 import { Metadata } from "next";
+import MaintenancePage from "./home/MaintenancePage";
 
 export async function generateMetadata(): Promise<Metadata> {
     const imgHost = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
@@ -17,7 +18,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
+    const maintenanceStatus = process.env.MAINTENANCE_STATUS
     const isRefreshTokenExist = typeof cookies().get('refreshToken')?.value == 'string'
 
-    return <HomePage isRefreshTokenExist={isRefreshTokenExist} />
+    return maintenanceStatus === 'true'
+            ? <MaintenancePage />
+            : <HomePage isRefreshTokenExist={isRefreshTokenExist} />
 }

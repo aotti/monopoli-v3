@@ -90,19 +90,19 @@ export default function Daily() {
                     <span className="w-full h-0 my-auto border"></span>
                 </div>
                 {/* head */}
-                <div className="grid grid-cols-5 p-1 text-2xs lg:text-xs">
+                <div className="grid grid-cols-6 p-1 text-2xs lg:text-xs">
                     <span className="text-orange-300 border-b"> 
                         {translateUI({lang: miscState.language, text: 'type'})} 
                     </span>
                     <span className="col-span-2 text-orange-300 border-b"> 
                         {translateUI({lang: miscState.language, text: 'item'})} 
                     </span>
-                    <span className="col-span-2 text-orange-300 border-b">
+                    <span className="col-span-3 text-orange-300 border-b">
                         {translateUI({lang: miscState.language, text: 'date'})}
                     </span>
                 </div>
                 {/* body */}
-                <div className="grid grid-cols-5 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll">
+                <div className="grid grid-cols-6 h-[calc(25vh)] p-1 text-2xs lg:text-xs overflow-y-scroll">
                     <div className="flex flex-col gap-2">
                         {gameState.dailyHistory 
                             ? gameState.dailyHistory.map((v,i) => <span key={i}>
@@ -117,7 +117,7 @@ export default function Daily() {
                             </span>)
                             : null}
                     </div>
-                    <div className="col-span-2 flex flex-col gap-2">
+                    <div className="col-span-3 flex flex-col gap-2">
                         {gameState.dailyHistory 
                             ? gameState.dailyHistory.map((v,i) => <span key={i}> {convertDate(v.reward_date)} </span>)
                             : null}

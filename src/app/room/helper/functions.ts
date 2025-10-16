@@ -34,11 +34,6 @@ export async function getRoomList(gameState: IGameContext) {
             gameState.setGameRoomInfo(getRoomResponse.data[0].roomListInfo)
             // set last daily status
             gameState.setLastDailyStatus(getRoomResponse.data[0].lastDailyStatus)
-            // save missing data to localStorage (only for checking)
-            // save if exist, remove if null
-            getRoomResponse.data[0]?.missingData
-                ? localStorage.setItem('missingData', JSON.stringify(getRoomResponse.data[0].missingData))
-                : localStorage.removeItem('missingData')
             return
         default: 
             resultMessage.textContent = `❌ ${getRoomResponse.status}: ${getRoomResponse.message}`
@@ -474,6 +469,7 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
             miscState.setDisableButtons(null)
             // set joined room
             gameState.setMyCurrentGame(roomId)
+
             // get room info
             const findRoomData = gameState.roomList.map(v => v.room_id).indexOf(roomId)
             const { room_id, room_name, creator, rules } = gameState.roomList[findRoomData]
@@ -489,6 +485,7 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
                 splitRules[4], // mode
                 +splitRules[5], // curse
             ]
+
             // set room info & filter to prevent duplicate
             gameState.setGameRoomInfo(rooms => [...rooms, {
                 room_id, room_name, creator, 
@@ -496,6 +493,7 @@ export async function joinRoom(formInputs: HTMLFormControlsCollection, roomId: n
             }].filter((obj1, i, arr) => 
                 arr.findLastIndex(obj2 => obj2.room_name == obj1.room_name) === i
             ))
+
             // move to game room
             const link = qS(`#gotoGame${roomId}`) as HTMLAnchorElement
             link.click()
@@ -620,6 +618,9 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
     // warning
     const buyItemWarning = `"${description}"\nare you sure wanna buy this item?`
     if(!confirm(buyItemWarning)) return
+    // buying notif
+    resultMessage.classList.remove('hidden')
+    resultMessage.textContent = translateUI({lang: miscState.language, text: 'buying item..😪'})
     // fetch
     const buyItemFetchOptions = fetcherOptions({method: 'POST', credentials: true, body: JSON.stringify(buyItemData)})
     const buyItemResponse: IResponse = await (await fetcher('/shop', buyItemFetchOptions)).json()
@@ -636,9 +637,8 @@ export async function buyShopitem(ev: FormEvent<HTMLFormElement>, itemData, misc
             localStorage.setItem('playerShopItems', JSON.stringify(playerShopItems))
             gameState.setMyShopItems(playerShopItems)
             // result message
-            resultMessage.textContent = translateUI({lang: miscState.language, text: 'item bought'})
+            resultMessage.textContent = translateUI({lang: miscState.language, text: 'item bought 👌'})
             // display notif
-            resultMessage.classList.remove('hidden')
             setTimeout(() => resultMessage.classList.add('hidden'), 3000);
             return
         default:

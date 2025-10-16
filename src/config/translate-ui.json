@@ -2,6 +2,7 @@
     "test": ["Create Account"],
     "indonesia": {
         "__TRANSLATE BAGIAN LAIN__": "__TRANSLATE BAGIAN LAIN__",
+        "Please rotate your screen to landscape 🙏": "Tolong miringkan layar anda menjadi horizontal 🙏",
         "report bugs": "lapor keanehan",
         "you can only report every 10 minutes, please send proper report": "anda hanya bisa lapor tiap 10 menit, tolong kirim laporan yang benar",
         "description": "jelaskan",
@@ -9,6 +10,7 @@
         "✅ report sent": "✅ laporan terkirim",
         
         "__TRANSLATE BAGIAN HOME__": "__TRANSLATE BAGIAN HOME__",
+        "Game is under maintenance 😓": "Permainan sedang dalam perbaikan 😓",
         "Do you already have an account?": "Apakah anda sudah punya akun?",
         "takes too long? back to ": "terlalu lama? kembali ke ",
         "or view as": "atau masuk sebagai",
@@ -48,7 +50,8 @@
         "Ranking": "Peringkat",
         "Refresh": "Perbarui",
         "Shop": "Toko",
-        "item bought": "barang terbeli",
+        "buying item..😪": "membeli barang..😪",
+        "item bought 👌": "barang terbeli 👌",
         "coins not enough": "koin tidak cukup",
         "already have this item": "sudah punya barang ini",
         "only allowed to have 2 items per type": "hanya boleh punya 2 barang per jenis",
@@ -293,6 +296,28 @@
         "Get curse reverser card": "Dapat kartu pembalik kutukan",
         "Reset money to 0 when you gonna lose": "Mengubah uang ke 0 saat anda kalah",
         "Start game with 2 laps": "Mulai main dengan 2 putaran",
+        
+        "__PRISON RULES__": "__PRISON RULES__",
+        "to get out of prison, player must accumulate dice number": "untuk keluar dari penjara, pemain harus akumulasi angka dadu",
+        "accumulated dice number can be seen in prison tile tooltip": "angka dadu yang terkumpul bisa dicek di tooltip petak penjara",
+        "game with 1 dice must accumulate > 6 dice number": "permainan dengan 1 dadu harus akumulasi > 6 angka dadu",
+        "game with 2 dice must accumulate > 12 dice number": "permainan dengan 2 dadu harus akumulasi > 12 angka dadu",
+        "there is bug where player cannot be imprisoned, good luck 😎": "masih ada error dimana pemain tidak bisa dipenjara, kalo hoki 😎",
+
+        "__MINIGAME HELP__": "__MINIGAME HELP__",
+        "minigame can only be played on start tile": "minigame hanya bisa dimainkan di petak start",
+        "player will get minigame chance every 3 laps": "pemain akan mendapat kesempatan main tiap 3 putaran",
+        "when someone start the minigame, others can play it too": "saat ada pemain yang bermain minigame, pemain lain juga bisa ikut main",
+        "correct answer will give Rp 15000": "jawaban benar dapat Rp 15000",
+        "wrong answer will give Rp 7000": "jawaban salah dapat Rp 7000",
+        "unknown/empty answer will give Rp 1000": "jawaban aneh/kosong dapat Rp 1000",
+        "if player 1 answer with \"apple\" then player 2 using the same answer, it will be considered \"wrong\"": "jika pemain 1 jawab dengan \"apel\" dan pemain 2 pake jawaban yang sama, maka itu dianggap \"salah\"",
+        
+        "__MISSING DATA HELP__": "__MISSING DATA HELP__",
+        "this game still have some weird bugs, maybe because i only use free stuff": "permainan ini masih ada sedikit error aneh, mungkin karna pake alat gratisan",
+        "sometimes player missing game data, but can only retrieve city, card, buff & debuff": "kadang data pemain bisa hilang, tapi cuma kota, kartu spesial, buff & debuff yang bisa dikembalikan",
+        "player cannot roll dice if missing data still exist": "pemain tidak bisa putar dadu kalo masih kehilangan data",
+        "to get missing data, click on player tab > burger icon > missing data": "untuk ambil data hilang, klik tab pemain > ikon burger > data hilang",
 
         "click here to continue": "klik ini untuk lanjut",
         "tutorial complete": "tutorial selesai",
@@ -341,6 +366,7 @@
         "name: length must be 4 to 12 | only letter, number and spaces allowed": "nama: panjang harus 4~12 | hanya huruf, angka dan spasi",
         "only letter, number, spaces and symbols .,#-+=@?! allowed": "hanya huruf, angka, spasi dan simbol .,#-+=@?!",
         "value doesnt match": "tidak ada pilihan itu!",
+        "typing too fast": "terlalu cepat mengirim",
         "login required": "anda hanya tamu",
         "name: room name already exist": "nama: nama ruang sudah ada!",
         "✅ chat box will persist": "✅ kotak obrolan akan tetap ada",
@@ -470,13 +496,6 @@
         "negara": "country",
         "hewan ikan": "pisces",
         "hewan burung": "aves",
-        "hewan mamalia": "mammals",
-        "minigame can only be played on start tile": "minigame hanya bisa dimainkan di petak start",
-        "player will get minigame chance every 3 laps": "pemain akan mendapat kesempatan main tiap 3 putaran",
-        "when someone start the minigame, others can play it too": "saat ada pemain yang bermain minigame, pemain lain juga bisa ikut main",
-        "correct answer will give Rp 15000": "jawaban benar dapat Rp 15000",
-        "wrong answer will give Rp 7000": "jawaban salah dapat Rp 7000",
-        "unknown/empty answer will give Rp 1000": "jawaban aneh/kosong dapat Rp 1000",
-        "if player 1 answer with \"apple\" then player 2 using the same answer, it will be considered \"wrong\"": "jika pemain 1 jawab dengan \"apel\" dan pemain 2 pake jawaban yang sama, maka itu dianggap \"salah\""
+        "hewan mamalia": "mammals"
     }
 }

@@ -2,11 +2,10 @@ import { IChat, IDaily, IGameContext, IPlayer, IQuerySelect, IQueryUpdate, IResp
 import Controller from "../Controller";
 import daily_rewards from "../../room/config/daily-rewards.json"
 import { cookies } from "next/headers";
-import { verifyAccessToken } from "../../../helper/helper";
 
 const rateLimitAvatar = Controller.createRateLimit(1, '10m')
 const rateLimitRanking = Controller.createRateLimit(1, '5s')
-const rateLimitLanguage = Controller.createRateLimit(1, '1m')
+const rateLimitLanguage = Controller.createRateLimit(2, process.env.MAINTENANCE_STATUS === 'true' ? '1d' : '5m')
 const rateLimitChat = Controller.createRateLimit(1, '1s')
 
 export default class PlayerController extends Controller {
@@ -314,11 +313,17 @@ export default class PlayerController extends Controller {
                             // shop items has value
                             if(getPlayerShopItems.length > 0) {
                                 // is item exist in player shop items
-                                const isItemShopExist = getPlayerShopItems.map(v => {
-                                    if(v.buff?.indexOf(payload.item_name) !== -1) return true
-                                    if(v.special_card?.indexOf(payload.item_name) !== -1) return true
-                                }).filter(i => i)[0]
-
+                                let isItemShopExist = []
+                                getPlayerShopItems.forEach(v => {
+                                    const isBuff = v.buff?.indexOf(payload.item_name)
+                                    const isSpecialCard = v.special_card?.indexOf(payload.item_name)
+                                    // ignore null/undefined
+                                    // duplicate buff/special card push to array
+                                    if(isBuff && isBuff !== -1) isItemShopExist.push(true)
+                                    if(isSpecialCard && isSpecialCard !== -1) isItemShopExist.push(true)
+                                })
+                                // filter array
+                                isItemShopExist = isItemShopExist.filter(i=>i)[0]
                                 // item exist, replace with coins
                                 if(isItemShopExist) {
                                     // update player coins

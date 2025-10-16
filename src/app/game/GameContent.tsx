@@ -15,8 +15,7 @@ import TutorialGameRoom from "./components/other/TutorialGameRoom"
 import PubNub, { Listener } from "pubnub"
 import { gameMessageListener } from "./helper/published-message"
 import GameSounds from "../../components/GameSounds"
-import { getPlayerInfo } from "./helper/game-prepare-playing-logic"
-import PreloadCardImages from "./components/other/PreloadCardImages"
+import { getAllPlayerData } from "./helper/game-prepare-playing-logic"
 import { clickOutsideElement } from "../../helper/click-outside"
 import MiniGame from "./components/board/MiniGame"
 import { clickInsideElement } from "../../helper/click-inside"
@@ -55,7 +54,7 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
         miscState.setDisableButtons(null)
         // get player list and set room id
         const gameroomParam = +location.search.match(/id=\d+$/)[0].split('=')[1]
-        getPlayerInfo(gameroomParam, miscState, gameState)
+        getAllPlayerData(gameroomParam, miscState, gameState)
         gameState.setGameRoomId(gameroomParam)
 
         // remove sub event data
@@ -117,11 +116,11 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                 const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
                 const playerData = gameState.gamePlayerInfo[findPlayer]
                 const tempPlayerData: IMissingData = {
-                    display_name: playerData.display_name,
-                    city: playerData.city,
-                    card: playerData.card,
-                    buff: playerData.buff,
-                    debuff: playerData.debuff,
+                    display_name: playerData?.display_name,
+                    city: playerData?.city,
+                    card: playerData?.card,
+                    buff: playerData?.buff,
+                    debuff: playerData?.debuff,
                 }
                 // match player data with missing data, if doesnt match show warning
                 const strTempPlayerData = JSON.stringify(tempPlayerData)
@@ -131,17 +130,17 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
                     soundMissingData.play()
                     // show warning icon on player tab and missing data option
                     const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
-                    playerSideButton.classList.add(...warningClass)
-                    playerSettingButton.classList.add(...warningClass)
-                    missingDataOption.classList.add(...warningClass)
+                    playerSideButton ? playerSideButton.classList.add(...warningClass) : null
+                    playerSettingButton ? playerSettingButton.classList.add(...warningClass): null
+                    missingDataOption ? missingDataOption.classList.add(...warningClass) : null
                 }
                 // if data match remove warning
                 else {
                     // remove warning icon
                     const warningClass = [`after:content-['!']`, `after:bg-red-600`, `after:p-1`, `after:rounded-full`]
-                    playerSideButton.classList.remove(...warningClass)
-                    playerSettingButton.classList.remove(...warningClass)
-                    missingDataOption.classList.remove(...warningClass)
+                    playerSideButton ? playerSideButton.classList.remove(...warningClass) : null
+                    playerSettingButton ? playerSettingButton.classList.remove(...warningClass) : null
+                    missingDataOption ? missingDataOption.classList.remove(...warningClass) : null
                 }
             }
         }
@@ -261,8 +260,6 @@ export default function GameContent({ pubnubSetting }: {pubnubSetting: {monopoly
 
             {/* game sounds */}
             <GameSounds />
-            {/* card images */}
-            <PreloadCardImages />
         </div>
     )
 }

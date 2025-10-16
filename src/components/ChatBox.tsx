@@ -99,11 +99,11 @@ function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}
     // find the emote
     const message_word = message_text.split(' ')
     message_word.forEach((word, i) => {
-        // (FE) Find Emote format in message text
-        const FE = emoList.map(emo => emo.alias).indexOf(word)
-        FE !== -1
+        // find emote format in message text
+        const findEmote = emoList.map(emo => emo.alias).indexOf(word)
+        findEmote !== -1
             // emote found, create img element
-            ? modifiedMessageText.push(<img key={i} src={emoList[FE].url} alt={emoList[FE].alias} className="!inline !h-5 lg:!h-6 mx-px" />)
+            ? modifiedMessageText.push(<img key={i} src={emoList[findEmote].url} alt={emoList[findEmote].alias} className={`${emoList[findEmote].class} !inline !h-5 lg:!h-6 mx-px`} />)
             // normal word, create span element
             : modifiedMessageText.push(<span key={i}> {word} </span>)
     })
@@ -139,7 +139,7 @@ export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
     return (
         <div className={`absolute ${emoteListPos} top z-40 grid grid-cols-5 gap-2 bg-darkblue-1 border-8bit-text w-40`}>
             {emoteList.map((v, i) => {
-                return <Image key={i} src={v.url} alt={v.alias} width={50} height={50} title={v.name} className="!h-min my-auto hover:bg-darkblue-3" priority={true} unoptimized onClick={handleChosenEmote} />
+                return <Image key={i} src={v.url} alt={v.alias} width={50} height={50} title={v.name} className={`${v.class} !h-min my-auto hover:bg-darkblue-3`} priority={true} unoptimized onClick={handleChosenEmote} />
             })}
         </div>
     )
@@ -234,8 +234,11 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
             return
         default: 
             const guestModeError = gameState.guestMode ? `❌ ${chatResponse.status}: ${translateUI({lang: miscState.language, text: 'login required'})}` : null
+            const errorMessage = chatResponse.status === 429 
+                                ? translateUI({lang: miscState.language, text: 'typing too fast'})
+                                : chatResponse.message
             inputValues.display_name = 'system'
-            inputValues.message_text = guestModeError || `${chatResponse.status} ${chatResponse.message}`
+            inputValues.message_text = guestModeError || `${chatResponse.status} ${errorMessage}`
             miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
             return
     }

@@ -141,25 +141,6 @@ export default class RoomController extends Controller {
             }
             // match joined room with room list
             const isJoinedRoomExist = data.map(v => v.room_id).indexOf(data[isMyGameExist]?.room_id || +getJoinedRoom)
-            
-            // check + get missing data
-            let validMissingData = null
-            if(tempTPayload?.display_name != 'guest') {
-                // check missing data limit
-                const getMissingLimit = await this.redisGet(`missingLimit_${tempTPayload.display_name}`)
-                // missing data limit reached
-                if(getMissingLimit.length > 0 && getMissingLimit[0] === 3) {
-                    validMissingData = null
-                }
-                // missing data limit not reached
-                else {
-                    // get missing data
-                    const getMissingData = await this.redisGet(`missingData_${data[isMyGameExist]?.room_id || +getJoinedRoom}`)
-                    // find player
-                    const findPlayer = getMissingData.map(v => v.display_name).indexOf(tempTPayload.display_name)
-                    validMissingData = getMissingData.length > 0 ? getMissingData[findPlayer] : null
-                }
-            }
 
             // set result
             const resultData = {
@@ -169,7 +150,6 @@ export default class RoomController extends Controller {
                 currentGame: isJoinedRoomExist !== -1 ? data[isJoinedRoomExist].room_id : null,
                 roomListInfo: roomListInfo,
                 roomList: data,
-                missingData: validMissingData,
             }
             result = this.respond(200, `${action} success`, [resultData])
         }
@@ -393,6 +373,14 @@ export default class RoomController extends Controller {
         else {
             // update disabled characters
             await this.redisSet(`disabledCharacters_${payload.room_id}`, [...getDisabledCharacters, payload.select_character])
+            // set joined room 
+            cookies().set('joinedRoom', data[0].room_id.toString(), {
+                path: '/',
+                maxAge: 604800 * 2, // 1 week * 2
+                httpOnly: true,
+                sameSite: 'strict',
+            })
+
             // publish realtime data
             const roomlistChannel = 'monopoli-roomlist'
             const publishData = {
@@ -425,13 +413,6 @@ export default class RoomController extends Controller {
             console.log(isGamePublished);
             
             if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
-            // set joined room 
-            cookies().set('joinedRoom', data[0].room_id.toString(), {
-                path: '/',
-                maxAge: 604800 * 2, // 1 week * 2
-                httpOnly: true,
-                sameSite: 'strict',
-            })
             // set result
             const resultData = {
                 joinData: data[0],

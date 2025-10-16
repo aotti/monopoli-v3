@@ -15,13 +15,6 @@ export default function HomePage({ isRefreshTokenExist }) {
     const gameState = useGame()
 
     useEffect(() => {
-        // get url params
-        const resetData = location.search.match('reset=true')
-        // reset all data and remove query
-        if(resetData) {
-            history.pushState({}, null, '/')
-            resetAllData(gameState)
-        }
         // create identifier
         generateIdentifier()
         // check token for auto login

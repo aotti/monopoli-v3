@@ -245,3 +245,20 @@ fix 17 aug 2025
 - ~~kartu upgrade city tidak masuk log dan history dan membuat player turn ngebug~~
 > > ubah sistem jadi seperti attack city
 - kartu dana umum (pilih koin) ngebug ??
+
+fix 22 september 2025
+- ~~attack + upgrade city harus masuk ke log~~
+- ~~tombol missing data gk bisa di klik lagi setelah fetch selesai~~
+- ~~tambah rate limiter ke login~~
+- ~~error setelah missing data lalu roll dice~~
+- ~~fitur attack city steal error~~
+- ~~tambah cek missing data saat attack/upgrade city~~
+- ~~jangan cek missing limit sblm save missing data~~
+- ~~missing limit direset tiap game start~~
+- ~~kartu ulang tahun 15k (dana umum) tidak gabung dgn uang lewat start~~
+- ~~minigame, jawapan bisa salah walau benar~~
+> > karna matched words kena splice di hint answer, jadi gabung match words + hint answer
+- ~~untuk semua gambar, validasi url nya agar hanya bersumber dari website tertentu~~
+- ~~hadiah daily pack bisa awto convert ke coin~~
+- ~~chat history bisa membuat memory bengkak~~
+- ~~daily reward untuk 10 koin ngebug~~

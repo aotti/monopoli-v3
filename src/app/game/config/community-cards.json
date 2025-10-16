@@ -6,12 +6,12 @@
             "data": [
                 {
                     "description": "Home Renovation TV Show gives you upgrade city card",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_S-Y3gSceoeaywaS2ABkaIresagoyBHRh.png",
+                    "imgclass": "card-community-s",
                     "effect": "special card_upgrade city"
                 },
                 {
                     "description": "You are dreaming about getting hit by truck and going to other world then get attack city card",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Chance_Card_S-HeOnWKulBma1kRBB97laqdfLCJpVh3.png",
+                    "imgclass": "card-community-s",
                     "effect": "special card_attack city"
                 }
             ]
@@ -22,17 +22,17 @@
             "data": [
                 {
                     "description": "Your catfish business is successful, profits increased by 50%. Then, Gilang stops by to buy catfish for 80.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_A-uCDUMj13x0hEW8aBUbIR4TY5JBB15r.png",
+                    "imgclass": "card-community-a",
                     "effect": "more money_50%&get money_80000"
                 },
                 {
                     "description": "Pay electricity & water bills 100.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_A-uCDUMj13x0hEW8aBUbIR4TY5JBB15r.png",
+                    "imgclass": "card-community-a",
                     "effect": "lose money_100000"
                 },
                 {
                     "description": "Sell 1 owned city (random)",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_A-uCDUMj13x0hEW8aBUbIR4TY5JBB15r.png",
+                    "imgclass": "card-community-a",
                     "effect": "random-sell city_city"
                 }
             ]
@@ -43,27 +43,27 @@
             "data": [
                 {
                     "description": "You take 1 step back when being chased by debt collectors, then get caught and pay 30%",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png",
+                    "imgclass": "card-community-b",
                     "effect": "lose money_30%&move backward_1"
                 },
                 {
                     "description": "Pay the hospital 50.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png",
+                    "imgclass": "card-community-b",
                     "effect": "lose money_50000"
                 },
                 {
                     "description": "Home renovation, pay 30% of the total money",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png",
+                    "imgclass": "card-community-b",
                     "effect": "lose money_30%"
                 },
                 {
                     "description": "Go to your own city (choice)",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png",
+                    "imgclass": "card-community-b",
                     "effect": "button-move place_my city"
                 },
                 {
                     "description": "After being friends with Gilang for a long time, he gave you an anti tax card for fun",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png",
+                    "imgclass": "card-community-b",
                     "effect": "special card_anti tax"
                 }
             ]
@@ -74,27 +74,27 @@
             "data": [
                 {
                     "description": "Gilang the hacker hacks your bank account and loses 20.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
+                    "imgclass": "card-community-c",
                     "effect": "lose money_20000"
                 },
                 {
                     "description": "Due to the small amount of aid from the government, you only get a fortune block card",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
+                    "imgclass": "card-community-c",
                     "effect": "special card_fortune block"
                 },
                 {
                     "description": "Your car is broken, pay 35.000 repair costs",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
+                    "imgclass": "card-community-c",
                     "effect": "lose money_35000"
                 },
                 {
                     "description": "You pick up the nerf tax card that Gilang dropped",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
+                    "imgclass": "card-community-c",
                     "effect": "special card_nerf tax"
                 },
                 {
                     "description": "You get 25.000 times the number on the selected coin",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png",
+                    "imgclass": "card-community-c",
                     "effect": "button-get money_25000"
                 }
             ]
@@ -105,17 +105,17 @@
             "data": [
                 {
                     "description": "Gift from the bank, you get 30.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_D-XUzERZjUnFjj7p7Bbnob38eygzCt2C.png",
+                    "imgclass": "card-community-d",
                     "effect": "get money_30000"
                 },
                 {
                     "description": "Your birthday, get 15.000 from each player",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_D-XUzERZjUnFjj7p7Bbnob38eygzCt2C.png",
+                    "imgclass": "card-community-d",
                     "effect": "take money_15000"
                 },
                 {
                     "description": "You get an inheritance of 40.000",
-                    "img": "https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/cards/Community_Card_D-XUzERZjUnFjj7p7Bbnob38eygzCt2C.png",
+                    "imgclass": "card-community-d",
                     "effect": "get money_40000"
                 }
             ]

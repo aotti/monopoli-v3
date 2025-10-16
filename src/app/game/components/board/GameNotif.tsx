@@ -23,7 +23,7 @@ export default function GameNotif() {
         ${gameState.showGameNotif ? 'flex' : 'hidden'}
         ${miscState.animation ? 'animate-slide-down' : 'animate-slide-up'}`}>
             <p id="result_notif_title" className="border-b-2 p-1"></p>
-            <div className="flex items-center justify-around">
+            <div className="flex items-center justify-around px-4">
                 <GameNotifWithImage />
                 <div className="w-[50vw] lg:w-[35vw]">
                     <p id="result_notif_message" className="whitespace-pre-line"></p>
@@ -44,8 +44,8 @@ function GameNotifWithImage() {
     const showImage = gameState.showGameNotif?.match('card') ? 'block' : 'hidden'
 
     return (
-        <div className={`${showImage} lg:w-44 lg:h-40`}>
-            <Image id="card_image" src="https://img.icons8.com/?id=GU4o4EwQmTkI&format=png&color=FFFFFF" alt="card-image" width={100} height={100} loading="eager" unoptimized draggable={false} />
+        <div className={`${showImage} lg:w-28 lg:h-40`}>
+            <Image id="card_image" src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" alt="card-image" width={100} height={150} unoptimized draggable={false} />
         </div>
     )
 }

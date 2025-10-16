@@ -125,6 +125,12 @@ export default class Controller {
         // log the action
         console.log(action);
 
+        // prevent all request except for language translate
+        const maintenanceStatus = process.env.MAINTENANCE_STATUS
+        if(action !== 'user language' && maintenanceStatus === 'true') {
+            return this.respond(403, 'Game is under maintenance', [])
+        }
+        
         // filter result
         let [filterStatus, filterMessage] = [false, 'payload is not filtered yet']
         // matching filter
@@ -365,7 +371,7 @@ export default class Controller {
         }
         return {
             status: 200, 
-            message: 'request failed', 
+            message: 'request success', 
             data: xid
         }
     }
@@ -432,6 +438,12 @@ export default class Controller {
      * @returns verified token & get payload | error if no refresh token
      */
     protected async getTokenPayload(payload: {token: string}): Promise<IResponse<{tpayload: IPlayer, token: string}>> {
+        // prevent all request except for language translate
+        const maintenanceStatus = process.env.MAINTENANCE_STATUS
+        if(maintenanceStatus === 'true') {
+            return this.respond(403, 'Game is under maintenance', [])
+        }
+
         // verify access token
         const [error, data] = await verifyAccessToken({
             action: 'verify-payload',
