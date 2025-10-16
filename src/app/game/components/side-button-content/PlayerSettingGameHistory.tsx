@@ -83,18 +83,17 @@ export function TileHistory({ data }) {
 function TileHistoryContent({ title }) {
     const gameState = useGame()
 
-    const hostname = 'lvu1slpqdkmigp40.public.blob.vercel-storage.com'
     const cardImageList = [
-        {name: 'chance_s', url: `https://${hostname}/cards/Chance_Card_S-HeOnWKulBma1kRBB97laqdfLCJpVh3.png`},
-        {name: 'chance_a', url: `https://${hostname}/cards/Chance_Card_A-PqkByzOifuXooKWUliXPdxR4kfDBI9.png`},
-        {name: 'chance_b', url: `https://${hostname}/cards/Chance_Card_B-tBnyXbzhrDNoINBlOssLPe0f79lvoR.png`},
-        {name: 'chance_c', url: `https://${hostname}/cards/Chance_Card_C-cI6wyoLk6OjqhTIPrjNHq01wcXKTF4.png`},
-        {name: 'chance_d', url: `https://${hostname}/cards/Chance_Card_D-9SWrEHsNrr9QEvvT8n9zQPKcqVWcb2.png`},
-        {name: 'community_s', url: `https://${hostname}/cards/Community_Card_S-Y3gSceoeaywaS2ABkaIresagoyBHRh.png`},
-        {name: 'community_a', url: `https://${hostname}/cards/Community_Card_A-uCDUMj13x0hEW8aBUbIR4TY5JBB15r.png`},
-        {name: 'community_b', url: `https://${hostname}/cards/Community_Card_B-OVAgCjtrKXrwtHbrVHqBmlZy0b1ypH.png`},
-        {name: 'community_c', url: `https://${hostname}/cards/Community_Card_C-NjfXu7sczMwZY5oEUWuhyCT4SL9eDk.png`},
-        {name: 'community_d', url: `https://${hostname}/cards/Community_Card_D-XUzERZjUnFjj7p7Bbnob38eygzCt2C.png`},
+        {name: 'chance_s', imgclass: `card-chance-s`},
+        {name: 'chance_a', imgclass: `card-chance-a`},
+        {name: 'chance_b', imgclass: `card-chance-b`},
+        {name: 'chance_c', imgclass: `card-chance-c`},
+        {name: 'chance_d', imgclass: `card-chance-d`},
+        {name: 'community_s', imgclass: `card-community-s`},
+        {name: 'community_a', imgclass: `card-community-a`},
+        {name: 'community_b', imgclass: `card-community-b`},
+        {name: 'community_c', imgclass: `card-community-c`},
+        {name: 'community_d', imgclass: `card-community-d`},
     ]
     const cardImageClass = `transition-all ease-in-out duration-300 
                             !w-6 lg:!w-14 !h-8 lg:!h-16 
@@ -111,7 +110,7 @@ function TileHistoryContent({ title }) {
                 return (
                     !v.name.match(title) ? null
                     : <div className={i % 5 == 0 ? 'col-span-2' : ''}>
-                        <Image src={v.url} alt={v.name} width={100} height={100} className={cardImageClass} />
+                        <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/sprites/transparent-y2LMJ3nPAfiAtwX1FQordG6v3FpSaw.png" alt={v.name} width={100} height={100} className={`${v.imgclass} ${cardImageClass}`} />
                         <p className="text-center"> {cardCounter.length} </p>
                     </div>
                 )
