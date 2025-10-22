@@ -18,6 +18,7 @@ import Ranking from "./components/other/Ranking";
 import Shop from "./components/other/Shop";
 import Daily, { getCurrentWeek } from "./components/other/Daily";
 import daily_rewards from "./config/daily-rewards.json"
+import Image from "next/image";
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
@@ -253,7 +254,7 @@ function RoomlistChatForm() {
             {miscState.showEmotes ? <ChatEmotes isGameRoom={false} /> : null}
             {/* emote button */}
             <button ref={chatEmotesRef} type="button" className="relative w-6 h-6 lg:w-10 lg:h-10 active:opacity-50" onClick={() => miscState.setShowEmotes(true)}>
-                <img src="https://img.icons8.com/?size=100&id=120044&format=png&color=FFFFFF" alt="emot" width={100} height={100} draggable={false} />
+                <img src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/emotes-eELgB3Y1hxTzcKafprENtp2VNeI84I.png" alt="emot" width={100} height={100} draggable={false} />
             </button>
             {/* submit chat */}
             <button type="submit" className="w-6 h-6 lg:w-10 lg:h-10 active:opacity-50">
@@ -283,7 +284,7 @@ function RankingButton() {
     
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+            <button type="button" className="flex items-center gap-2 w-full" onClick={() => {
                 // close join modal
                 miscState.setShowJoinModal(null)
                 // close room list menu
@@ -295,8 +296,8 @@ function RankingButton() {
                 // get ranking
                 viewRanking(miscState, gameState)
             }}>
-                <img src="https://img.icons8.com/?id=6yiQUAER3NXc&format=png" alt="👑" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> 
+                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/ranking-Yc5GX4VNppg95sUkXKFSGlOzl6Go1M.png" alt="👑" className="!w-8 !h-8" width={100} height={100} draggable={false} />
+                <span> 
                     {translateUI({lang: miscState.language, text: 'Ranking', lowercase: true})} 
                 </span>
             </button>
@@ -309,7 +310,7 @@ function ShopButton() {
 
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className="flex items-center gap-2 w-full invert" onClick={() => {
+            <button type="button" className="flex items-center gap-2 w-full" onClick={() => {
                 // close join modal
                 miscState.setShowJoinModal(null)
                 // close room list menu
@@ -319,8 +320,8 @@ function ShopButton() {
                 // show the modal
                 miscState.setShowModal('shop') 
             }}>
-                <img src="https://img.icons8.com/?id=rkVMQqdC1O9B&format=png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> 
+                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/shop-yaqaJRoTr9t5BE1HgvxQsjdILEHdRD.png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
+                <span> 
                     {translateUI({lang: miscState.language, text: 'Shop', lowercase: true})} 
                 </span>
             </button>
@@ -335,7 +336,7 @@ function DailyButton() {
 
     return (
         <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className={`flex items-center gap-2 w-full invert ${gameState.dailyStatus == 'unclaim' ? `after:invert ${warningClass}` : ''}`} onClick={() => {
+            <button type="button" className={`flex items-center gap-2 w-full ${gameState.dailyStatus == 'unclaim' ? `${warningClass}` : ''}`} onClick={() => {
                 // close join modal 
                 miscState.setShowJoinModal(null)
                 // close room list menu
@@ -345,8 +346,8 @@ function DailyButton() {
                 // show the modal
                 miscState.setShowModal('daily') 
             }}>
-                <img src="https://img.icons8.com/?id=23&format=png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span className="invert"> 
+                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/daily-vmA8mjz1RYqrYPLL51jci2QoxxF29l.png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
+                <span> 
                     {translateUI({lang: miscState.language, text: 'Daily', lowercase: true})} 
                 </span>
             </button>
@@ -361,7 +362,7 @@ function CreateRoomButton() {
     return (
         <div data-tooltip={translateUI({lang: miscState.language, text: 'Create Room'})} 
         className={`${gameState.guestMode ? 'invisible' : ''} w-8 my-auto text-right`}>
-            <button type="button" className="invert active:opacity-75"
+            <button type="button" className="active:opacity-75"
             onClick={() => {
                 // close join modal
                 miscState.setShowJoinModal(null)
@@ -370,7 +371,7 @@ function CreateRoomButton() {
                 // show the modal
                 miscState.setShowModal('create room') 
             }}> 
-                <img src="https://img.icons8.com/?id=113116&format=png" alt="🚪" width={100} height={100} draggable={false} />
+                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/create_room-NUKqG5tw18Rb64CXsUnLjrplVns69c.png" alt="🚪" width={100} height={100} draggable={false} />
             </button>
         </div>
     )
