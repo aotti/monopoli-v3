@@ -75,6 +75,14 @@ export default class Controller {
         // this.redisReset('missingLimit_gandesblood')
     }
 
+    static createRateLimit(limit: number, timeout: Duration) {
+        return new Ratelimit({
+            redis: Redis.fromEnv(),
+            limiter: Ratelimit.slidingWindow(limit, timeout),
+            prefix: '@upstash/ratelimit',
+        })
+    }
+
     protected chattingPublish(channel: string, data: any) {
         return this.chattingPubnubServer.publish({
             channel: channel,
@@ -111,14 +119,6 @@ export default class Controller {
     protected async redisReset(key: string) {
         // reset existing data
         await redisClient.del(key)
-    }
-
-    static createRateLimit(limit: number, timeout: Duration) {
-        return new Ratelimit({
-            redis: Redis.fromEnv(),
-            limiter: Ratelimit.slidingWindow(limit, timeout),
-            prefix: '@upstash/ratelimit',
-        })
     }
 
     protected filterPayload<T>(action: string, payload: T) {

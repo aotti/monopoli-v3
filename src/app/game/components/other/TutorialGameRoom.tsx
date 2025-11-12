@@ -74,7 +74,7 @@ export default function TutorialGameRoom() {
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[1] as any})}
                 </p>
                 <hr className="my-1" />
-                <p className="text-balance text-2xs"> 
+                <p className="text-balance"> 
                     {translateUI({lang: miscState.language, text: tutorialText.part_3[2] as any})}
                 </p>
                 <hr className="my-1" />
