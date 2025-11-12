@@ -17,6 +17,7 @@ module.exports = {
         'slide-down': 'slide-down .5s linear 1',
         'slide-up': 'slide-up .5s linear 1',
         'player-pos': 'player-pos 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'rotate-screen': 'rotate-screen 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
       },
       keyframes: {
         'zoom-in': {
@@ -42,6 +43,11 @@ module.exports = {
           '0%, 100%': { 
             backgroundColor: 'rgb(245 232 199 / 0.9)', 
           },
+        },
+        'rotate-screen': {
+          '25%': {transform: 'rotate(-0deg)'},
+          '50%': {transform: 'rotate(-90deg)'},
+          '100%': {transform: 'rotate(-90deg)'},
         }
       },
       backgroundColor: {

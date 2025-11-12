@@ -2,7 +2,7 @@
     "test": ["Create Account"],
     "indonesia": {
         "__TRANSLATE BAGIAN LAIN__": "__TRANSLATE BAGIAN LAIN__",
-        "Please rotate your screen to landscape 🙏": "Tolong miringkan layar anda menjadi horizontal 🙏",
+        "Please rotate your screen to landscape": "Tolong miringkan layar anda menjadi horizontal",
         "report bugs": "lapor keanehan",
         "you can only report every 10 minutes, please send proper report": "anda hanya bisa lapor tiap 10 menit, tolong kirim laporan yang benar",
         "description": "jelaskan",
