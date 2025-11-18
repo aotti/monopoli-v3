@@ -352,6 +352,9 @@ export function filterInput(input: InputIDType, value: string) {
         // time of chat
         case 'message_time': 
             return value ? value.match(/^[\d{2}:\d{2}]{4,5}$/) : null
+        // message visibility
+        case 'visibility':
+            return value ? value.match(/0$|1$/) : null
 
         // ====== CREATE ROOM TYPE ======
         case 'room_id': 

@@ -9,27 +9,36 @@ const MiscContext = createContext<IMiscContext>(null)
 export const MiscProvider = ({ accessSecret, savedLanguage, cryptoKey, children }: IMiscProvider) => {
     const [screenType, setScreenType] = useState<'landscape'|'portrait'>(null)
     const [language, setLanguage] = useState<ITranslate['lang']>(savedLanguage || 'english')
+    // show modal for login, register, create room
     const [showModal, setShowModal] = useState<IMiscContext['showModal']>(null)
+    // show join room modal
     const [showJoinModal, setShowJoinModal] = useState<string>(null)
+    // set animation class (notif box, daily)
     const [animation, setAnimation] = useState<boolean>(true)
     // used to make chat box stay open (room list)
     const [isChatFocus, setIsChatFocus] = useState<IMiscContext['isChatFocus']>('on')
+    // show tutorial in room list / game room
     const [showTutorial, setShowTutorial] = useState<IMiscContext['showTutorial']>(null)
     // access token secret
     const [secret, setSecret] = useState<string>(accessSecret)
     const [simpleKey, setSimpleKey] = useState<number>(+cryptoKey)
+    // set loading screen
     const [isLoading, setIsLoading] = useState<boolean>(true)
+    // setting for disable room list / game room buttons
     const [disableButtons, setDisableButtons] = useState<'roomlist'|'gameroom'>(null)
     // message items
     const [messageItems, setMessageItems] = useState<Omit<IChat, 'channel'|'token'>[]>(() => {
         const systemMessage: Omit<IChat, 'channel'|'token'> = {
             display_name: 'system',
             message_text: 'only player in this room can see the chat',
-            message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'})
+            message_time: new Date().toLocaleTimeString([], {hour12: false, hour: '2-digit', minute: '2-digit'}),
+            visibility: '1',
         }
         systemMessage.message_text = translateUI({lang: language, text: 'only player in this room can see the chat'})
         return [systemMessage]
     })
+    // show chat commands
+    const [showChatCommands, setShowChatCommands] = useState(false)
     // emotes
     const [showEmotes, setShowEmotes] = useState(false)
     // room list menu
@@ -71,6 +80,7 @@ export const MiscProvider = ({ accessSecret, savedLanguage, cryptoKey, children 
         simpleKey, setSimpleKey,
         isLoading, setIsLoading,
         messageItems, setMessageItems,
+        showChatCommands, setShowChatCommands,
         screenType, setScreenType,
         showJoinModal, setShowJoinModal,
         disableButtons, setDisableButtons,

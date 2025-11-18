@@ -1,4 +1,4 @@
-import { FormEvent, MouseEvent, useEffect } from "react"
+import { FormEvent, MouseEvent, useEffect, useRef } from "react"
 import { useGame } from "../context/GameContext"
 import { useMisc } from "../context/MiscContext"
 import { fetcher, fetcherOptions, qS, setInputValue, translateUI } from "../helper/helper"
@@ -7,6 +7,7 @@ import emotes from "../config/emotes.json"
 import PubNub, { Listener } from "pubnub"
 import Image from "next/image"
 import { claimDaily } from "../app/room/helper/functions"
+import { clickOutsideElement } from "../helper/click-outside"
 
 interface IChatBox {
     page: 'room'|'game', 
@@ -81,18 +82,30 @@ function ChatContainer() {
 
     return (
         <div>
-            {miscState.messageItems.map((v,i) => 
-                <div key={i} className={`${v.display_name == 'system' ? 'text-green-400' : ''} 
-                hover:bg-darkblue-3/30 text-2xs lg:text-xs py-1`}>
-                    <ChatItem messageData={v} />
-                </div>
-            )}
+            {miscState.messageItems.map((v,i) => {
+                const systemCommand = getChatCommandsFromStorage('/sys')
+                // filter every new messages
+                const filteredChatMessages = systemCommand 
+                                                // only display messages from system
+                                                ? v.display_name === 'system'
+                                                    ? v
+                                                    : null
+                                                // display messages from everyone
+                                                : v
+
+                return filteredChatMessages
+                    ? <div key={i} className={`${v.display_name == 'system' ? 'text-green-400' : ''} 
+                    hover:bg-darkblue-3/30 text-2xs lg:text-xs py-1`}>
+                        <ChatItem messageData={v} />
+                    </div>
+                    : null
+            })}
         </div>
     )
 }
 
 function ChatItem({ messageData }: {messageData: Omit<IChat, 'channel'|'token'>}) {
-    const {display_name, message_text, message_time} = messageData
+    const {display_name, message_text, message_time, visibility} = messageData
     // emote message stuff
     const emoList = emotes.list
     const modifiedMessageText = []
@@ -145,6 +158,51 @@ export function ChatEmotes({ isGameRoom }: {isGameRoom: boolean}) {
     )
 }
 
+export function ChatCommands() {
+    const miscState = useMisc()
+
+    // chat commands ref
+    const chatCommandsRef = useRef()
+    clickOutsideElement(chatCommandsRef, () => miscState.showChatCommands ? miscState.setShowChatCommands(false) : null)
+
+    const commands = [
+        {key: '/on', purpose: 'to make chat box persist'},
+        {key: '/off', purpose: 'to make chat box auto hide'},
+        {key: '/sys', purpose: 'to show/hide player chats'},
+        {key: '/myroom', purpose: 'to join your game room'},
+        {key: '/findroom name', purpose: 'to find room by name'},
+        {
+            key: 'shorthand', 
+            purpose: `/mr is short for /myroom-
+                    /fr is short for /findroom`
+        },
+        {
+            key: 'note', 
+            purpose: `/findroom * = display all rooms`
+        },
+    ]
+    
+    return (
+        <div ref={chatCommandsRef} className="absolute z-10 bg-darkblue-1 border-8bit-text w-max text-2xs lg:text-xs">
+            <p className="border-b"> chat commands </p>
+            <ul className="text-left">
+                {commands.map((v,i) => 
+                    v.key == 'shorthand' || v.key == 'note'
+                        ? <li key={i} className={v.key == 'note' ? 'text-orange-400' : ''}>
+                            <p className="border-b text-center"> {v.key} </p>
+                            <p className="whitespace-pre-line leading-none pt-1"> 
+                                {v.purpose.trim().replaceAll('-', '\n')} 
+                            </p>
+                        </li>
+                        : <li key={i}>
+                            <span className="text-green-400"> {v.key}: </span>
+                            <span> {v.purpose} </span>
+                        </li>)}
+            </ul>
+        </div>
+    )
+}
+
 export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscContext, gameState: IGameContext, id?: number, rewardData?: any) {
     ev.preventDefault()
 
@@ -158,7 +216,8 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
         channel: id ? `monopoli-gameroom-${id}` : 'monopoli-roomlist',
         display_name: gameState.myPlayerInfo.display_name,
         message_text: null,
-        message_time: `${getHours}:${getMinutes}`
+        message_time: `${getHours}:${getMinutes}`,
+        visibility: '1',
     }
     // get input elements
     const formInputs = ev.currentTarget.elements
@@ -166,46 +225,8 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName == 'INPUT') {
             // toggle chat box (for room list)
-            if(input.value == '/on') {
-                miscState.setIsChatFocus('stay')
-                inputValues.display_name = 'system'
-                inputValues.message_text = translateUI({lang: miscState.language, text: '✅ chat box will persist'})
-                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
-                messageInput.value = ''
-                return
-            }
-            else if(input.value == '/off') {
-                miscState.setIsChatFocus('off')
-                inputValues.display_name = 'system'
-                inputValues.message_text = translateUI({lang: miscState.language, text: '❌ chat box back to normal'})
-                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
-                messageInput.value = ''
-                return
-            }
-            else if(input.value == '/ch') {
-                inputValues.display_name = 'system'
-                inputValues.message_text = inputValues.channel.split('-')[1]
-                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
-                messageInput.value = ''
-                return
-            }
-            // daily command only work from room list
-            else if(input.value == '/daily') {
-                if(id) {
-                    inputValues.display_name = 'system'
-                    inputValues.message_text = 'only work in roomlist'
-                    miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
-                    messageInput.value = ''
-                }
-                else {
-                    const claimResult = await claimDaily(null, rewardData, miscState, gameState)
-                    inputValues.display_name = 'system'
-                    inputValues.message_text = claimResult
-                    miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
-                    messageInput.value = ''
-                }
-                return
-            }
+            if(input.value.match(/\/on|\/off|\/ch|\/sys|\/myroom|\/mr|\/findroom|\/fr/))
+                return chatCommandsListener(input, input.value, inputValues, miscState, gameState)
             // filter message
             else if(setInputValue('message_text', input)) inputValues.message_text = input.value.trim()
             // error
@@ -244,6 +265,115 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
     }
 }
 
+function chatCommandsListener(inputElement: HTMLInputElement, inputValue: string, inputValues: any, miscState: IMiscContext, gameState: IGameContext) {
+    const [command, param] = inputValue.split(' ')
+    switch(command) {
+        case '/on':
+            miscState.setIsChatFocus('stay')
+            inputValues.display_name = 'system'
+            inputValues.message_text = translateUI({lang: miscState.language, text: '✅ chat box will persist'})
+            miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+            inputElement.value = ''
+            return
+        case '/off':
+            miscState.setIsChatFocus('off')
+            inputValues.display_name = 'system'
+            inputValues.message_text = translateUI({lang: miscState.language, text: '❌ chat box back to normal'})
+            miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+            inputElement.value = ''
+            return
+        case '/ch':
+            inputValues.display_name = 'system'
+            inputValues.message_text = inputValues.channel.split('-')[1]
+            miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+            inputElement.value = ''
+            return
+        case '/sys':
+            // filter messages after run the command
+            miscState.setMessageItems(data => {
+                const newData = [...data]
+                // has /sys command been triggered?
+                const isTriggered = newData.map(v => v.message_text).lastIndexOf('display system messages')
+                // has'nt triggered yet
+                if(isTriggered === -1) {
+                    inputValues.display_name = 'system'
+                    inputValues.message_text = 'display system messages'
+                    // set command to local storage to filter every new chat comes in
+                    setChatCommandsToStorage('push', command)
+                    // hide player messages, show system messages
+                    const hideMessages = newData
+                                        .map(v => v.message_text == 'display everyone messages' ? null : v)
+                                        .filter(i => i)
+                                        .filter(v => v.display_name == 'system' ? v.visibility = '1' : v.visibility = '0')
+                    return [...hideMessages, inputValues]
+                }
+                else {
+                    inputValues.display_name = 'system'
+                    inputValues.message_text = 'display everyone messages'
+                    setChatCommandsToStorage('pop', command)
+                    // show everyone messages
+                    const showMessages = newData
+                                        .map(v => v.message_text == 'display system messages' ? null : v)
+                                        .filter(i => i)
+                                        .filter(v => v.visibility = '1')
+                    return [...showMessages, inputValues]
+                }
+            })
+            inputElement.value = ''
+            return
+        case '/findroom': case '/fr':
+            if(!param) {
+                inputValues.display_name = 'system'
+                inputValues.message_text = `nothing to find`
+                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+                inputElement.value = ''
+                return
+            }
+            inputValues.display_name = 'system'
+            inputValues.message_text = param == '*' ? `display all rooms` : `display rooms starts with '${param}'`
+            miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+            // setChatCommandsToStorage(command)
+            // filter game rooms
+            gameState.setRoomList(rooms => {
+                const newRooms = [...rooms]
+                // display all rooms
+                if(param == '*') 
+                    return newRooms.filter(v => v.visibility = '1')
+                // filter rooms by name
+                else 
+                    return newRooms.filter(v => v.room_name.startsWith(param) ? v.visibility = '1' : v.visibility = '0')
+            })
+            inputElement.value = ''
+            return
+    }
+}
+
+/**
+ * @param action push = add command, pop = remove command
+ * @param command chat command
+ */
+function setChatCommandsToStorage(action: 'push'|'pop', command: string) {
+    const getChatCommands = localStorage.getItem('chatCommands') || '[]'
+    const parseChatCommands = JSON.parse(getChatCommands) as string[]
+    if(parseChatCommands.length === 0) {
+        // empty local storage
+        if(action == 'push') localStorage.setItem('chatCommands', JSON.stringify([command]))
+        else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => v != command)))
+    }
+    else {
+        // local storage with some values
+        if(action == 'push') localStorage.setItem('chatCommands', JSON.stringify([command]))
+        else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => v != command)))
+    }
+}
+
+function getChatCommandsFromStorage(command: string) {
+    const getChatCommands = localStorage.getItem('chatCommands') || '[]'
+    const parseChatCommands = JSON.parse(getChatCommands) as string[]
+    const isCommandExist = parseChatCommands.indexOf(command)
+    return isCommandExist !== -1 ? command : null
+}
+
 export function chatMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
     const getMessage = data.message as PubNub.Payload & IChat & {onlinePlayers: string}
     // add chat
@@ -251,7 +381,8 @@ export function chatMessageListener(data: PubNub.Subscription.Message, miscState
         const chatData: Omit<IChat, 'channel'|'token'> = {
             display_name: getMessage.display_name,
             message_text: getMessage.message_text,
-            message_time: getMessage.message_time
+            message_time: getMessage.message_time,
+            visibility: getMessage.visibility,
         }
         miscState.setMessageItems(data => {
             // filter chat data if exceed 200 messages
