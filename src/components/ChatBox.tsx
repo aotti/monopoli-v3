@@ -83,15 +83,20 @@ function ChatContainer() {
     return (
         <div>
             {miscState.messageItems.map((v,i) => {
-                const systemCommand = getChatCommandsFromStorage('/sys')
+                const [systemCommand, systemParam] = getChatCommandsFromStorage('/sys')
+                const [chatwithCommand, chatwithParam] = getChatCommandsFromStorage('/cw')
+                console.log({chatwithCommand});
+                
                 // filter every new messages
-                const filteredChatMessages = systemCommand 
+                const filteredChatMessages = systemCommand || chatwithCommand
                                                 // only display messages from system
-                                                ? v.display_name === 'system'
+                                                ? v.display_name === 'system' || chatwithParam.match(v.display_name)
                                                     ? v
                                                     : null
-                                                // display messages from everyone
-                                                : v
+                                                // hide message with visibility 0
+                                                : v.visibility == '0'
+                                                    ? null
+                                                    : v
 
                 return filteredChatMessages
                     ? <div key={i} className={`${v.display_name == 'system' ? 'text-green-400' : ''} 
@@ -170,25 +175,29 @@ export function ChatCommands() {
         {key: '/off', purpose: 'to make chat box auto hide'},
         {key: '/sys', purpose: 'to show/hide player chats'},
         {key: '/myroom', purpose: 'to join your game room'},
+        {key: '/chatwith name', purpose: 'to show chat from specific users'},
         {key: '/findroom name', purpose: 'to find room by name'},
         {
             key: 'shorthand', 
             purpose: `/mr is short for /myroom-
-                    /fr is short for /findroom`
+                    /fr is short for /findroom-
+                    /cw is short for /chatwith`
         },
         {
             key: 'note', 
-            purpose: `/findroom * = display all rooms`
+            purpose: `/fr * = display all rooms-
+                    /cw abc = display chat from abc-
+                    /cw abc,xyz = display chat from abc & xyz`
         },
     ]
     
     return (
-        <div ref={chatCommandsRef} className="absolute z-10 bg-darkblue-1 border-8bit-text w-max text-2xs lg:text-xs">
+        <div ref={chatCommandsRef} className="absolute z-10 bg-darkblue-1 border-8bit-text w-max text-2xs lg:text-xs leading-tight">
             <p className="border-b"> chat commands </p>
             <ul className="text-left">
                 {commands.map((v,i) => 
                     v.key == 'shorthand' || v.key == 'note'
-                        ? <li key={i} className={v.key == 'note' ? 'text-orange-400' : ''}>
+                        ? <li key={i} className={`${v.key == 'note' ? 'text-orange-400' : ''} lg:mt-2`}>
                             <p className="border-b text-center"> {v.key} </p>
                             <p className="whitespace-pre-line leading-none pt-1"> 
                                 {v.purpose.trim().replaceAll('-', '\n')} 
@@ -225,7 +234,7 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName == 'INPUT') {
             // toggle chat box (for room list)
-            if(input.value.match(/\/on|\/off|\/ch|\/sys|\/myroom|\/mr|\/findroom|\/fr/))
+            if(input.value.match(/\/on|\/off|\/ch|\/sys|\/myroom|\/mr|\/chatwith|\/cw|\/findroom|\/fr/))
                 return chatCommandsListener(input, input.value, inputValues, miscState, gameState)
             // filter message
             else if(setInputValue('message_text', input)) inputValues.message_text = input.value.trim()
@@ -292,31 +301,98 @@ function chatCommandsListener(inputElement: HTMLInputElement, inputValue: string
             // filter messages after run the command
             miscState.setMessageItems(data => {
                 const newData = [...data]
+                // make sure the author is system
+                const isAuthorSystem = newData.map(v => v.display_name).lastIndexOf('system')
                 // has /sys command been triggered?
-                const isTriggered = newData.map(v => v.message_text).lastIndexOf('display system messages')
+                const isTriggered = newData[isAuthorSystem].message_text == 'display system messages'
                 // has'nt triggered yet
-                if(isTriggered === -1) {
+                if(isTriggered) {
+                    inputValues.display_name = 'system'
+                    inputValues.message_text = 'display everyone messages'
+                    setChatCommandsToStorage('pop', command)
+                    // show everyone messages
+                    const showMessages = newData
+                                        // remove system message
+                                        .map(v => v.message_text == 'display system messages' ? null : v)
+                                        .filter(i => i)
+                                        // show all message
+                                        .filter(v => v.visibility = '1')
+                    return [...showMessages, inputValues]
+                }
+                else {
                     inputValues.display_name = 'system'
                     inputValues.message_text = 'display system messages'
                     // set command to local storage to filter every new chat comes in
                     setChatCommandsToStorage('push', command)
                     // hide player messages, show system messages
                     const hideMessages = newData
+                                        // remove system message
                                         .map(v => v.message_text == 'display everyone messages' ? null : v)
                                         .filter(i => i)
+                                        // show system message
                                         .filter(v => v.display_name == 'system' ? v.visibility = '1' : v.visibility = '0')
                     return [...hideMessages, inputValues]
                 }
-                else {
+            })
+            inputElement.value = ''
+            return
+        case '/myroom': case '/mr':
+            inputValues.display_name = 'system'
+            inputValues.message_text = `command ini belom jadi`
+            miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+            inputElement.value = ''
+            return
+        case '/chatwith': case '/cw':
+            // only allow if cw param has comma
+            // param format wrong
+            if(!param.match(/\*$|^[a-zA-Z0-9\s,]{4,}$/)) {
+                inputValues.display_name = 'system'
+                inputValues.message_text = `chat with ???`
+                miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
+                inputElement.value = ''
+                return
+            }
+            // param format correct 
+            // filter messages after run the command
+            miscState.setMessageItems(data => {
+                const newData = [...data]
+                // make sure the author is system
+                const isAuthorSystem = newData.map(v => v.display_name).lastIndexOf('system')
+                // has /sys command been triggered?
+                const isTriggered = newData[isAuthorSystem].message_text.match(/^chat with [a-zA-Z0-9\s,]{4,}$/)
+                // has triggered
+                if(isTriggered) {
+                    // set system message
                     inputValues.display_name = 'system'
-                    inputValues.message_text = 'display everyone messages'
-                    setChatCommandsToStorage('pop', command)
+                    inputValues.message_text = param == '*' ? `chat with all` : null
+                    // set command to local storage to filter every new chat comes in
+                    setChatCommandsToStorage('pop', `/cw=${param}`)
                     // show everyone messages
                     const showMessages = newData
-                                        .map(v => v.message_text == 'display system messages' ? null : v)
+                                        // remove system message
+                                        .map(v => v.display_name == 'system' && v.message_text.match(/^chat with [a-zA-Z0-9\s,]{4,}$/) ? null : v)
                                         .filter(i => i)
+                                        // show all message
                                         .filter(v => v.visibility = '1')
                     return [...showMessages, inputValues]
+                }
+                // has'nt triggered
+                else {
+                    // add yourself to chat
+                    const specificPlayers = `${gameState.myPlayerInfo.display_name},${param}`
+                    // set system message
+                    inputValues.display_name = 'system'
+                    inputValues.message_text = `chat with ${specificPlayers}`
+                    // set command to local storage to filter every new chat comes in
+                    setChatCommandsToStorage('push', `/cw=${specificPlayers}`)
+                    // hide player messages, show system messages
+                    const hideMessages = newData
+                                        // remove system message
+                                        .map(v => v.display_name == 'system' && v.message_text == 'chat with *' ? null : v)
+                                        .filter(i => i)
+                                        // show specific player message
+                                        .filter(v => specificPlayers.match(v.display_name) ? v.visibility = '1' : v.visibility = '0')
+                    return [...hideMessages, inputValues]
                 }
             })
             inputElement.value = ''
@@ -358,20 +434,29 @@ function setChatCommandsToStorage(action: 'push'|'pop', command: string) {
     if(parseChatCommands.length === 0) {
         // empty local storage
         if(action == 'push') localStorage.setItem('chatCommands', JSON.stringify([command]))
-        else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => v != command)))
+        else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => !v.match(command))))
     }
     else {
         // local storage with some values
-        if(action == 'push') localStorage.setItem('chatCommands', JSON.stringify([command]))
-        else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => v != command)))
+        if(action == 'push') {
+            // prevent duplicate commands
+            localStorage.setItem('chatCommands', JSON.stringify([...parseChatCommands, command]))
+        }
+        else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => !v.match(command))))
     }
 }
 
-function getChatCommandsFromStorage(command: string) {
+function getChatCommandsFromStorage(command: string): [string, string] {
     const getChatCommands = localStorage.getItem('chatCommands') || '[]'
     const parseChatCommands = JSON.parse(getChatCommands) as string[]
-    const isCommandExist = parseChatCommands.indexOf(command)
-    return isCommandExist !== -1 ? command : null
+    const findCommand = parseChatCommands.filter(v => v.match(command))
+
+    if(findCommand.length > 0) {
+        // split command and param
+        const [tempCommand, tempParam] = findCommand[0]?.split('=')
+        return [tempCommand, tempParam]
+    }
+    return [null, null]
 }
 
 export function chatMessageListener(data: PubNub.Subscription.Message, miscState: IMiscContext, gameState: IGameContext) {
