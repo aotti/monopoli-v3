@@ -338,9 +338,12 @@ function chatCommandsListener(inputElement: HTMLInputElement, inputValue: string
             return
         case '/myroom': case '/mr':
             inputValues.display_name = 'system'
-            inputValues.message_text = `command ini belom jadi`
+            inputValues.message_text = `joining game room..`
             miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
             inputElement.value = ''
+            // click join button
+            const joinButton = qS(`#join_button_${gameState.myCurrentGame}`) as HTMLElement
+            joinButton.click()
             return
         case '/chatwith': case '/cw':
             // only allow if cw param has comma
