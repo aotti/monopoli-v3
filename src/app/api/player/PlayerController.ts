@@ -282,15 +282,15 @@ export default class PlayerController extends Controller {
                     reward_date: todayDate
                 }
                 // save daily history
-                const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
-                // if history length > 30, remove 1st index
-                if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                let setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                // if history length > 14, remove 1st index
+                if(setDailyHistory.length > 14) setDailyHistory = setDailyHistory.slice(-14)
                 await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                 // set result data
                 const resultData = {
                     token: token,
                     dailyStatus: 'claimed',
-                    dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
+                    dailyHistory: setDailyHistory,
                     playerCoins: gainCoins,
                 }
                 result = this.respond(200, `${action} success`, [resultData])
@@ -346,7 +346,7 @@ export default class PlayerController extends Controller {
                                     const resultData = {
                                         token: token,
                                         dailyStatus: 'claimed',
-                                        dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
+                                        dailyHistory: setDailyHistory,
                                         playerCoins: gainCoins
                                     }
                                     result = this.respond(200, `${action} success`, [resultData])
@@ -377,15 +377,15 @@ export default class PlayerController extends Controller {
                                         reward_date: todayDate
                                     }
                                     // save daily history
-                                    const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
-                                    // if history length > 30, remove 1st index
-                                    if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                                    let setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                                    // if history length > 14, remove 1st index
+                                    if(setDailyHistory.length > 14) setDailyHistory = setDailyHistory.slice(-14)
                                     await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                                     // set result data
                                     const resultData = {
                                         token: token,
                                         dailyStatus: 'claimed',
-                                        dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
+                                        dailyHistory: setDailyHistory,
                                         playerShopItems: ownedItems
                                     }
                                     result = this.respond(200, `${action} success`, [resultData])
@@ -416,15 +416,15 @@ export default class PlayerController extends Controller {
                                     reward_date: todayDate
                                 }
                                 // save daily history
-                                const setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
-                                // if history length > 30, remove 1st index
-                                if(setDailyHistory.length > 30) setDailyHistory.splice(0, 1)
+                                let setDailyHistory = [...getPlayerDailyHistory, newRewardHistory]
+                                // if history length > 14, remove 1st index
+                                if(setDailyHistory.length > 14) setDailyHistory = setDailyHistory.slice(-14)
                                 await this.redisSet(`${payload.display_name}_dailyHistory`, setDailyHistory)
                                 // set result data
                                 const resultData = {
                                     token: token,
                                     dailyStatus: 'claimed',
-                                    dailyHistory: [...getPlayerDailyHistory, newRewardHistory],
+                                    dailyHistory: setDailyHistory,
                                     playerShopItems: ownedItems
                                 }
                                 result = this.respond(200, `${action} success`, [resultData])

@@ -142,6 +142,8 @@ export interface IMiscContext {
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     messageItems: Omit<IChat, 'channel'|'token'>[],
     setMessageItems: Dispatch<SetStateAction<Omit<IChat, 'channel'|'token'>[]>>,
+    showChatCommands: boolean, 
+    setShowChatCommands: Dispatch<SetStateAction<boolean>>,
     disableButtons: 'roomlist'|'gameroom',
     setDisableButtons: Dispatch<SetStateAction<'roomlist'|'gameroom'>>,
     showEmotes: boolean, 
@@ -375,7 +377,7 @@ export interface IResponse<T = any> {
 // input ID
 type IdentifierType = 'identifier'
 type PlayerType = 'uuid'|'username'|'password'|'confirm_password'|'display_name'|'avatar'
-type ChatType = 'channel'|'message_text'|'message_time'
+type ChatType = 'channel'|'message_text'|'message_time'|'visibility'
 type CreateRoomType = 'room_id'|'creator'|'room_name'|'room_password'|'select_mode'|'select_board'|'select_dice'|'select_money_start'|'select_money_lose'|'select_curse'|'select_max_player'|'select_character'
 type JoinRoomType = 'money_start'|'confirm_room_password'|'rules'
 type GameReadyType = 'player_joined'
@@ -425,6 +427,7 @@ export interface IChat extends ITokenPayload {
     display_name: string,
     message_text: string,
     message_time: string
+    visibility: '0'|'1'
 }
 
 export interface IDaily extends ITokenPayload {
@@ -467,6 +470,7 @@ export interface ICreateRoom {
         rules: string,
         status: 'prepare'|'playing',
         characters: string[],
+        visibility: '0'|'1'
     },
     server: {
         room_id: number,

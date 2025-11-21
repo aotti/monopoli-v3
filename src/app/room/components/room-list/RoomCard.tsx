@@ -141,7 +141,7 @@ function JoinRoomButton(
 
     return (
         gameState.myCurrentGame == roomId
-        ? <Link href={miscState.disableButtons == 'roomlist' ? '#' : { pathname: '/game', query:{id: roomId} }} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs text-center bg-success border-8bit-success active:opacity-75`}>
+        ? <Link id={`join_button_${roomId}`} href={miscState.disableButtons == 'roomlist' ? '#' : { pathname: '/game', query:{id: roomId} }} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0' : ''} w-16 lg:w-24 text-2xs lg:text-xs text-center bg-success border-8bit-success active:opacity-75`}>
             {translateUI({lang: miscState.language, text: 'Join'})}
         </Link>
         : <button type="button" id={`join_button_${roomId}`} className={`${miscState.disableButtons == 'roomlist' ? 'saturate-0':''} w-16 lg:w-24 text-2xs lg:text-xs bg-success border-8bit-success active:opacity-75 ${lockIcon}`} onClick={joinHandler} disabled={miscState.disableButtons == 'roomlist' ? true : false}>

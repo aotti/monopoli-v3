@@ -1,33 +1,25 @@
 import { useMisc } from "../../context/MiscContext";
 import { applyTooltipEvent, qS, translateUI, verifyAccessToken } from "../../helper/helper";
 import ChatBox, { ChatEmotes, sendChat } from "../../components/ChatBox";
-import CreateRoom from "./components/room-list/CreateRoom";
 import PlayerList from "./components/other/PlayerList";
 import PlayerStats from "./components/other/PlayerStats";
-import RoomCard from "./components/room-list/RoomCard";
 import { useEffect, useRef } from "react";
 import TutorialRoomList from "./components/other/TutorialRoomList";
 import { useGame } from "../../context/GameContext";
 import PubNub, { Listener } from "pubnub";
 import { roomMessageListener } from "./helper/published-message";
 import GameSounds from "../../components/GameSounds";
-import { getRoomList, viewRanking } from "./helper/functions";
+import { getRoomList } from "./helper/functions";
 import { clickOutsideElement } from "../../helper/click-outside";
 import { clickInsideElement } from "../../helper/click-inside";
-import Ranking from "./components/other/Ranking";
-import Shop from "./components/other/Shop";
-import Daily, { getCurrentWeek } from "./components/other/Daily";
+import { getCurrentWeek } from "./components/other/Daily";
 import daily_rewards from "./config/daily-rewards.json"
-import Image from "next/image";
+import RoomList from "./components/room-list/RoomList";
 
 export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly: any, chatting: any}}) {
     const miscState = useMisc()
     const gameState = useGame()
     const playerData = gameState.otherPlayerInfo || gameState.myPlayerInfo
-    
-    // menu item ref
-    const menuItemRef = useRef()
-    clickOutsideElement(menuItemRef, () => miscState.showRoomListMenu ? miscState.setShowRoomListMenu(false) : null)
 
     // pubnub
     const pubnubClient = new PubNub(pubnubSetting.monopoly)
@@ -125,68 +117,7 @@ export default function RoomContent({ pubnubSetting }: {pubnubSetting: {monopoly
             </div>
 
             {/* room list */}
-            {/* tutorial: relative z-10 */}
-            <div className={`flex flex-col w-[calc(100vw-30vw)]`}>
-                {/* room list header
-                    1rem gap, 3.5rem title, 0.5rem margin bot */}
-                <div className={`${miscState.showTutorial == 'tutorial_roomlist_4' ? 'relative z-10 bg-darkblue-2' : ''} 
-                flex justify-between gap-4 w-full h-fit text-center p-2`}>
-                    {/* tutorial button */}
-                    <div data-tooltip="tutorial" className="w-8 my-auto">
-                        <button type="button" className="invert active:opacity-75" onClick={() => miscState.setShowTutorial('tutorial_roomlist_1')}>
-                            <img src="https://img.icons8.com/?id=3656&format=png" alt="📖" width={100} height={100} draggable={false} />
-                        </button>
-                    </div>
-                    {/* title */}
-                    <div className="flex items-center justify-center w-3/5">
-                        <p> {translateUI({lang: miscState.language, text: 'Room List'})} </p>
-                    </div>
-                    {/* menu & create room button */}
-                    <div className="flex gap-2">
-                        {/* create room button */}
-                        <CreateRoomButton />
-                        {/* menu button */}
-                        <MenuButton />
-                        {/* menu item */}
-                        <div ref={menuItemRef} className={`${miscState.showRoomListMenu ? 'flex' : 'hidden'} flex-col gap-2 absolute z-10 right-16 border-8bit-text bg-darkblue-1 w-max`}>
-                            {/* ranking button */}
-                            <RankingButton />
-                            {/* shop button */}
-                            <ShopButton />
-                            {/* daily button */}
-                            {gameState.myPlayerInfo.display_name != 'guest' ? <DailyButton /> : null}
-                        </div>
-                    </div>
-                    {/* create room, ranking, shop, calendar modal */}
-                    <div className={`absolute z-20 -ml-2 bg-black/50
-                    ${miscState.showModal === null ? 'hidden' : 'flex'} items-center justify-center text-left
-                    h-[calc(100vh-4rem)] lg:h-[calc(100vh-4.25rem)] w-[calc(65vw+1.5rem)] lg:w-[calc(65vw+3rem)]`}>
-                        {/* create room */}
-                        <CreateRoom />
-                        {/* ranking */}
-                        <Ranking />
-                        {/* shop */}
-                        <Shop />
-                        {/* daily */}
-                        {gameState.lastDailyStatus ? <Daily /> : null}
-                    </div>
-                </div>
-                {/* room list cards 
-                    100vh - 3.75rem (header) - 5rem (room list title) */}
-                <div className={`${miscState.showTutorial == 'tutorial_roomlist_3' ? 'relative z-10' : ''} 
-                flex flex-wrap gap-2 justify-between 
-                text-xs w-[calc(100%-1rem)] h-[calc(100vh-7.25rem)] lg:h-[calc(100vh-8.25rem)]
-                overflow-y-scroll p-2 bg-darkblue-1/60 border-8bit-text`}>
-                    {/* card */}
-                    {gameState.roomList.length > 0
-                        ? gameState.roomList.map((room, i) => <RoomCard key={i} roomData={room} />)
-                        : <div className="m-auto">
-                            <span id="result_message"> there is no game </span>
-                            <img src="https://img.icons8.com/?id=-70EdELqFxwn&format=png" className="inline !w-10 !h-10" loading="lazy" />
-                        </div>
-                    }
-                </div>
-            </div>
+            <RoomList />
             
             {/* tutorial */}
             <div className={`${miscState.showTutorial ? 'block' : 'hidden'} 
@@ -261,118 +192,5 @@ function RoomlistChatForm() {
                 <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=FFFFFF" alt="send" width={100} height={100} draggable={false} />
             </button>
         </form>
-    )
-}
-
-function MenuButton() {
-    const miscState = useMisc()
-    const gameState = useGame()
-    const warningClass = `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`
-
-    return (
-        <div data-tooltip="menu" className={`w-8 my-auto text-right`}>
-            <button type="button" className={`invert active:opacity-75 ${gameState.dailyStatus == 'unclaim' ? `after:absolute after:-top-1 after:invert ${warningClass}` : ''}`} onClick={() => miscState.setShowRoomListMenu(true)}>
-                <img src="https://img.icons8.com/?id=95245&format=png" alt="📅" width={100} height={100} draggable={false} />
-            </button>
-        </div>
-    )
-}
-
-function RankingButton() {
-    const miscState = useMisc()
-    const gameState = useGame()
-    
-    return (
-        <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className="flex items-center gap-2 w-full" onClick={() => {
-                // close join modal
-                miscState.setShowJoinModal(null)
-                // close room list menu
-                miscState.setShowRoomListMenu(false)
-                // to give zoom-in animate class
-                miscState.setAnimation(true); 
-                // show the modal
-                miscState.setShowModal('ranking') 
-                // get ranking
-                viewRanking(miscState, gameState)
-            }}>
-                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/ranking-Yc5GX4VNppg95sUkXKFSGlOzl6Go1M.png" alt="👑" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span> 
-                    {translateUI({lang: miscState.language, text: 'Ranking', lowercase: true})} 
-                </span>
-            </button>
-        </div>
-    )
-}
-
-function ShopButton() {
-    const miscState = useMisc()
-
-    return (
-        <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className="flex items-center gap-2 w-full" onClick={() => {
-                // close join modal
-                miscState.setShowJoinModal(null)
-                // close room list menu
-                miscState.setShowRoomListMenu(false)
-                // to give zoom-in animate class
-                miscState.setAnimation(true); 
-                // show the modal
-                miscState.setShowModal('shop') 
-            }}>
-                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/shop-yaqaJRoTr9t5BE1HgvxQsjdILEHdRD.png" alt="🛍" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span> 
-                    {translateUI({lang: miscState.language, text: 'Shop', lowercase: true})} 
-                </span>
-            </button>
-        </div>
-    )
-}
-
-function DailyButton() {
-    const miscState = useMisc()
-    const gameState = useGame()
-    const warningClass = `after:content-['!'] after:bg-red-600 after:p-1 after:rounded-full`
-
-    return (
-        <div className="my-auto text-right hover:bg-darkblue-2 active:bg-darkblue-2">
-            <button type="button" className={`flex items-center gap-2 w-full ${gameState.dailyStatus == 'unclaim' ? `${warningClass}` : ''}`} onClick={() => {
-                // close join modal 
-                miscState.setShowJoinModal(null)
-                // close room list menu
-                miscState.setShowRoomListMenu(false)
-                // to give zoom-in animate class
-                miscState.setAnimation(true); 
-                // show the modal
-                miscState.setShowModal('daily') 
-            }}>
-                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/daily-vmA8mjz1RYqrYPLL51jci2QoxxF29l.png" alt="📅" className="!w-8 !h-8" width={100} height={100} draggable={false} />
-                <span> 
-                    {translateUI({lang: miscState.language, text: 'Daily', lowercase: true})} 
-                </span>
-            </button>
-        </div>
-    )
-}
-
-function CreateRoomButton() {
-    const miscState = useMisc()
-    const gameState = useGame()
-
-    return (
-        <div data-tooltip={translateUI({lang: miscState.language, text: 'Create Room'})} 
-        className={`${gameState.guestMode ? 'invisible' : ''} w-8 my-auto text-right`}>
-            <button type="button" className="active:opacity-75"
-            onClick={() => {
-                // close join modal
-                miscState.setShowJoinModal(null)
-                // to give zoom-in animate class
-                miscState.setAnimation(true); 
-                // show the modal
-                miscState.setShowModal('create room') 
-            }}> 
-                <Image src="https://lvu1slpqdkmigp40.public.blob.vercel-storage.com/misc/create_room-NUKqG5tw18Rb64CXsUnLjrplVns69c.png" alt="🚪" width={100} height={100} draggable={false} />
-            </button>
-        </div>
     )
 }

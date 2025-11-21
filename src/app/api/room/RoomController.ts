@@ -13,6 +13,7 @@ export default class RoomController extends Controller {
         let tempRoomList = getRoomList.length > 0 ? getRoomList : []
         // check if room name is already exist
         const isRoomNameExist = tempRoomList.indexOf(room_name)
+        // room name exist
         if(isRoomNameExist !== -1) {
             // remove selected room name
             if(action == 'out') {
@@ -28,7 +29,7 @@ export default class RoomController extends Controller {
             // save to redis
             await this.redisSet('roomList', tempRoomList)
         }
-        // return data
+        // room name doesnt exist, return ok
         return this.respond(200, 'room name ok', tempRoomList)
     }
 
@@ -93,6 +94,8 @@ export default class RoomController extends Controller {
                 d.rules = rules
                 // update room list characters data
                 d.characters = getDisabledCharacters
+                // set room visibility
+                d.visibility = '1'
                 // modify room info for gameRoomInfo
                 // split rules
                 const splitRules = rules.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
@@ -112,6 +115,7 @@ export default class RoomController extends Controller {
                     board, dice, money_lose, mode, curse
                 }))
                 // push to temp room list to prevent duplicate room name
+                // that created by other players
                 for(let [key, value] of Object.entries(d)) {
                     if(key == 'room_name') {
                         // filter room name
@@ -255,6 +259,7 @@ export default class RoomController extends Controller {
                 rules: rules,
                 status: data[0].status,
                 characters: [payload.select_character],
+                visibility: '1',
             }
             // split rules
             const splitRules = rules.match(/^board: (normal|twoway);dice: (1|2);start: (50000|75000|100000);lose: (-25000|-50000|-75000);mode: (5_laps|7_laps|survive);curse: (5|10|15)$/)
@@ -555,7 +560,8 @@ export default class RoomController extends Controller {
                     player_max: +playerMax,
                     rules: rules,
                     status: d.status,
-                    characters: getDisabledCharacters
+                    characters: getDisabledCharacters,
+                    visibility: '1',
                 })
             }
             // publish realtime data
