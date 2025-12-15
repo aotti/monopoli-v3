@@ -240,6 +240,7 @@ export function resetAllData(gameState: IGameContext) {
     localStorage.removeItem('playerShopItems')
     localStorage.removeItem('dailyStatus')
     localStorage.removeItem('dailyHistory')
+    localStorage.removeItem('chatCommands')
     // remove player info
     gameState.setMyPlayerInfo({
         display_name: 'guest',

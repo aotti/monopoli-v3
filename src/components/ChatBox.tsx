@@ -85,11 +85,10 @@ function ChatContainer() {
             {miscState.messageItems.map((v,i) => {
                 const [systemCommand, systemParam] = getChatCommandsFromStorage('/sys')
                 const [chatwithCommand, chatwithParam] = getChatCommandsFromStorage('/cw')
-                console.log({chatwithCommand});
                 
                 // filter every new messages
                 const filteredChatMessages = systemCommand || chatwithCommand
-                                                // only display messages from system
+                                                // only display messages from system OR chat with players
                                                 ? v.display_name === 'system' || chatwithParam.match(v.display_name)
                                                     ? v
                                                     : null
@@ -234,7 +233,7 @@ export async function sendChat(ev: FormEvent<HTMLFormElement>, miscState: IMiscC
         const input = formInputs.item(i) as HTMLInputElement
         if(input.nodeName == 'INPUT') {
             // toggle chat box (for room list)
-            if(input.value.match(/\/on|\/off|\/ch|\/sys|\/myroom|\/mr|\/chatwith|\/cw|\/findroom|\/fr/))
+            if(input.value.match(/^\/on$|^\/off$|^\/ch$|^\/sys$|^\/myroom$|^\/mr$|^\/chatwith|^\/cw|^\/findroom|^\/fr/))
                 return chatCommandsListener(input, input.value, inputValues, miscState, gameState)
             // filter message
             else if(setInputValue('message_text', input)) inputValues.message_text = input.value.trim()

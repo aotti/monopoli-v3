@@ -95,6 +95,9 @@ export function gameMessageListener(data: PubNub.Subscription.Message, miscState
         playerTurnNotif.textContent = translateUI({lang: miscState.language, text: 'click roll turn'})
         // reset all player shop items
         gameState.setMyShopItems(null)
+        // game start sound
+        const soundGameStart = qS('#sound_game_start') as HTMLAudioElement
+        soundGameStart.play()
     }
     // - PLAYER DECIDE TURN
     if(getMessage.decidePlayers) {

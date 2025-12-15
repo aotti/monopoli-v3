@@ -4,6 +4,7 @@ export default function GameSounds() {
         // game sfx
         message: `https://${hostname}/sound/message_notif-DgTswdqDvWjUqgZhXNsbgl9c6DAWPg.mp3`,
         game_notif: `https://${hostname}/sound/game_notif-YzBafun0qLBhCH4Qhdzsp1IaE9yvLW.mp3`,
+        game_start: `https://${hostname}/sound/game_start-ekkpsIDG10QOCmin3I0D62GVcjCYNt.mp3`,
         footstep_1: `https://${hostname}/sound/footstep_1-1Q5XIEv89asfSop2tUZBchz5DeHyN5.mp3`,
         footstep_2: `https://${hostname}/sound/footstep_2-tCSGUyQcL0FtWPXsNfjSinwqNcbdzv.mp3`,
         roll_number: `https://${hostname}/sound/roll_number-ZG4g11XWaf6RLDUfSFimQoDEwgrglG.mp3`,

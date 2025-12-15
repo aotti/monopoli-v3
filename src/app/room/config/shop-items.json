@@ -56,6 +56,11 @@
             "name": "the twond",
             "description": "Start game with 2 laps",
             "price": 30
+        },
+        {
+            "name": "clown piece",
+            "description": "[coming soon] Alter all minus money event to plus from community/chance card (full desc in help)",
+            "price": 999
         }
     ]
 }
