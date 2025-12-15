@@ -7,7 +7,7 @@ import { useMisc } from "../../context/MiscContext"
 import LoadingPage from "../../components/LoadingPage"
 import { useGame } from "../../context/GameContext"
 import { useEffect } from "react"
-import { checkAccessToken, generateIdentifier, qS, resetAllData } from "../../helper/helper"
+import { checkAccessToken, generateIdentifier, qS } from "../../helper/helper"
 import Link from "next/link"
 
 export default function HomePage({ isRefreshTokenExist }) {
