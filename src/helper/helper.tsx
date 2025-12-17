@@ -349,7 +349,7 @@ export function filterInput(input: InputIDType, value: string) {
             return value ? value.match(/monopoli-roomlist$|monopoli-gameroom-\d{1,3}$/) : null
         // message text can have letter, number, whitespace, symbol (.,#-+@)
         case 'message_text': 
-            return value ? value.match(/^[a-zA-Z0-9\s.,#\-+=@?!]{1,80}$/) : null
+            return value ? value.match(/^[a-zA-Z0-9\/\s.,#\-+=@?!]{1,80}$/) : null
         // time of chat
         case 'message_time': 
             return value ? value.match(/^[\d{2}:\d{2}]{4,5}$/) : null
