@@ -345,9 +345,9 @@ function chatCommandsListener(inputElement: HTMLInputElement, inputValue: string
             joinButton.click()
             return
         case '/chatwith': case '/cw':
-            // only allow if cw param has comma
-            // param format wrong
-            if(!param.match(/\*$|^[a-zA-Z0-9\s,]{4,}$/)) {
+            // only allow if cw param has comma OR param is not self display name
+            // param format wrong || self display name
+            if(!param.match(/\*$|^[a-zA-Z0-9\s,]{4,}$/) || param.match(gameState.myPlayerInfo.display_name)) {
                 inputValues.display_name = 'system'
                 inputValues.message_text = `chat with ???`
                 miscState.setMessageItems(data => data ? [...data, inputValues] : [inputValues])
@@ -360,8 +360,8 @@ function chatCommandsListener(inputElement: HTMLInputElement, inputValue: string
                 const newData = [...data]
                 // make sure the author is system
                 const isAuthorSystem = newData.map(v => v.display_name).lastIndexOf('system')
-                // has /sys command been triggered?
-                const isTriggered = newData[isAuthorSystem].message_text.match(/^chat with [a-zA-Z0-9\s,]{4,}$/)
+                // has /chatwith command been triggered?
+                const isTriggered = newData[isAuthorSystem].message_text.match(/^chat with [a-zA-Z0-9\s\*,]{1,}$/)
                 // has triggered
                 if(isTriggered) {
                     // set system message
@@ -372,7 +372,7 @@ function chatCommandsListener(inputElement: HTMLInputElement, inputValue: string
                     // show everyone messages
                     const showMessages = newData
                                         // remove system message
-                                        .map(v => v.display_name == 'system' && v.message_text.match(/^chat with [a-zA-Z0-9\s,]{4,}$/) ? null : v)
+                                        .map(v => v.display_name == 'system' && v.message_text.match(/^chat with [a-zA-Z0-9\s\*,]{1,}$/) ? null : v)
                                         .filter(i => i)
                                         // show all message
                                         .filter(v => v.visibility = '1')
@@ -435,7 +435,9 @@ function setChatCommandsToStorage(action: 'push'|'pop', command: string) {
     const parseChatCommands = JSON.parse(getChatCommands) as string[]
     if(parseChatCommands.length === 0) {
         // empty local storage
+        // push command
         if(action == 'push') localStorage.setItem('chatCommands', JSON.stringify([command]))
+        // pop command
         else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => !v.match(command))))
     }
     else {
@@ -444,6 +446,7 @@ function setChatCommandsToStorage(action: 'push'|'pop', command: string) {
             // prevent duplicate commands
             localStorage.setItem('chatCommands', JSON.stringify([...parseChatCommands, command]))
         }
+        // pop command
         else localStorage.setItem('chatCommands', JSON.stringify(parseChatCommands.filter(v => !v.match(command))))
     }
 }
