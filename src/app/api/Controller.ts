@@ -284,7 +284,7 @@ export default class Controller {
         }
 
         /**
-         * @description match timeout token as identifier for user
+         * @description match user agent as identifier for online user
          */
         function matchUserAgent(userAgent: string, index: number) {
             if(userAgent && userAgent == loggedPlayers[index]?.user_agent)

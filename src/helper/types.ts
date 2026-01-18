@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import translateUI_data from '../config/translate-ui.json'
+import api_list from '../app/docs/config/api-docs.json'
 import { PostgrestError } from "@supabase/supabase-js";
 import { JWTPayload } from "jose";
 
@@ -10,6 +11,10 @@ export interface ITranslate {
     lowercase?: boolean,
     reverse?: boolean,
 }
+
+// api docs
+export type ApiDocListType = keyof typeof api_list.tabs
+export type ApiDocData = typeof api_list.list[0]['data'][0] 
 
 // tooltip
 /**

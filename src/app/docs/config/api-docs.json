@@ -1,0 +1,77 @@
+{
+    "tabs": {
+        "login": "",
+        "register": "",
+        "logout": "",
+        "room": ""
+    },
+    "list": [
+        {
+            "route": "login",
+            "data": [
+                {
+                    "for": "user login",
+                    "method": "POST",
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": ["username", "password"],
+                    "note": "authorization only for auto login"
+                }
+            ]
+        },
+        {
+            "route": "register",
+            "data": [
+                {
+                    "for": "user register",
+                    "method": "POST",
+                    "headers": ["X-IDENTIFIER"],
+                    "body": ["username", "password", "display_name"],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "logout",
+            "data": [
+                {
+                    "for": "user logout",
+                    "method": "POST",
+                    "headers": ["X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "room",
+            "data": [
+                {
+                    "for": "get room",
+                    "method": "GET",
+                    "headers": ["X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                },
+                {
+                    "for": "create room",
+                    "method": "POST",
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "creator",
+                        "room_name",
+                        "room_password",
+                        "select_mode",
+                        "select_board",
+                        "select_dice",
+                        "select_money_start",
+                        "select_money_lose",
+                        "select_curse",
+                        "select_max_player",
+                        "select_character"
+                    ],
+                    "note": ""
+                }
+            ]
+        }
+    ]
+}
