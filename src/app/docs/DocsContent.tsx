@@ -1,10 +1,10 @@
 import { useState } from "react"
 import api_list from "./config/api-docs.json"
-import { ApiDocData, ApiDocListType } from "../../helper/types"
+import { ApiDocData } from "../../helper/types"
 
 export default function DocsContent() {
     const apiList = api_list.list
-    const [currentApiDoc, setCurrentApiDoc] = useState<ApiDocListType>('login')
+    const [currentApiDoc, setCurrentApiDoc] = useState('/')
 
     return (
         <div className="text-center">
@@ -22,7 +22,8 @@ export default function DocsContent() {
                 )}
             </div>
             {/* content */}
-            <div className="bg-darkblue-1 grid grid-cols-3 p-1 text-left">
+            <div className="grid grid-cols-4 bg-darkblue-1 h-[70vh] lg:h-[80vh] overflow-y-scroll p-1 text-left
+            [&>*:nth-child(1n+5)]:border-t [&>*:nth-child(1n+5)]:pt-1">
                 {apiList.map((v,i) => currentApiDoc == v.route
                     ? <ApiDoc data={v.data} />
                     : null
@@ -36,8 +37,13 @@ function ApiDoc({ data }: {data: ApiDocData[]}) {
     
     return data.map((v,i) => 
         <div>
-            <p className=""> {v.for} </p>
+            <p className="text-balance"> [{v.for}] </p>
             <p className=""> {v.method} </p>
+            {/* search query */}
+            <div className="text-yellow-400">
+                <p> query </p>
+                <p className="whitespace-pre-line"> - {v.query.join('\n- ')} </p>
+            </div>
             {/* headers */}
             <div className="text-yellow-400">
                 <p> headers </p>
@@ -46,7 +52,7 @@ function ApiDoc({ data }: {data: ApiDocData[]}) {
             {/* payload */}
             <div className="text-green-400">
                 <p> payload </p>
-                <p className="whitespace-pre-line"> - {v.body?.join('\n- ') || 'empty'} </p>
+                <p className="whitespace-pre-line"> - {v.body.join('\n- ')} </p>
             </div>
             {/* notes */}
             <div className="">

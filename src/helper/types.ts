@@ -13,7 +13,6 @@ export interface ITranslate {
 }
 
 // api docs
-export type ApiDocListType = keyof typeof api_list.tabs
 export type ApiDocData = typeof api_list.list[0]['data'][0] 
 
 // tooltip

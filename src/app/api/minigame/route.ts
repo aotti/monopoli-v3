@@ -5,7 +5,7 @@ import { IResponse } from "../../../helper/types";
 
 export async function GET(req: NextRequest) {
     // api action
-    const action = 'game get player'
+    const action = 'minigame get words'
     // query
     const payload: any = {
         room_id: req.nextUrl.searchParams.get('id'),
