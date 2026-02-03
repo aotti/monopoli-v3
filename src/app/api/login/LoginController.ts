@@ -72,9 +72,9 @@ export default class LoginController extends Controller {
             
             if(!isRoomPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
             // generate refresh token
-            const refreshToken = await this.generateToken({type: 'refresh', payload: data[0]})
+            const refreshToken = await this.generateToken({type: 'refresh', payload: data[0]});
             // save refresh token
-            cookies().set('refreshToken', refreshToken, { 
+            (await cookies()).set('refreshToken', refreshToken, { 
                 path: '/',
                 maxAge: 604800 * 2, // 1 week * 2
                 httpOnly: true,
@@ -107,7 +107,7 @@ export default class LoginController extends Controller {
         let result: IResponse
 
         // get refresh token
-        const refreshToken = cookies().get('refreshToken')?.value
+        const refreshToken = (await cookies()).get('refreshToken')?.value
         if(!refreshToken) return result = this.respond(403, `${action} failed`, [])
         // verify token
         const isVerified = await this.renewAccessToken(refreshToken)

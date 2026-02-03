@@ -346,11 +346,11 @@ export default class Controller {
     /**
      * @description check authorization header token 
      */
-    checkAuthorization(req: NextRequest) {
+    async checkAuthorization(req: NextRequest) {
         const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
         if(!accessToken) {
             // check refresh token
-            const refreshToken = cookies().get('refreshToken')?.value
+            const refreshToken = (await cookies()).get('refreshToken')?.value
             // access & refresh token empty
             if(!refreshToken) 
                 return this.respond(403, 'forbidden', [])
@@ -422,7 +422,7 @@ export default class Controller {
         else {
             // token expired / not exist
             // remove token
-            cookies().set('refreshToken', '', { 
+            (await cookies()).set('refreshToken', '', { 
                 path: '/',
                 maxAge: 0, // expire in 0sec
                 httpOnly: true,
@@ -453,7 +453,7 @@ export default class Controller {
         // access token expired / not exist
         if(!payload.token || error) {
             // get refresh token
-            const refreshToken = cookies().get('refreshToken')?.value
+            const refreshToken = (await cookies()).get('refreshToken')?.value
             if(!refreshToken) return this.respond(403, `forbidden`, [])
             // verify token & renew access token
             const isVerified = await this.renewAccessToken(refreshToken)

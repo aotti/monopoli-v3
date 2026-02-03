@@ -17,13 +17,13 @@ const retroFont = Press_Start_2P({
     weight: ['400']
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const accessSecret = process.env.ACCESS_TOKEN_SECRET
-  const savedLanguage = cookies().get('language')?.value as any
+  const savedLanguage: any = (await cookies()).get('language')?.value
   const cryptoKey = process.env.CRYPTO_KEY
 
   return (

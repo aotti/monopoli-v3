@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     const action = 'room get list'
     // check authorization
     const controller = new Controller()
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     if(checkXID.status !== 200) 
         return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
@@ -54,7 +54,7 @@ export async function PUT(req: NextRequest) {
     if(checkXID.status !== 200) 
         return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
@@ -82,7 +82,7 @@ export async function DELETE(req: NextRequest) {
     if(checkXID.status !== 200) 
         return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload

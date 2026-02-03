@@ -125,7 +125,7 @@ export default class RoomController extends Controller {
                 }
             }
             // get joined room from cookie
-            const getJoinedRoom = cookies().get('joinedRoom')?.value
+            const getJoinedRoom = (await cookies()).get('joinedRoom')?.value
             // dummy tpayload
             const tempTPayload = tpayload || {display_name: 'guest'}
             // always get player daily status for lastDailyStatus state (cant save it in localStorage)
@@ -136,7 +136,7 @@ export default class RoomController extends Controller {
                 // find in player list
                 isMyGameExist = data.map((v, i) => v.player_list.match(tempTPayload.display_name) ? i : null).filter(i => i !== null)[0]
                 if(typeof isMyGameExist == 'number' && isMyGameExist !== -1) 
-                    cookies().set('joinedRoom', data[isMyGameExist].room_id.toString(), {
+                    (await cookies()).set('joinedRoom', data[isMyGameExist].room_id.toString(), {
                         path: '/',
                         maxAge: 604800 * 2, // 1 week * 2
                         httpOnly: true,
@@ -290,9 +290,9 @@ export default class RoomController extends Controller {
             const isPublished = await this.monopoliPublish(roomlistChannel, publishData)
             console.log(isPublished);
             
-            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', []);
             // set joined room 
-            cookies().set('joinedRoom', data[0].room_id.toString(), {
+            (await cookies()).set('joinedRoom', data[0].room_id.toString(), {
                 path: '/',
                 maxAge: 604800 * 2, // 1 week * 2
                 httpOnly: true,
@@ -377,9 +377,9 @@ export default class RoomController extends Controller {
         }
         else {
             // update disabled characters
-            await this.redisSet(`disabledCharacters_${payload.room_id}`, [...getDisabledCharacters, payload.select_character])
+            await this.redisSet(`disabledCharacters_${payload.room_id}`, [...getDisabledCharacters, payload.select_character]);
             // set joined room 
-            cookies().set('joinedRoom', data[0].room_id.toString(), {
+            (await cookies()).set('joinedRoom', data[0].room_id.toString(), {
                 path: '/',
                 maxAge: 604800 * 2, // 1 week * 2
                 httpOnly: true,
@@ -487,9 +487,9 @@ export default class RoomController extends Controller {
             const isGamePublished = await this.monopoliPublish(gameroomChannel, {leavePlayer: payload.display_name})
             console.log(isGamePublished);
             
-            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+            if(!isGamePublished.timetoken) return this.respond(500, 'realtime error, try again', []);
             // remove joined room cookie
-            cookies().set('joinedRoom', '', {
+            (await cookies()).set('joinedRoom', '', {
                 path: '/',
                 maxAge: 0, // expire & remove in 0 seconds
                 httpOnly: true,

@@ -11,7 +11,7 @@ export default class LogoutController extends Controller {
         let result: IResponse
 
         // check refresh token
-        const refreshToken = cookies().get('refreshToken')?.value
+        const refreshToken = (await cookies()).get('refreshToken')?.value
         // access & refresh token empty
         if(!refreshToken) 
             return result = this.respond(403, 'forbidden', [])
@@ -33,21 +33,21 @@ export default class LogoutController extends Controller {
         const isPublished = await this.monopoliPublish(onlineplayer_channel, {onlinePlayers: JSON.stringify(onlinePlayers.data)})
         console.log(isPublished);
         
-        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', [])
+        if(!isPublished.timetoken) return this.respond(500, 'realtime error, try again', []);
         // remove cookies
-        cookies().set('joinedRoom', '', {
+        (await cookies()).set('joinedRoom', '', {
             path: '/',
             maxAge: 0, // expire & remove in 0 seconds
             httpOnly: true,
             sameSite: 'strict',
-        })
+        });
         // set refresh token to empty
-        cookies().set('refreshToken', '', { 
+        (await cookies()).set('refreshToken', '', { 
             path: '/',
             maxAge: 0, // expire & remove in 0 seconds
             httpOnly: true,
             sameSite: 'strict'
-        })
+        });
         // return result
         return result = this.respond(200, `${action} success`, [])
     }

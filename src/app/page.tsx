@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
     const maintenanceStatus = process.env.MAINTENANCE_STATUS
-    const isRefreshTokenExist = typeof cookies().get('refreshToken')?.value == 'string'
+    const isRefreshTokenExist = typeof (await cookies()).get('refreshToken')?.value == 'string'
 
     return maintenanceStatus === 'true'
             ? <MaintenancePage />
