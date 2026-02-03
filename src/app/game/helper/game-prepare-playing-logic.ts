@@ -401,6 +401,7 @@ export async function rollDiceGameRoom(formInputs: HTMLFormControlsCollection, t
     const findPlayer = gameState.gamePlayerInfo.map(v => v.display_name).indexOf(gameState.myPlayerInfo.display_name)
     const currentPos = gameState.gamePlayerInfo[findPlayer].pos
     const branchRNG: number[] = checkBranchTiles('roll_dice', currentPos)
+    // send player game data for checking with missing data
     const playerGameData = {
         display_name: gameState.gamePlayerInfo[findPlayer].display_name,
         city: gameState.gamePlayerInfo[findPlayer].city,

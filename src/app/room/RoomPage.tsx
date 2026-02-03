@@ -11,6 +11,8 @@ import { checkAccessToken, generateIdentifier } from "../../helper/helper";
 import Link from "next/link";
 
 export default function RoomPage({ pubnubSetting }) {
+    console.log({pubnubSetting});
+    
     const miscState = useMisc()
     const gameState = useGame()
     

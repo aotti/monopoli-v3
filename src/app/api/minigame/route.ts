@@ -5,7 +5,7 @@ import { IResponse } from "../../../helper/types";
 
 export async function GET(req: NextRequest) {
     // api action
-    const action = 'game get player'
+    const action = 'minigame get words'
     // query
     const payload: any = {
         room_id: req.nextUrl.searchParams.get('id'),
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     if(checkXID.status !== 200) 
         return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     if(checkXID.status !== 200) 
         return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload

@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     if(checkXID.status !== 200) 
         return NextResponse.json(checkXID, {status: checkXID.status})
     // check authorization
-    const isAuth = controller.checkAuthorization(req)
+    const isAuth = await controller.checkAuthorization(req)
     // token empty
     if(isAuth.status !== 200) return NextResponse.json(isAuth, {status: isAuth.status})
     // token exist, add to payload

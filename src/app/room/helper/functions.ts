@@ -658,7 +658,6 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     ev ? ev.preventDefault() : null
     
     const chatInput = qS('#message_text') as HTMLInputElement
-
     const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})
     const {week, day, name, type, items} = rewardData
     // result message
@@ -767,7 +766,7 @@ export async function claimDaily(ev: FormEvent<HTMLFormElement>, rewardData: any
     }
 }
 
-export function claimAnimation() {
+function claimAnimation() {
     return new Promise(resolve => {
         const animate: FunctionComponent<IAnimate> = anime
         const today = new Date().toLocaleString('en', {weekday: 'long', timeZone: 'Asia/Jakarta'})

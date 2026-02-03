@@ -377,11 +377,9 @@ export function updateCityList(data: UpdateCityListType) {
 
 // ========== > SPECIAL UPGRADE CITY ==========
 // ========== > SPECIAL UPGRADE CITY ==========
-export function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number, miscState: IMiscContext) {
+function specialUpgradeCity(playerTurnData: IGameContext['gamePlayerInfo'][0], rng: number, miscState: IMiscContext) {
     // get all owned city, except special & fully upgrade city
     const myCityList = playerTurnData.city.split(';').filter(v => !v.match(/2house1hotel|special/i))
-    console.log(myCityList);
-    
     // get city name
     const upgradeRNG = rng % myCityList.length
     const upgradeCityName = myCityList[upgradeRNG].split('*')[0]

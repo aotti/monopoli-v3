@@ -22,7 +22,7 @@ export default class PlayerController extends Controller {
         }
 
         // save language to cookies
-        cookies().set('language', payload.language)
+        (await cookies()).set('language', payload.language)
 
         return this.respond(200, `${action} success`, [])
     }

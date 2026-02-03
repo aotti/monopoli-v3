@@ -1,0 +1,349 @@
+{
+    "list": [
+        {
+            "route": "/",
+            "data": [
+                {
+                    "for": "user login, /login",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": ["username", "password"],
+                    "note": "authorization only for auto login"
+                },
+                {
+                    "for": "user register, /register",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["X-IDENTIFIER"],
+                    "body": ["username", "password", "display_name"],
+                    "note": ""
+                },
+                {
+                    "for": "user logout, /logout",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "player",
+            "data": [
+                {
+                    "for": "player stats",
+                    "method": "GET",
+                    "query": ["display_name"],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                },
+                {
+                    "for": "update avatar, /avatar",
+                    "method": "PUT",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "display_name",
+                        "avatar"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "send chat, /chat",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "channel",
+                        "display_name",
+                        "message_text",
+                        "message_time",
+                        "visibility"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "change language, /language",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["X-IDENTIFIER"],
+                    "body": [
+                        "language"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "get ranking, /ranking",
+                    "method": "GET",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                },
+                {
+                    "for": "claim daily, /daily",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "display_name",
+                        "week",
+                        "item_name"
+                    ],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "room",
+            "data": [
+                {
+                    "for": "get room",
+                    "method": "GET",
+                    "query": [],
+                    "headers": ["X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                },
+                {
+                    "for": "create room",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "creator",
+                        "room_name",
+                        "room_password",
+                        "select_mode",
+                        "select_board",
+                        "select_dice",
+                        "select_money_start",
+                        "select_money_lose",
+                        "select_curse",
+                        "select_max_player",
+                        "select_character"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "join room",
+                    "method": "PUT",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "room_id",
+                        "room_password", 
+                        "display_name" ,
+                        "money_start",
+                        "select_character"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "leave room",
+                    "method": "DELETE",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "room_id",
+                        "display_name",
+                        "select_character"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "delete room",
+                    "method": "DELETE",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "display_name",
+                        "creator",
+                        "room_id",
+                        "room_name"
+                    ],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "game",
+            "data": [
+                {
+                    "for": "get players",
+                    "method": "GET",
+                    "query": ["id"],
+                    "headers": ["authorization", "cache", "X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                },
+                {
+                    "for": "ready players",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "display_name",
+                        "player_joined"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "game start",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "roll turn",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "display_name",
+                        "rolled_number"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "roll dice",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "display_name",
+                        "rolled_dice",
+                        "rng",
+                        "game_data"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "upgrade city",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "display_name",
+                        "city",
+                        "target_city",
+                        "target_city_property",
+                        "event_money",
+                        "card",
+                        "special_card"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "attack city",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "attacker_name",
+                        "attacker_city",
+                        "attack_type",
+                        "event_money",
+                        "special_card",
+                        "card",
+                        "target_city_owner",
+                        "target_city_left",
+                        "target_city_property",
+                        "target_city",
+                        "target_special_card",
+                        "target_card"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "fix player turns",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "display_name"
+                    ],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "shop",
+            "data": [
+                {
+                    "for": "buy shop item",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "display_name",
+                        "item_type",
+                        "item_name"
+                    ],
+                    "note": ""
+                }
+            ]
+        },
+        {
+            "route": "minigame",
+            "data": [
+                {
+                    "for": "minigame get words",
+                    "method": "GET",
+                    "query": ["id"],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [],
+                    "note": ""
+                },
+                {
+                    "for": "minigame answer",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "channel",
+                        "display_name",
+                        "minigame_answer"
+                    ],
+                    "note": ""
+                },
+                {
+                    "for": "minigame unknown answer",
+                    "method": "POST",
+                    "query": [],
+                    "headers": ["authorization", "X-IDENTIFIER"],
+                    "body": [
+                        "action",
+                        "display_name",
+                        "minigame_answer"
+                    ],
+                    "note": ""
+                }
+            ]
+        }
+    ]
+}
